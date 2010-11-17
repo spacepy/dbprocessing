@@ -1,0 +1,2058 @@
+import sqlalchemy
+from sqlalchemy.orm import mapper, sessionmaker
+from sqlalchemy import Column, Integer, String, DateTime, BigInteger, Boolean, Date, Float, Table
+from sqlalchemy import desc, and_, select
+import os.path
+import datetime
+import subprocess
+import numpy as np
+import copy
+from sqlalchemy.exceptions import IntegrityError
+import Version
+import glob
+from sqlalchemy.sql.expression import asc, desc
+
+
+## This goes in the processing comment field in the DB, do update it
+__version__ = '2.0.0'
+__package__  = None
+
+
+class DBError(Exception):
+    pass
+class DBProcessingError(Exception):
+    pass
+class DBInputError(Exception):
+    pass
+class FilenameParse(Exception):
+    pass
+
+
+
+class DBUtils2(object):
+    """
+    @summary: DBUtils - utility routines for the DBProcessing class, all of these may be user called but are meant to
+    be internal routines for DBProcessing
+    """
+
+    def __init__(self, mission='Test'):
+        """
+        @summary: Initialize the DBUtils class, default mission is 'Test'
+        """
+        if mission == None:
+            raise(DBError("Must input mission name to create DBUtils2 instance"))
+        self.mission = mission
+        self.dbIsOpen = False
+
+    def __repr__(self):
+        """
+        @summary: Print out something usefule when one prints the class instance
+
+        @return: DBProcessing class instance for mission <mission name>
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 7-Jul-2010 (BAL)
+        """
+        return 'DBProcessing class instance for mission ' + self.mission + ', version: ' + __version__
+
+
+    @classmethod
+    def _test_SQLAlchemy_version(self, version= sqlalchemy.__version__):
+        """This tests the version to be sure that it is compatable"""
+        expected = '0.6.2'
+        if version != expected:
+            raise(DBError("SQLAlchemy version %s was not expected, expected %s" % (version, expected)))
+        return True
+
+
+    @classmethod
+    def _build_fname(self,
+                     rootdir = '',
+                     relative_path = '',
+                     mission_name = '',
+                     satellite_name = '',
+                     product_name = '',
+                     date = '',
+                     release = '',
+                     quality = '',
+                     revision = '',
+                     extension = '.cdf'):
+        """This builds a filename from the peices contained in the filename
+
+        @keyword rootdir: root directory of the filename to create (default '')
+        @keyword relative_path: relative path for filename (default '')
+        @keyword mission_name: mission name (default '')
+        @keyword satellite_name: satellite name  (default '')
+        @keyword product_name: data product name (default '')
+        @keyword date: file date (default '')
+        @keyword release: release version number (default '')
+        @keyword quality: quality version number (default '')
+        @keyword revision: revision version number  (default '')
+
+        @return: A full filename that can be used by OS calls
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 14-Jun-2010 (BAL)
+
+        >>> nl._ProcessNext__build_fname('/root/file/', 'relative/', 'Test', 'test1', 'Prod1', '20100614', 1, 1, 1)
+            Out[9]: '/root/file/relative/Test-test1_Prod1_20100614_v1.1.1.cdf'
+
+        """
+        dir = rootdir + relative_path
+        fname = mission_name + '-' + satellite_name + '_' + product_name
+        ver = 'v' + str(release) + '.' + str(quality) + '.' + str(revision)
+        fname = fname + '_' + date + '_' + ver + extension
+        return dir + fname
+
+
+
+####################################
+###### DB and Tables ###############
+####################################
+
+    def _openDB(self, verbose=False):
+        """
+        setup python to talk to the database, this is where it is, name and password.
+
+        @keyword verbose: (optional) - print information out to the command line
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 14-Jun-2010 (BAL)
+        @version: V2: 7-Jul-2010 (BAL) added verbose and printing
+        @version: V3: 25-Aug-2010 (BAL) added DBerror instead of False return
+
+        @todo: change the user form owner to ops as DB permnissons are fixed
+
+        >>>  pnl._openDB()
+        """
+        if self.dbIsOpen == True:
+            return
+        try:
+            if self.mission == 'Test':
+                engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
+                # this holds the metadata, tables names, attributes, etc
+            elif self.mission == 'Polar':
+                engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
+            elif self.mission == 'unittest':
+                engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=False)
+
+        except:
+            raise(DBError('Error creating engine'))
+        try:
+            metadata = sqlalchemy.MetaData(bind=engine)
+            # a session is what you use to actually talk to the DB, set one up with the current engine
+            Session = sessionmaker(bind=engine)
+            session = Session()
+            self.engine = engine
+            self.metadata = metadata
+            self.session = session
+            self.dbIsOpen = True
+            if verbose: print("DB is open: %s" % (engine))
+            return
+        except Exception, msg:
+            raise(DBError('Error opening database: %s'% (msg)))
+
+
+    def _createTableObjects(self, verbose = False):
+        """
+        cycle through the database and build classes for each of the tables
+
+        @keyword verbose: (optional) - print information out to the command line
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 14-Jun-2010 (BAL)
+        @version: V2: 25-Aug-2010 (BAL) - chnaged to throuw exception not return False
+
+        >>>  pnl._createTableObjects()
+
+        """
+
+## ask for the table names form the database (does not grab views)
+        table_names = self.engine.table_names()
+
+## create a dictionary of all the table names that will be used as calss names.
+## this uses the db table name as the tabel name and a cap 1st letter as the class
+## when interacting using python use the class
+        table_dict = {}
+        for val in table_names:
+            table_dict[val[0].upper() + val[1:]] = val
+
+##  dynamincally create all the classes (c1)
+##  dynamicallly create all the tables in the db (c2)
+##  dynaminically create all the mapping between class and table (c3)
+## this just saves a lot of typing and is equilivant to:
+##     class Missions(object):
+##         pass
+##     missions = Table('missions', metadata, autoload=True)
+##     mapper(Missions, missions)
+#        try:
+        for val in table_dict:
+            if verbose: print val
+            c0 = compile('a = self.%s()' % (val), '', 'exec')
+            try:
+                exec(c0)
+            except AttributeError:
+                c1 = compile("""class %s(object):\n\tpass""" % (val), '', 'exec')
+                c2 = compile("%s = Table('%s', self.metadata, autoload=True)" % (str(table_dict[val]), table_dict[val]) , '', 'exec')
+                c3 = compile("mapper(%s, %s)" % (val, str(table_dict[val])), '', 'exec')
+                c4 = compile("self.%s = %s" % (val, val), '', 'exec' )
+                exec(c1)
+                exec(c2)
+                exec(c3)
+                exec(c4)
+                if verbose: print("Class %s created" % (val))
+
+
+###################################
+### Views #########################
+###################################
+
+
+#    def _createViews(self, verbose = False):
+#        """
+#        cycle through the database and build classes for each of the Views
+#        views cannot be dynamically allocated since you have to manually define the promary keys
+#        also views cannot be grabbed form the engine the same way that tables are.  They are typed so
+#        I wont change this to some standard.
+#        --- When creating a new verw make really usre it has something unique that can be used as
+#        --- a primary key. some below use f_id others use pk whisch is a call to a sequence
+#
+#        @keyword verbose: (optional) - print information out to the command line
+#
+#        @author: Brian Larsen
+#        @organization: Los Alamos National Lab
+#        @contact: balarsen@lanl.gov
+#
+#        @version: V1: 14-Jun-2010 (BAL)
+#        @version: V2: 25-Aug-2010 (BAL) - chnaged to throuw exception not return False
+#
+#        >>>  pnl._createViews()
+#        """
+#        try: self.Build_filenames  # if they already are defined dont do it again
+#        except AttributeError:
+#            try:
+#                class Build_filenames(object):
+#                    pass
+#                build_filenames = Table('build_filenames', self.metadata,
+#                                        Column('pk', BigInteger, primary_key=True),
+#                                        autoload=True)
+#                mapper(Build_filenames, build_filenames)
+#                self.Build_filenames = Build_filenames
+#                if verbose: print("Class %s created" % ('Build_filenames'))
+#
+#
+#                class Build_output_filenames(object):
+#                    pass
+#                build_output_filenames = Table('build_output_filenames', self.metadata,
+#                                               Column('pk', BigInteger, primary_key=True),
+#                                               autoload=True)
+#                mapper(Build_output_filenames, build_output_filenames)
+#                self.Build_output_filenames = Build_output_filenames
+#                if verbose: print("Class %s created" % ('Build_output_filenames'))
+#
+#                class Files_by_mission(object):
+#                    pass
+#                files_by_mission = Table('files_by_mission', self.metadata,
+#                                         Column('f_id', BigInteger,  primary_key=True),
+#                                         autoload = True)
+#                mapper(Files_by_mission,files_by_mission)
+#                self.Files_by_mission = Files_by_mission
+#                if verbose: print("Class %s created" % ('Files_by_mission'))
+#
+#
+#                class Data_product_by_mission(object):
+#                    pass
+#                data_product_by_mission = Table('data_product_by_mission', self.metadata,
+#                                                Column('dp_id', BigInteger, primary_key=True),
+#                                                autoload=True)
+#                mapper(Data_product_by_mission,data_product_by_mission)
+#                self.Data_product_by_mission = Data_product_by_mission
+#                if verbose: print("Class %s created" % ('Data_product_by_mission'))
+#
+#
+#                class Processing_paths(object):
+#                    pass
+#                processing_paths = Table('processing_paths', self.metadata,
+#                                         Column('pk', BigInteger, primary_key=True),
+#                                         autoload=True)
+#                mapper(Processing_paths, processing_paths)
+#                self.Processing_paths = Processing_paths
+#                if verbose: print("Class %s created" % ('Processing_paths'))
+#
+#                class Build_reprocess_filenames(object):
+#                    pass
+#                build_reprocess_filenames = Table('build_reprocess_filenames', self.metadata,
+#                                               Column('pk', BigInteger, primary_key=True),
+#                                               autoload=True)
+#                mapper(Build_reprocess_filenames, build_reprocess_filenames)
+#                self.Build_reprocess_filenames = Build_reprocess_filenames
+#                if verbose: print("Class %s created" % ('Build_reprocess_filenames'))
+#
+#            except:
+#                raise(DBError('error creating view<->class mapping'))
+
+######################################
+### Gather files from DB #############
+######################################
+
+    def _gatherFiles(self, level, verbose=False):
+        """
+        gather all the files for a given mission into a list of sqlalchemy objects
+
+        @keyword verbose: (optional) print more out to the command line
+
+        @return: list of Data_files objects
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 14-Jun-2010 (BAL)
+
+        >>>  pnl._gatherFiles()
+        123
+        """
+        try: self.Data_file
+        except AttributeError: self._createTableObjects()
+        try: self.Files_by_mission
+        except AttributeError: self._createViews()
+
+        files = self.session.query(self.Data_files).filter(self.Data_sources.ds_id == self.Data_files.ds_id).filter(self.Satellites.s_id == self.Data_sources.s_id).filter(self.Missions.m_id == self.Satellites.m_id).filter_by(data_level=level).all()
+        return {'files':files, 'process':[True]*len(files)}
+
+
+        #################
+        ## OLD way ######
+        #################
+##         files = self.session.query(self.Files_by_mission.f_id, self.Files_by_mission.filename).filter_by(mission_name=self.mission).all()
+##         files = zip(*files)
+##         if verbose:
+##             print("About to process %d files from %s to the next data level" % (len(files[0]), self.mission))
+
+##         # get the number of products for that mission
+##         products = self.session.query(self.Data_product_by_mission.dp_id,
+##                                       self.Data_product_by_mission.product_name).filter_by(mission_name=self.mission).all()
+##         products = zip(*products)
+##         if verbose:
+##             print("\tMission %s has %d data products to step through" % (self.mission, len(products[0])))
+
+##         # create a list of everyting keys by filename that is an input to a process
+##         # this dictionary is the key to everyhting, just keep it up to date and then you can add/delete form it
+##         # to decide what needs to be processed
+##         for val in self.session.query(self.Build_filenames).filter_by(type=0).filter(self.Build_filenames.f_id != None):
+##             self.bf[val.filename] = {'mission_name':val.mission_name,
+##                                 'missions_rootdir':val.missions_rootdir,
+##                                 'p_id':val.p_id,
+##                                 'dp_id':val.dp_id,
+##                                 'type':val.type,
+##                                 'relative_path':val.relative_path,
+##                                 'product_name':val.product_name,
+##                                 'satellite_name':val.satellite_name,
+##                                 'f_id':val.f_id,
+##                                 'utc_file_date':val.utc_file_date,
+##                                 'absolute_name':val.absolute_name,
+##                                 'interface_version':val.interface_version,
+##                                 'quality_version':val.quality_version,
+##                                 'revision_version':val.revision_version,
+##                                 'ec_interface_version':val.ec_interface_version,
+##                                 'base_filename':val.base_filename,
+##                                 'exists_on_disk':val.exists_on_disk,
+##                                 'data_level':val.data_level}
+
+## ## add to the dict the data product that is the output of the process in the bf dict
+##         for fname in self.bf:
+##             for sq in self.session.query(self.File_processes).filter_by(type=1).filter_by(p_id = self.bf[fname]['p_id']):
+##                 self.bf[fname]['out_dp_id'] = sq.dp_id
+##                 self.bf[fname]['out_p_id']  = sq.p_id
+
+## ## now get the output data_product information form the given out_dp_id
+##         for fname in self.bf:
+##             for sq in self.session.query(self.Data_products).filter_by(dp_id = self.bf[fname]['out_dp_id']):
+##                 self.bf[fname]['out_product_name'] = sq.product_name
+##                 self.bf[fname]['out_ds_id'] = sq.ds_id
+##                 self.bf[fname]['out_relative_path'] = sq.relative_path
+
+##         if verbose:
+##             print("\t\t%s  %d files elegible to process" % ("len(bf)", len(self.bf)))
+##         return len(self.bf)
+
+
+###########################################
+### Decide which files NOT to process #####
+###########################################
+
+    def _procCodeDates(self, verbose = False):
+        """
+        go through bf dict and if files have processing code in the right date range
+
+        @keyword verbose: (optional) - print out lots of info
+
+        @return: Counter - number of files added to the list from this check
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 16-Jun-2010 (BAL)
+
+        >>>  pnl._procCodeDates()
+        """
+        # is there a processing code with the right dates?
+        # this is broken as there is more than one processing file that spans the data L0-L1 conversion
+        try: self.del_names
+        except AttributeError: self.initDelNames()
+        counter = 0
+        for fname in self.bf:
+            all_false = np.array([])
+            for sq in self.session.query(self.Processing_paths).filter_by(p_id = self.bf[fname]['out_p_id']):
+                if self.bf[fname]['utc_file_date'] < sq.code_start_date or self.bf[fname]['utc_file_date'] > sq.code_stop_date:
+                    all_false = np.append(all_false, True)
+            if ~all_false.any() and len(all_false) != 0:
+                print("\t<procCodeDates> %s didnt have valid, %s, %s, %s" % (fname, sq.code_start_date, sq.code_stop_date, all_false))
+                self.del_names.append(fname)
+                counter += 1
+        return counter
+
+#    def _activeProcCode(self, verbose=False):
+#        """
+#        go through bf dict and if files have active processing codes
+#
+#        @keyword verbose: (optional) - print information out to the command line
+#
+#        @return: Counter - number of files added to the list from this check
+#
+#        @author: Brian Larsen
+#        @organization: Los Alamos National Lab
+#        @contact: balarsen@lanl.gov
+#
+#        @version: V1: 16-Jun-2010 (BAL)
+#
+#        >>>  pnl._procCodeDates()
+#        """
+#        # is there an active processing code?
+#        try: self.del_names
+#        except AttributeError: self.initDelNames()
+#        counter = 0
+#        for fname in self.bf:
+#            all_false = np.array([sq.active_code for sq in self.session.query(self.Executable_codes).filter_by(p_id = self.bf[fname]['out_p_id'])])
+#            if ~all_false.any():
+#                self.del_names.append(fname)
+#                if verbose: print("\t%s does not have an active proc code" % (fname))
+#                counter += 1
+#        return counter
+
+
+
+    def _newerFileVersion(self, id, bool=False, verbose=False):
+        """
+        given a data_file ID decide if there is a newer version
+        (maybe _delNewerVersion() can extend this but not yet)
+
+        @param id: the code or file id to check
+        @keyword bool: (optional) if set answers the question is there a newer version of the file?
+
+        @return: id of the newest version
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 18-Jun-2010 (BAL)
+        @version: V2: 1-Jul-2010 (BAL) added bool keyword
+
+        >>>  pnl._newerFileVersion(101)
+        101
+        """
+        try: self.Data_files
+        except AttributeError: self._createTableObjects()
+
+        mul = []
+        vall = []
+        for sq_bf in self.session.query(self.Data_files).filter_by(base_filename = self._getBaseFilename(id)):
+            mul.append([sq_bf.filename,
+                        sq_bf.f_id])
+            vall.append(self.__get_V_num(sq_bf.interface_version,
+                                         sq_bf.quality_version,
+                                         sq_bf.revision_version))
+            if verbose:
+                print("\t\t%s %d %d %d %d" % (sq_bf.filename,
+                                              sq_bf.interface_version,
+                                              sq_bf.quality_version,
+                                              sq_bf.revision_version,
+                                              self.__get_V_num(sq_bf.interface_version,
+                                                               sq_bf.quality_version,
+                                                               sq_bf.revision_version)) )
+
+        if len(vall) == 0:
+            return None
+
+        self.mul = mul
+        self.vall = vall
+
+        ## make sure that there is just one of each v_num in vall
+        cnts = [vall.count(val) for val in vall]
+        if cnts.count(1) != len(cnts):
+            raise(DBProcessingError('More than one file with thwe same computed V_num'))
+
+        ## test to see if the newest is the id passed in
+        ind = np.argsort(vall)
+        if mul[ind[-1]][1] != id:
+            if bool: return True
+            else: return mul[ind[-1]][1]
+        else:
+            if bool: return False
+            else: return mul[ind[-1]][1]
+
+
+
+#########################################
+## now that we have all the files that actiually need to be processed, grab more info
+
+    def _buildOutName(self, incQuality=False, incRevision=False, verbose=False):
+        """
+        TODO this needs updateing to make the versions set correctly for reporcessing
+
+        build up the output name of the file that will be output of processing
+        to add a file to the database one needs to collect and do the following
+          - create a new data file from running a process (above stored in commands)
+          - insert that file into the data_files table
+          - INFO NEEDED:
+          - filename  -- from the command  (out_fname)
+          - utc_file_date  -- from the command  (utc_file_date)
+          - utc_start_date  -- from inpout files  (get from a query)
+          - utc_stop_date  -- from inout files  (get from a query)
+          - data_level  -- from processes table    (get from a query)
+          - consistency_check  -- (optional blank on additon)
+          - ec_interface_version  -- copy from Executable_code interface version (inferface_version)
+          - verbose_provenance  -- (optional, to add later)
+          - quality_check  -- (optional, blank for new files)
+          - quality_comment  -- (optional, blank for new files)
+          - caveats  -- (optional, black for new files)
+          - release_number  -- (optional, blank for new files)
+          - ds_id  -- what data source it came from   (out_ds_id)
+          - quality_version -- starts at 1 always
+          - revision_version  -- starts at 1 always
+          - file_create_date  -- the date and time file was created   (DB defaults to now)
+          - dp_id  -- the data product    (out_dp_id)
+          - met_start_time  -- (optional if we know it)
+          - met_stop_time  -- (optional if we knowq it)
+          - exists_on_disk  --  true for all new files
+          - base_filename   --  built from the output filename
+
+        @keyword verbose: (optional) print information out to the command line
+        @return: True - Success, False - Failure
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 14-Jun-2010 (BAL)
+
+        >>>  pnl._buildOutName()
+        """
+        # gather and put the processing info for each fiole in the dictionary
+        for fname in self.bf:
+            for sq in self.session.query(self.Processing_paths).filter_by(p_id=self.bf[fname]['out_p_id']).filter_by(active_code=True):
+                self.bf[fname]['exc_absolute_name'] = sq.absolute_name
+                self.bf[fname]['ec_id'] = sq.ec_id
+
+            # gather and put the output file name into the dictionary
+            for sq in self.session.query(self.Build_output_filenames).filter_by(p_id=self.bf[fname]['out_p_id']):
+                if incQuality:
+                    self.bf[fname]['outquality_version'] = self.bf[fname]['quality_version'] + 1
+                else:
+                    self.bf[fname]['outquality_version'] = self.bf[fname]['quality_version']
+                if incRevision:
+                    self.bf[fname]['outrevision_version'] = self.bf[fname]['revision_version'] + 1
+                else:
+                    self.bf[fname]['outrevision_version'] = self.bf[fname]['revision_version']
+                interface_ver = self.session.query(self.Executable_codes).filter_by(ec_id=self.bf[fname]['ec_id']).all()[0]
+                out_fname = self.__build_fname(sq.path,
+                                          '',
+                                          sq.mission_name,
+                                          sq.satellite_name,
+                                          sq.product_name,
+                                          datetime.strftime(self.bf[fname]['utc_file_date'], '%Y%m%d'),
+                                          interface_ver.interface_version,
+                                          self.bf[fname]['outquality_version'],
+                                          self.bf[fname]['outrevision_version'])
+                self.bf[fname]['out_absolute_name'] = out_fname
+                self.bf[fname]['out_fname'] = os.path.basename(self.bf[fname]['out_absolute_name'])
+                self.bf[fname]['level'] = sq.level
+                break # hack to just do this once
+
+            for sq in self.session.query(self.Data_files).filter_by(f_id = self.bf[fname]['f_id']):
+                self.bf[fname]['utc_start_time'] = sq.utc_start_time
+                self.bf[fname]['utc_end_time'] = sq.utc_end_time
+                self.bf[fname]['data_level'] = sq.data_level
+                self.bf[fname]['met_start_time'] = sq.met_start_time
+                self.bf[fname]['met_stop_time'] = sq.met_stop_time
+                f2 = self.bf[fname]['out_fname'].split('.')[0]
+                f3 = f2.split('_v')[0]
+                self.bf[fname]['base_filename'] = f3
+                ## self.bf[fname]['quality_version'] += 1
+                ## self.bf[fname]['revision_version'] += 1
+
+                if verbose: print("\t build the outname %s" % (self.bf[fname]['out_fname']))
+        return True  # should actually check something
+
+
+#
+#    def _buildOutNameReprocess(self, incQuality=False, incRevision=False, verbose=False):
+#        for fname in self.bf:
+#            for sq in self.session.query(self.Code_dependencies).filter_by(cd_id=self.bf[fname]['code_dependencies'][0]):
+#                self.bf[fname]['ec_id'] = self._newerCodeVersion(sq.dependent_ec_id)
+#            for sq in self.session.query(self.Processing_paths).filter_by(ec_id=self.bf[fname]['ec_id']).filter_by(active_code=True):
+#                self.bf[fname]['exc_absolute_name'] = sq.absolute_name
+#
+#
+#            # gather and put the output file name into the dictionary
+#            for sq in self.session.query(self.Build_reprocess_filenames).filter_by(p_id=self.bf[fname]['p_id']):
+#                if incQuality:
+#                    self.bf[fname]['quality_version'] = self.bf[fname]['quality_version'] + 1
+#                if incRevision:
+#                    self.bf[fname]['revision_version'] = self.bf[fname]['revision_version'] + 1
+#                interface_ver = self.session.query(self.Executable_codes).filter_by(ec_id=self.bf[fname]['ec_id']).all()[0]
+#                out_fname = self.__build_fname(sq.path,
+#                                          '',
+#                                          sq.mission_name,
+#                                          sq.satellite_name,
+#                                          sq.product_name,
+#                                          datetime.strftime(self.bf[fname]['utc_file_date'], '%Y%m%d'),
+#                                          interface_ver.interface_version,
+#                                          self.bf[fname]['quality_version'],
+#                                          self.bf[fname]['revision_version'])
+#                self.bf[fname]['out_absolute_name'] = out_fname
+#                self.bf[fname]['out_fname'] = os.path.basename(self.bf[fname]['out_absolute_name'])
+#                self.bf[fname]['level'] = sq.level
+#                break   #kack to just do this once
+#            if verbose: print("\t build the outname %s" % (self.bf[fname]['out_fname']))
+#
+#            for sq in self.session.query(self.Data_files).filter_by(f_id = self.bf[fname]['f_id']):
+#                self.bf[fname]['utc_start_time'] = sq.utc_start_time
+#                self.bf[fname]['utc_end_time'] = sq.utc_end_time
+#                self.bf[fname]['data_level'] = sq.data_level
+#                self.bf[fname]['met_start_time'] = sq.met_start_time
+#                self.bf[fname]['met_stop_time'] = sq.met_stop_time
+#                f2 = self.bf[fname]['out_fname'].split('.')[0]
+#                f3 = f2.split('_v')[0]
+#                self.bf[fname]['base_filename'] = f3
+#            ## if incQuality:
+#            ##     self.bf[fname]['quality_version'] = self.bf[fname]['quality_version'] + 1
+#            ## if incRevision:
+#            ##     self.bf[fname]['revision_version'] = self.bf[fname]['revision_version'] + 1
+#
+#
+#
+#                ## if verbose: print("\t build the outname %s" % (self.bf[fname]['out_fname']))
+#        return True  # should actually check something
+
+
+#####################################
+####  Do processing and input to DB
+#####################################
+
+    def _currentlyProcessing(self, verbose=False):
+        """
+        Checks the db to see if it is currently processing, dont want to do 2 at the same time
+
+        @keyword verbose: (optional) print out verbose informaiton
+        @return: True - Success, False - Failure
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Jun-2010 (BAL)
+
+        >>>  pnl._currentlyProcessing()
+        """
+        sq = self.session.query(self.Logging).filter_by(currently_processing = True).count()
+        if sq != 0:
+            return True
+        else:
+            return False
+
+    def _resetProcessingFlag(self, comment=None):
+        """
+        Query the db and reset a processing flag
+
+        @keyword comment: the comment to enter into the processing log DB
+        @return: True - Success, False - Failure
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Jun-2010 (BAL)
+
+        >>>  pnl._resetProcessingFlag()
+        """
+        if comment == None:
+            print("Must enter a comment to override DB lock")
+            return False
+        sq = self.session.query(self.Logging).filter_by(currently_processing = True)
+        for val in sq:
+            val.currently_processing = False
+            val.processing_end = datetime.now()
+            val.comment = 'Overridden:' + comment + ':' + __version__
+            self.session.add(val)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        return True
+
+    def _startLogging(self, verbose = False):
+        """
+        Add an entry to the logging table in the DB, logging
+
+        @keyword verbose: (optional) print information out to the command line
+        @return: True - Success, False - Failure
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Jun-2010 (BAL)
+
+        >>>  pnl._startLogging()
+        """
+        # this is the logging of the processing, no real use for it yet but maybe we will inthe future
+        # helps to know is the process ran and if it succeeded
+        import socket # to get the local hostname
+        if self._currentlyProcessing():
+            raise(DBError('A Currently Processing flag is still set, cannot process now'))
+        # save this class instance so that we can finish the logging later
+        self.__p1 = self._addLogging(True,
+                         datetime.datetime.now(),
+                        self._getMissionID(),
+                        os.getlogin(),
+                        socket.gethostname(),
+                        pid = os.getpid() )
+        if verbose: print("Logging started: %s, PID: %s, M_id: %s, user: %s, hostmane: %s" %
+                          (p1.processing_start, p1.pid, p1.mission_id, p1.user, p1.hostname))
+
+    def _addLogging(self,
+                    currently_processing,
+                    processing_start_time,
+                    mission_id,
+                    user,
+                    hostname,
+                    pid=None,
+                    processing_end_time= None,
+                    comment=None):
+        """
+        add an entry to th logging table
+
+        @param currently_processing: is the db currently processing?
+        @type currently_processing: bool
+        @param processing_start_time: the time the proessing started
+        @type processing_start_time: datetime.datetime
+        @param mission_id: the mission idthe processing if for
+        @type mission_id: int
+        @param user: the user doing the processing
+        @type user: str
+        @param hostname: the hostname that initiated the processing
+        @type hostname: str
+
+        @keyword pid: the process id that id the processing
+        @type pid: int
+        @keyword processing_end_time: the time the processing stopped
+        @type processing_end_time: datetime.datetime
+        @keyword comment: commen about the processing run
+        @type comment: str
+
+        @return: instance of the Logging class
+        @rtype: Logging
+
+        """
+        try:
+            l1 = self.Logging()
+        except AttributeError:
+           raise(DBError("Class Logging not found was it created?"))
+
+        l1.currently_processing = currently_processing
+        l1.processing_start_time = processing_start_time
+        l1.mission_id = mission_id
+        l1.user = user
+        l1.hostname = hostname
+        l1.pid = pid
+        l1.processing_end_time = processing_end_time
+        l1.comment = comment
+        self.session.add(l1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        return l1    # so we can use the same session to stop the logging
+
+    def _stopLogging(self, comment, verbose=False):
+        """
+        Finish the entry to the processing table in the DB, logging
+
+        @param comment: (optional) a comment to insert intot he DB
+        @type param: str
+        @keyword verbose: (optional) print information out to the command line
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Jun-2010 (BAL)
+        @version: V2: 17-Sep-2010 (BAL) - updated for new DB format
+
+        >>>  pnl._stopLogging()
+        """
+        try: self.__p1
+        except:
+            raise(DBProcessingError("Logging was not started"))
+        # clean up the logging, we are done processing and we can realease the lock (currently_processing) and
+        # put in the complete time
+        if comment == None:
+            print("Must enter a comment for the log")
+            return False
+
+        self.__p1.processing_end = datetime.now()
+        self.__p1.currently_processing = False
+        self.__p1.comment = comment+':' + __version__
+        self.session.add(self.__p1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        if verbose: print("Logging stopped: %s comment '%s' entered" % (self.__p1.processing_end, self.__p1.comment))
+
+    def _addLoggingFile(self,
+                        logging_id,
+                        file_id,
+                        code_id,
+                        comment=None):
+        """
+        add a Logging_files entry to  DB
+
+        @param logging_id: the id of the logging session
+        @type logging_id: int
+        @param file_id: file id of the file being logged
+        @type file_id: int
+        @param code_id: the id of ete code being used
+        @type code_id: int
+        @keyword comment: comment on the logged file
+        @type comment: str
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Jun-2010 (BAL)
+        @version: V2: 17-Sep-2010 (BAL) - updated for new DB format
+        """
+        pf1 = self.Logging_files()
+        pf1.logging_id = logging_id
+        pf1.file_id = file_id
+        pf1.code_id = code_id
+        pf1.comment = comment
+        self.session.add(pf1)
+        # TODO  think on if session should be left open or if a list shoud be passed in
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+    def _checkDiskForFile(self, fix=False):
+        """
+        Check the filesystem tosee if the file exits or not as it says in the db
+
+        @keyword fix: (optional) set to have the DB fixed to match the filesystem
+           this is **NOT** sure to be safe
+        @return: count - return the count of out of sync files
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Jun-2010 (BAL)
+        """
+        counter = 0  # count how many were wrong
+        for fname in self.bf:
+            for sq in self.session.query(self.Data_files).filter_by(f_id = self.bf[fname]['f_id']):
+                if sq.exists_on_disk != os.path.exists(self.bf[fname]['absolute_name']):
+                    counter += 1
+                    if sq.exists_on_disk == True:
+                        print("%s DB shows exists, must have been deleted" % (self.bf[fname]['absolute_name']))
+                        if fix == True:
+                            sq.exists_on_disk = False
+                            self.session.add(sq)
+                    else:
+                        print("%s file in filesystem, DB didnt have it so, manually added?" % (self.bf[fname]['absolute_name']))
+                        if fix == True:
+                            sq.exists_on_disk = True
+                            self.session.add(sq)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        return counter
+
+
+    def _purgeFileFromDB(self, filename=None):
+        """
+        removes a file from the DB
+
+        @keyword filename: name of the file to remove (or a list of names)
+        @return: True - Success, False - Failure
+
+        >>>  pnl._purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 18-Jun-2010 (BAL)
+        """
+        # filenames are unique so no need to loop (DB assures uniqueness)
+        if not isinstance(filename, (list, np.ndarray)):
+            filename = [filename]
+        for fname in filename:
+            for sq_df in self.session.query(self.Data_files).filter_by(filename = fname):
+                self.__sq_df = sq_df
+                # not unique so loop
+                for sq_cd in self.session.query(self.Code_dependencies).filter_by(f_id = sq_df.f_id):
+                    self.session.delete(sq_cd)
+                try:
+                    self.session.commit()
+                except IntegrityError as IE:
+                    self.session.rollback()
+                    raise(DBError(IE))
+                for sq_fd in self.session.query(self.File_dependencies).filter_by(f_id = sq_df.f_id):
+                    self.session.delete(sq_fd)
+                try:
+                    self.session.commit()
+                except IntegrityError as IE:
+                    self.session.rollback()
+                    raise(DBError(IE))
+            self.session.delete(sq_df)
+            print("File %s purged" % (sq_df.filename))
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        return True  # need some error checking here
+
+
+
+
+#    def _collectDependencies(self, f_id=None, verbose=False):
+#        """
+#        Collect the dependencies for a file and add it to the BF dict or if f_id is set return
+#        that file's dependencies.  NOTE this collects the cd_id and fd_id form those tables not the
+#        actual file, have to query the tables.
+#
+#        @keyword f_id: (optional) changes routine to return lists of file and code dependencies
+#
+#        @return:
+#             - without f_id True means success, False means failure
+#             - with f_id returns a list of file dependicies and a list of code dependencies
+#
+#        @author: Brian Larsen
+#        @organization: Los Alamos National Lab
+#        @contact: balarsen@lanl.gov
+#
+#        @version: V1: 18-Jun-2010 (BAL)
+#
+#        >>>  pnl._collectDependencies()
+#        """
+#        try: self.File_dependencies
+#        except AttributeError: self._createTableObjects()
+#        if f_id == None:
+#            for fname in self.bf:
+#                self.bf[fname]['file_dependencies'] = []
+#                self.bf[fname]['code_dependencies'] = []
+#
+#                # query and find dependencies, add them as a list to the BF dict
+#                for sq_fd in self.session.query(self.File_dependencies).filter_by(f_id = self.bf[fname]['f_id']):
+#                    self.bf[fname]['file_dependencies'].append(sq_fd.fd_id)
+#                for sq_cd in self.session.query(self.Code_dependencies).filter_by(f_id = self.bf[fname]['f_id']):
+#                    self.bf[fname]['code_dependencies'].append(sq_cd.cd_id)
+#            return True   # add error checking
+#        else:  # just to make it obvious what is going on
+#            fd = []
+#            cd = []
+#            for sq_fd in self.session.query(self.File_dependencies).filter_by(f_id = f_id):
+#                fd.append(sq_fd.fd_id)
+#            for sq_cd in self.session.query(self.Code_dependencies).filter_by(f_id = f_id):
+#                cd.append(sq_cd.cd_id)
+#            return (fd, cd)
+#
+
+
+    def _addMission(self,
+                    mission_name,
+                    rootdir):
+        """ add a mission to the database
+
+        @param mission_name: the name of the mission
+        @type mission_name: str
+        @param rootdir: the root directory of the mission
+        @type rootdir: str
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 170-Sep-2010 (BAL)
+        """
+        if not isinstance(mission_name, str):
+            raise(DBInputError("Mission name has to  a string"))
+        if not isinstance(rootdir, str):
+            raise(DBInputError("Rootdir must be a string"))
+
+        try:
+            m1 = self.Mission()
+        except AttributeError:
+           raise(DBError("Class Mission not found was it created?"))
+
+        m1.mission_name = mission_name
+        m1.rootdir = rootdir
+        self.session.add(m1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+    def _addSatellite(self,
+                    satellite_name,
+                    mission_id):
+        """ add a satellite to the database
+
+        @param satellite_name: the name of the mission
+        @type satellite_name: str
+        @param mission_id: the root directory of the mission
+        @type mission_id: str
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 170-Sep-2010 (BAL)
+        """
+        if not isinstance(satellite_name, str):
+            raise(DBInputError("Satellite name has to  a string"))
+        if not isinstance(mission_id, (int, long)):
+            raise(DBInputError("Mission_id must be an int"))
+
+        try:
+            s1 = self.Satellite()
+        except AttributeError:
+            raise(DBError  ("Class Satellite not found was it created?"))
+        s1.mission_id = mission_id
+        s1.satellite_name = satellite_name
+        self.session.add(s1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+    def _addProcess(self,
+                    process_name,
+                    output_product,
+                    extra_params=None,
+                    super_process_id=None):
+        """ add a process to the database
+
+        @param process_name: the name of the process
+        @type process_name: str
+        @param output_product: the output product id
+        @type output_product: int
+        @keyword extra_params: extra paramerts to pass to the code
+        @type extra_params: str
+        @keyword super_process_id: th process id of the superprocess for this process
+        @type super_process_id: int
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Sep-2010 (BAL)
+        """
+        # TODO I think that the DB will deal with this...
+        if not isinstance(process_name, str):
+            raise(DBInputError("process name has to  a string"))
+        if not isinstance(output_product, (int, long)):
+            raise(DBInputError("output_product must be an int"))
+        if not isinstance(extra_params, str) and extra_params != None:
+            raise(DBInputError("extra_params muct be string or None"))
+        if not isinstance(super_process_id, (int, long)) and super_process_id != None:
+            raise(DBInputError("super_process_id must be int or None"))
+
+
+        try:
+            p1 = self.Process()
+        except AttributeError:
+           raise(DBError("Class process not found was it created?"))
+        p1.output_product = output_product
+        p1.process_name = process_name
+        p1.extra_params = extra_params
+        p1.super_process_id = super_process_id
+        self.session.add(p1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+    def _addProduct(self,
+                    product_name,
+                    instrument_id,
+                    relative_path,
+                    super_product_id,
+                    format):
+        """ add a product to the database
+
+        @param product_name: the name of the product
+        @type product_name: str
+        @param instrument_id: the instrument   the product is from
+        @type instrument_id: int
+        @param relative_path:relative path for th product
+        @type relative_path: str
+        @param super_product_id: th product id of the super product for this product
+        @type super_product_id: int
+        @param format: the format of the product files 
+        @type super_product_id: str
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Sep-2010 (BAL)
+        @version: V2 20-Sep-2010 (BAL) updated to new DB format
+        @version: V3 17-Nov-2010 (BAL) added format and changed super_product_id to param
+        """
+
+        try:
+            p1 = self.Product()
+        except AttributeError:
+           raise(DBError("Class product not found was it created?"))
+
+        p1.instrument_id = instrument_id
+        p1.product_name = product_name
+        p1.relative_path = relative_path
+        p1.super_product_id = super_product_id
+        p1.format = format
+        self.session.add(p1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+    def _addproductprocesslink(self,
+                    input_product_id,
+                    process_id):
+        """ add a product process link to the database
+
+        @param input_product_id: id of the produc to link
+        @type input_product_id: int
+        @param process_id: id of the process to link
+        @type process_id: int
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Sep-2010 (BAL)
+        """
+
+        try:
+            ppl1 = self.Productprocesslink()
+        except AttributeError:
+           raise(DBError("Class Productprocesslink not found was it created?"))
+        ppl1.input_product_id = input_product_id
+        ppl1.process_id = process_id
+        self.session.add(ppl1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+    def _addFilecodelink(self,
+                     resulting_file_id,
+                     source_code):
+        """ add a file code  link to the database
+
+        @param resulting_file_id: id of the produc to link
+        @type resulting_file_id: int
+        @param source_code: id of the process to link
+        @type source_code: int
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Sep-2010 (BAL)
+        """
+
+        try:
+            fcl1 = self.Filecodelink()
+        except AttributeError:
+           raise(DBError("Class Filecodelink not found was it created?"))
+        fcl1.resulting_file = resulting_file_id
+        fcl1.source_code = source_code
+        self.session.add(fcl1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+
+    def _addFilefilelink(self,
+                     source_file,
+                     resulting_file_id):
+        """ add a file file  link to the database
+
+        @param source_file: id of the produc to link
+        @type souce_file: int
+        @param resulting_file_id: id of the process to link
+        @type resulting_file_id: int
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Sep-2010 (BAL)
+        """
+
+        try:
+            ffl1 = self.Filefilelink()
+        except AttributeError:
+           raise(DBError("Class Filefilelink not found was it created?"))
+        ffl1.source_file = source_file
+        ffl1.resulting_file = resulting_file_id
+        self.session.add(ffl1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+
+    def _addInstrumentproductlink(self,
+                     instrument_id,
+                     product_id):
+        """ add a instrument product  link to the database
+
+        @param instrument_id: id of the instrument to link
+        @type instrument_id: int
+        @param product_id: id of the product to link
+        @type product_id: int
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Sep-2010 (BAL)
+        """
+
+        try:
+            ipl1 = self.Instrumentproductlink()
+        except AttributeError:
+           raise(DBError("Class Instrumentproductlink not found was it created?"))
+        ipl1.instrument_id = instrument_id
+        ipl1.product_id = product_id
+        self.session.add(ipl1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+
+    def _addInstrument(self,
+                    instrument_name,
+                    satellite_id):
+        """ add a Instrument to the database
+
+        @param instrument_name: the name of the mission
+        @type instrument_name: str
+        @param satellite_id: the root directory of the mission
+        @type satellite_id: int
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 170-Sep-2010 (BAL)
+        """
+        if not isinstance(instrument_name, str):
+            raise(DBInputError("Instrument name has to  a string"))
+        if not isinstance(satellite_id, (int, long)):
+            raise(DBInputError("Satellite_id must be an int"))
+
+        try:
+            i1 = self.Instrument()
+        except:
+           raise(DBError("Class Instrument not found was it created?"))
+
+        i1.satellite_id = satellite_id
+        i1.instrument_name = instrument_name
+        self.session.add(i1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+    def _addCode(self,
+                           filename,
+                           relative_path,
+                           code_start_date,
+                           code_stop_date,
+                           code_description,
+                           process_id,
+                           version,
+                           active_code,
+                           date_written,
+                           output_interface_version,
+                           newest_version):
+        """
+        Add an executable code to the DB
+
+        @param filename: the filename of the code
+        @type filename: str
+        @param relative_path: the relative path (relative to mission base dir)
+        @type relative_path: str
+        @param code_start_date: start of valaitdy of the code (datetime)
+        @type code_start_date: datetime
+        @param code_stop_date: end of validity of the code (datetime)
+        @type code_stop_date: datetime
+        @param code_description: description of th code (50 char)
+        @type code_description: str
+        @param process_id: the id of the process this code is part of
+        @type process_id: int
+        @param version: the version of the code
+        @type version: Version.Version
+        @param active_code: boolean True means the code is active
+        @type active_code: boolean
+        @param date_written: the dat the cod was written
+        @type date_written: date
+        @param output_interface_version: the interface version of the output (effects the data file names)
+        @type output_interface_version: int
+        @param newest_version: is this code the newestversion in the DB?
+        @type newest_version: bool
+
+        @return: the code_id of the newly inserted code
+        @rtype: long
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 18-Jun-2010 (BAL)
+        @version: V2: 17-Sep-2010 (BAL - updated to new DB format)
+        @version: V3: 04-Oct-2010 (BAL - added return of code_id)
+
+
+        """
+        try:
+            c1 = self.Code()
+        except:
+            raise(DBError("Class Code not found was it created?"))
+        c1.filename = filename
+        c1.relative_path = relative_path
+        c1.code_start_date = code_start_date
+        c1.code_stop_date = code_stop_date
+        c1.code_description = code_description
+        c1.process_id = process_id
+        c1.interface_version = version.interface
+        c1.quality_version =version. quality
+        c1.revision_version = version.revision
+        c1.active_code = active_code
+        c1.date_written = date_written
+        c1.output_interface_version = output_interface_version
+        c1.newest_version = newest_version
+
+        self.session.add(c1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        sq1 = self.session.query(self.Code).filter_by(filename = filename)
+        return sq1[0].code_id
+
+
+    def _closeDB(self, verbose=False):
+        """
+        Close the database connection
+
+        @keyword verbose: (optional) print information out to the command line
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 14-Jun-2010 (BAL)
+        @version: V2: 25-Aug-2010 (BAL) - changed to raise exception not returtn False
+
+        >>>  pnl._closeDB()
+        """
+        if self.dbIsOpen == False:
+            return True
+        try:
+            self.session.close()
+            self.__dbIsOpen = False
+            if verbose: print("DB is now closed")
+        except:
+            raise(DBError('could not close DB'))
+
+
+    def _addFile(self,
+                        filename = None,
+                        data_level = None,
+                        version = None,
+                        file_create_date = None,
+                        exists_on_disk = None,
+                        utc_file_date = None,
+                        utc_start_time = None,
+                        utc_stop_time = None,
+                        check_date = None,
+                        verbose_provenance = None,
+                        quality_comment = None,
+                        caveats = None,
+                        met_start_time = None,
+                        met_stop_time = None,
+                        release_number = None,
+                        product_id = None,
+                        newest_version = None,
+                        md5sum = None):
+        """
+        add a datafile to the database
+
+        @param filename: filename to add
+        @type filename: str
+        @param data_level: the data level of the file
+        @type data_level: float
+        @param version: the version of te file to create
+        @type version: Version.Version
+        @param file_create_date: dat the fie was created
+        @type file_create_date: datetime.datetime
+        @param exists_on_disk: dpes the file exist on disk?
+        @type exists_on_disk: bool
+        @param product_id: the product id of he product he file belongs to
+        @type product_id: int
+
+        @keyword utc_file_date: The UTC date of the file
+        @type utc_file_date: datetime.date
+        @keyword utc_start_time: utc start time of the file
+        @type utc_start_time: datetime.datetime
+        @keyword utc_end_time: itc end time of the file
+        @type utc_end_time: datetime.datetime
+        @keyword check_date: the date the file was quality checked
+        @type check_date: datetime.datetime
+        @keyword verbose_provenance: Verbose provenance of the file
+        @type verbose_provenance: str
+        @keyword quality_comment: comment on quality from quality check
+        @type quality_comment: str
+        @keyword caveats: caveates associated with the file
+        @type caveates: str
+        @keyword met_start_time: met start time of the file
+        @type met_start_time: long
+        @keyword met_stop_time: metstop time of the file
+        @type met_stop_time: long
+
+        @ return: file_id of the newly inserted file
+        @rtype: long
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 18-Jun-2010 (BAL)
+        @version: V2: 19-Sep-2010 (BAL) - revised fo new DB format
+        @version: V3: 04-Oct-2010 (BAL) - added return
+
+
+        """
+        try:
+            d1 = self.File()
+        except AttributeError:
+           raise(DBError("Class File not found was it created?"))
+
+
+        self._createTableObjects()
+        d1 = self.File()
+        d1.filename = filename
+        d1.utc_file_date = utc_file_date
+        d1.utc_start_time = utc_start_time
+        d1.utc_stop_time = utc_stop_time
+        d1.data_level = data_level
+        d1.check_date= check_date
+        d1.verbose_provenance = verbose_provenance
+        d1.quality_comment = quality_comment
+        d1.caveats = caveats
+        d1.release_number = release_number
+        d1.interface_version = version.interface
+        d1.quality_version = version.quality
+        d1.revision_version = version.revision
+        d1.file_create_date = file_create_date
+        d1.product_id = product_id
+        d1.met_start_time = met_start_time
+        d1.met_stop_time = met_stop_time
+        d1.exists_on_disk = exists_on_disk
+        d1. newest_version  = newest_version
+        d1.md5sum = md5sum
+        self.session.add(d1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        sq1 = self.session.query(self.File).filter_by(filename = filename)
+        return sq1[0].file_id
+
+
+    def _codeIsActive(self, ec_id, date):
+        """
+        Given a ec_id and a date is that code active for that date
+
+        @param ec_id: executable code id to see if is active
+        @param date: date object to use when checking
+
+        @return: True - the code is active for that date, False otherwise
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 1-Jul-2010 (BAL)
+        """
+        try: self.Executable_codes
+        except AttributeError: self._createTableObjects()
+
+        # can only be one here (sq)
+        for sq in self.session.query(self.Executable_codes).filter_by(ec_id = ec_id):
+            if sq.active_code == False:
+                return False
+            if sq.code_start_date > date:
+                return False
+            if sq.code_stop_date < date:
+                return False
+        return True
+
+    def _newerCodeVersion(self, ec_id, date=None, bool=False, verbose=False):
+        """
+        given a executable_code ID decide if there is a newer version
+        # TODO think on if this needs to check avtive dates etc
+
+        @param ec_id: the executable code id to check
+        @keyword date: (optional) the date to check for the newer version
+        @keyword bool: if set return boolean True=there s a newer version
+        @return
+             - id of the newest version if bool is False
+             - True there is a newer version, False otherwise if bool is set
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 1-Jul-2010 (BAL)
+        """
+        try: self.Executable_codes
+        except AttributeError: self._createTableObjects()
+
+        # if bool then we just wat to know if this is the newest version
+        mul = []
+        vall = []
+        for sq_bf in self.session.query(self.Executable_codes).filter_by(p_id = self._getPID(ec_id)):
+            mul.append([sq_bf.filename,
+                        sq_bf.ec_id])
+            vall.append(self.__get_V_num(sq_bf.interface_version,
+                                         sq_bf.quality_version,
+                                         sq_bf.revision_version))
+
+            if verbose:
+                print("\t\t%s %d %d %d %d" % (sq_bf.filename,
+                                              sq_bf.interface_version,
+                                              sq_bf.quality_version,
+                                              sq_bf.revision_version,
+                                              self.__get_V_num(sq_bf.interface_version,
+                                                               sq_bf.quality_version,
+                                                               sq_bf.revision_version)) )
+
+
+        if len(mul) == 0:
+            if bool: return False
+            return None
+
+        self.mul = mul
+        self.vall = vall
+
+        ## make sure that there is just one of each v_num in vall
+        cnts = [vall.count(val) for val in vall]
+        if cnts.count(1) != len(cnts):
+            raise(DBProcessingError('More than one code with the same v_num'))
+
+        ## test to see if the newest is the id passed in
+        ind = np.argsort(vall)
+        if mul[ind[-1]][1] != id:
+            if bool: return True
+            else: return mul[ind[-1]][1]
+        else:
+            if bool: return False
+            else: return mul[ind[-1]][1]
+
+    def _copyDataFile(self,
+                      f_id,
+                      interface_version,
+                      quality_version,
+                      revision_version):
+        """
+        Given an input file change its versions and insert it to DB
+
+        @param f_id: the file_id to copy
+        @param interface_version: new interface version
+        @param quality_version: new quality version
+        @param revision_version: new revision version
+        @return: True - Success, False - Failure
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 6-Jul-2010 (BAL)
+
+        >>> dbp = DBProcessing()
+        >>> dbp._copyDataFile(18,999 , 1 ,1)
+        """
+        if self.__dbIsOpen == False:
+            self._openDB()
+        try: self.Base_filename
+        except AttributeError: self._createTableObjects()
+        try: self.Build_filenames
+        except AttributeError: self._createViews()
+        # should only do this once
+        sq = self.session.query(self.Data_files).filter_by(f_id = f_id)
+        DF = self.Data_files()
+        DF.utc_file_date = sq[0].utc_file_date
+        DF.utc_start_time = sq[0].utc_start_time
+        DF.utc_end_time = sq[0].utc_end_time
+        DF.data_level = sq[0].data_level
+        DF.consistency_check = sq[0].consistency_check
+        DF.interface_version = interface_version
+        DF.verbose_provenance = None
+        DF.quality_check = 0
+        DF.quality_comment = None
+        DF.caveats = None
+        DF.release_number = None
+        DF.ds_id = sq[0].ds_id
+        DF.quality_version = quality_version
+        DF.revision_version = revision_version
+        DF.file_create_date = datetime.now()
+        DF.dp_id = sq[0].dp_id
+        DF.met_start_time = sq[0].met_start_time
+        DF.met_stop_time = sq[0].met_stop_time
+        DF.exists_on_disk = True
+        DF.base_filename = self._getBaseFilename(f_id)
+        DF.filename = DF.base_filename + '_v' + \
+                      repr(interface_version) + '.' + \
+                      repr(quality_version) + '.' + \
+                      repr(revision_version) + '.cdf'
+               ## if not np.array([DF.interface_version != sq.interface_version,
+               ##       DF.quality_version != sq.quality_version,
+               ##       DF.revision_version != sq.revision_version]).any()
+        self.session.add(DF)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+
+    def _copyExecutableCode(self,
+                            ec_id,
+                            new_filename,
+                            interface_version,
+                            quality_version,
+                            revision_version,
+                            active_code = True):
+        """
+        Given an input executable code change its version ands insert it to DB
+
+        @param ec_id: the file_id to copy
+        @param new_filename: the new name of the file
+        @param interface_version: new interface version
+        @param quality_version: new quality version
+        @param revision_version: new revision version
+        @param active_code: (optional) is the code active, default True
+
+        @return: True = Success / False = Failure
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 6-Jul-2010 (BAL)
+        """
+        if self.__dbIsOpen == False:
+            self._openDB()
+        try: self.Base_filename
+        except AttributeError: self._createTableObjects()
+        try: self.Build_filenames
+        except AttributeError: self._createViews()
+        # should only do this once
+        sq = self.session.query(self.Executable_codes).filter_by(ec_id = ec_id)
+        EC = self.Executable_codes()
+        EC.relative_path = sq[0].relative_path
+        EC.code_start_date = sq[0].code_start_date
+        EC.code_stop_date = sq[0].code_stop_date
+        EC.code_id = sq[0].code_id
+        EC.p_id = sq[0].p_id
+        EC.ds_id = sq[0].ds_id
+        EC.interface_version = interface_version
+        EC.quality_version = quality_version
+        EC.revision_version = revision_version
+        EC.active_code = active_code
+        basefn = sq[0].filename.split('_v')[0]
+        EC.filename = new_filename
+
+        self.session.add(EC)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+
+
+
+    def _getMissionID(self):
+        """
+        Return the current mission ID
+
+        @return: mission_id - the current mission ID
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 6-Jul-2010 (BAL)
+
+        >>> dbp = DBProcessing()
+        >>> dbp._getMissionID()
+        19
+        """
+        sq = self.session.query(self.Mission).filter_by(mission_name = self.mission)
+        return sq[0].mission_id
+
+
+    def _getMissions(self):
+        sq = self.session.query(self.Mission.mission_name)
+        return [val[0] for val in sq.all()]
+
+    def _getFileID(self, filename):
+        """
+        Return the fileID for the input filename
+
+        @param filename: filename to return the fileid of
+        @type filename: str
+
+        @return: file_id: file_id of the input file
+        @rtype: long
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 4-Oct-2010 (BAL)
+        """
+        sq = self.session.query(self.File).filter_by(filename = filename)
+        try:
+            return sq[0].file_id
+        except IndexError: # no file_id found
+            raise(DBError("No filename %s found in the DB" % (filename)))
+
+
+    def _getCodeID(self, codename):
+        """
+        Return the codeID for the input code
+
+        @param codename: filename to return the fileid of
+        @type filename: str
+
+        @return: code_id: code_id of the input file
+        @rtype: long
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 16-Nov-2010 (BAL)
+        """
+        sq = self.session.query(self.Code).filter_by(filename = codename)
+        try:
+            return sq[0].code_id
+        except IndexError: # no file_id found
+            raise(DBError("No filename %s found in the DB" % (filename)))
+
+
+    def _getFilename(self, file_id):
+        """
+        Return the filename for the input file_id
+
+        @param file_id: file_id to return the name from
+        @type filename: long
+
+        @return: filename: filename associated with the file_id
+        @rtype: str
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 6-Oct-2010 (BAL)
+        """
+        sq = self.session.query(self.File).filter_by(file_id = file_id)
+        return sq[0].filename
+
+
+    def _getFileUTCfileDate(self, file_id):
+        """
+        Return the utc_file_date for the input file_id
+
+        @param file_id: file_id to return the date  from
+        @type filename: long
+
+        @return: utc_file_date: date of the file  associated with the file_id
+        @rtype: datetime
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 15-Oct-2010 (BAL)
+        """
+        sq = self.session.query(self.File).filter_by(file_id = file_id)
+        return sq[0].utc_file_date
+
+    def _getInputProductID(self, process_id):
+        """
+        Return the fileID for the input filename
+
+        @param process_id: process_)id to return the inout_product_id for
+        @type process_id: long
+
+        @return: list of input_product_ids
+        @rtype: list
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 15-Oct-2010 (BAL)
+        """
+        sq = self.session.query(self.Productprocesslink.input_product_id).filter_by(process_id = process_id)
+        return [val[0] for val in sq.all()]  # the zero is because all() returns a list of one element tuples
+
+
+    def _getProductFormats(self, productID=None):
+        """
+        Return the product formats for all the formats
+
+        @return: list of all the product format strings and ids from the database
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 25-Oct-2010 (BAL)
+
+        """
+        if productID == None:
+            sq = self.session.query(self.Product.format, self.Product.product_id)
+            return sq.order_by(asc(self.Product.product_id)).all()
+        else:
+            sq = self.session.query(self.Product.format, self.Product.product_id).filter_by(product_id = productID)
+            return sq[0]
+
+    def _getProductNames(self, productID=None):
+        """
+        Return the mission, Satellite, Instrument,  product, product_id   names as a tuple
+
+        @return: list of tuples of the mission, Satellite, Instrument,  product, product id  names
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 26-Oct-2010 (BAL)
+
+        """
+        if productID == None:
+            sq = self.session.query(self.Mission.mission_name,
+                                                    self.Satellite.satellite_name,
+                                                    self.Instrument.instrument_name,
+                                                    self.Product.product_name,
+                                                    self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product)
+            return sq.order_by(asc(self.Product.product_id)).all()
+        else:
+            sq = self.session.query(self.Mission.mission_name,
+                                        self.Satellite.satellite_name,
+                                        self.Instrument.instrument_name,
+                                        self.Product.product_name,
+                                        self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == productID)
+            return sq[0]
+
+
+    def _getProductID(self,
+                     product_name):
+        """
+        Return the product ID for an input product name
+
+        @param product_name: the name of the product to et the id of
+        @type product_name: str
+
+        @return: product_id -the product  ID for the input product name
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 20-Sep-2010 (BAL)
+
+        """
+        sq = self.session.query(self.Product.product_id).filter_by(product_name = product_name)
+        if sq.count() == 0:
+            raise(DBError('Product %s was not found' % (product_name)))
+        if sq.count() == 1:
+            return sq.first()[0]
+        elif sq.count() > 1:
+            return sq
+
+
+    def _getSatelliteID(self,
+                        sat_name):
+        """
+        @param sat_name: the satellie name to look up the id
+        @type sat_name: str
+
+        @return: satellite_id - the requested satellite  ID
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Sep-2010 (BAL)
+        """
+        sq = self.session.query(self.Satellite.satellite_id).filter_by(mission_id = self._getMissionID()).filter_by(satellite_name = sat_name)
+        if sq.count() == 0:
+            raise(DBError('Satellite %s was not found' % (sat_name)))
+        return sq.first()[0]  # there can be only one of each name
+
+
+    def _getMissionDirectory(self):
+        """
+        return the base direcorty for the current mission
+
+        @return: base directory for thcurrent mission
+        @rtype: str
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 20-Sep-2010 (BAL)
+        """
+        sq = self.session.query(self.Mission.rootdir).filter_by(mission_name  = self.mission)
+        if sq.count() == 0:
+            raise(DBError('Mission %s was not found' % (self.mission)))
+        return sq.first()[0]  # there can be only one of each name
+
+
+    def _checkIncoming(self):
+        """
+        check the incoming directory for the current mision and add those files to the processing list
+
+        @return: processing list of file ids
+        @rtype: list
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 20-Sep-2010 (BAL)
+        """
+        try:
+            self.Mission
+        except AttributeError:
+            self._createTableObjects()
+
+        basedir = self._getMissionDirectory()
+        files = os.listdir(basedir + '/incoming/')
+        for i in range(len(files)):
+            files[i] = basedir + '/incoming/' + files[i]
+        return files
+
+
+    def _parseFileName(self,
+                       filename):
+        """
+        Parse a filename from incoming (or anywhere) and return a file object populated with the infomation
+
+        @param filename: the filename to parse (or a list  filenames)
+        @type filename: str
+        @return: file object populated from the filename
+        @rtype: DBUtils2.File
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 20-Sep-2010 (BAL)
+        """
+        if isinstance(filename, str):  # if it is just a filename make it a list and parse the list
+            filename = [filename]
+        output = []
+        for val in filename:
+            # this is an if elif block testing by mission
+            if not self.__isTestFile(val):
+                raise(FilenameParse("filename %s not found to belong to mission %s" %   ( val, self.mission)))
+            f1 = self.File()
+            f1.filename = val
+            file_date
+            f1.utc_file_date = None
+
+
+
