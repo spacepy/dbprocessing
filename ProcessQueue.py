@@ -216,8 +216,12 @@ class ProcessQueue(object):
             # filefilelink is out_path in_path
             self.dbu._addFilefilelink(self.dbu._getFileID(os.path.basename(val[0].diskfile.filename)),
                                       self.dbu._getFileID(os.path.basename(out_path)) )
-            self.dbu._addFilecodelink(self.dbu._getFileID(os.path.basename(out_path)),
-                                      self.dbu._getCodeID(os.path.basename(codep)) )
+            # TODO, think here if this is really ok to do
+            try:
+                self.dbu._addFilecodelink(self.dbu._getFileID(os.path.basename(out_path)),
+                                          self.dbu._getCodeID(os.path.basename(codep)) )
+            except DBUtils2.DBError:
+                pass
 
 
             
@@ -239,23 +243,23 @@ class ProcessQueue(object):
             DBlogging.dblogger.debug( "\t\tfound products for children: %s: %s" %(val, val2.product_id))
 
 
-    def addLinks(self):
-        DBlogging.dblogger.debug( "\tEntered addLinks()" )
+    ## def addLinks(self):
+    ##     DBlogging.dblogger.debug( "\tEntered addLinks()" )
 
-        # go through the self.depends queue and add in the filefile anf filecode links
-        # TODO think on this loop structure, can do a for loop but it doesnt pop, maybe with does this?
+    ##     # go through the self.depends queue and add in the filefile anf filecode links
+    ##     # TODO think on this loop structure, can do a for loop but it doesnt pop, maybe with does this?
 
-        for dep in self.depends.popleftiter():
-            if dep['code'] == [None] :  # TODO do I need a check on the file also?
-                continue
-            # TODO do a query here to get this
-            if dep['code'] == 83:
-                dep['file']  = dep['file'] + '.png'
-                DBlogging.dblogger.debug("\t\t\t\tAdded .png to extension")
-            dep['file'] = self.dbu._getFileID(dep['file'])
-            # so far only works on things with one dep
-            self.dbu._addFilefilelink(dep['infile'], dep['file'])
-            self.dbu._addFilecodelink(dep['file'], dep['code'])
+    ##     for dep in self.depends.popleftiter():
+    ##         if dep['code'] == [None] :  # TODO do I need a check on the file also?
+    ##             continue
+    ##         # TODO do a query here to get this
+    ##         if dep['code'] == 83:
+    ##             dep['file']  = dep['file'] + '.png'
+    ##             DBlogging.dblogger.debug("\t\t\t\tAdded .png to extension")
+    ##         dep['file'] = self.dbu._getFileID(dep['file'])
+    ##         # so far only works on things with one dep
+    ##         self.dbu._addFilefilelink(dep['infile'], dep['file'])
+    ##         self.dbu._addFilecodelink(dep['file'], dep['code'])
 
 
 

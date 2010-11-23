@@ -278,7 +278,9 @@ class Diskfile(object):
         prods = self.dbu._getProductNames()
         # these two are not required to be in the same order, so we need to do something about that.
         
-        
+        # this checks for a DB error where the INstrument Product Link was not filled in
+        if len(p_formats) != len(prods):
+            raise(DBUtils2.DBError('self.dbu._getProductFormats() and self.dbu._getProductNames(), differnet length, check instrumentproductlink'))
 
         missions = zip(*prods)[0]
         satellites = zip(*prods)[1]
@@ -290,7 +292,7 @@ class Diskfile(object):
         matches = []
         for i in range(len(products)):
             # this format has which fields in it?
-            expression = r'^' + format + '$'
+            expression = r'^' + formats[i] + '$'
 
             # TODO this can be cleaned up...
             expression=expression.replace('%MISSION',  prods[i][0])
