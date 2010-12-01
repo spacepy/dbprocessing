@@ -1,8 +1,6 @@
 class VersionError(Exception):
     pass
 
-
-
 class Version(object):
     """
     A version class to simplify pushing around version  information all the time
