@@ -41,7 +41,7 @@ class Tests(unittest.TestCase):
         ex.doIt()
 
     def test_outputBadDir(self):
-        """Exeption on bad output directory"""
+        """Exception on bad output directory"""
         ex = Executor.Executor(self.path + '/code_run_tmp', self.path + '/code_dat_tmp', '/tmp/IDONOTEXIST/file')
         self.assertRaises(Executor.ExecutorError, ex.checkExists)         
 
