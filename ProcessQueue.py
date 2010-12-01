@@ -1,13 +1,10 @@
 #!/usr/bin/env python2.6
 
 import DBUtils2
-import ProcessQueue
 import DBqueue
 import shutil
 import DBfile
 import Diskfile
-import shutil
-import os.path
 import os.path
 import Executor
 
@@ -92,14 +89,20 @@ class ProcessQueue(object):
                 dbf = DBfile.DBfile(fname)
                 try:
                     f_id = dbf.addFileToDB()
-                    # add to findChildren queue
-                    self.findChildren.append(dbf)
-
-                    DBlogging.dblogger.debug("\t\t\tf_id = %s" % (str(f_id)))
-                    self.depends.append(self.depDict(f_id))
-                except (DBUtils2.DBInputError, DBUtils2.DBError):
+                except (DBUtils2.DBInputError, DBUtils2.DBError) as errmsg:
+                    DBlogging.dblogger.warning("Except adding file to db so moving to error: %s" % (errmsg))
                     self.moveToError(val)
                     continue
+                
+                # add to findChildren queue
+                self.findChildren.append(dbf)
+
+                DBlogging.dblogger.debug("\t\t\tf_id = %s" % (str(f_id)))
+                self.depends.append(self.depDict(f_id))
+                ## except (DBUtils2.DBInputError, DBUtils2.DBError):
+                ##     DBlogging.dblogger.debug("Except DBUtils2.DBInputError, DBUtils2.DBError so moving to error")
+                ##     self.moveToError(val)
+                ##     continue
                 # move file from incoming to path
                 mov = dbf.move()
                 self.moved.append(mov[1])  # only want to dest file
@@ -240,27 +243,7 @@ class ProcessQueue(object):
                 sq_ans = self.dbu.session.query(self.dbu.Product).filter_by(product_id = sq2)
                 for val2 in sq_ans:
                     self.childrenQueue.append( (val, val2.product_id) )
-            DBlogging.dblogger.debug( "\t\tfound products for children: %s: %s" %(val, val2.product_id))
-
-
-    ## def addLinks(self):
-    ##     DBlogging.dblogger.debug( "\tEntered addLinks()" )
-
-    ##     # go through the self.depends queue and add in the filefile anf filecode links
-    ##     # TODO think on this loop structure, can do a for loop but it doesnt pop, maybe with does this?
-
-    ##     for dep in self.depends.popleftiter():
-    ##         if dep['code'] == [None] :  # TODO do I need a check on the file also?
-    ##             continue
-    ##         # TODO do a query here to get this
-    ##         if dep['code'] == 83:
-    ##             dep['file']  = dep['file'] + '.png'
-    ##             DBlogging.dblogger.debug("\t\t\t\tAdded .png to extension")
-    ##         dep['file'] = self.dbu._getFileID(dep['file'])
-    ##         # so far only works on things with one dep
-    ##         self.dbu._addFilefilelink(dep['infile'], dep['file'])
-    ##         self.dbu._addFilecodelink(dep['file'], dep['code'])
-
+                    DBlogging.dblogger.debug( "\t\tfound products for children: %s: %s" %(val, val2.product_id))
 
 
 if __name__ == "__main__":
