@@ -5,7 +5,6 @@ import os
 import os.path
 import DBUtils2
 import datetime
-import DBfile
 import hashlib
 import Version
 import re
@@ -163,13 +162,6 @@ class Diskfile(object):
 
         if parse:
             self.parseAll()
-#
-#
-#    def fillParams(self):
-#        """
-#        fill in the params dict from the file and filename
-#        """
-
 
 
     def checkAccess(self):
