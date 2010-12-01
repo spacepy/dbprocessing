@@ -2,8 +2,6 @@
 
 import unittest
 import Version
-import sys
-import getopt
 
 
 
@@ -11,12 +9,9 @@ import getopt
 class VersionTests(unittest.TestCase):
     def setUp(self):
         super(VersionTests, self).setUp()
-        pass
-
 
     def tearDown(self):
         super(VersionTests, self).tearDown()
-        pass
 
     def test_interfaceOne(self):
         """Interface version starts at 1"""

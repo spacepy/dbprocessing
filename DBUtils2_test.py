@@ -3,7 +3,6 @@
 import unittest
 import DBUtils2
 import sys
-import getopt
 import Version
 import datetime
 import os

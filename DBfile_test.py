@@ -1,8 +1,6 @@
 #!/usr/bin/env python2.6
 
 import unittest
-import DBUtils2
-import datetime
 import DBfile
 import os
 import Diskfile

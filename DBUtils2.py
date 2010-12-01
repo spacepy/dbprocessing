@@ -1,15 +1,9 @@
 import sqlalchemy
-from sqlalchemy.orm import mapper, sessionmaker
-from sqlalchemy import Column, Integer, String, DateTime, BigInteger, Boolean, Date, Float, Table
-from sqlalchemy import desc, and_, select
+from sqlalchemy.orm import sessionmaker
 import os.path
 import datetime
-import subprocess
 import numpy as np
-import copy
 from sqlalchemy.exceptions import IntegrityError
-import Version
-import glob
 from sqlalchemy.sql.expression import asc, desc
 
 
