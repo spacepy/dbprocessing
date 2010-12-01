@@ -1,8 +1,3 @@
-
-
-
-
-
 class VersionError(Exception):
     pass
 
