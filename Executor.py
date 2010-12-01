@@ -9,7 +9,6 @@ import DBlogging
 
 class ExecutorError(Exception):
     DBlogging.dblogger.warning("\t\tEntered ExecutorError:")
-    pass
 
 class Executor(object):
     """
@@ -64,7 +63,7 @@ class Executor(object):
                     raise(ExecutorError("input %s did not exist"% (val)))
         if self.output != None:
             if not os.path.isdir(os.path.dirname(self.output)):
-                raise(ExecutorError("Invalid path for output"% (val)))
+                raise(ExecutorError("Invalid path for output: %s" % (self.output)))
 
     def doIt(self):
         cmd = []
