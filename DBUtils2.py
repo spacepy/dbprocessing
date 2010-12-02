@@ -1591,6 +1591,27 @@ class DBUtils2(object):
 
 
 
+    def _getFileFullPath(self, filename):
+        """
+        return the full path to a file given the name or id
+        (name or id is based on type)
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 2-DEC-2010 (BAL)
+        """
+        if not isinstance(filename, str):
+            filename = self._getFileName(filename)
+        # need to know file product and mission to get whole path
+        product_id = self.session.query(self.File.product_id).filter_by(filename = filename)[0][0]
+        rel_path = self.session.query(self.Product.relative_path).filter_by(product_id = product_id)[0][0]
+        root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
+
+        return root_dir + os.path.sep + rel_path + os.path.sep + filename
+
+
     def _getMissionID(self):
         """
         Return the current mission ID
@@ -1847,7 +1868,7 @@ class DBUtils2(object):
 
     def _checkIncoming(self):
         """
-        check the incoming directory for the current mision and add those files to the processing list
+        check the incoming directory for the current mision and add those files to the geting list
 
         @return: processing list of file ids
         @rtype: list
