@@ -351,7 +351,6 @@ if __name__ == "__main__":
         pq.importFromIncoming()
         pq.findChildrenProducts()
         pq.buildChildren()
-     #   tb.query_yes_no('Continue')
 
 
 
