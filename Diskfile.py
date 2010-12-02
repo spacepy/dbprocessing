@@ -196,6 +196,7 @@ class Diskfile(object):
         return self.dbu._getMissions()
 
 
+
     def makeProductFilename(self, productID, date, version, qacode = None):
         """
         go through the DB and make a filename from the product format string
@@ -226,6 +227,10 @@ class Diskfile(object):
         filename=filename.replace('%M',date.strftime('%M'))
         filename=filename.replace('%MILLI', date.strftime('%f')[0:3])
         filename=filename.replace('%MICRO',date.strftime('%f')[3:6])
+        # TODO not sure what to here so I'll try a hack
+        # filename=filename.replace('%QACODE','(ok|ignore|problem)')
+        filename=filename.replace('%QACODE','ok')
+
         if qacode != None:
             filename=filename.replace('%QACODE', qacode)
 
