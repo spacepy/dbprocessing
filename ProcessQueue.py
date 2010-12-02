@@ -160,6 +160,8 @@ class ProcessQueue(object):
 
             # get the path of the input file
             in_path = self.moved.popleft()
+            DBlogging.dblogger.debug("popleft %s from self.moved" % (str(in_path)))
+
             sq1 = self.dbu.session.query(self.dbu.Product).filter_by(product_id = val[1])[0]
             product = sq1.product_id
             root_path = self.dbu.session.query(self.dbu.Mission.rootdir).filter_by(mission_name = self.dbu.mission)[0][0]  # should only have one value
@@ -231,6 +233,8 @@ class ProcessQueue(object):
         DBlogging.dblogger.debug( "Entered findChildrenProducts()" )
 
         for val in self.findChildren.popleftiter():
+            DBlogging.dblogger.debug("popleftiter %s from self.findChildren" % (str(val)))
+
             proc_ids = self.dbu.session.query(self.dbu.Productprocesslink.process_id).filter_by(input_product_id = val.diskfile.params['product_id'])
 
             for pval in proc_ids:
