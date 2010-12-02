@@ -14,15 +14,22 @@ __version__ = '2.0.1'
 
 
 
-class EmptyQueue(Exception):
-    pass
 
-
-class ForExcept(Exception):
+class ForException(Exception):
+    """Cheezy but separate excpetion for breaking out of a nested loop"""
     pass
 
 
 class ProcessQueue(object):
+    """
+    Main code used to process the Queue, looks in incioming and builds all possible files
+
+    @author: Brian Larsen
+    @organization: Los Alamos National Lab
+    @contact: balarsen@lanl.gov
+    
+    @version: V1: 02-Dec-2010 (BAL)
+    """
     def __init__(self,
                  mission):
 
@@ -38,6 +45,15 @@ class ProcessQueue(object):
         DBlogging.dblogger.info("Entering ProcessQueue")
 
     def depDict(self, infile, file=None, code=None):
+        """
+        Dict to keep track of dependencies
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
+        
         DBlogging.dblogger.debug("Entered depDict:")
 
         # maybe this should be a class
@@ -49,6 +65,15 @@ class ProcessQueue(object):
 
 
     def checkIncoming(self):
+        """
+        Goes out to incoming and grabs all files there adding them to self.queue
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
         DBlogging.dblogger.debug("Entered checkIncoming:")
 
         self.queue.extendleft(self.dbu._checkIncoming())
@@ -62,13 +87,21 @@ class ProcessQueue(object):
                 pass   # this means it was shortened
         DBlogging.dblogger.debug("Queue contains (%d): %s" % (len(self.queue), self.queue))
 
-
  
-    def doProcess(self):
-        DBlogging.dblogger.info("Entering doProcess()")
-        self.process()
+    ## def doProcess(self):
+    ##     DBlogging.dblogger.info("Entering doProcess()")
+    ##     self.process()
 
     def moveToError(self, fname):
+        """
+        Moves a file from incoming to error
+        
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
         DBlogging.dblogger.debug("Entered moveToError:")
 
         DBlogging.dblogger.warning("**ERROR** %s moved to %s"%(fname, '/n/projects/cda/Test/errors/'))
@@ -78,6 +111,15 @@ class ProcessQueue(object):
 
 
     def importFromIncoming(self):
+        """
+        Import a file from incoming into the database
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
         DBlogging.dblogger.debug("Entering importFromIncoming, %d to import" % (len(self.queue)))
  
         for val in self.queue.popleftiter() :
@@ -112,6 +154,16 @@ class ProcessQueue(object):
                 DBlogging.dblogger.debug("Length of findChildren is %d" % (len(self.findChildren)))
 
     def getProcessFromOutputProduct(self, outProd):
+        """
+        Gets process from the db that have the output product
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
+        # TODO maybe this should move to DBUtils2
         DBlogging.dblogger.debug("Entered getProcessFromOutputProduct:")
 
         ans = []
@@ -121,6 +173,15 @@ class ProcessQueue(object):
         return ans
 
     def getCodeFromProcess(self, proc_id):
+        """
+        given a process id return the code that makes perfoms that process
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
         DBlogging.dblogger.debug("Entered getCodeFromProcess:")
 
         ans = []
@@ -133,6 +194,15 @@ class ProcessQueue(object):
         return ans
 
     def getCodePath(self, code_id):
+        """
+        Given a code_id list return the full name (path and all) of the code
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
         DBlogging.dblogger.debug("Entered getCodePath:")
 
         ans = []
@@ -145,6 +215,16 @@ class ProcessQueue(object):
 
 
     def buildChildren(self):
+        """
+        given the values in self.childrenQueue build them is possible
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
+        # TODO maybe this should be broken up
         DBlogging.dblogger.debug("Entered buildChildren:")
         for val in self.childrenQueue.popleftiter():  # val is a dbfile, product id tuple
             DBlogging.dblogger.debug("popleft %s from self.childrenQueue" % (str(val)))
@@ -163,11 +243,6 @@ class ProcessQueue(object):
                 continue  # The code_id was []
             # figure out the codes name and path
             codep = self.getCodePath([code_id])[0]
-
-            # get the path of the input file
-            ## This is flawed since an input file can have more than one child, inputs wiht more than one need to be added agian to the moved queue
-            ##in_path = self.moved.popleft()
-            ##DBlogging.dblogger.debug("popleft %s from self.moved" % (str(in_path)))
 
             sq1 = self.dbu.session.query(self.dbu.Product).filter_by(product_id = val[1])[0]
             product = sq1.product_id
@@ -188,14 +263,14 @@ class ProcessQueue(object):
                     sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
                     if sq1.count() == 0:
                         DBlogging.dblogger.debug("Skipping file since requirement not available (sq1.count)")
-                        raise(ForExcept())
+                        raise(ForException())
                     DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
                     # get an in_path for exe
                     in_path = self.dbu._getFileFullPath(val[0].diskfile.makeProductFilename(pval, date, version))
                     if in_path == None:
                         DBlogging.dblogger.debug("Skipping file since requirement not available (in_path)")
-                        raise(ForExcept())
-            except ForExcept:
+                        raise(ForException())
+            except ForException:
                 continue
             sq1 = self.dbu.session.query(self.dbu.Process).filter_by(process_id = proc_id)[0]
             extra_params_in = sq1.extra_params_in
@@ -239,6 +314,15 @@ class ProcessQueue(object):
 
             
     def findChildrenProducts(self):
+        """
+        from the queue self.findChildren go though and find all the products of the children
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+        
+        @version: V1: 02-Dec-2010 (BAL)
+        """
         # childern is a sub sub query
         # select * from product where product_id = (SELECT output_product from process where process_id
         #  = (select product_id from productprocesslink where product_id = 16));
