@@ -14,7 +14,7 @@ __version__ = '2.0.1'
 class Tests(unittest.TestCase):
     def setUp(self):
         super(Tests, self).setUp()
-        self.queue = DBqueue.DBqueue([1,2,3])
+        self.queue = DBqueue.DBqueue([1, 2, 3])
 
 
     def tearDown(self):

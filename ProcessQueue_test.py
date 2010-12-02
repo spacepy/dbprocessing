@@ -1,12 +1,11 @@
 #!/usr/bin/env python2.6
 
 import unittest
-import DBUtils2
-import sys
-import getopt
-import Version
-import datetime
-import os
+#import DBUtils2
+#import sys
+#import Version
+#import datetime
+#import os
 import ProcessQueue
 
 from collections import deque

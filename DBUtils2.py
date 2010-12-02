@@ -6,12 +6,11 @@ from sqlalchemy import Table #Column, Integer, String, DateTime, BigInteger, Boo
 from sqlalchemy.orm import mapper # sessionmaker
 import numpy as np
 from sqlalchemy.exceptions import IntegrityError
-from sqlalchemy.sql.expression import asc, desc
+from sqlalchemy.sql.expression import asc #, desc
 
 
 ## This goes in the processing comment field in the DB, do update it
 __version__ = '2.0.1'
-__package__  = None
 
 
 class DBError(Exception):
@@ -462,93 +461,95 @@ class DBUtils2(object):
 #########################################
 ## now that we have all the files that actiually need to be processed, grab more info
 
-    def _buildOutName(self, incQuality=False, incRevision=False, verbose=False):
-        """
-        TODO this needs updateing to make the versions set correctly for reporcessing
 
-        build up the output name of the file that will be output of processing
-        to add a file to the database one needs to collect and do the following
-          - create a new data file from running a process (above stored in commands)
-          - insert that file into the data_files table
-          - INFO NEEDED:
-          - filename  -- from the command  (out_fname)
-          - utc_file_date  -- from the command  (utc_file_date)
-          - utc_start_date  -- from inpout files  (get from a query)
-          - utc_stop_date  -- from inout files  (get from a query)
-          - data_level  -- from processes table    (get from a query)
-          - consistency_check  -- (optional blank on additon)
-          - ec_interface_version  -- copy from Executable_code interface version (inferface_version)
-          - verbose_provenance  -- (optional, to add later)
-          - quality_check  -- (optional, blank for new files)
-          - quality_comment  -- (optional, blank for new files)
-          - caveats  -- (optional, black for new files)
-          - release_number  -- (optional, blank for new files)
-          - ds_id  -- what data source it came from   (out_ds_id)
-          - quality_version -- starts at 1 always
-          - revision_version  -- starts at 1 always
-          - file_create_date  -- the date and time file was created   (DB defaults to now)
-          - dp_id  -- the data product    (out_dp_id)
-          - met_start_time  -- (optional if we know it)
-          - met_stop_time  -- (optional if we knowq it)
-          - exists_on_disk  --  true for all new files
-          - base_filename   --  built from the output filename
+    ## This code is depricated
+    ## def _buildOutName(self, incQuality=False, incRevision=False, verbose=False):
+    ##     """
+    ##     TODO this needs updateing to make the versions set correctly for reporcessing
 
-        @keyword verbose: (optional) print information out to the command line
-        @return: True - Success, False - Failure
+    ##     build up the output name of the file that will be output of processing
+    ##     to add a file to the database one needs to collect and do the following
+    ##       - create a new data file from running a process (above stored in commands)
+    ##       - insert that file into the data_files table
+    ##       - INFO NEEDED:
+    ##       - filename  -- from the command  (out_fname)
+    ##       - utc_file_date  -- from the command  (utc_file_date)
+    ##       - utc_start_date  -- from inpout files  (get from a query)
+    ##       - utc_stop_date  -- from inout files  (get from a query)
+    ##       - data_level  -- from processes table    (get from a query)
+    ##       - consistency_check  -- (optional blank on additon)
+    ##       - ec_interface_version  -- copy from Executable_code interface version (inferface_version)
+    ##       - verbose_provenance  -- (optional, to add later)
+    ##       - quality_check  -- (optional, blank for new files)
+    ##       - quality_comment  -- (optional, blank for new files)
+    ##       - caveats  -- (optional, black for new files)
+    ##       - release_number  -- (optional, blank for new files)
+    ##       - ds_id  -- what data source it came from   (out_ds_id)
+    ##       - quality_version -- starts at 1 always
+    ##       - revision_version  -- starts at 1 always
+    ##       - file_create_date  -- the date and time file was created   (DB defaults to now)
+    ##       - dp_id  -- the data product    (out_dp_id)
+    ##       - met_start_time  -- (optional if we know it)
+    ##       - met_stop_time  -- (optional if we knowq it)
+    ##       - exists_on_disk  --  true for all new files
+    ##       - base_filename   --  built from the output filename
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
+    ##     @keyword verbose: (optional) print information out to the command line
+    ##     @return: True - Success, False - Failure
 
-        @version: V1: 14-Jun-2010 (BAL)
+    ##     @author: Brian Larsen
+    ##     @organization: Los Alamos National Lab
+    ##     @contact: balarsen@lanl.gov
 
-        >>>  pnl._buildOutName()
-        """
-        # gather and put the processing info for each fiole in the dictionary
-        for fname in self.bf:
-            for sq in self.session.query(self.Processing_paths).filter_by(p_id=self.bf[fname]['out_p_id']).filter_by(active_code=True):
-                self.bf[fname]['exc_absolute_name'] = sq.absolute_name
-                self.bf[fname]['ec_id'] = sq.ec_id
+    ##     @version: V1: 14-Jun-2010 (BAL)
 
-            # gather and put the output file name into the dictionary
-            for sq in self.session.query(self.Build_output_filenames).filter_by(p_id=self.bf[fname]['out_p_id']):
-                if incQuality:
-                    self.bf[fname]['outquality_version'] = self.bf[fname]['quality_version'] + 1
-                else:
-                    self.bf[fname]['outquality_version'] = self.bf[fname]['quality_version']
-                if incRevision:
-                    self.bf[fname]['outrevision_version'] = self.bf[fname]['revision_version'] + 1
-                else:
-                    self.bf[fname]['outrevision_version'] = self.bf[fname]['revision_version']
-                interface_ver = self.session.query(self.Executable_codes).filter_by(ec_id=self.bf[fname]['ec_id']).all()[0]
-                out_fname = self.__build_fname(sq.path,
-                                          '',
-                                          sq.mission_name,
-                                          sq.satellite_name,
-                                          sq.product_name,
-                                          datetime.strftime(self.bf[fname]['utc_file_date'], '%Y%m%d'),
-                                          interface_ver.interface_version,
-                                          self.bf[fname]['outquality_version'],
-                                          self.bf[fname]['outrevision_version'])
-                self.bf[fname]['out_absolute_name'] = out_fname
-                self.bf[fname]['out_fname'] = os.path.basename(self.bf[fname]['out_absolute_name'])
-                self.bf[fname]['level'] = sq.level
-                break # hack to just do this once
+    ##     >>>  pnl._buildOutName()
+    ##     """
+    ##     # gather and put the processing info for each fiole in the dictionary
+    ##     for fname in self.bf:
+    ##         for sq in self.session.query(self.Processing_paths).filter_by(p_id=self.bf[fname]['out_p_id']).filter_by(active_code=True):
+    ##             self.bf[fname]['exc_absolute_name'] = sq.absolute_name
+    ##             self.bf[fname]['ec_id'] = sq.ec_id
 
-            for sq in self.session.query(self.Data_files).filter_by(f_id = self.bf[fname]['f_id']):
-                self.bf[fname]['utc_start_time'] = sq.utc_start_time
-                self.bf[fname]['utc_end_time'] = sq.utc_end_time
-                self.bf[fname]['data_level'] = sq.data_level
-                self.bf[fname]['met_start_time'] = sq.met_start_time
-                self.bf[fname]['met_stop_time'] = sq.met_stop_time
-                f2 = self.bf[fname]['out_fname'].split('.')[0]
-                f3 = f2.split('_v')[0]
-                self.bf[fname]['base_filename'] = f3
-                ## self.bf[fname]['quality_version'] += 1
-                ## self.bf[fname]['revision_version'] += 1
+    ##         # gather and put the output file name into the dictionary
+    ##         for sq in self.session.query(self.Build_output_filenames).filter_by(p_id=self.bf[fname]['out_p_id']):
+    ##             if incQuality:
+    ##                 self.bf[fname]['outquality_version'] = self.bf[fname]['quality_version'] + 1
+    ##             else:
+    ##                 self.bf[fname]['outquality_version'] = self.bf[fname]['quality_version']
+    ##             if incRevision:
+    ##                 self.bf[fname]['outrevision_version'] = self.bf[fname]['revision_version'] + 1
+    ##             else:
+    ##                 self.bf[fname]['outrevision_version'] = self.bf[fname]['revision_version']
+    ##             interface_ver = self.session.query(self.Executable_codes).filter_by(ec_id=self.bf[fname]['ec_id']).all()[0]
+    ##             out_fname = self.__build_fname(sq.path,
+    ##                                       '',
+    ##                                       sq.mission_name,
+    ##                                       sq.satellite_name,
+    ##                                       sq.product_name,
+    ##                                       datetime.strftime(self.bf[fname]['utc_file_date'], '%Y%m%d'),
+    ##                                       interface_ver.interface_version,
+    ##                                       self.bf[fname]['outquality_version'],
+    ##                                       self.bf[fname]['outrevision_version'])
+    ##             self.bf[fname]['out_absolute_name'] = out_fname
+    ##             self.bf[fname]['out_fname'] = os.path.basename(self.bf[fname]['out_absolute_name'])
+    ##             self.bf[fname]['level'] = sq.level
+    ##             break # hack to just do this once
 
-                if verbose: print("\t build the outname %s" % (self.bf[fname]['out_fname']))
-        return True  # should actually check something
+    ##         for sq in self.session.query(self.Data_files).filter_by(f_id = self.bf[fname]['f_id']):
+    ##             self.bf[fname]['utc_start_time'] = sq.utc_start_time
+    ##             self.bf[fname]['utc_end_time'] = sq.utc_end_time
+    ##             self.bf[fname]['data_level'] = sq.data_level
+    ##             self.bf[fname]['met_start_time'] = sq.met_start_time
+    ##             self.bf[fname]['met_stop_time'] = sq.met_stop_time
+    ##             f2 = self.bf[fname]['out_fname'].split('.')[0]
+    ##             f3 = f2.split('_v')[0]
+    ##             self.bf[fname]['base_filename'] = f3
+    ##             ## self.bf[fname]['quality_version'] += 1
+    ##             ## self.bf[fname]['revision_version'] += 1
+
+    ##             if verbose: print("\t build the outname %s" % (self.bf[fname]['out_fname']))
+    ##     return True  # should actually check something
 
 #####################################
 ####  Do processing and input to DB
@@ -673,7 +674,7 @@ class DBUtils2(object):
         try:
             l1 = self.Logging()
         except AttributeError:
-           raise(DBError("Class Logging not found was it created?"))
+            raise(DBError("Class Logging not found was it created?"))
 
         l1.currently_processing = currently_processing
         l1.processing_start_time = processing_start_time
@@ -873,7 +874,7 @@ class DBUtils2(object):
         try:
             m1 = self.Mission()
         except AttributeError:
-           raise(DBError("Class Mission not found was it created?"))
+            raise(DBError("Class Mission not found was it created?"))
 
         m1.mission_name = mission_name
         m1.rootdir = rootdir
@@ -954,7 +955,7 @@ class DBUtils2(object):
         try:
             p1 = self.Process()
         except AttributeError:
-           raise(DBError("Class process not found was it created?"))
+            raise(DBError("Class process not found was it created?"))
         p1.output_product = output_product
         p1.process_name = process_name
         p1.extra_params = extra_params
@@ -997,7 +998,7 @@ class DBUtils2(object):
         try:
             p1 = self.Product()
         except AttributeError:
-           raise(DBError("Class product not found was it created?"))
+            raise(DBError("Class product not found was it created?"))
 
         p1.instrument_id = instrument_id
         p1.product_name = product_name
@@ -1031,7 +1032,7 @@ class DBUtils2(object):
         try:
             ppl1 = self.Productprocesslink()
         except AttributeError:
-           raise(DBError("Class Productprocesslink not found was it created?"))
+            raise(DBError("Class Productprocesslink not found was it created?"))
         ppl1.input_product_id = input_product_id
         ppl1.process_id = process_id
         self.session.add(ppl1)
@@ -1061,7 +1062,7 @@ class DBUtils2(object):
         try:
             fcl1 = self.Filecodelink()
         except AttributeError:
-           raise(DBError("Class Filecodelink not found was it created?"))
+            raise(DBError("Class Filecodelink not found was it created?"))
         fcl1.resulting_file = resulting_file_id
         fcl1.source_code = source_code
         self.session.add(fcl1)
@@ -1092,7 +1093,7 @@ class DBUtils2(object):
         try:
             ffl1 = self.Filefilelink()
         except AttributeError:
-           raise(DBError("Class Filefilelink not found was it created?"))
+            raise(DBError("Class Filefilelink not found was it created?"))
         ffl1.source_file = source_file
         ffl1.resulting_file = resulting_file_id
         self.session.add(ffl1)
@@ -1123,7 +1124,7 @@ class DBUtils2(object):
         try:
             ipl1 = self.Instrumentproductlink()
         except AttributeError:
-           raise(DBError("Class Instrumentproductlink not found was it created?"))
+            raise(DBError("Class Instrumentproductlink not found was it created?"))
         ipl1.instrument_id = instrument_id
         ipl1.product_id = product_id
         self.session.add(ipl1)
@@ -1158,7 +1159,7 @@ class DBUtils2(object):
         try:
             i1 = self.Instrument()
         except:
-           raise(DBError("Class Instrument not found was it created?"))
+            raise(DBError("Class Instrument not found was it created?"))
 
         i1.satellite_id = satellite_id
         i1.instrument_name = instrument_name
@@ -1343,7 +1344,7 @@ class DBUtils2(object):
         try:
             d1 = self.File()
         except AttributeError:
-           raise(DBError("Class File not found was it created?"))
+            raise(DBError("Class File not found was it created?"))
 
 
         self._createTableObjects()

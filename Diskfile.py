@@ -214,27 +214,27 @@ class Diskfile(object):
         filename = self.dbu._getProductFormats(productID)[0] # just for the format
         mission, satellite, instrument, product, product_id = self.dbu._getProductNames(productID)
 
-        filename=filename.replace('%MISSION',  mission)
-        filename=filename.replace('%SPACECRAFT',   satellite)
-        filename=filename.replace('%PRODUCT', product )
-        filename=filename.replace('%VERSION',str(version))
-        filename=filename.replace('%Y', date.strftime('%Y'))
-        filename=filename.replace('%m',date.strftime('%m'))
-        filename=filename.replace('%d',date.strftime('%d'))
-        filename=filename.replace('%INSTRUMENT', instrument)
+        filename = filename.replace('%MISSION',  mission)
+        filename = filename.replace('%SPACECRAFT',   satellite)
+        filename = filename.replace('%PRODUCT', product )
+        filename = filename.replace('%VERSION',str(version))
+        filename = filename.replace('%Y', date.strftime('%Y'))
+        filename = filename.replace('%m',date.strftime('%m'))
+        filename = filename.replace('%d',date.strftime('%d'))
+        filename = filename.replace('%INSTRUMENT', instrument)
         filename = filename.replace('%y', date.strftime('%y'))
         # TODO can be made more restrictive
-        filename=filename.replace('%j',date.strftime('%j'))
-        filename=filename.replace('%H', date.strftime('%H'))
-        filename=filename.replace('%M',date.strftime('%M'))
-        filename=filename.replace('%MILLI', date.strftime('%f')[0:3])
-        filename=filename.replace('%MICRO',date.strftime('%f')[3:6])
+        filename = filename.replace('%j',date.strftime('%j'))
+        filename = filename.replace('%H', date.strftime('%H'))
+        filename = filename.replace('%M',date.strftime('%M'))
+        filename = filename.replace('%MILLI', date.strftime('%f')[0:3])
+        filename = filename.replace('%MICRO',date.strftime('%f')[3:6])
         # TODO not sure what to here so I'll try a hack
-        # filename=filename.replace('%QACODE','(ok|ignore|problem)')
-        filename=filename.replace('%QACODE','ok')
+        # filename = filename.replace('%QACODE','(ok|ignore|problem)')
+        filename = filename.replace('%QACODE','ok')
 
         if qacode != None:
-            filename=filename.replace('%QACODE', qacode)
+            filename = filename.replace('%QACODE', qacode)
 
         if self.figureProduct(filename) != productID:
             raise(FilenameError("Created filename did not match convention"))
@@ -294,22 +294,22 @@ class Diskfile(object):
             expression = r'^' + formats[i] + '$'
 
             # TODO this can be cleaned up...
-            expression=expression.replace('%MISSION',  prods[i][0])
-            expression=expression.replace('%SPACECRAFT',   prods[i][1])
-            expression=expression.replace('%PRODUCT', prods[i][3] )
-            expression=expression.replace('%VERSION','\d.\d.\d')
-            expression=expression.replace('%Y','(19|2\d)\d\d')
-            expression=expression.replace('%m','(0\d|1[0-2])')
-            expression=expression.replace('%d','[0-3]\d')
-            expression=expression.replace('%INSTRUMENT', prods[i][2])
+            expression = expression.replace('%MISSION',  prods[i][0])
+            expression = expression.replace('%SPACECRAFT',   prods[i][1])
+            expression = expression.replace('%PRODUCT', prods[i][3] )
+            expression = expression.replace('%VERSION','\d.\d.\d')
+            expression = expression.replace('%Y','(19|2\d)\d\d')
+            expression = expression.replace('%m','(0\d|1[0-2])')
+            expression = expression.replace('%d','[0-3]\d')
+            expression = expression.replace('%INSTRUMENT', prods[i][2])
             expression = expression.replace('%y', '\d\d')
             # TODO can be made more restrictive
-            expression=expression.replace('%j','[0-3]\d\d')
-            expression=expression.replace('%H','[0-2]\d')
-            expression=expression.replace('%M','[0-6]\d')
-            expression=expression.replace('%MILLI','\d{3}')
-            expression=expression.replace('%MICRO','\d{3}')
-            expression=expression.replace('%QACODE','(ok|ignore|problem)')
+            expression = expression.replace('%j','[0-3]\d\d')
+            expression = expression.replace('%H','[0-2]\d')
+            expression = expression.replace('%M','[0-6]\d')
+            expression = expression.replace('%MILLI','\d{3}')
+            expression = expression.replace('%MICRO','\d{3}')
+            expression = expression.replace('%QACODE','(ok|ignore|problem)')
             #TODO what to do with the IGNORE code?  Maybe it doesnt need to exist
             if filename == None:
                 DBlogging.dblogger.debug("Matching %d:%s against %s" % (prods[i][4], expression,  os.path.basename(self.filename)))
@@ -371,8 +371,8 @@ class Diskfile(object):
 
             date = datetime.date(year, month, day)
             self.params['utc_file_date'] = date
-            self.params['utc_start_time'] = datetime.datetime.combine(date, datetime.time(0,0,0))
-            self.params['utc_stop_time'] = datetime.datetime.combine(date, datetime.time(23,59,59,999999))
+            self.params['utc_start_time'] = datetime.datetime.combine(date, datetime.time(0, 0, 0))
+            self.params['utc_stop_time'] = datetime.datetime.combine(date, datetime.time(23, 59, 59, 999999))
 
 
 
