@@ -615,12 +615,9 @@ class DBUtils2(object):
             raise(DBError(IE))
         return True
 
-    def _startLogging(self, verbose = False):
+    def _startLogging(self):
         """
         Add an entry to the logging table in the DB, logging
-
-        @keyword verbose: (optional) print information out to the command line
-        @return: True - Success, False - Failure
 
         @author: Brian Larsen
         @organization: Los Alamos National Lab
@@ -642,8 +639,9 @@ class DBUtils2(object):
                         os.getlogin(),
                         socket.gethostname(),
                         pid = os.getpid() )
-        if verbose: print("Logging started: %s, PID: %s, M_id: %s, user: %s, hostmane: %s" %
-                          (p1.processing_start, p1.pid, p1.mission_id, p1.user, p1.hostname))
+        DBlogging.dblogger.info( "Logging started: %s, PID: %s, M_id: %s, user: %s, hostmane: %s" %
+                          (p1.processing_start, p1.pid, p1.mission_id, p1.user, p1.hostname) )
+
 
     def _addLogging(self,
                     currently_processing,
