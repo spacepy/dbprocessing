@@ -1602,8 +1602,8 @@ class DBUtils2(object):
 
         @version: V1: 2-DEC-2010 (BAL)
         """
-        if not isinstance(filename, str):
-            filename = self._getFileName(filename)
+        if isinstance(filename, (int, long)):
+            filename = self._getFilename(filename)
         # need to know file product and mission to get whole path
         product_id = self.session.query(self.File.product_id).filter_by(filename = filename)[0][0]
         rel_path = self.session.query(self.Product.relative_path).filter_by(product_id = product_id)[0][0]
