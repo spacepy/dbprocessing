@@ -16,6 +16,9 @@ class EmptyQueue(Exception):
     pass
 
 
+class ForExcept(Exception):
+    pass
+
 
 class ProcessQueue(object):
     def __init__(self,
@@ -146,8 +149,9 @@ class ProcessQueue(object):
 
             # check to see if there is a process defined on this output product
             proc_id = self.getProcessFromOutputProduct([val[1]])[0]
-            if proc_id == []:
+            if proc_id == []:  #TODO should this be a None?
                 continue # there is no process defined
+
 
             # since we have a process do we have a code that does it?
             code_id = self.getCodeFromProcess([proc_id])  
@@ -159,8 +163,9 @@ class ProcessQueue(object):
             codep = self.getCodePath([code_id])[0]
 
             # get the path of the input file
-            in_path = self.moved.popleft()
-            DBlogging.dblogger.debug("popleft %s from self.moved" % (str(in_path)))
+            ## This is flawed since an input file can have more than one child, inputs wiht more than one need to be added agian to the moved queue
+            ##in_path = self.moved.popleft()
+            ##DBlogging.dblogger.debug("popleft %s from self.moved" % (str(in_path)))
 
             sq1 = self.dbu.session.query(self.dbu.Product).filter_by(product_id = val[1])[0]
             product = sq1.product_id
@@ -180,10 +185,12 @@ class ProcessQueue(object):
                 for pval in products:
                     sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
                     DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
+                    # get an in_path for exe
+                    in_path = self.dbu._getFileFullPath(val[0].diskfile.makeProductFilename(pval, date, version))
                     if sq1.count() == 0:
                         DBlogging.dblogger.debug("Skipping file since requirement not available")
-                        Raise(Exception())
-            except:
+                        raise(ForExcept())
+            except ForExcept:
                 continue
             sq1 = self.dbu.session.query(self.dbu.Process).filter_by(process_id = proc_id)[0]
             extra_params_in = sq1.extra_params_in
