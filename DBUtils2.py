@@ -849,51 +849,6 @@ class DBUtils2(object):
 
 
 
-
-#    def _collectDependencies(self, f_id=None, verbose=False):
-#        """
-#        Collect the dependencies for a file and add it to the BF dict or if f_id is set return
-#        that file's dependencies.  NOTE this collects the cd_id and fd_id form those tables not the
-#        actual file, have to query the tables.
-#
-#        @keyword f_id: (optional) changes routine to return lists of file and code dependencies
-#
-#        @return:
-#             - without f_id True means success, False means failure
-#             - with f_id returns a list of file dependicies and a list of code dependencies
-#
-#        @author: Brian Larsen
-#        @organization: Los Alamos National Lab
-#        @contact: balarsen@lanl.gov
-#
-#        @version: V1: 18-Jun-2010 (BAL)
-#
-#        >>>  pnl._collectDependencies()
-#        """
-#        try: self.File_dependencies
-#        except AttributeError: self._createTableObjects()
-#        if f_id == None:
-#            for fname in self.bf:
-#                self.bf[fname]['file_dependencies'] = []
-#                self.bf[fname]['code_dependencies'] = []
-#
-#                # query and find dependencies, add them as a list to the BF dict
-#                for sq_fd in self.session.query(self.File_dependencies).filter_by(f_id = self.bf[fname]['f_id']):
-#                    self.bf[fname]['file_dependencies'].append(sq_fd.fd_id)
-#                for sq_cd in self.session.query(self.Code_dependencies).filter_by(f_id = self.bf[fname]['f_id']):
-#                    self.bf[fname]['code_dependencies'].append(sq_cd.cd_id)
-#            return True   # add error checking
-#        else:  # just to make it obvious what is going on
-#            fd = []
-#            cd = []
-#            for sq_fd in self.session.query(self.File_dependencies).filter_by(f_id = f_id):
-#                fd.append(sq_fd.fd_id)
-#            for sq_cd in self.session.query(self.Code_dependencies).filter_by(f_id = f_id):
-#                cd.append(sq_cd.cd_id)
-#            return (fd, cd)
-#
-
-
     def _addMission(self,
                     mission_name,
                     rootdir):
