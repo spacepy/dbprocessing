@@ -184,11 +184,14 @@ class ProcessQueue(object):
             try:
                 for pval in products:
                     sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
+                    if sq1.count() == 0:
+                        DBlogging.dblogger.debug("Skipping file since requirement not available (sq1.count)")
+                        raise(ForExcept())
                     DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
                     # get an in_path for exe
                     in_path = self.dbu._getFileFullPath(val[0].diskfile.makeProductFilename(pval, date, version))
-                    if sq1.count() == 0:
-                        DBlogging.dblogger.debug("Skipping file since requirement not available")
+                    if in_path == None:
+                        DBlogging.dblogger.debug("Skipping file since requirement not available (in_path)")
                         raise(ForExcept())
             except ForExcept:
                 continue
