@@ -75,11 +75,9 @@ class AddTests(unittest.TestCase):
         self.assertRaises(DBUtils2.DBError, self.dbu._addProcess, 'instname', 1234, 'string')
         self.assertRaises(DBUtils2.DBError, self.dbu._addProcess, 'instname', 1234, 'string', 1234)
 
-    def test_addProductOrder(self):
-        """_addProduct wont work until the Product class is created from the DB"""
-        self.assertRaises(DBUtils2.DBError, self.dbu._addProduct, 'instname', 1234, 'path')
-        self.assertRaises(DBUtils2.DBError, self.dbu._addProduct, 'instname', 1234, 'string', 1234)
-
+    ## def test_addProductOrder(self):
+    ##     """_addProduct wont work until the Product class is created from the DB"""
+    ##     self.assertRaises(DBUtils2.DBError, self.dbu._addProduct, 'pname' , 11, 'rel_path', 1234, 'path')
 
     def test_addCodeOrder(self):
         """_addCode wont work until the Code class is created from the DB"""
