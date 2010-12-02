@@ -390,7 +390,8 @@ if __name__ == "__main__":
             pq.dbu._closeDB()
             DBlogging.dblogger.error( "There is a processing flag set but it died, dont start another" )
             raise(ProcessException("There is a processing flag set but it died, dont start another"))
-
+    # start logging as a lock
+    pq.dbu._startLogging()
         
     
     pq.checkIncoming()
@@ -399,6 +400,8 @@ if __name__ == "__main__":
         pq.findChildrenProducts()
         pq.buildChildren()
 
+    
+    pq.dbu._stopLogging('Nominal Exit')
     pq.dbu._closeDB()
 
 
