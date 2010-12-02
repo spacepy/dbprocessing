@@ -605,7 +605,7 @@ class DBUtils2(object):
         sq = self.session.query(self.Logging).filter_by(currently_processing = True)
         for val in sq:
             val.currently_processing = False
-            val.processing_end = datetime.now()
+            val.processing_end = datetime.datetime.now()
             val.comment = 'Overridden:' + comment + ':' + __version__
             self.session.add(val)
         try:
