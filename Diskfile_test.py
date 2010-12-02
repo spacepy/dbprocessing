@@ -8,7 +8,7 @@ import os
 import Version
 import stat
 
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 
 class StaticTests(unittest.TestCase):

@@ -11,7 +11,7 @@ import DBlogging
 
 
 ## This goes in the processing comment field in the DB, do update it
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 
 class DBError(Exception):
@@ -607,7 +607,7 @@ class DBUtils2(object):
             val.currently_processing = False
             val.processing_end = datetime.datetime.now()
             val.comment = 'Overridden:' + comment + ':' + __version__
-            DBlogging.dblogger.info( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
+            DBlogging.dblogger.error( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
             self.session.add(val)
         try:
             self.session.commit()
@@ -740,7 +740,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
-        DBlogging.dblogger.warning( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) ) 
+        DBlogging.dblogger.info( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) ) 
 
     def _addLoggingFile(self,
                         logging_id,
@@ -772,6 +772,7 @@ class DBUtils2(object):
         pf1.code_id = code_id
         pf1.comment = comment
         self.session.add(pf1)
+        DBlogging.dblogger.info( "File Logging added for file:%d code:%d with comment:%s"  % (pf1.file_id, pf1.code_id, pf1.comment) ) 
         # TODO  think on if session should be left open or if a list shoud be passed in
         try:
             self.session.commit()

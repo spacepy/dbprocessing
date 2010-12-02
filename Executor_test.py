@@ -6,6 +6,7 @@ import sys
 import os
 import stat
 
+__version__ = '2.0.2'
 
 class Tests(unittest.TestCase):
     def setUp(self):
