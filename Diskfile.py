@@ -194,21 +194,16 @@ class Diskfile(object):
 
 
 
-    def _isValidMission(self, m_in):
-        return self.dbu._getMissions()
-
-
-
     def makeProductFilename(self, productID, date, version, qacode = None):
         """
         go through the DB and make a filename from the product format string
         """
         if not isinstance(version, Version.Version):
-            rasie(InputError("Version must be an instance of a Version object"))
+            raise(InputError("Version must be an instance of a Version object"))
         if not isinstance(date, (datetime.datetime, datetime.date)):
-            rasie(InputError("date must be an instance of a date or datetime  object"))
+            raise(InputError("date must be an instance of a date or datetime  object"))
         if not qacode in ['ok', 'ignore', 'problem', None]:
-            rasie(InputError("qacode invalid, can be ok, ignore, problem, or None "))
+            raise(InputError("qacode invalid, can be ok, ignore, problem, or None "))
 
 
         filename = self.dbu._getProductFormats(productID)[0] # just for the format
@@ -386,7 +381,7 @@ class Diskfile(object):
                 mtime = os.path.getmtime(self.infile)
                 self.params['file_create_date'] = datetime.datetime.fromtimestamp(mtime)
             except OSError:
-                pass
+                pass #TODO why did I do this?
             self.params['met_start_time'] = None
             self.params['met_stop_time'] = None
             self.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk

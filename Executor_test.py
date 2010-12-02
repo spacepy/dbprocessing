@@ -31,6 +31,8 @@ class Tests(unittest.TestCase):
         """Exception on missing file to run"""
         ex = Executor.Executor('code_run_tmp_bad', '', '')
         self.assertRaises(Executor.ExecutorError, ex.checkExists)
+        ex = Executor.Executor('code_run_tmp_bad', 'blabla', '')
+        self.assertRaises(Executor.ExecutorError, ex.checkExists)
 
 
     def test_runfile(self):
