@@ -1605,10 +1605,13 @@ class DBUtils2(object):
         if isinstance(filename, (int, long)):
             filename = self._getFilename(filename)
         # need to know file product and mission to get whole path
-        product_id = self.session.query(self.File.product_id).filter_by(filename = filename)[0][0]
-        rel_path = self.session.query(self.Product.relative_path).filter_by(product_id = product_id)[0][0]
-        root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
-
+        try:
+            product_id = self.session.query(self.File.product_id).filter_by(filename = filename)[0][0]
+            rel_path = self.session.query(self.Product.relative_path).filter_by(product_id = product_id)[0][0]
+            root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
+        except IndexError:
+            return None
+            
         return root_dir + os.path.sep + rel_path + os.path.sep + filename
 
 
