@@ -607,6 +607,7 @@ class DBUtils2(object):
             val.currently_processing = False
             val.processing_end = datetime.datetime.now()
             val.comment = 'Overridden:' + comment + ':' + __version__
+            DBlogging.dblogger.info( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
             self.session.add(val)
         try:
             self.session.commit()
@@ -614,6 +615,10 @@ class DBUtils2(object):
             self.session.rollback()
             raise(DBError(IE))
         return True
+
+
+
+    
 
     def _startLogging(self):
         """
@@ -634,13 +639,14 @@ class DBUtils2(object):
             raise(DBError('A Currently Processing flag is still set, cannot process now'))
         # save this class instance so that we can finish the logging later
         self.__p1 = self._addLogging(True,
-                         datetime.datetime.now(),
-                        self._getMissionID(),
-                        os.getlogin(),
-                        socket.gethostname(),
-                        pid = os.getpid() )
-        DBlogging.dblogger.info( "Logging started: %s, PID: %s, M_id: %s, user: %s, hostmane: %s" %
-                          (p1.processing_start, p1.pid, p1.mission_id, p1.user, p1.hostname) )
+                              datetime.datetime.now(),
+                              self._getMissionID(),
+                              os.getlogin(),
+                              socket.gethostname(),
+                              pid = os.getpid() )
+        DBlogging.dblogger.info( "Logging started: %d: %s, PID: %s, M_id: %s, user: %s, hostmane: %s" %
+                                 (self.__p1.logging_id, self.__p1.processing_start_time, self.__p1.pid,
+                                  self.__p1.mission_id, self.__p1.user, self.__p1.hostname) )
 
 
     def _addLogging(self,
@@ -698,13 +704,12 @@ class DBUtils2(object):
             raise(DBError(IE))
         return l1    # so we can use the same session to stop the logging
 
-    def _stopLogging(self, comment, verbose=False):
+    def _stopLogging(self, comment):
         """
         Finish the entry to the processing table in the DB, logging
 
         @param comment: (optional) a comment to insert intot he DB
         @type param: str
-        @keyword verbose: (optional) print information out to the command line
 
         @author: Brian Larsen
         @organization: Los Alamos National Lab
@@ -712,11 +717,13 @@ class DBUtils2(object):
 
         @version: V1: 17-Jun-2010 (BAL)
         @version: V2: 17-Sep-2010 (BAL) - updated for new DB format
+        @version: V3: 02-Dec-2010 (BAL) - added dblogging not verbose
 
         >>>  pnl._stopLogging()
         """
         try: self.__p1
         except:
+            DBlogging.dblogger.warning( "Logging was not started, can't stop") 
             raise(DBProcessingError("Logging was not started"))
         # clean up the logging, we are done processing and we can realease the lock (currently_processing) and
         # put in the complete time
@@ -724,7 +731,7 @@ class DBUtils2(object):
             print("Must enter a comment for the log")
             return False
 
-        self.__p1.processing_end = datetime.now()
+        self.__p1.processing_end = datetime.datetime.now()
         self.__p1.currently_processing = False
         self.__p1.comment = comment+':' + __version__
         self.session.add(self.__p1)
@@ -733,7 +740,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
-        if verbose: print("Logging stopped: %s comment '%s' entered" % (self.__p1.processing_end, self.__p1.comment))
+        DBlogging.dblogger.warning( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) ) 
 
     def _addLoggingFile(self,
                         logging_id,
