@@ -1,6 +1,10 @@
 
 from collections import deque
 
+
+__version__ = '2.0.1'
+
+
 class DBqueue(deque):
 
     def popleftiter(self):

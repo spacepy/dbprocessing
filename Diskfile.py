@@ -11,6 +11,8 @@ import re
 
 import DBlogging
 
+__version__ = '2.0.1'
+
 
 # TODO look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isnt called
 class ReadError(Exception):

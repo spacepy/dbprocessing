@@ -7,6 +7,9 @@ import Diskfile
 import os
 import Version
 
+__version__ = '2.0.1'
+
+
 class StaticTests(unittest.TestCase):
     """ tests for the static methods in DBfile"""
     def setUp(self):

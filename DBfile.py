@@ -5,6 +5,8 @@ import Diskfile
 from sqlalchemy.exceptions import IntegrityError
 import shutil
 
+__version__ = '2.0.1'
+
 
 class DBfileError(Exception):
     """Exception that is raised by DBfile class

@@ -10,6 +10,8 @@ import Executor
 
 import DBlogging
 
+__version__ = '2.0.1'
+
 
 
 class EmptyQueue(Exception):

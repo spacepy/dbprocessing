@@ -5,6 +5,10 @@ import DBfile
 import os
 import Diskfile
 
+__version__ = '2.0.1'
+
+
+
 class DBfileTests(unittest.TestCase):
     def setUp(self):
         super(DBfileTests, self).setUp()

@@ -6,6 +6,11 @@
 import unittest
 import DBqueue
 
+
+__version__ = '2.0.1'
+
+
+
 class Tests(unittest.TestCase):
     def setUp(self):
         super(Tests, self).setUp()

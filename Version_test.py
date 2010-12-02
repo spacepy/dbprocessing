@@ -4,6 +4,7 @@ import unittest
 import Version
 
 
+__version__ = '2.0.1'
 
 
 class VersionTests(unittest.TestCase):

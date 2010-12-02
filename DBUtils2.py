@@ -10,7 +10,7 @@ from sqlalchemy.sql.expression import asc, desc
 
 
 ## This goes in the processing comment field in the DB, do update it
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 __package__  = None
 
 

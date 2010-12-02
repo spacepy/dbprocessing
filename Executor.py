@@ -6,6 +6,8 @@ import os.path
 
 import DBlogging
 
+__version__ = '2.0.1'
+
 
 class ExecutorError(Exception):
     DBlogging.dblogger.warning("\t\tEntered ExecutorError:")

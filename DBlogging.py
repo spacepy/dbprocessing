@@ -2,6 +2,10 @@
 import logging
 import logging.handlers
 
+__version__ = '2.0.1'
+
+
+
 """
 Setup routines to log information from thedbprocessing chain
 

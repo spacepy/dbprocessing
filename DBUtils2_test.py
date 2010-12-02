@@ -8,6 +8,10 @@ import datetime
 import os
 import os.path
 
+__version__ = '2.0.1'
+
+
+
 class AddTests(unittest.TestCase):
     def setUp(self):
         super(AddTests, self).setUp()
