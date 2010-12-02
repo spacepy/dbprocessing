@@ -58,7 +58,7 @@ class ProcessQueue(object):
         DBlogging.dblogger.debug("Queue contains (%d): %s" % (len(self.queue), self.queue))
 
 
-
+ 
     def doProcess(self):
         DBlogging.dblogger.info("\t\tEntering doProcess()")
         self.process()
@@ -99,11 +99,7 @@ class ProcessQueue(object):
 
                 DBlogging.dblogger.debug("\t\t\tf_id = %s" % (str(f_id)))
                 self.depends.append(self.depDict(f_id))
-                ## except (DBUtils2.DBInputError, DBUtils2.DBError):
-                ##     DBlogging.dblogger.debug("Except DBUtils2.DBInputError, DBUtils2.DBError so moving to error")
-                ##     self.moveToError(val)
-                ##     continue
-                # move file from incoming to path
+
                 mov = dbf.move()
                 self.moved.append(mov[1])  # only want to dest file
                 DBlogging.dblogger.debug("\tfile %s moved to  %s" % (mov[0], mov[1]))
@@ -145,48 +141,48 @@ class ProcessQueue(object):
 
     def buildChildren(self):
         DBlogging.dblogger.debug("\t\tEntered buildChildren:")
-        for val in self.childrenQueue.popleftiter():  # val is adbfile, product id tuple
+        for val in self.childrenQueue.popleftiter():  # val is a dbfile, product id tuple
             DBlogging.dblogger.debug("\t\t\tpopleft %s from self.childrenQueue" % (str(val)))
-            ## if isinstance(val, list) and val != []:
-            ##     val = val[0]
-            # from the childrenQueue we get a productID, get the Process then Code, the code path
-            proc_id = self.getProcessFromOutputProduct([val[1]])[0]#[0]
+
+            # check to see if there is a process defined on this output product
+            proc_id = self.getProcessFromOutputProduct([val[1]])[0]
             if proc_id == []:
-                continue # there is no code defined
-            code_id = self.getCodeFromProcess([proc_id])   #[0]#[0]
+                continue # there is no process defined
+
+            # since we have a process do we have a code that does it?
+            code_id = self.getCodeFromProcess([proc_id])  
             try:
                 code_id = code_id[0]
             except IndexError:
                 continue  # The code_id was []
+            # figure out the codes name and path
             codep = self.getCodePath([code_id])[0]
-            in_path = self.moved.popleft()
 
+            # get the path of the input file
+            in_path = self.moved.popleft()
             sq1 = self.dbu.session.query(self.dbu.Product).filter_by(product_id = val[1])[0]
             product = sq1.product_id
             root_path = self.dbu.session.query(self.dbu.Mission.rootdir).filter_by(mission_name = self.dbu.mission)[0][0]  # should only have one value
 
-            #filename = Diskfile.Diskfile(in_path)
-#            filename.parseAll()
             date = val[0].diskfile.params['utc_file_date']
             version = val[0].diskfile.params['version']
             out_path = '/tmp/' + val[0].diskfile.makeProductFilename(product,  date, version)
-
-
+            # now we have everything it takes to build the file
 
             # ####### get all the input_product_id and make sure they all exist before we build the child.
             # from the process get all the input_product_id
             products = self.dbu._getInputProductID(proc_id)
             # query for the files that match the products for the right date
             # TODO this is another place that is one day to one day limited
+            skip = False
             for pval in products:
                 sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
+                DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
                 if sq1.count() == 0:
                     DBlogging.dblogger.debug("\t\tSkipping file since requirement not available")
-                    continue
-                #                if sq1.count() > 1:
-                #                    raise(DBUtils2.DBError("More than one file found that met product/date pair"))
-                #
-
+                    skip = True
+            if skip:
+                continue
             sq1 = self.dbu.session.query(self.dbu.Process).filter_by(process_id = proc_id)[0]
             extra_params_in = sq1.extra_params_in
             if extra_params_in != None:
@@ -230,8 +226,8 @@ class ProcessQueue(object):
             
     def findChildrenProducts(self):
         # childern is a sub sub query
-        # select * from product where product_id = (SELECT output_product from process where process_i
-        #                                                    d = (select product_id from productprocesslink where product_id = 16));
+        # select * from product where product_id = (SELECT output_product from process where process_id
+        #  = (select product_id from productprocesslink where product_id = 16));
         DBlogging.dblogger.debug( "\tEntered findChildrenProducts()" )
 
         for val in self.findChildren.popleftiter():
