@@ -33,7 +33,7 @@ class ProcessQueue(object):
         DBlogging.dblogger.info("Entering ProcessQueue")
 
     def depDict(self, infile, file=None, code=None):
-        DBlogging.dblogger.debug("\t\tEntered depDict:")
+        DBlogging.dblogger.debug("Entered depDict:")
 
         # maybe this should be a class
         if not isinstance(file, (list, tuple)):
@@ -44,7 +44,7 @@ class ProcessQueue(object):
 
 
     def checkIncoming(self):
-        DBlogging.dblogger.debug("\t\tEntered checkIncoming:")
+        DBlogging.dblogger.debug("Entered checkIncoming:")
 
         self.queue.extendleft(self.dbu._checkIncoming())
         # step through and remove duplicates
@@ -60,11 +60,11 @@ class ProcessQueue(object):
 
  
     def doProcess(self):
-        DBlogging.dblogger.info("\t\tEntering doProcess()")
+        DBlogging.dblogger.info("Entering doProcess()")
         self.process()
 
     def moveToError(self, fname):
-        DBlogging.dblogger.debug("\t\tEntered moveToError:")
+        DBlogging.dblogger.debug("Entered moveToError:")
 
         DBlogging.dblogger.warning("**ERROR** %s moved to %s"%(fname, '/n/projects/cda/Test/errors/'))
         if os.path.isfile('/n/projects/cda/Test/errors/' + os.path.basename(fname)):
@@ -73,18 +73,18 @@ class ProcessQueue(object):
 
 
     def importFromIncoming(self):
-        DBlogging.dblogger.debug("\tEntering importFromIncoming, %d to import" % (len(self.queue)))
+        DBlogging.dblogger.debug("Entering importFromIncoming, %d to import" % (len(self.queue)))
  
         for val in self.queue.popleftiter() :
             self.current_file = val
-            DBlogging.dblogger.debug("\tpopped '%s' from the queue" % (val))
+            DBlogging.dblogger.debug("popped '%s' from the queue" % (val))
             fname = Diskfile.Diskfile(val)
             prod = fname.figureProduct()
             if prod == None:
                 DBlogging.dblogger.debug("prod==None so moving to error")
                 self.moveToError(val)
                 continue
-            DBlogging.dblogger.debug("\tfname created %s" % (fname.filename))
+            DBlogging.dblogger.debug("fname created %s" % (fname.filename))
             if fname.mission == self.dbu.mission:   # if the file is the wrong mission skip it
                 dbf = DBfile.DBfile(fname)
                 try:
@@ -97,17 +97,17 @@ class ProcessQueue(object):
                 # add to findChildren queue
                 self.findChildren.append(dbf)
 
-                DBlogging.dblogger.debug("\t\t\tf_id = %s" % (str(f_id)))
+                DBlogging.dblogger.debug("f_id = %s" % (str(f_id)))
                 self.depends.append(self.depDict(f_id))
 
                 mov = dbf.move()
                 self.moved.append(mov[1])  # only want to dest file
-                DBlogging.dblogger.debug("\tfile %s moved to  %s" % (mov[0], mov[1]))
+                DBlogging.dblogger.debug("file %s moved to  %s" % (mov[0], mov[1]))
                 
-                DBlogging.dblogger.debug("\tLength of findChildren is %d" % (len(self.findChildren)))
+                DBlogging.dblogger.debug("Length of findChildren is %d" % (len(self.findChildren)))
 
     def getProcessFromOutputProduct(self, outProd):
-        DBlogging.dblogger.debug("\t\tEntered getProcessFromOutputProduct:")
+        DBlogging.dblogger.debug("Entered getProcessFromOutputProduct:")
 
         ans = []
         for val in outProd:
@@ -116,7 +116,7 @@ class ProcessQueue(object):
         return ans
 
     def getCodeFromProcess(self, proc_id):
-        DBlogging.dblogger.debug("\t\tEntered getCodeFromProcess:")
+        DBlogging.dblogger.debug("Entered getCodeFromProcess:")
 
         ans = []
         for val in proc_id:
@@ -128,7 +128,7 @@ class ProcessQueue(object):
         return ans
 
     def getCodePath(self, code_id):
-        DBlogging.dblogger.debug("\t\tEntered getCodePath:")
+        DBlogging.dblogger.debug("Entered getCodePath:")
 
         ans = []
         for val in code_id:
@@ -140,9 +140,9 @@ class ProcessQueue(object):
 
 
     def buildChildren(self):
-        DBlogging.dblogger.debug("\t\tEntered buildChildren:")
+        DBlogging.dblogger.debug("Entered buildChildren:")
         for val in self.childrenQueue.popleftiter():  # val is a dbfile, product id tuple
-            DBlogging.dblogger.debug("\t\t\tpopleft %s from self.childrenQueue" % (str(val)))
+            DBlogging.dblogger.debug("popleft %s from self.childrenQueue" % (str(val)))
 
             # check to see if there is a process defined on this output product
             proc_id = self.getProcessFromOutputProduct([val[1]])[0]
@@ -174,14 +174,14 @@ class ProcessQueue(object):
             products = self.dbu._getInputProductID(proc_id)
             # query for the files that match the products for the right date
             # TODO this is another place that is one day to one day limited
-            skip = False
-            for pval in products:
-                sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
-                DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
-                if sq1.count() == 0:
-                    DBlogging.dblogger.debug("\t\tSkipping file since requirement not available")
-                    skip = True
-            if skip:
+            try:
+                for pval in products:
+                    sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
+                    DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
+                    if sq1.count() == 0:
+                        DBlogging.dblogger.debug("Skipping file since requirement not available")
+                        Raise(Exception())
+            except:
                 continue
             sq1 = self.dbu.session.query(self.dbu.Process).filter_by(process_id = proc_id)[0]
             extra_params_in = sq1.extra_params_in
@@ -189,10 +189,10 @@ class ProcessQueue(object):
                 # now we need to play with what is in the query and parse it
                 if '%DATE' in extra_params_in:
                     extra_params_in = extra_params_in.replace('%DATE', date.strftime('%Y%m%d'))
-                    DBlogging.dblogger.debug("\t\t-*-* extra_params_in=%s" % (extra_params_in))
+                    DBlogging.dblogger.debug("-*-* extra_params_in=%s" % (extra_params_in))
                 if '%OUTFILE' in extra_params_in:
                     extra_params_in = extra_params_in.replace('%OUTFILE', out_path)
-                    DBlogging.dblogger.debug("\t\t-*-* extra_params_in=%s" % (extra_params_in))
+                    DBlogging.dblogger.debug("-*-* extra_params_in=%s" % (extra_params_in))
                 # TODO what other %CODEs are allowed?
                 if '%BASEDIR' in extra_params_in:
                     extra_params_in = extra_params_in.replace('%BASEDIR', root_path)
@@ -203,7 +203,7 @@ class ProcessQueue(object):
                 for val2 in in_path:
                     tmp.append(str(val2))
                 in_path = tmp
-                DBlogging.dblogger.debug("\t\t--**-- in_path=%s" % (in_path))
+                DBlogging.dblogger.debug("--**-- in_path=%s" % (in_path))
 
             exe = Executor.Executor(codep, in_path, out_path)
             exe.doIt()
@@ -228,7 +228,7 @@ class ProcessQueue(object):
         # childern is a sub sub query
         # select * from product where product_id = (SELECT output_product from process where process_id
         #  = (select product_id from productprocesslink where product_id = 16));
-        DBlogging.dblogger.debug( "\tEntered findChildrenProducts()" )
+        DBlogging.dblogger.debug( "Entered findChildrenProducts()" )
 
         for val in self.findChildren.popleftiter():
             proc_ids = self.dbu.session.query(self.dbu.Productprocesslink.process_id).filter_by(input_product_id = val.diskfile.params['product_id'])
@@ -239,7 +239,7 @@ class ProcessQueue(object):
                 sq_ans = self.dbu.session.query(self.dbu.Product).filter_by(product_id = sq2)
                 for val2 in sq_ans:
                     self.childrenQueue.append( (val, val2.product_id) )
-                    DBlogging.dblogger.debug( "\t\tfound products for children: %s: %s" %(val, val2.product_id))
+                    DBlogging.dblogger.debug( "found products for children: %s: %s" %(val, val2.product_id))
 
 
 if __name__ == "__main__":

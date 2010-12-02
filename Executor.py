@@ -43,7 +43,7 @@ class Executor(object):
 
         @version: V1: 05-Oct-2010 (BAL)
         """
-        DBlogging.dblogger.debug("\t\tEntered Executor:")
+        DBlogging.dblogger.info("Entered Executor:")
         if not isinstance(code, (str, unicode)):
             raise(ExecutorError("Only one code can be executed, must be a string"))
         if not isinstance(output, (str, unicode)) and  output!=None:
@@ -72,7 +72,7 @@ class Executor(object):
             cmd.extend(self.inVal)
         if self.output != None:
             cmd.append(self.output)
-        DBlogging.dblogger.debug("\t\tExecuting: %s" % (cmd))
+        DBlogging.dblogger.info("Executing: %s" % (cmd))
         subprocess.call(cmd)
 
 
