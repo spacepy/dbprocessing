@@ -7,6 +7,7 @@ from sqlalchemy.orm import mapper # sessionmaker
 import numpy as np
 from sqlalchemy.exceptions import IntegrityError
 from sqlalchemy.sql.expression import asc #, desc
+import DBlogging
 
 
 ## This goes in the processing comment field in the DB, do update it
@@ -555,26 +556,33 @@ class DBUtils2(object):
 ####  Do processing and input to DB
 #####################################
 
-    def _currentlyProcessing(self, verbose=False):
+    def _currentlyProcessing(self):
         """
         Checks the db to see if it is currently processing, dont want to do 2 at the same time
 
-        @keyword verbose: (optional) print out verbose informaiton
-        @return: True - Success, False - Failure
+        @return: false or the pid
+        @rtype: (bool, long)
 
         @author: Brian Larsen
         @organization: Los Alamos National Lab
         @contact: balarsen@lanl.gov
 
         @version: V1: 17-Jun-2010 (BAL)
+        @version: V2: 02-Dec-2010 (BAL) - returns False or the PID
 
         >>>  pnl._currentlyProcessing()
         """
-        sq = self.session.query(self.Logging).filter_by(currently_processing = True).count()
-        if sq != 0:
-            return True
-        else:
+        DBlogging.dblogger.info("Checking currently_processing")
+
+        sq = self.session.query(self.Logging).filter_by(currently_processing = True)
+        if sq.count() == 1:
+            DBlogging.dblogger.warning("currently_processing is set.  PID: %d" % (sq[0].pid))
+            return sq[0].pid
+        elif sq.count() == 0:
             return False
+        else:
+            DBlogging.dblogger.error("More than one currently_processing flag set, fix the DB" )
+            raise(DBError("More than one currently_processing flag set, fix the DB"))
 
     def _resetProcessingFlag(self, comment=None):
         """
