@@ -329,60 +329,6 @@ class DBUtils2(object):
         return {'files':files, 'process':[True]*len(files)}
 
 
-        #################
-        ## OLD way ######
-        #################
-##         files = self.session.query(self.Files_by_mission.f_id, self.Files_by_mission.filename).filter_by(mission_name=self.mission).all()
-##         files = zip(*files)
-##         if verbose:
-##             print("About to process %d files from %s to the next data level" % (len(files[0]), self.mission))
-
-##         # get the number of products for that mission
-##         products = self.session.query(self.Data_product_by_mission.dp_id,
-##                                       self.Data_product_by_mission.product_name).filter_by(mission_name=self.mission).all()
-##         products = zip(*products)
-##         if verbose:
-##             print("\tMission %s has %d data products to step through" % (self.mission, len(products[0])))
-
-##         # create a list of everyting keys by filename that is an input to a process
-##         # this dictionary is the key to everyhting, just keep it up to date and then you can add/delete form it
-##         # to decide what needs to be processed
-##         for val in self.session.query(self.Build_filenames).filter_by(type=0).filter(self.Build_filenames.f_id != None):
-##             self.bf[val.filename] = {'mission_name':val.mission_name,
-##                                 'missions_rootdir':val.missions_rootdir,
-##                                 'p_id':val.p_id,
-##                                 'dp_id':val.dp_id,
-##                                 'type':val.type,
-##                                 'relative_path':val.relative_path,
-##                                 'product_name':val.product_name,
-##                                 'satellite_name':val.satellite_name,
-##                                 'f_id':val.f_id,
-##                                 'utc_file_date':val.utc_file_date,
-##                                 'absolute_name':val.absolute_name,
-##                                 'interface_version':val.interface_version,
-##                                 'quality_version':val.quality_version,
-##                                 'revision_version':val.revision_version,
-##                                 'ec_interface_version':val.ec_interface_version,
-##                                 'base_filename':val.base_filename,
-##                                 'exists_on_disk':val.exists_on_disk,
-##                                 'data_level':val.data_level}
-
-## ## add to the dict the data product that is the output of the process in the bf dict
-##         for fname in self.bf:
-##             for sq in self.session.query(self.File_processes).filter_by(type=1).filter_by(p_id = self.bf[fname]['p_id']):
-##                 self.bf[fname]['out_dp_id'] = sq.dp_id
-##                 self.bf[fname]['out_p_id']  = sq.p_id
-
-## ## now get the output data_product information form the given out_dp_id
-##         for fname in self.bf:
-##             for sq in self.session.query(self.Data_products).filter_by(dp_id = self.bf[fname]['out_dp_id']):
-##                 self.bf[fname]['out_product_name'] = sq.product_name
-##                 self.bf[fname]['out_ds_id'] = sq.ds_id
-##                 self.bf[fname]['out_relative_path'] = sq.relative_path
-
-##         if verbose:
-##             print("\t\t%s  %d files elegible to process" % ("len(bf)", len(self.bf)))
-##         return len(self.bf)
 
 
 ###########################################
@@ -603,58 +549,6 @@ class DBUtils2(object):
 
                 if verbose: print("\t build the outname %s" % (self.bf[fname]['out_fname']))
         return True  # should actually check something
-
-
-#
-#    def _buildOutNameReprocess(self, incQuality=False, incRevision=False, verbose=False):
-#        for fname in self.bf:
-#            for sq in self.session.query(self.Code_dependencies).filter_by(cd_id=self.bf[fname]['code_dependencies'][0]):
-#                self.bf[fname]['ec_id'] = self._newerCodeVersion(sq.dependent_ec_id)
-#            for sq in self.session.query(self.Processing_paths).filter_by(ec_id=self.bf[fname]['ec_id']).filter_by(active_code=True):
-#                self.bf[fname]['exc_absolute_name'] = sq.absolute_name
-#
-#
-#            # gather and put the output file name into the dictionary
-#            for sq in self.session.query(self.Build_reprocess_filenames).filter_by(p_id=self.bf[fname]['p_id']):
-#                if incQuality:
-#                    self.bf[fname]['quality_version'] = self.bf[fname]['quality_version'] + 1
-#                if incRevision:
-#                    self.bf[fname]['revision_version'] = self.bf[fname]['revision_version'] + 1
-#                interface_ver = self.session.query(self.Executable_codes).filter_by(ec_id=self.bf[fname]['ec_id']).all()[0]
-#                out_fname = self.__build_fname(sq.path,
-#                                          '',
-#                                          sq.mission_name,
-#                                          sq.satellite_name,
-#                                          sq.product_name,
-#                                          datetime.strftime(self.bf[fname]['utc_file_date'], '%Y%m%d'),
-#                                          interface_ver.interface_version,
-#                                          self.bf[fname]['quality_version'],
-#                                          self.bf[fname]['revision_version'])
-#                self.bf[fname]['out_absolute_name'] = out_fname
-#                self.bf[fname]['out_fname'] = os.path.basename(self.bf[fname]['out_absolute_name'])
-#                self.bf[fname]['level'] = sq.level
-#                break   #kack to just do this once
-#            if verbose: print("\t build the outname %s" % (self.bf[fname]['out_fname']))
-#
-#            for sq in self.session.query(self.Data_files).filter_by(f_id = self.bf[fname]['f_id']):
-#                self.bf[fname]['utc_start_time'] = sq.utc_start_time
-#                self.bf[fname]['utc_end_time'] = sq.utc_end_time
-#                self.bf[fname]['data_level'] = sq.data_level
-#                self.bf[fname]['met_start_time'] = sq.met_start_time
-#                self.bf[fname]['met_stop_time'] = sq.met_stop_time
-#                f2 = self.bf[fname]['out_fname'].split('.')[0]
-#                f3 = f2.split('_v')[0]
-#                self.bf[fname]['base_filename'] = f3
-#            ## if incQuality:
-#            ##     self.bf[fname]['quality_version'] = self.bf[fname]['quality_version'] + 1
-#            ## if incRevision:
-#            ##     self.bf[fname]['revision_version'] = self.bf[fname]['revision_version'] + 1
-#
-#
-#
-#                ## if verbose: print("\t build the outname %s" % (self.bf[fname]['out_fname']))
-#        return True  # should actually check something
-
 
 #####################################
 ####  Do processing and input to DB
