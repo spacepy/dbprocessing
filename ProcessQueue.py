@@ -13,7 +13,10 @@ import DBlogging
 __version__ = '2.0.1'
 
 
-
+class ProcessException(Exception):
+    """Class for errors in ProcessQueue"""
+    pass
+    
 
 class ForException(Exception):
     """Cheezy but separate excpetion for breaking out of a nested loop"""
@@ -342,16 +345,61 @@ class ProcessQueue(object):
                     DBlogging.dblogger.debug( "found products for children: %s: %s" %(val, val2.product_id))
 
 
-if __name__ == "__main__":
-    #from spacepy import toolbox as tb
+def processRunning(pid):
+    """
+    given a PID see if it is currently running
 
+    @param pid: a pid
+    @type pid: long
+
+    @return: True if pid is running, False otherwise
+    @rtype: bool
+
+    @author: Brandon Craig Rhodes
+    @organization: Stackoverflow
+    http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
+    
+    @version: V1: 02-Dec-2010 (BAL)
+    """
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
+
+
+
+
+
+if __name__ == "__main__":
+    # TODO decide if we really want to run this way, works for now
+    
     pq = ProcessQueue('Test')
+    # check currently processing
+    curr_proc = pq.dbu._currentlyProcessing()
+    if curr_proc:  # returns False or the PID
+        # check if the PID is running
+        if processRunning(curr_proc):
+            # we still have an instance processing, dont start another
+            pq.dbu._closeDB()
+            DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
+            raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
+        else:
+            # There is a processing flag set but it died, dont start another
+            pq.dbu._closeDB()
+            DBlogging.dblogger.error( "There is a processing flag set but it died, dont start another" )
+            raise(ProcessException("There is a processing flag set but it died, dont start another"))
+
+        
+    
     pq.checkIncoming()
     while len(pq.queue) != 0 or len(pq.findChildren) !=0 or len(pq.childrenQueue):
         pq.importFromIncoming()
         pq.findChildrenProducts()
         pq.buildChildren()
 
+    pq.dbu._closeDB()
 
 
 
