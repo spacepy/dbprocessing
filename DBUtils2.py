@@ -8,6 +8,7 @@ import numpy as np
 from sqlalchemy.exceptions import IntegrityError
 from sqlalchemy.sql.expression import asc #, desc
 import DBlogging
+import socket # to get the local hostname
 
 
 ## This goes in the processing comment field in the DB, do update it
@@ -618,7 +619,7 @@ class DBUtils2(object):
 
 
 
-    
+
 
     def _startLogging(self):
         """
@@ -634,7 +635,6 @@ class DBUtils2(object):
         """
         # this is the logging of the processing, no real use for it yet but maybe we will inthe future
         # helps to know is the process ran and if it succeeded
-        import socket # to get the local hostname
         if self._currentlyProcessing():
             raise(DBError('A Currently Processing flag is still set, cannot process now'))
         # save this class instance so that we can finish the logging later
@@ -723,7 +723,7 @@ class DBUtils2(object):
         """
         try: self.__p1
         except:
-            DBlogging.dblogger.warning( "Logging was not started, can't stop") 
+            DBlogging.dblogger.warning( "Logging was not started, can't stop")
             raise(DBProcessingError("Logging was not started"))
         # clean up the logging, we are done processing and we can realease the lock (currently_processing) and
         # put in the complete time
@@ -740,7 +740,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
-        DBlogging.dblogger.info( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) ) 
+        DBlogging.dblogger.info( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) )
 
     def _addLoggingFile(self,
                         logging_id,
@@ -772,7 +772,7 @@ class DBUtils2(object):
         pf1.code_id = code_id
         pf1.comment = comment
         self.session.add(pf1)
-        DBlogging.dblogger.info( "File Logging added for file:%d code:%d with comment:%s"  % (pf1.file_id, pf1.code_id, pf1.comment) ) 
+        DBlogging.dblogger.info( "File Logging added for file:%d code:%d with comment:%s"  % (pf1.file_id, pf1.code_id, pf1.comment) )
         # TODO  think on if session should be left open or if a list shoud be passed in
         try:
             self.session.commit()
@@ -997,7 +997,7 @@ class DBUtils2(object):
         @type relative_path: str
         @param super_product_id: th product id of the super product for this product
         @type super_product_id: int
-        @param format: the format of the product files 
+        @param format: the format of the product files
         @type super_product_id: str
 
         @author: Brian Larsen
@@ -1626,7 +1626,7 @@ class DBUtils2(object):
             root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
         except IndexError:
             return None
-            
+
         return root_dir + os.path.sep + rel_path + os.path.sep + filename
 
 
@@ -1937,6 +1937,3 @@ class DBUtils2(object):
             f1.filename = val
             file_date
             f1.utc_file_date = None
-
-
-
