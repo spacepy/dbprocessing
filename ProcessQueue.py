@@ -146,7 +146,7 @@ class ProcessQueue(object):
             DBlogging.dblogger.debug("fname created %s" % (fname.filename))
             if fname.mission == self.dbu.mission:
                 # if the file is the wrong mission skip it
-                dbf = DBfile.DBfile(fname)
+                dbf = DBfile.DBfile(fname, self.dbu)
                 try:
                     f_id = dbf.addFileToDB()
                 except (DBUtils2.DBInputError, DBUtils2.DBError) as errmsg:

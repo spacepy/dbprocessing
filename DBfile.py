@@ -35,7 +35,7 @@ class DBfile(object):
     @version: V1: 05-Oct-2010 (BAL)
     """
     def __init__(self,
-                 diskfile, makeDiskFile = False):
+                 diskfile, dbu, makeDiskFile = False):
         """
         setup a DBfile classinputs a diskfile instance or a filename with the makeDiskFile keyword
 
@@ -43,6 +43,8 @@ class DBfile(object):
 
         @param diskfile: a diskfile instance to create a DBfile from
         @type infile: Diskfile
+        @param dbu: pass in the current DBUtils2 session so that a new connection is not made
+        @type dbu: DBUtils2
 
         @author: Brian Larsen
         @organization: Los Alamos National Lab
@@ -55,9 +57,10 @@ class DBfile(object):
         if not isinstance(diskfile, Diskfile.Diskfile):
             raise(DBfileError('Wrong input, must input a Diskfile object'))
 
-        dbu = DBUtils2.DBUtils2(diskfile.mission)
-        dbu._openDB()
-        dbu._createTableObjects()
+        # this keeps opening connecitons
+        #dbu = DBUtils2.DBUtils2(diskfile.mission)
+        #dbu._openDB()
+        #dbu._createTableObjects()
         self.dbu = dbu
         self.diskfile = diskfile
         self.checkVersion()

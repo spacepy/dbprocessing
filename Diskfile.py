@@ -160,7 +160,7 @@ class Diskfile(object):
 
         self.mission = None  # keeps track if we found a parsematch
 
-        # this keps opening connecitons
+        # this keeps opening connecitons
         #dbu = DBUtils2.DBUtils2('Test')
         #dbu._openDB()
         #dbu._createTableObjects()
