@@ -137,7 +137,7 @@ class ProcessQueue(object):
         for val in self.queue.popleftiter() :
             self.current_file = val
             DBlogging.dblogger.debug("popped '%s' from the queue" % (val))
-            fname = Diskfile.Diskfile(val)
+            fname = Diskfile.Diskfile(val, self.dbu)
             prod = fname.figureProduct()
             if prod == None:
                 DBlogging.dblogger.debug("prod==None so moving to error")

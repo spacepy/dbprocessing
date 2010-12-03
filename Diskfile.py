@@ -108,6 +108,7 @@ class Diskfile(object):
 
     def __init__(self,
                  infile,
+                 dbu,
                  parse=False):
         """
         setup a Diskfile class, takes in a filename and creates a params dict ro hold information about the file
@@ -115,6 +116,8 @@ class Diskfile(object):
 
         @param infile: a file to create a diskfile around
         @type infile: str
+        @param dbu: pass in the current DBUtils2 session so that a new connection is not made
+        @type dbu: DBUtils2
 
         @author: Brian Larsen
         @organization: Los Alamos National Lab
@@ -157,9 +160,10 @@ class Diskfile(object):
 
         self.mission = None  # keeps track if we found a parsematch
 
-        dbu = DBUtils2.DBUtils2('Test')
-        dbu._openDB()
-        dbu._createTableObjects()
+        # this keps opening connecitons
+        #dbu = DBUtils2.DBUtils2('Test')
+        #dbu._openDB()
+        #dbu._createTableObjects()
         self.dbu = dbu
 
         if parse:
