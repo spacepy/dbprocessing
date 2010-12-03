@@ -49,7 +49,8 @@ class Version(object):
 
 
     def __repr__(self):
-        return str(self.interface) + '.' + str(self.quality) + '.' + str(self.revision)
+        return str(self.interface) + '.' + str(self.quality) + '.' + \
+            str(self.revision)
 
     __str__ = __repr__
 
@@ -105,4 +106,3 @@ class Version(object):
             return True
         else:
             return False
-

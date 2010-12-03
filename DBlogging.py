@@ -7,7 +7,7 @@ __version__ = '2.0.2'
 
 
 """
-Setup routines to log information from thedbprocessing chain
+Setup routines to log information from the dbprocessing chain
 
 """
 
@@ -33,7 +33,8 @@ LEVELS = {'debug': logging.DEBUG,
 
 # create formatter
 formatter = \
-    logging.Formatter("%(asctime)s - %(module)s:%(lineno)d - %(levelname)s - %(message)s")
+    logging.Formatter("%(asctime)s - %(module)s:%(lineno)d - %(levelname)s" +
+                      " - %(message)s")
 
 # add formatter to ch
 handler.setFormatter(formatter)
@@ -43,11 +44,3 @@ dblogger.addHandler(handler)
 
 
 dblogger.info("DBLogger initialized")
-
-
-
-
-
-
-
-
