@@ -285,8 +285,7 @@ class ProcessQueue(object):
                                                  "requirement not available" + \
                                                  "(sq1.count)")
                         raise(ForException())
-                    DBlogging.dblogger.debug("<>Looking for product %d for " + \
-                                             "date %s" % (pval, date))
+                    DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
                     # get an in_path for exe
                     in_path = self.dbu._getFileFullPath(val[0].diskfile.makeProductFilename(pval, date, version))
                     if in_path == None:
