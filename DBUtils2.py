@@ -134,13 +134,20 @@ class DBUtils2(object):
         if self.dbIsOpen == True:
             return
         try:
+
             if self.mission == 'Test':
                 engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
+                DBlogging.dblogger.info("Database Connection opened")
+
                 # this holds the metadata, tables names, attributes, etc
             elif self.mission == 'Polar':
                 engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
+                DBlogging.dblogger.info("Database Connection opened")
+
             elif self.mission == 'unittest':
                 engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=False)
+                DBlogging.dblogger.info("Database Connection opened")
+
 
         except:
             raise(DBError('Error creating engine'))
@@ -1263,7 +1270,7 @@ class DBUtils2(object):
         return sq1[0].code_id
 
 
-    def _closeDB(self, verbose=False):
+    def _closeDB(self):
         """
         Close the database connection
 
@@ -1279,12 +1286,13 @@ class DBUtils2(object):
         >>>  pnl._closeDB()
         """
         if self.dbIsOpen == False:
-            return True
+            return
         try:
             self.session.close()
-            self.__dbIsOpen = False
-            if verbose: print("DB is now closed")
-        except:
+            self.dbIsOpen = False
+            DBlogging.dblogger.info( "Database connection closed" )
+        except DBError:
+            DBlogging.dblogger.error( "Database connection could not be closed" )
             raise(DBError('could not close DB'))
 
 
