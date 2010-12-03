@@ -6,7 +6,7 @@ import sys
 import os
 import stat
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 class Tests(unittest.TestCase):
     def setUp(self):
@@ -27,7 +27,7 @@ class Tests(unittest.TestCase):
         """Init does some input checking"""
         self.assertRaises(Executor.ExecutorError, Executor.Executor, 123, 'input', 'output')
         self.assertRaises(Executor.ExecutorError, Executor.Executor, 'code', 'input', 123)
-        
+
     def test_checkExists(self):
         """Exception on missing file to run"""
         ex = Executor.Executor('code_run_tmp_bad', '', '')
@@ -46,11 +46,8 @@ class Tests(unittest.TestCase):
     def test_outputBadDir(self):
         """Exception on bad output directory"""
         ex = Executor.Executor(self.path + '/code_run_tmp', self.path + '/code_dat_tmp', '/tmp/IDONOTEXIST/file')
-        self.assertRaises(Executor.ExecutorError, ex.checkExists)         
+        self.assertRaises(Executor.ExecutorError, ex.checkExists)
 
 
 if __name__ == "__main__":
     unittest.main()
-
-
-

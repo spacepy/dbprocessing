@@ -2,7 +2,7 @@
 from collections import deque
 
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 
 class DBqueue(deque):
@@ -48,4 +48,3 @@ class DBqueue(deque):
         """
         while len(self) != 0:
             yield self.pop()
-

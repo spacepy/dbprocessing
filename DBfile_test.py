@@ -5,7 +5,7 @@ import DBfile
 import os
 import Diskfile
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 
 
@@ -32,4 +32,3 @@ class DBfileTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

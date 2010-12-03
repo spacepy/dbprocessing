@@ -12,7 +12,7 @@ import socket # to get the local hostname
 
 
 ## This goes in the processing comment field in the DB, do update it
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 
 class DBError(Exception):

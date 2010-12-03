@@ -10,7 +10,7 @@ import ProcessQueue
 
 from collections import deque
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 
 class SimpleTests(unittest.TestCase):
@@ -38,4 +38,3 @@ class SimpleTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

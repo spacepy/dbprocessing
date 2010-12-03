@@ -7,7 +7,7 @@ import unittest
 import DBqueue
 
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 
 
@@ -39,4 +39,3 @@ class Tests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

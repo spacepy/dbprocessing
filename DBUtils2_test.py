@@ -8,7 +8,7 @@ import datetime
 import os
 import os.path
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 
 
@@ -133,7 +133,7 @@ class DBTests(unittest.TestCase):
 
     def setUp(self):
         super(DBTests, self).setUp()
-        
+
     def tearDown(self):
         super(tearDown, self).tearDown()
 
