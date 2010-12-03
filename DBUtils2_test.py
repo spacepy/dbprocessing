@@ -19,22 +19,16 @@ class AddTests(unittest.TestCase):
         self.dbu._openDB('Test')
         self.dbu._createTableObjects()
 
-
-
     def tearDown(self):
         super(AddTests, self).tearDown()
         self.dbu._closeDB()
         del self.dbu
 
-
-
-
-
     def test_addMissionInput(self):
         """_addMission should only accept strig input"""
         self.assertRaises(DBUtils2.DBInputError, self.dbu._addMission, 1234, 12345)
         self.assertRaises(DBUtils2.DBInputError, self.dbu._addMission, 1234, 'path')
-        self.assertRaises(DBUtils2.DBInputError,self. dbu._addMission, 'filename', 12345)
+        self.assertRaises(DBUtils2.DBInputError, self. dbu._addMission, 'filename', 12345)
 
     def test_addMissionOrder(self):
         """_addMission wont work until the Mission class is created from the DB"""
@@ -45,7 +39,7 @@ class AddTests(unittest.TestCase):
         """_addSatellite should only accept strig input"""
         self.assertRaises(DBUtils2.DBInputError, self.dbu._addSatellite, 1234, 'id string')
         self.assertRaises(DBUtils2.DBInputError, self.dbu._addSatellite, 1234, 1234)
-        self.assertRaises(DBUtils2.DBInputError,self. dbu._addSatellite, 'filename', 'id string')
+        self.assertRaises(DBUtils2.DBInputError, self. dbu._addSatellite, 'filename', 'id string')
 
     def test_addSatelliteOrder(self):
         """_addSatellite wont work until the Mission class is created from the DB"""
@@ -56,7 +50,7 @@ class AddTests(unittest.TestCase):
         """_addInstrument should only accept strig input"""
         self.assertRaises(DBUtils2.DBInputError, self.dbu._addInstrument, 1234, 'id string')
         self.assertRaises(DBUtils2.DBInputError, self.dbu._addInstrument, 1234, 1234)
-        self.assertRaises(DBUtils2.DBInputError,self. dbu._addInstrument, 'instname', 'id string')
+        self.assertRaises(DBUtils2.DBInputError, self. dbu._addInstrument, 'instname', 'id string')
 
     def test_addInstrumentOrder(self):
         """_addInstrument wont work until the Mission class is created from the DB"""
@@ -81,17 +75,19 @@ class AddTests(unittest.TestCase):
 
     def test_addCodeOrder(self):
         """_addCode wont work until the Code class is created from the DB"""
-        ver =Version.Version(1,0,0)
+        ver =Version.Version(1, 0, 0)
         startt = datetime.datetime(2010, 4, 5)
         stopt = datetime.datetime(2010, 4, 7)
         writet = datetime.datetime(2010, 6, 7)
-        self.assertRaises(DBUtils2.DBError, self.dbu._addCode, 'string', 'string', startt, stopt, 'string', 1234, ver, False, startt, 1234, True)
+        self.assertRaises(DBUtils2.DBError, self.dbu._addCode, 'string',
+                          'string', startt, stopt, 'string', 1234, ver,
+                          False, startt, 1234, True)
 
     def test_code_dats(self):
         """Stop date must be after start date"""
         startt = datetime.datetime(2010, 4, 5)
         stopt = datetime.datetime(2010, 4, 7)
-        ver =Version.Version(1,0,0)
+        ver =Version.Version(1, 0, 0)
         self.assertRaises(DBUtils2.DBError, self.dbu._addCode, 'string', 'string', stopt, startt, 'string', 1234, ver, False, startt, 1, True)
 
 class ClassMethodTests(unittest.TestCase):
@@ -278,9 +274,3 @@ class DBUseTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
-
-
-

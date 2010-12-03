@@ -21,7 +21,7 @@ class VersionTests(unittest.TestCase):
 
     def test_Version_inc(self):
         """The versions should increment"""
-        ver = Version.Version(1,0,0)
+        ver = Version.Version(1, 0, 0)
         ver.incRevision()
         self.assertEqual(Version.Version(1, 0, 1), ver)
         ver.incQuality()
@@ -32,7 +32,7 @@ class VersionTests(unittest.TestCase):
 
     def test_Version_repr(self):
         """__repr__ should have a known output"""
-        invals = ( Version.Version(1, 0, 1), Version.Version(5, 0,1),
+        invals = ( Version.Version(1, 0, 1), Version.Version(5, 0, 1),
                   Version.Version(1, 3, 1) )
         answers = ( '1.0.1', '5.0.1', '1.3.1' )
         for i, val in enumerate(invals):
@@ -40,7 +40,7 @@ class VersionTests(unittest.TestCase):
 
     def test_Version_eq(self):
         """__eq__ should work"""
-        invals = (  (Version.Version(1,0,0), Version.Version(1,0,0)),
+        invals = (  (Version.Version(1, 0, 0), Version.Version(1, 0, 0)),
                         (Version.Version(1, 2, 0), Version.Version(1, 0, 0)),
                         (Version.Version(1, 0, 4), Version.Version(1, 0, 0)),
                         (Version.Version(4, 2, 1), Version.Version(1, 0, 0)) )

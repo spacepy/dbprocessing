@@ -209,24 +209,24 @@ class Diskfile(object):
         filename = self.dbu._getProductFormats(productID)[0] # just for the format
         mission, satellite, instrument, product, product_id = self.dbu._getProductNames(productID)
 
-        filename = filename.replace('%MISSION',  mission)
-        filename = filename.replace('%SPACECRAFT',   satellite)
+        filename = filename.replace('%MISSION', mission)
+        filename = filename.replace('%SPACECRAFT', satellite)
         filename = filename.replace('%PRODUCT', product )
-        filename = filename.replace('%VERSION',str(version))
+        filename = filename.replace('%VERSION', str(version))
         filename = filename.replace('%Y', date.strftime('%Y'))
-        filename = filename.replace('%m',date.strftime('%m'))
-        filename = filename.replace('%d',date.strftime('%d'))
+        filename = filename.replace('%m', date.strftime('%m'))
+        filename = filename.replace('%d', date.strftime('%d'))
         filename = filename.replace('%INSTRUMENT', instrument)
         filename = filename.replace('%y', date.strftime('%y'))
         # TODO can be made more restrictive
-        filename = filename.replace('%j',date.strftime('%j'))
+        filename = filename.replace('%j', date.strftime('%j'))
         filename = filename.replace('%H', date.strftime('%H'))
-        filename = filename.replace('%M',date.strftime('%M'))
+        filename = filename.replace('%M', date.strftime('%M'))
         filename = filename.replace('%MILLI', date.strftime('%f')[0:3])
-        filename = filename.replace('%MICRO',date.strftime('%f')[3:6])
+        filename = filename.replace('%MICRO', date.strftime('%f')[3:6])
         # TODO not sure what to here so I'll try a hack
         # filename = filename.replace('%QACODE','(ok|ignore|problem)')
-        filename = filename.replace('%QACODE','ok')
+        filename = filename.replace('%QACODE', 'ok')
 
         if qacode != None:
             filename = filename.replace('%QACODE', qacode)
@@ -271,7 +271,7 @@ class Diskfile(object):
         p_formats = self.dbu._getProductFormats()
         prods = self.dbu._getProductNames()
         # these two are not required to be in the same order, so we need to do something about that.
-        
+
         # this checks for a DB error where the INstrument Product Link was not filled in
         if len(p_formats) != len(prods):
             raise(DBUtils2.DBError('self.dbu._getProductFormats() and self.dbu._getProductNames(), differnet length, check instrumentproductlink'))
@@ -422,8 +422,3 @@ def calcDigest( infile):
     DBlogging.dblogger.debug("digest calculated: %s, file: %s " % (m.hexdigest(), infile))
 
     return m.hexdigest()
-
-
-
-
-

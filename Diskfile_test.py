@@ -84,7 +84,9 @@ class DiskfileTests(unittest.TestCase):
         except:
             self.fail()
         finally:
-            self.assertEqual(a.makeProductFilename(17, datetime.datetime.now(), Version.Version(1,0,0)), u'Test-Test_L1_evinst_20101202_v1.0.0.cdf')
+            self.assertEqual(a.makeProductFilename(17, datetime.datetime.now(),
+                                    Version.Version(1, 0, 0)),
+                                    u'Test-Test_L1_evinst_20101202_v1.0.0.cdf')
             os.remove('Test-Test_R0_evinst_20090117_v1.0.0.cdf')
 
     def test_makeProductFilenameChecks(self):
@@ -96,9 +98,13 @@ class DiskfileTests(unittest.TestCase):
         except:
             self.fail()
         finally:
-            self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17, datetime.datetime.now(), '1.0.0')
-            self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17, 'bad in', Version.Version(1,0,0))
-            self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17, datetime.datetime.now(), Version.Version(1,0,0), 'bad in')
+            self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
+                              datetime.datetime.now(), '1.0.0')
+            self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
+                              'bad in', Version.Version(1, 0, 0))
+            self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
+                              datetime.datetime.now(), Version.Version(1,0,0),
+                              'bad in')
 
             os.remove('Test-Test_R0_evinst_20090117_v1.0.0.cdf')
 
@@ -106,5 +112,3 @@ class DiskfileTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
