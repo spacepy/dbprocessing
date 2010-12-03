@@ -132,12 +132,10 @@ class DBTests(unittest.TestCase):
 
 
     def setUp(self):
-        #        super(PickleTests, self).setUp()
-        pass
-
+        super(DBTests, self).setUp()
+        
     def tearDown(self):
-        # super(PickleTests, self).tearDown()
-        pass
+        super(tearDown, self).tearDown()
 
     def test_opencloseDB(self):
         """_open should open a db in memory and _close should close it"""

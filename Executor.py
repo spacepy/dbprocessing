@@ -14,7 +14,8 @@ class ExecutorError(Exception):
 
 class Executor(object):
     """
-    Class that wraps subprocess.call() so that we can run more complicated command lines
+    Class that wraps subprocess.call() so that we can run more complicated
+    command lines
 
     @author: Brian Larsen
     @organization: Los Alamos National Lab
@@ -65,7 +66,8 @@ class Executor(object):
                     raise(ExecutorError("input %s did not exist"% (val)))
         if self.output != None:
             if not os.path.isdir(os.path.dirname(self.output)):
-                raise(ExecutorError("Invalid path for output: %s" % (self.output)))
+                raise(ExecutorError("Invalid path for output: %s" % \
+                                    (self.output)))
 
     def doIt(self):
         cmd = []
@@ -76,8 +78,3 @@ class Executor(object):
             cmd.append(self.output)
         DBlogging.dblogger.info("Executing: %s" % (cmd))
         subprocess.call(cmd)
-
-
-
-
-
