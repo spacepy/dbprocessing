@@ -9,6 +9,7 @@ from sqlalchemy.exceptions import IntegrityError
 from sqlalchemy.sql.expression import asc #, desc
 import DBlogging
 import socket # to get the local hostname
+import sys
 
 
 ## This goes in the processing comment field in the DB, do update it
@@ -150,7 +151,8 @@ class DBUtils2(object):
 
 
         except:
-            raise(DBError('Error creating engine'))
+            (t, v, tb) = sys.exc_info()
+            raise(DBError('Error creating engine: ' + str(v)))
         try:
             metadata = sqlalchemy.MetaData(bind=engine)
             # a session is what you use to actually talk to the DB, set one up with the current engine
