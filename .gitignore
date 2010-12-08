@@ -2,3 +2,6 @@ CVS/
 html/
 *.pyc
 *~
+.coverage
+dbprocessing_log.log*
+htmlcov/
