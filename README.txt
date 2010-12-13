@@ -13,18 +13,24 @@ This is a bit stream of consciousness and a bit documentation, comments to the r
 
 What the Chain Does:
 --------------------
-The processing chain takes L0 files placed into incoming (how they arrive there is not this code's issue) and processes
+The processing chain takes L0 and QA files placed into incoming (how they arrive there is not this code's issue) and processes
 all available children adding everything to the db as it goes.
 When a new version of a code or L0 is added all dependent files will be recreated and version numbers bumped.
 
 
+How to run the chain:
+---------------------
+in your cvs checkout directory
+python2.6 ProcessQueue.py
+<<this runs one instance of the loop, does not stay resident, will be run form cron>>
+before I run i always tail -f dbprocessing_log.log  so I can see whats going on
 
 
 Flow:
 -----
-Check "Processing" flag (in logging)
+Check "Currently Processing" flag (in logging)
 if set:
-    check PID:
+    check PID on system:
         If running - Quit with message about another still running
         if not running - There was a crash, log message, things are potentially inconsistent, set crash flag <<not implemented>>
 Set "processing" in logging
@@ -41,22 +47,22 @@ Perform inner loop
 clear processing in logging
 
 (Main Loop)
-Build "import me" from incoming
+Build "import me" from incoming (queue)
 foreach file in "import me":
     figure product
     add to DB
     move to final resting place
-    append to "find children"
+    append to "find children" (queue)
 (inner loop)
-foreach in "find children":
+foreach in "find children": (queue)
     figure possible children:
         is that child build-able?
             no - move to next child
             yes:
                 make the child on disk (in /tmp)
-                add to db, including filefile and filecode links
-                move to final resting
-                append to "find children"
+                add child to db, including filefile and filecode links
+                move child to final resting
+                append child of child to "find children" (queue)
 
 
 Important Files:
@@ -74,7 +80,7 @@ Version.py - class that represents a version code for a file, has gt, lt, eq, et
 mk_all_l0.py - simple script to make L0 files that can then be put into incoming
 
 
-Important Directories:
+Important Directories: (Test mission)
 ----------------------
 cvs checkout directory: code should run anyway but /n/projects must be mapped, sqlalchemy required
 /n/projects/cda/Test/incoming: incoming directory where input files are placed
@@ -87,12 +93,13 @@ Database info:
 ---------------
 to connect to the db as ops:  (Don't do this not setup yet)
 psql -a -d rbsp -h edgar -p 5432 -U rbsp_ops
+
 to connect to the db as rbsp_owner (RECCOMENDED)
 psql -a -d rbsp -h edgar -p 5432 -U rbsp_owner
 <<See Brian for passwords>>
 
 To see how many connections there are (useful for runaway mistakes)
-SELECT * FROM pg_stat_activity;
+SELECT * FROM pg_stat_activity;  <<query to db, run from postgres command line>>
 
 Database structure and relations are laid out in:
 DB_Structure_4Oct2010.pdf
@@ -101,12 +108,36 @@ Commands to create the DB are in:
 DatabaseCreationCommands.sql  <<as of 8-Dec-2010 this is slightly outdated on some constraints>>
 
 
+Helpful DB commands:
+---------------------
+DELETE FROM filefilelink ;   <<removes all file dependencies>>
+DELETE FROM filecodelink ;   <<removes all code dependeciues>>
+DELETE FROM file;            <<removes all file entries>>
+<<no need to remove files on disk>>
+
+
+Other things:
+-------------
+If the PorcessQueue dies then you are locked out:
+- run ProcessQueue  <<dies will not run>>
+- pq.dbu._resetProcessingFlag('Some comment')
+
+
+
+Calling conventions:
+--------------------
+to executor from process table.
+
+If extra_params_in == None then input filename else the contenst of extra_params_in
+
+
 Known Shortcomings:
 --------------------
 - There is no consistency checking
 - Version is ignored when processing <<so don't try new versions of files and expect it to work as you want>>
 - Unittests are incomplete <<I want to merge these all to one file>>
 - There is no mechanism for adding new versions of processing codes and having files reprocessed
+- No good way to initialize a fresh DB
 
 
 Big Tracker:
