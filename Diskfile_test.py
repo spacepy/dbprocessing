@@ -48,7 +48,8 @@ class DiskfileTests(unittest.TestCase):
 
     def test_read_error(self):
         """given a file input that is not readable raise ReadError:"""
-        self.assertRaises(Diskfile.ReadError, Diskfile.Diskfile, 'wrong input')
+        self.assertRaises(Diskfile.ReadError, Diskfile.Diskfile, 'wrong input',
+                          self.dbo)
 
 
     def test_write_error(self):
@@ -56,7 +57,8 @@ class DiskfileTests(unittest.TestCase):
         with open('IamAfileThatExists.file', 'wb') as f:
             f.write('I am some text in a file')
         os.chmod('IamAfileThatExists.file', stat.S_IRUSR)
-        self.assertRaises(Diskfile.WriteError, Diskfile.Diskfile, 'IamAfileThatExists.file')
+        self.assertRaises(Diskfile.WriteError, Diskfile.Diskfile,
+                          'IamAfileThatExists.file', self.dbo)
 
         os.chmod('IamAfileThatExists.file', stat.S_IWUSR|stat.S_IRUSR)
         os.remove('IamAfileThatExists.file')
@@ -66,9 +68,7 @@ class DiskfileTests(unittest.TestCase):
         with open('IamAfileThatExists.file', 'wb') as f:
             f.write('I am some text in a file')
         try:
-            a = Diskfile.Diskfile('IamAfileThatExists.file')
-        except:
-            self.fail()
+            a = Diskfile.Diskfile('IamAfileThatExists.file', self.dbo)
         finally:
             os.remove('IamAfileThatExists.file')
 
@@ -77,13 +77,16 @@ class DiskfileTests(unittest.TestCase):
         with open('Test-Test_R0_evinst_20090117_v1.0.0.cdf', 'wb') as f:
             f.write('I am some text in a file')
         try:
-            a = Diskfile.Diskfile('Test-Test_R0_evinst_20090117_v1.0.0.cdf')
-        except:
-            self.fail()
-        finally:
+            a = Diskfile.Diskfile('Test-Test_R0_evinst_20090117_v1.0.0.cdf',
+                                  self.dbo)
+            now = datetime.datetime.now()
+            expect = u'Test-Test_L1_evinst_{:04}{:02}{:02}_v1.0.0.cdf'.format(
+                now.year, now.month, now.day)
+            
             self.assertEqual(a.makeProductFilename(17, datetime.datetime.now(),
                                     Version.Version(1, 0, 0)),
-                                    u'Test-Test_L1_evinst_20101202_v1.0.0.cdf')
+                                    expect)
+        finally:
             os.remove('Test-Test_R0_evinst_20090117_v1.0.0.cdf')
 
     def test_makeProductFilenameChecks(self):
@@ -91,10 +94,8 @@ class DiskfileTests(unittest.TestCase):
         with open('Test-Test_R0_evinst_20090117_v1.0.0.cdf', 'wb') as f:
             f.write('I am some text in a file')
         try:
-            a = Diskfile.Diskfile('Test-Test_R0_evinst_20090117_v1.0.0.cdf')
-        except:
-            self.fail()
-        finally:
+            a = Diskfile.Diskfile('Test-Test_R0_evinst_20090117_v1.0.0.cdf',
+                                  self.dbo)
             self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
                               datetime.datetime.now(), '1.0.0')
             self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
@@ -102,7 +103,7 @@ class DiskfileTests(unittest.TestCase):
             self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
                               datetime.datetime.now(), Version.Version(1,0,0),
                               'bad in')
-
+        finally:
             os.remove('Test-Test_R0_evinst_20090117_v1.0.0.cdf')
 
 
