@@ -19,7 +19,7 @@ class DBUtils2AddTests(unittest.TestCase):
     def setUp(self):
         super(DBUtils2AddTests, self).setUp()
         self.dbu = DBUtils2.DBUtils2()
-        self.dbu._openDB('Test')
+        self.dbu._openDB()
         self.dbu._createTableObjects()
 
     def tearDown(self):
