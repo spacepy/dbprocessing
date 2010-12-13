@@ -4,6 +4,7 @@ import unittest
 import os
 
 import DBfile
+import DBUtils2
 import Diskfile
 
 
@@ -18,8 +19,10 @@ class DBfileTests(unittest.TestCase):
         self.test_filename = 'Test-one_R0_evinst_20100112_v2.0.0.cdf'
         with open(self.test_filename, 'wb') as f:
             f.write('I am some text in a file')
-        self.df = Diskfile.Diskfile(self.test_filename)
-        self.df.parseAll()
+        self.dbu = DBUtils2.DBUtils2('Test')
+        self.df = Diskfile.Diskfile(self.test_filename, self.dbu)
+        #TODO: Diskfile appears to have never had this method
+        #self.df.parseAll()
 
     def tearDown(self):
         super(DBfileTests, self).tearDown()
@@ -27,7 +30,8 @@ class DBfileTests(unittest.TestCase):
 
     def test_badInput(self):
         """DBfile object will only take a Diskfile as input"""
-        self.assertRaises(DBfile.DBfileError, DBfile.DBfile, 'wrong input')
+        self.assertRaises(DBfile.DBfileError, DBfile.DBfile,
+                          'wrong input', self.dbu)
 
 
 if __name__ == "__main__":
