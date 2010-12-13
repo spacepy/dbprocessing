@@ -109,7 +109,7 @@ class DBUtils2ClassMethodTests(unittest.TestCase):
     def test_test_SQLAlchemy_version(self):
         """The testing of the SQLAlchemy version should work"""
         self.assertTrue(DBUtils2.DBUtils2._test_SQLAlchemy_version())
-        errstr = 'SQLAlchemy version wrong_Ver was not expected, expected 0.6.2'
+        errstr = 'SQLAlchemy version wrong_Ver was not expected, expected 0.6.x'
         try:
             DBUtils2.DBUtils2._test_SQLAlchemy_version('wrong_Ver')
         except DBUtils2.DBError:
