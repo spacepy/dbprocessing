@@ -1,16 +1,21 @@
 #!/usr/bin/env python2.6
 
-import unittest
-import Executor
-import sys
 import os
 import stat
+import sys
+import unittest
+
+import Executor
+
 
 __version__ = '2.0.3'
 
-class Tests(unittest.TestCase):
+
+class ExecutorTests(unittest.TestCase):
+    """Tests of the Executor class"""
+    
     def setUp(self):
-        super(Tests, self).setUp()
+        super(ExecutorTests, self).setUp()
         with open('code_run_tmp', 'w') as f:
             f.writelines('#!/bin/sh\necho $1')
         os.chmod('code_run_tmp', stat.S_IXUSR|stat.S_IWUSR|stat.S_IRUSR)
@@ -19,7 +24,7 @@ class Tests(unittest.TestCase):
         self.path = os.path.abspath('.')
 
     def tearDown(self):
-        super(Tests, self).tearDown()
+        super(ExecutorTests, self).tearDown()
         os.remove('code_run_tmp')
         os.remove('code_dat_tmp')
 
@@ -34,7 +39,6 @@ class Tests(unittest.TestCase):
         self.assertRaises(Executor.ExecutorError, ex.checkExists)
         ex = Executor.Executor('code_run_tmp_bad', 'blabla', '')
         self.assertRaises(Executor.ExecutorError, ex.checkExists)
-
 
     def test_runfile(self):
         """Should run an echo command"""

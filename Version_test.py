@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.6
 
 import unittest
+
 import Version
 
 
@@ -8,16 +9,11 @@ __version__ = '2.0.3'
 
 
 class VersionTests(unittest.TestCase):
-    def setUp(self):
-        super(VersionTests, self).setUp()
-
-    def tearDown(self):
-        super(VersionTests, self).tearDown()
+    """Tests of the Version class"""
 
     def test_interfaceOne(self):
         """Interface version starts at 1"""
         self.assertRaises(Version.VersionError, Version.Version, 0, 0, 0)
-
 
     def test_Version_inc(self):
         """The versions should increment"""
@@ -28,7 +24,6 @@ class VersionTests(unittest.TestCase):
         self.assertEqual(Version.Version(1, 1, 1), ver)
         ver.incInterface()
         self.assertEqual(Version.Version(2, 1, 1), ver)
-
 
     def test_Version_repr(self):
         """__repr__ should have a known output"""
@@ -47,7 +42,6 @@ class VersionTests(unittest.TestCase):
         real_ans = (True, False, False, False)
         for i, val in enumerate(invals):
             self.assertEqual(real_ans[i], val[0] == val[1])
-
 
     def test_Version_ne(self):
         """__ne__ should work"""
@@ -68,7 +62,6 @@ class VersionTests(unittest.TestCase):
         real_ans = (False, True, True, True)
         for i, val in enumerate(invals):
             self.assertEqual(real_ans[i], val[0] > val[1])
-
 
     def test_Version_lt(self):
         """__lt__ should work"""
@@ -92,7 +85,6 @@ class VersionTests(unittest.TestCase):
         self.assertRaises(Version.VersionError, Version.Version, 'string', 0, 0)
         self.assertRaises(Version.VersionError, Version.Version, 0, 'string', 0)
         self.assertRaises(Version.VersionError, Version.Version, 0, 0, 'string')
-
 
 
 if __name__ == "__main__":

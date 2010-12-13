@@ -1,26 +1,29 @@
 #!/usr/bin/env python2.6
 
-import unittest
-import DBUtils2
-import sys
-import Version
 import datetime
 import os
 import os.path
+import sys
+import unittest
+
+import DBUtils2
+import Version
+
 
 __version__ = '2.0.3'
 
 
-
-class AddTests(unittest.TestCase):
+class DBUtils2AddTests(unittest.TestCase):
+    """Tests for add methods (?) of DBUtils2"""
+    
     def setUp(self):
-        super(AddTests, self).setUp()
+        super(DBUtils2AddTests, self).setUp()
         self.dbu = DBUtils2.DBUtils2()
         self.dbu._openDB('Test')
         self.dbu._createTableObjects()
 
     def tearDown(self):
-        super(AddTests, self).tearDown()
+        super(DBUtils2AddTests, self).tearDown()
         self.dbu._closeDB()
         del self.dbu
 
@@ -90,16 +93,8 @@ class AddTests(unittest.TestCase):
         ver =Version.Version(1, 0, 0)
         self.assertRaises(DBUtils2.DBError, self.dbu._addCode, 'string', 'string', stopt, startt, 'string', 1234, ver, False, startt, 1, True)
 
-class ClassMethodTests(unittest.TestCase):
-
-    def setUp(self):
-        #        super(PickleTests, self).setUp()
-        pass
-
-
-    def tearDown(self):
-        # super(PickleTests, self).tearDown()
-        pass
+class DBUtils2ClassMethodTests(unittest.TestCase):
+    """Tests for class methods of DBUtils2"""
 
     def test_build_fname(self):
         """_build_fname should give known outout for known input"""
@@ -125,17 +120,12 @@ class ClassMethodTests(unittest.TestCase):
                       errstr)
 
 
-class DBTests(unittest.TestCase):
+class DBUtils2DBTests(unittest.TestCase):
+    """Tests for database access through DBUtils2"""
+
     def __init__(self, *args):
         self.dbp = DBUtils2.DBUtils2('unittest')
-        super(DBTests, self).__init__(*args)
-
-
-    def setUp(self):
-        super(DBTests, self).setUp()
-
-    def tearDown(self):
-        super(tearDown, self).tearDown()
+        super(DBUtils2DBTests, self).__init__(*args)
 
     def test_opencloseDB(self):
         """_open should open a db in memory and _close should close it"""
@@ -207,24 +197,26 @@ class DBTests(unittest.TestCase):
         # TODO define a test here, not sure how to crate views from within SQLAlchemy
         pass
 
-class DBUseTests(unittest.TestCase):
+
+class DBUtils2DBUseTests(unittest.TestCase):
+    """Tests for DBUtils2"""
+    
     def __init__(self, *args):
         # TODO change this to a test DB not the real one
 
-        super(DBUseTests, self).__init__(*args)
-
+        super(DBUtils2DBUseTests, self).__init__(*args)
 
     def setUp(self):
         self.dbu = DBUtils2.DBUtils2()
         self.dbu._openDB()
         self.dbu._createTableObjects()
-        super(DBUseTests, self).setUp()
+        super(DBUtils2DBUseTests, self).setUp()
         pass
 
     def tearDown(self):
         self.dbu._closeDB()
         del self.dbu
-        super(DBUseTests, self).tearDown()
+        super(DBUtils2DBUseTests, self).tearDown()
 
     def test_getMissionDirectory(self):
         """ _getMissionDirectory should return known ouput for a known mission"""
@@ -237,9 +229,6 @@ class DBUseTests(unittest.TestCase):
         fd.close()
         self.assertTrue(self.dbu._getMissionDirectory() + '/incoming/unittest.tst' in self.dbu._checkIncoming())
         os.remove(self.dbu._getMissionDirectory() + '/incoming/unittest.tst')
-
-
-
 
 #    def test_addDataFile(self):
 #        """_addDataFile should add a file entry to the db"""

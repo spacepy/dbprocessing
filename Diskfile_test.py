@@ -1,27 +1,21 @@
 #!/usr/bin/env python2.6
 
-import unittest
-import DBUtils2
 import datetime
-import Diskfile
 import os
-import Version
 import stat
+import unittest
+
+import DBUtils2
+import Diskfile
+import Version
+
 
 __version__ = '2.0.3'
 
 
-class StaticTests(unittest.TestCase):
-    """ tests for the static methods in DBfile"""
-    def setUp(self):
-        super(StaticTests, self).setUp()
-        pass
-
-    def tearDown(self):
-        super(StaticTests, self).tearDown()
-        pass
-
-
+class DiskfileStaticTests(unittest.TestCase):
+    """Tests for the static methods in Diskfile"""
+    
     def test_calcDigest(self):
         """ calcDigest  should behave correctly"""
         self.assertRaises(Diskfile.DigestError, Diskfile.calcDigest, 'idontexist.file')
@@ -37,7 +31,10 @@ class StaticTests(unittest.TestCase):
         f.close()
         os.remove('IamAfileThatExists.file')
 
+
 class DiskfileTests(unittest.TestCase):
+    """Tests for Diskfile class"""
+    
     def setUp(self):
         super(DiskfileTests, self).setUp()
         dbo = DBUtils2.DBUtils2()
@@ -47,7 +44,7 @@ class DiskfileTests(unittest.TestCase):
 
     def tearDown(self):
         super(DiskfileTests, self).tearDown()
-        pass
+        #Shouldn't this do something to close the db object created in setup?
 
     def test_read_error(self):
         """given a file input that is not readable raise ReadError:"""
@@ -107,7 +104,6 @@ class DiskfileTests(unittest.TestCase):
                               'bad in')
 
             os.remove('Test-Test_R0_evinst_20090117_v1.0.0.cdf')
-
 
 
 if __name__ == "__main__":

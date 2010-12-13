@@ -1,39 +1,20 @@
 #!/usr/bin/env python2.6
 
+import collections
 import unittest
-#import DBUtils2
-#import sys
-#import Version
-#import datetime
-#import os
+
 import ProcessQueue
 
-from collections import deque
 
 __version__ = '2.0.3'
 
 
-class SimpleTests(unittest.TestCase):
-    def setUp(self):
-        super(SimpleTests, self).setUp()
-        pass
+class ProcessQueueSimpleTests(unittest.TestCase):
+     """Simple test cases for the ProcessQueue class"""
 
-
-    def tearDown(self):
-        super(SimpleTests, self).tearDown()
-        pass
-
-
-
-    def test_emptyQueue(self):
+     def test_emptyQueue(self):
         """ should raise an EmptyQueue exception if it is empty"""
         pass
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
