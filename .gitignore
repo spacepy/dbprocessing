@@ -1,9 +1,11 @@
 *.pyc
 *~
-CVS/
-Test-Test_R0_evinst_20000111_v1.0.0.cdf
-dbprocessing_log.log
-html/
+.coverage
+dbprocessing_log.log*
 coverage_dir/
+CVS/
+html/
+htmlcov/
 logfile.txt
 old/
+Test-Test_R0_evinst_20000111_v1.0.0.cdf
