@@ -1,14 +1,16 @@
 #!/usr/bin/env python2.6
 
-import DBUtils2
-import DBqueue
-import shutil
-import DBfile
-import Diskfile
 import os.path
+import shutil
+import traceback
+
+import DBfile
+import DBlogging
+import DBqueue
+import DBUtils2
+import Diskfile
 import Executor
 
-import DBlogging
 
 __version__ = '2.0.3'
 
@@ -398,9 +400,6 @@ def processRunning(pid):
         return True
 
 
-
-
-
 if __name__ == "__main__":
     # TODO decide if we really want to run this way, works for now
 
@@ -423,12 +422,23 @@ if __name__ == "__main__":
     pq.dbu._startLogging()
 
 
-    pq.checkIncoming()
-    while len(pq.queue) != 0 or len(pq.findChildren) !=0 or len(pq.childrenQueue):
-        pq.importFromIncoming()
-        pq.findChildrenProducts()
-        pq.buildChildren()
-
-
-    pq.dbu._stopLogging('Nominal Exit')
+    try:
+        pq.checkIncoming()
+        while len(pq.queue) != 0 or len(pq.findChildren) !=0 or len(pq.childrenQueue):
+            pq.importFromIncoming()
+            pq.findChildrenProducts()
+            pq.buildChildren()
+    except:
+        #Generic top-level error handler, because otherwise people freak if
+        #they see an exception thrown.
+        print('Error in running processing chain; debugging details follow:')
+        tbstring = traceback.format_exc()
+        print tbstring
+        print('This probably indicates a programming error. Please pass '
+              'this debugging\ninformation to the developer, along with '
+              'any information on what was\nhappening at the time.')
+        DBlogging.dblogger.critical(tbstring)
+        pq.dbu._stopLogging('Abnormal exit on exception')
+    else:
+        pq.dbu._stopLogging('Nominal Exit')
     pq.dbu._closeDB()
