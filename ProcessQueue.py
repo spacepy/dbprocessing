@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.6
 
+import os
 import os.path
 import shutil
 import traceback
@@ -325,7 +326,14 @@ class ProcessQueue(object):
                 DBlogging.dblogger.debug("--**-- in_path=%s" % (in_path))
 
             exe = Executor.Executor(codep, in_path, out_path)
-            exe.doIt()
+            try:
+                exe.doIt()
+            except:
+                tbstring = traceback.format_exc()
+                DBlogging.dblogger.error(tbstring)
+                if os.path.exists(out_path):
+                    os.remove(out_path)
+                continue
             self.queue.append(out_path)
             self.importFromIncoming()  # we added something it is time to import it
 

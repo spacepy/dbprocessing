@@ -77,4 +77,4 @@ class Executor(object):
         if self.output != None:
             cmd.append(self.output)
         DBlogging.dblogger.info("Executing: %s" % (cmd))
-        subprocess.call(cmd)
+        subprocess.check_call(cmd)
