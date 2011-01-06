@@ -9,6 +9,7 @@ from Diskfile_test import *
 from Executor_test import *
 from ProcessQueue_test import *
 from Version_test import *
+from testDBStrings import *
 
 
 __version__ = '2.0.3'
