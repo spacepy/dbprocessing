@@ -35,6 +35,45 @@ class DBFormatterTests(unittest.TestCase):
         """Format strings with unspecified keys"""
         self.assertEqual('hi {there}',
                          self.fmtr.format('{hi} {there}', hi='hi'))
+        self.assertEqual(
+            'hi {there.here!s:100s}',
+            self.fmtr.format('{hi} {there.here!s:100s}', hi='hi'))
+
+
+class UnfoundFieldTests(unittest.TestCase):
+    """Tests of the UnfoundField object"""
+
+    def testSetKey(self):
+        """Record key name on not-found object"""
+        a = DBStrings._UnfoundField('key')
+        self.assertEqual('key', a.key)
+
+    def testGetattr(self):
+        """Record an attribute lookup on the not-found object"""
+        a = DBStrings._UnfoundField('key')
+        b = a.attr
+        self.assertEqual(a, b)
+        self.assertEqual(a.lookups, '.attr')
+
+    def testGetItem(self):
+        """Record an item lookup on the not-found object"""
+        a = DBStrings._UnfoundField('key')
+        b = a['keyname']
+        self.assertEqual(a, b)
+        self.assertEqual(a.lookups, "['keyname']")
+        c = b[0]
+        self.assertEqual(a, c)
+        self.assertEqual(a.lookups, "['keyname'][0]")
+
+    def testFieldSpec(self):
+        """Reproduce original spec of the field"""
+        a = DBStrings._UnfoundField('key')
+        b = a['keyname']
+        c = b.attribute
+        d = c[0]
+        a.conversion = 's'
+        self.assertEqual("{key['keyname'].attribute[0]!s:04d}",
+                         a.field_spec('04d'))
 
 
 if __name__ == '__main__':
