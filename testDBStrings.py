@@ -5,6 +5,7 @@
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
 __version__ = '0.0'
 
+import datetime
 import unittest
 
 import DBStrings
@@ -119,6 +120,22 @@ class DBFormatterTests(unittest.TestCase):
         """Replace special fields with regular expression"""
         self.assertEqual('stuff(\d{3})([0-3]\d\d){d:2d}',
                          self.fmtr.regex('stuff{MILLI}{j:03d}{d:2d}'))
+
+    def testExpandDatetime(self):
+        """Expand a single datetime object to a set of keywords"""
+        dt = datetime.datetime(2010, 1, 2, 3, 44, 59, 123456)
+        kwargs = {'Y': 1999, 'datetime': dt}
+        self.fmtr.expand_datetime(kwargs)
+        expected = {'Y': 1999, 'm': 1, 'd': 2, 'y': 10, 'j': 2,
+                    'H': 3, 'M': 44, 'S': 59, 'MILLI': 123, 'MICRO': 456,
+                    'datetime': dt}
+        self.assertEqual(expected, kwargs)
+
+    def testFormat(self):
+        """Format a string from a datetime"""
+        dt = datetime.datetime(2010, 1, 2, 3, 44, 59, 123456)
+        self.assertEqual('2010/1/2 hi',
+                         self.fmtr.format('{Y}/{m}/{d} hi', datetime=dt))
 
 
 if __name__ == '__main__':

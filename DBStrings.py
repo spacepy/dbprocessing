@@ -220,7 +220,18 @@ class DBFormatter(QuietFormatter):
                           a fully-formatted representation of the field
                           and a regular expression that should match it.
     @type SPECIAL_FIELDS: dict
+    @note: As this is currently implemented, L{regex} may not handle
+           {{ and }} properly, since regex expansion is applied I{after}
+           the basic formatting is done, and thus {{ and }} are already
+           replaced with { and }. In this case, {{Y}} would be replaced
+           with the {Y} regex. One solution to this may be to put a
+           callback in L{QuietFormatter} to allow other handling of
+           unmatched fields. Callback would have to be specified at
+           class construction time and be same for the life of the formatter
+           Also, it might make more sense to let the exception throw if fields
+           aren't filled.
     """
+    
     SPECIAL_FIELDS = {
         'Y': ('{Y:04d}', '(19|2\d)\d\d'),
         'm': ('{m:02d}', '(0\d|1[0-2])'),
@@ -229,12 +240,51 @@ class DBFormatter(QuietFormatter):
         'j': ('{j:03d}', '[0-3]\d\d'),
         'H': ('{H:02d}', '[0-2]\d'),
         'M': ('{M:02d}', '[0-6]\d'),
+        'S': ('{S:02d}', '[0-6]\d'),
         'MILLI': ('{MILLI:03d}', '\d{3}'),
         'MICRO': ('{MICRO:03d}', '\d{3}'),
         'QACODE': ('{QACODE}', '(ok|ignore|problem)'),
         }
 
-    #Following methods provide new functionality for this class
+    def format(self, format_string, *args, **kwargs):
+        """Expand base format to handle datetime"""
+        self.expand_datetime(kwargs)
+        return super(DBFormatter, self).format(format_string, *args, **kwargs)
+
+    def expand_datetime(self, kwargs):
+        """Expands datetime keyword into special keywords
+
+        A single datetime keyword may be provided to L{format}; this
+        function expands that datetime keyword into all the fields that
+        may be provided by the datetime object and inserts those keywords
+        into L{kwargs}.
+
+        @param kwargs: list of keywords passed to L{format}
+        @type kwargs: dict.
+        """
+        if 'datetime' in kwargs:
+            dt = kwargs['datetime']
+            if not 'Y' in kwargs:
+                kwargs['Y'] = dt.year
+            if not 'm' in kwargs:
+                kwargs['m'] = dt.month
+            if not 'd' in kwargs:
+                kwargs['d'] = dt.day
+            if not 'y' in kwargs:
+                kwargs['y'] = dt.year % 100
+            if not 'j' in kwargs:
+                kwargs['j'] = int(dt.strftime('%j'))
+            if not 'H' in kwargs:
+                kwargs['H'] = dt.hour
+            if not 'M' in kwargs:
+                kwargs['M'] = dt.minute
+            if not 'S' in kwargs:
+                kwargs['S'] = dt.second
+            if not 'MILLI' in kwargs:
+                kwargs['MILLI'] = int(dt.microsecond / 1000)
+            if not 'MICRO' in kwargs:
+                kwargs['MICRO'] = dt.microsecond % 1000
+
     def expand_format(self, format_string):
         """Adds formatting codes to 'special' fields in format string
 
