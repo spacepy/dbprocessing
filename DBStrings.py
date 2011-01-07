@@ -112,3 +112,33 @@ class DBFormatter(string.Formatter):
             return value.field_spec(format_spec)
         else:
             return super(DBFormatter, self).format_field(value, format_spec)
+
+    #Following methods provide new functionality for this class
+    @staticmethod
+    def assemble(literal, field, format, conversion):
+        """Assembles components of a field specification
+
+        Converse of parse. Takes literal text, field name, format spec,
+        and conversion and assembles into a full field spec.
+
+        @param literal: any literal text preceding the field definition
+        @type literal: str
+        @param field: name of the field
+        @type field: str
+        @param format: format specification to apply to L{field}
+        @type format: str
+        @param conversion: conversion to apply to L{field}
+        @type conversion: str
+        @return: a full format spec that will parse into L{literal},
+                 L{field}, L{format}, L{conversion}
+        @rtype: str
+        """
+        fs = literal + '{' + field
+        if conversion:
+            fs += ('!' + conversion)
+        if format:
+            if literal or field or conversion:
+                fs += ':'
+            fs += format
+        fs += '}'
+        return fs

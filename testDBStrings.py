@@ -39,6 +39,13 @@ class DBFormatterTests(unittest.TestCase):
             'hi {there.here!s:100s}',
             self.fmtr.format('{hi} {there.here!s:100s}', hi='hi'))
 
+    def testAssemble(self):
+        """Assemble components of a field spec"""
+        self.assertEqual('{04d}',
+                         self.fmtr.assemble('', '', '04d', ''))
+        self.assertEqual('stuff{name[0]!s:4.2f}',
+                         self.fmtr.assemble('stuff', 'name[0]', '4.2f', 's'))
+
 
 class UnfoundFieldTests(unittest.TestCase):
     """Tests of the UnfoundField object"""
