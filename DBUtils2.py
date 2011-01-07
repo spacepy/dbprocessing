@@ -11,6 +11,8 @@ import DBlogging
 import socket # to get the local hostname
 import sys
 
+import DBStrings
+
 
 ## This goes in the processing comment field in the DB, do update it
 __version__ = '2.0.3'
@@ -41,6 +43,10 @@ class DBUtils2(object):
             raise(DBError("Must input mission name to create DBUtils2 instance"))
         self.mission = mission
         self.dbIsOpen = False
+        #Expose the format/regex routines of DBFormatter
+        fmtr = DBStrings.DBFormatter()
+        self.format = fmtr.format
+        self.re = fmtr.re
 
     def __repr__(self):
         """

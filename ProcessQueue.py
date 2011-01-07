@@ -3,6 +3,7 @@
 import os
 import os.path
 import shutil
+import subprocess
 import traceback
 
 import DBfile
@@ -10,7 +11,6 @@ import DBlogging
 import DBqueue
 import DBUtils2
 import Diskfile
-import Executor
 
 
 __version__ = '2.0.3'
@@ -233,6 +233,25 @@ class ProcessQueue(object):
         return ans
 
 
+    def getCodeArgs(self, code_id):
+        """
+        Given a code_id list return the arguments to the code
+
+        @author: Jon Niehof after L{getCodePath}
+        @organization: Los Alamos National Lab
+        @contact: jniehof@lanl.gov
+
+        @version: V1: 07-Jan-2011 (JTN)
+        """
+        DBlogging.dblogger.debug("Entered getCodeArgs:")
+
+        ans = []
+        for val in code_id:
+            sq1 =  self.dbu.session.query(self.dbu.Code.arguments).filter_by(code_id = val)  # should only have one value
+            ans.append(sq1[0][0])  # the [0][0] is ok (ish) since there can only be one
+        return ans
+
+
     def buildChildren(self):
         """
         given the values in self.childrenQueue build them is possible
@@ -274,8 +293,12 @@ class ProcessQueue(object):
             out_path = '/tmp/' + val[0].diskfile.makeProductFilename(product, date, version)
             # now we have everything it takes to build the file
 
-            # ####### get all the input_product_id and make sure they all exist
-            #    before we build the child.
+            arg_subs = {'datetime': date,
+                        'BASEDIR': root_path,
+                        'OUTPATH': out_path,
+                        }
+            # ####### get all the input_product_id and filenames
+            #    make sure they all exist before we build the child.
             # from the process get all the input_product_id
             products = self.dbu._getInputProductID(proc_id)
             # query for the files that match the products for the right date
@@ -291,6 +314,7 @@ class ProcessQueue(object):
                     DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
                     # get an in_path for exe
                     in_path = self.dbu._getFileFullPath(val[0].diskfile.makeProductFilename(pval, date, version))
+                    arg_subs['INPATH_{:d}'.format(pval)] = in_path
                     if in_path == None:
                         DBlogging.dblogger.debug("Skipping file since " + \
                                                  "requirement not available" + \
@@ -298,39 +322,18 @@ class ProcessQueue(object):
                         raise(ForException())
             except ForException:
                 continue
-            sq1 = self.dbu.session.query(self.dbu.Process).filter_by(process_id = proc_id)[0]
-            extra_params_in = sq1.extra_params_in
-            if extra_params_in != None:
-                # now we need to play with what is in the query and parse it
-                if '%DATE' in extra_params_in:
-                    extra_params_in = extra_params_in.replace('%DATE',
-                                                    date.strftime('%Y%m%d'))
-                    DBlogging.dblogger.debug("-*-* extra_params_in=%s" %  \
-                                             (extra_params_in))
-                if '%OUTFILE' in extra_params_in:
-                    extra_params_in = extra_params_in.replace('%OUTFILE',
-                                                    out_path)
-                    DBlogging.dblogger.debug("-*-* extra_params_in=%s" %  \
-                                             (extra_params_in))
-                # TODO what other %CODEs are allowed?
-                if '%BASEDIR' in extra_params_in:
-                    extra_params_in = extra_params_in.replace('%BASEDIR',
-                                                    root_path)
 
-                ep = extra_params_in.split(' ')
-                in_path = ep
-                tmp = []
-                for val2 in in_path:
-                    tmp.append(str(val2))
-                in_path = tmp
-                DBlogging.dblogger.debug("--**-- in_path=%s" % (in_path))
-
-            exe = Executor.Executor(codep, in_path, out_path)
-            try:
-                exe.doIt()
-            except:
-                tbstring = traceback.format_exc()
-                DBlogging.dblogger.error(tbstring)
+            args = self.getCodeArgs([code_id])[0]
+            cmd = codep + ' ' + self.dbu.format(args, **arg_subs)
+            DBlogging.dblogger.debug('Executing: %s' % cmd)
+            process = subprocess.Popen(cmd.split(' '),
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT)
+            (output, errs) = process.communicate()
+            if process.returncode != 0:
+                DBlogging.dblogger.error(
+                    'Command returned code {0:d} and output:\n{1}'.format(
+                    process.returncode, output))
                 if os.path.exists(out_path):
                     os.remove(out_path)
                 continue

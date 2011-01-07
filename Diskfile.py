@@ -192,12 +192,6 @@ class Diskfile(object):
 
 
 
-    formats = ['%MISSION', '%SPACECRAFT', '%PRODUCT', '%Y',
-               '%y' , '%m' , '%d' , '%VERSION', '%b', '%j', '%H' , '%M', '%s' ,
-               '%MILLI', '%MICRO', '%IGNORE', '%QACODE']
-
-
-
     def makeProductFilename(self, productID, date, version, qacode = None):
         """
         go through the DB and make a filename from the product format string
@@ -213,28 +207,16 @@ class Diskfile(object):
         filename = self.dbu._getProductFormats(productID)[0] # just for the format
         mission, satellite, instrument, product, product_id = self.dbu._getProductNames(productID)
 
-        filename = filename.replace('%MISSION', mission)
-        filename = filename.replace('%SPACECRAFT', satellite)
-        filename = filename.replace('%PRODUCT', product )
-        filename = filename.replace('%VERSION', str(version))
-        filename = filename.replace('%Y', date.strftime('%Y'))
-        filename = filename.replace('%m', date.strftime('%m'))
-        filename = filename.replace('%d', date.strftime('%d'))
-        filename = filename.replace('%INSTRUMENT', instrument)
-        filename = filename.replace('%y', date.strftime('%y'))
-        # TODO can be made more restrictive
-        filename = filename.replace('%j', date.strftime('%j'))
-        filename = filename.replace('%H', date.strftime('%H'))
-        filename = filename.replace('%M', date.strftime('%M'))
-        filename = filename.replace('%MILLI', date.strftime('%f')[0:3])
-        filename = filename.replace('%MICRO', date.strftime('%f')[3:6])
-        # TODO not sure what to here so I'll try a hack
-        # filename = filename.replace('%QACODE','(ok|ignore|problem)')
-        filename = filename.replace('%QACODE', 'ok')
-
-        if qacode != None:
-            filename = filename.replace('%QACODE', qacode)
-
+        if qacode == None:
+            qacode = 'ok'
+        filename = self.dbu.format(filename,
+                                   MISSION=mission,
+                                   SPACECRAFT=satellite,
+                                   PRODUCT=product,
+                                   VERSION=str(version),
+                                   INSTRUMENT=instrument,
+                                   QACODE=qacode,
+                                   datetime=date)
         if self.figureProduct(filename) != productID:
             raise(FilenameError("Created filename did not match convention"))
 
@@ -290,25 +272,14 @@ class Diskfile(object):
         matches = []
         for i in range(len(products)):
             # this format has which fields in it?
-            expression = r'^' + formats[i] + '$'
-
-            # TODO this can be cleaned up...
-            expression = expression.replace('%MISSION',  prods[i][0])
-            expression = expression.replace('%SPACECRAFT',   prods[i][1])
-            expression = expression.replace('%PRODUCT', prods[i][3] )
-            expression = expression.replace('%VERSION','\d.\d.\d')
-            expression = expression.replace('%Y','(19|2\d)\d\d')
-            expression = expression.replace('%m','(0\d|1[0-2])')
-            expression = expression.replace('%d','[0-3]\d')
-            expression = expression.replace('%INSTRUMENT', prods[i][2])
-            expression = expression.replace('%y', '\d\d')
-            # TODO can be made more restrictive
-            expression = expression.replace('%j','[0-3]\d\d')
-            expression = expression.replace('%H','[0-2]\d')
-            expression = expression.replace('%M','[0-6]\d')
-            expression = expression.replace('%MILLI','\d{3}')
-            expression = expression.replace('%MICRO','\d{3}')
-            expression = expression.replace('%QACODE','(ok|ignore|problem)')
+            expression = r'^' + \
+                         self.dbu.re(formats[i],
+                                     MISSION=prods[i][0],
+                                     SPACECRAFT=prods[i][1],
+                                     PRODUCT=prods[i][3],
+                                     INSTRUMENT=prods[i][2],
+                                     ) + '$'
+                                     
             #TODO what to do with the IGNORE code?  Maybe it doesnt need to exist
             if filename == None:
                 DBlogging.dblogger.debug("Matching %d:%s against %s" % (prods[i][4], expression,  os.path.basename(self.filename)))
@@ -334,32 +305,32 @@ class Diskfile(object):
             # build a date
             # need year month day from the format or year DOY
             format = self.dbu._getProductFormats(matches[0])[0]  # get the format again for the correct product
-            if not ('%Y' in format ) or ('%y' in format):
+            if not ('{Y}' in format ) or ('{y}' in format):
                 raise(DBUtils2.DBError("Format %s has no year field"% (format)))
             DBlogging.dblogger.debug("Found a year in %s" % (format))
-            if not (('%m' in format or '%b' in format) and ('%d' in format)) or ('%j' in format):
+            if not (('{m}' in format or '{b}' in format) and ('{d}' in format)) or ('{j}' in format):
                 raise(DBUtils2.DBError("Format %s has no month/day or DOY  field"% (format)))
             DBlogging.dblogger.debug("Found month/day or DOY in  %s" % (format))
             # now that we know we have a date fill in those fields
             #TODO utc_end_time and utc_start_time should come from file or something
-            if '%y' in format:
+            if '{y}' in format:
                 pass # TODO there is a 2 digit year, do somehting
             else:
-                splitter = format[format.find('%Y')-1]
+                splitter = format[format.find('{Y}')-1]
                 try:
                     year = filename.split(splitter)[-2][0:4]
                 except AttributeError:
                     year = self.filename.split(splitter)[-2][0:4]
-            if '%j' in format:
+            if '{j}' in format:
                 pass # TODO do something with DOY info
-            if '%m' in format or '%b' in format:
-                if '%b' in format:
+            if '{m}' in format or '{b}' in format:
+                if '{b}' in format:
                     pass # TODO do something with a 3 char month name
                 pass
 
             # do a larger less general case to see if we can: '%Y%m%d'
-            if '%Y%m%d' in format:
-                splitter = format[format.find('%Y%m%d')-1]
+            if '{Y}{m}{d}' in format:
+                splitter = format[format.find('{Y}{m}{d}')-1]
                 try:
                     date = filename.split(splitter)[-2]
                 except AttributeError:

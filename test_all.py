@@ -6,7 +6,6 @@ from DBfile_test import *
 from DBqueue_test import *
 from DBUtils2_test import *
 from Diskfile_test import *
-from Executor_test import *
 from ProcessQueue_test import *
 from Version_test import *
 from testDBStrings import *
