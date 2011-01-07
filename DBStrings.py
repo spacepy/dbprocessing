@@ -7,7 +7,7 @@ dbprocessing: parsing, formatting, etc.
 """
 
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
-__version__ = '0.2'
+__version__ = '0.3pre'
 
 import re
 import string
@@ -35,6 +35,7 @@ class DBFormatter(string.Formatter):
     SPECIAL_FIELDS = {
         'Y': ('{Y:04d}', '(19|2\d)\d\d'),
         'm': ('{m:02d}', '(0\d|1[0-2])'),
+        'b': ('{b}', 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec'),
         'd': ('{d:02d}', '[0-3]\d'),
         'y': ('{y:02d}', '\d\d'),
         'j': ('{j:03d}', '[0-3]\d\d'),
@@ -43,7 +44,9 @@ class DBFormatter(string.Formatter):
         'S': ('{S:02d}', '[0-6]\d'),
         'MILLI': ('{MILLI:03d}', '\d{3}'),
         'MICRO': ('{MICRO:03d}', '\d{3}'),
-        'QACODE': ('{QACODE}', '(ok|ignore|problem)'),
+        'QACODE': ('{QACODE}', 'ok|ignore|problem'),
+        'VERSION': ('{VERSION}', '\d\.\d\.\d'),
+        'DATE': ('{DATE}', '(19|2\d)\d\d(0\d|1[0-2])[0-3]\d'),
         }
 
     def format(self, format_string, *args, **kwargs):
@@ -71,26 +74,32 @@ class DBFormatter(string.Formatter):
         """
         if 'datetime' in kwargs:
             dt = kwargs['datetime']
-            if not 'Y' in kwargs:
-                kwargs['Y'] = dt.year
-            if not 'm' in kwargs:
-                kwargs['m'] = dt.month
-            if not 'd' in kwargs:
-                kwargs['d'] = dt.day
-            if not 'y' in kwargs:
-                kwargs['y'] = dt.year % 100
-            if not 'j' in kwargs:
-                kwargs['j'] = int(dt.strftime('%j'))
-            if not 'H' in kwargs:
-                kwargs['H'] = dt.hour
-            if not 'M' in kwargs:
-                kwargs['M'] = dt.minute
-            if not 'S' in kwargs:
-                kwargs['S'] = dt.second
-            if not 'MILLI' in kwargs:
-                kwargs['MILLI'] = int(dt.microsecond / 1000)
-            if not 'MICRO' in kwargs:
-                kwargs['MICRO'] = dt.microsecond % 1000
+            if hasattr(dt, 'year'):
+                if not 'Y' in kwargs:
+                    kwargs['Y'] = dt.year
+                if not 'm' in kwargs:
+                    kwargs['m'] = dt.month
+                if not 'd' in kwargs:
+                    kwargs['d'] = dt.day
+                if not 'y' in kwargs:
+                    kwargs['y'] = dt.year % 100
+                if not 'j' in kwargs:
+                    kwargs['j'] = int(dt.strftime('%j'))
+                if not 'DATE' in kwargs:
+                    kwargs['DATE'] = dt.strftime('%Y%m%d')
+                if not 'b' in kwargs:
+                    kwargs['b'] = dt.strftime('%b')
+            if hasattr(dt, 'hour'):
+                if not 'H' in kwargs:
+                    kwargs['H'] = dt.hour
+                if not 'M' in kwargs:
+                    kwargs['M'] = dt.minute
+                if not 'S' in kwargs:
+                    kwargs['S'] = dt.second
+                if not 'MILLI' in kwargs:
+                    kwargs['MILLI'] = int(dt.microsecond / 1000)
+                if not 'MICRO' in kwargs:
+                    kwargs['MICRO'] = dt.microsecond % 1000
 
     def expand_format(self, format_string, kwargs=None):
         """Adds formatting codes to 'special' fields in format string

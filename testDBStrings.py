@@ -3,7 +3,7 @@
 """Unit tests for string handling for dbprocessing"""
 
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
-__version__ = '0.2'
+__version__ = '0.3pre'
 
 import datetime
 import unittest
@@ -65,7 +65,7 @@ class DBFormatterTests(unittest.TestCase):
         self.fmtr.expand_datetime(kwargs)
         expected = {'Y': 1999, 'm': 1, 'd': 2, 'y': 10, 'j': 2,
                     'H': 3, 'M': 44, 'S': 59, 'MILLI': 123, 'MICRO': 456,
-                    'datetime': dt}
+                    'datetime': dt, 'DATE': '20100102', 'b': 'Jan'}
         self.assertEqual(expected, kwargs)
 
     def testFormat(self):
