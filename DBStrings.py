@@ -7,7 +7,7 @@ dbprocessing: parsing, formatting, etc.
 """
 
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
-__version__ = '0.0'
+__version__ = '0.1'
 
 import re
 import string
