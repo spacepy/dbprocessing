@@ -10,17 +10,28 @@ import unittest
 import DBStrings
 
 
-class AssemblingFormatterTests(unittest.TestCase):
-    """Test of the Formatter which reassembles field specs"""
+class XFormatterTests(unittest.TestCase):
+    """Test of the extended Formatter"""
 
     def testAssemble(self):
         """Assemble components of a field spec"""
         self.assertEqual(
             '{04d}',
-            DBStrings.AssemblingFormatter.assemble('', '', '04d', ''))
+            DBStrings.XFormatter.assemble('', '', '04d', ''))
         self.assertEqual(
             'stuff{name[0]!s:4.2f}',
-            DBStrings.AssemblingFormatter.assemble('stuff', 'name[0]', '4.2f', 's'))
+            DBStrings.XFormatter.assemble('stuff', 'name[0]', '4.2f', 's'))
+
+    def testParseFormat(self):
+        """Parse components of a format string"""
+        #There should be more tests here if this is ever used
+        fmtr = DBStrings.XFormatter()
+        inputs = ['04d',
+                  ]
+        outputs = [(None, None, None, None, True, 4, None, 'd'),
+                   ]
+        for (inp, outp) in zip(inputs, outputs):
+            self.assertEqual(outp, fmtr.parse_format(inp))
 
 
 class UnfoundFieldTests(unittest.TestCase):
@@ -106,7 +117,7 @@ class DBFormatterTests(unittest.TestCase):
 
     def testRegex(self):
         """Replace special fields with regular expression"""
-        self.assertEqual('stuff\d{3}[0-3]\d\d{d:2d}',
+        self.assertEqual('stuff(\d{3})([0-3]\d\d){d:2d}',
                          self.fmtr.regex('stuff{MILLI}{j:03d}{d:2d}'))
 
 

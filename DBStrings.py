@@ -9,11 +9,12 @@ dbprocessing: parsing, formatting, etc.
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
 __version__ = '0.0'
 
+import re
 import string
 
 
-class AssemblingFormatter(string.Formatter):
-    """String formatter extended with a method to reassemble field specs"""
+class XFormatter(string.Formatter):
+    """String formatter extended to reassemble field specs, allow regex"""
 
     @staticmethod
     def assemble(literal, field, format, conversion):
@@ -43,6 +44,72 @@ class AssemblingFormatter(string.Formatter):
             fs += format
         fs += '}'
         return fs
+
+    def regex(self, format_string):
+        """Convert fields in format string to regular expression
+        
+        @param format_string: the format string to convert
+        @type format_string: str
+        @return: L{format_string} with fields replaced with matching
+                 regular expressions
+        @rtype: str
+        @note: conversion strings and field names are ignored; only format
+               spec is used.
+        """
+        #TODO: finish this implementation
+        #This obviously would need unit tests, plus more unit tests for parse_format
+        raise NotImplementedError('Regular expression expansion not implemented')
+        result = []
+        for literal, field, format, conversion in self.parse(format_string):
+            (fill, align, sign, pound, zero, width, precision, type) = \
+                   self.parse_format(format)
+        return ''.join(result)
+
+    def parse_format(self, format):
+        """Parses a format specifier into its parts
+
+        @param format: format specifier to parse
+        @type format: str
+        @return: (fill character, alignment character, sign option,
+                  True if pound present, else None, True if 0 present,
+                  else None, width of field, precision of field,
+                  type character)
+        @rtype: tuple
+        """
+        fill, align, sign, pound, zero, width, precision, type = \
+              None, None, None, None, None, None, None, None
+        remain = format[:]
+        if len(remain) > 0 and remain[0] in ('<', '>', '=', '^'):
+            align = remain[0]
+            remain = remain[1:]
+        elif len(remain) > 1 and remain[1] in ('<', '>', '=', '^'):
+            align = remain[1]
+            fill = remain[0]
+            remain = remain[2:]
+        if len(remain) > 0 and remain[0] in ('+', '-', ' '):
+            sign = remain[0]
+            remain = remain[1:]
+        if len(remain) > 0 and remain[0] == '#':
+            pound = True
+            remain = remain[1:]
+        if len(remain) > 0 and remain[0] == '0':
+            zero = True
+            remain = remain[1:]
+        if len(remain) > 0:
+            matches = re.match('(\d*)', remain)
+            if matches:
+                groups = matches.groups()
+                width = int(groups[0])
+                remain = remain[len(groups[0]):]
+        if len(remain) > 0 and remain[0] == '.':
+            matches = re.match('(\d*)', remain[1:])
+            if matches:
+                groups = matches.groups()
+                precision = int(groups[0])
+                remain = remain[len(groups[0] + 1):]
+        if len(remain) > 0:
+            type = remain
+        return fill, align, sign, pound, zero, width, precision, type
 
 
 class _UnfoundField(object):
@@ -92,7 +159,7 @@ class _UnfoundField(object):
                                        format_spec, self.conversion)
 
 
-class QuietFormatter(AssemblingFormatter):
+class QuietFormatter(XFormatter):
     """String formatter extended to silently leave unfilled fields alone.
 
     Normal formatter throws an exception if a field cannot be filled from
@@ -196,7 +263,7 @@ class DBFormatter(QuietFormatter):
         """Convert 'special' fields in format string to regex
 
         For every field defined in L{SPECIAL_FIELDS}, if there is no
-        forma spec/conversion specified OR it matches that in
+        format spec/conversion specified OR it matches that in
         L{SPECIAL_FIELDS}, replace with the regular expression from
         L{SPECIAL_FIELDS}. Everything else returned verbatim.
 
@@ -207,7 +274,6 @@ class DBFormatter(QuietFormatter):
                  replaced with matching regular expressions
         @rtype: str
         """
-
         result = []
         for literal, field, format, conversion in self.parse(format_string):
             if field in self.SPECIAL_FIELDS:
@@ -215,9 +281,9 @@ class DBFormatter(QuietFormatter):
                 orig = self.assemble('', field, format, conversion)
                 if (not format and not conversion) \
                    or self.SPECIAL_FIELDS[field][0] == orig:
-                    result.append(self.SPECIAL_FIELDS[field][1])
+                    result.append('(' + self.SPECIAL_FIELDS[field][1] + ')')
                 else:
                     result.append(orig)
             else:
                 result.append(self.assemble(literal, field, format, conversion))
-        return ''.join(result)      
+        return ''.join(result)
