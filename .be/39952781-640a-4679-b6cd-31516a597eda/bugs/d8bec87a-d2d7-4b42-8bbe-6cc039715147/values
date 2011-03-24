@@ -1,0 +1,17 @@
+creator: Brian Larsen <balarsen@lanl.gov>
+
+
+reporter: Brian Larsen <balarsen@lanl.gov>
+
+
+severity: minor
+
+
+status: closed
+
+
+summary: check string lengths on all string data types
+
+
+time: Thu, 24 Mar 2011 15:54:26 +0000
+
