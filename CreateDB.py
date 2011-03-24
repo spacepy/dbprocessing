@@ -108,7 +108,7 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('file', metadata,
                 # this was a bigint, sqlalchemy doesnt seem to like this... think here
-            schema.Column('file_id', types.Integer, autoincrement=True, primary_key=True),
+            schema.Column('file_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('filename', types.String(50), nullable=False, unique=True),  # hmm long enough?
             schema.Column('utc_file_date', types.Date, nullable=True),
             schema.Column('utc_start_time', types.DateTime, nullable=True),  # might have to be a TIMESTAMP
@@ -146,7 +146,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('code', metadata,
-            schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True),
+            schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('filename', types.String(50), nullable=False, unique=True),  # hmm long enough?
             schema.Column('relative_path', types.String(50), nullable=False),
             schema.Column('code_start_date', types.Date, nullable=False),  # might have to be a TIMESTAMP
