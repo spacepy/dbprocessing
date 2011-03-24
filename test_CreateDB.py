@@ -36,22 +36,14 @@ class CreateDBTests(unittest.TestCase):
 
     def setUp(self):
         super(CreateDBTests, self).setUp()
-        try:
-            os.remove('dbprocessing_test.db')
-        except OSError:
-            pass
-        self.db = CreateDB.dbprocessing_db(filename = 'dbprocessing_test.db', create=True)
+        self.db = CreateDB.dbprocessing_db(filename = ':memory:', create=True)
         Session = orm.sessionmaker(bind=self.db.engine)
         session = Session()
         self.session = session
 
     def tearDown(self):
         super(CreateDBTests, self).tearDown()
-        del self.db
-        try:
-            os.remove('dbprocessing_test.db')
-        except OSError:
-            pass
+        del self.db, self.session
 
     def addMission(self):
         """add a mission, convienience routine"""
