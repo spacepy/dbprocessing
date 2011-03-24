@@ -50,13 +50,13 @@ class dbprocessing_db(object):
         metadata = schema.MetaData()
 
         data_table = schema.Table('mission', metadata,
-            schema.Column('mission_id', types.Integer, autoincrement=True, primary_key=True),
+            schema.Column('mission_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('mission_name', types.String(20), nullable=False, unique=True),  # hmm long enough?
             schema.Column('rootdir', types.String(20), nullable=False,),
         )
 
         data_table = schema.Table('satellite', metadata,
-            schema.Column('satellite_id', types.Integer, autoincrement=True, primary_key=True),
+            schema.Column('satellite_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('satellite_name', types.String(20), nullable=False),  # hmm long enough?
             schema.Column('mission_id', types.Integer,
                           schema.ForeignKey('mission.mission_id'), nullable=False,),
@@ -64,7 +64,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('instrument', metadata,
-            schema.Column('instrument_id', types.Integer, autoincrement=True, primary_key=True),
+            schema.Column('instrument_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('instrument_name', types.String(20), nullable=False),  # hmm long enough?
             schema.Column('satellite_id', types.Integer,
                           schema.ForeignKey('satellite.satellite_id'), nullable=False,),
@@ -72,7 +72,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('product', metadata,
-            schema.Column('product_id', types.Integer, autoincrement=True, primary_key=True),
+            schema.Column('product_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('product_name', types.String(30), nullable=False),  # hmm long enough?
             schema.Column('instrument_id', types.Integer,
                           schema.ForeignKey('instrument.instrument_id'), nullable=False,),
@@ -91,7 +91,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('process', metadata,
-            schema.Column('process_id', types.Integer, autoincrement=True, primary_key=True),
+            schema.Column('process_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('process_name', types.String(20), nullable=False),  # hmm long enough?
             schema.Column('output_product', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False, unique=True),
@@ -110,26 +110,26 @@ class dbprocessing_db(object):
                 # this was a bigint, sqlalchemy doesnt seem to like this... think here
             schema.Column('file_id', types.Integer, autoincrement=True, primary_key=True),
             schema.Column('filename', types.String(50), nullable=False, unique=True),  # hmm long enough?
-            schema.Column('utc_file_date', types.Date),
-            schema.Column('utc_start_time', types.DateTime),  # might have to be a TIMESTAMP
-            schema.Column('utc_stop_time', types.DateTime),
+            schema.Column('utc_file_date', types.Date, nullable=True),
+            schema.Column('utc_start_time', types.DateTime, nullable=True),  # might have to be a TIMESTAMP
+            schema.Column('utc_stop_time', types.DateTime, nullable=True),
             schema.Column('data_level', types.Float, nullable=False),
             schema.Column('interface_version', types.SmallInteger, nullable=False),
             schema.Column('quality_version', types.SmallInteger, nullable=False),
             schema.Column('revision_version', types.SmallInteger, nullable=False),
-            schema.Column('verbose_provenance', types.String(500)),
-            schema.Column('check_date', types.DateTime),
-            schema.Column('quality_comment', types.String(100)),
-            schema.Column('caveats', types.String(20)),
-            schema.Column('release_number', types.String(2)),
+            schema.Column('verbose_provenance', types.String(500), nullable=True),
+            schema.Column('check_date', types.DateTime, nullable=True),
+            schema.Column('quality_comment', types.String(100), nullable=True),
+            schema.Column('caveats', types.String(20), nullable=True),
+            schema.Column('release_number', types.String(2), nullable=True),
             schema.Column('file_create_date', types.DateTime, nullable=False),
-            schema.Column('met_start_time', types.BigInteger),
-            schema.Column('met_stop_time', types.BigInteger),
+            schema.Column('met_start_time', types.BigInteger, nullable=True),
+            schema.Column('met_stop_time', types.BigInteger, nullable=True),
             schema.Column('exists_on_disk', types.Boolean, nullable=False),
             schema.Column('quality_checked', types.Boolean, default=False),
             schema.Column('product_id', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False),
-            schema.Column('md5sum', types.String(32)),
+            schema.Column('md5sum', types.String(32), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
             schema.CheckConstraint('utc_stop_time is not NULL OR met_stop_time is not NULL'),
             schema.CheckConstraint('utc_start_time is not NULL OR met_start_time is not NULL'),
