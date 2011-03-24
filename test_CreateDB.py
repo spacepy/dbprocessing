@@ -10,19 +10,17 @@ Test suite for the Lstar_db file
 @version: V1: 20-Dec-2010 (BAL)
 """
 
+try:
+    import unittest_pretty as ut
+except ImportError:
+    import unittest as ut
 import unittest
-import shutil
+
 import os
 import datetime
-import socket
 
-from spacepy.datamodel import dmarray
-import numpy
-import sqlalchemy
-import sqlalchemy
-from sqlalchemy import schema, types, exceptions, orm, Table
-from sqlalchemy.engine import create_engine
-from sqlalchemy.exceptions import SQLAlchemyError, IntegrityError
+from sqlalchemy import orm
+from sqlalchemy.exceptions import IntegrityError
 
 import CreateDB
 
@@ -49,10 +47,11 @@ class CreateDBTests(unittest.TestCase):
 
     def tearDown(self):
         super(CreateDBTests, self).tearDown()
-        #try:
-        #    os.remove('dbprocessing_test.db')
-        #except OSError:
-        #    pass
+        del self.db
+        try:
+            os.remove('dbprocessing_test.db')
+        except OSError:
+            pass
 
     def addMission(self):
         """add a mission, convienience routine"""
@@ -93,6 +92,72 @@ class CreateDBTests(unittest.TestCase):
             prod.relative_path = 'relpath'
             prod.format = 'format'
             self.session.add(prod)
+            self.session.commit()
+
+    def addProcess(self):
+        if self.session.query(self.db.Product).count() == 0:
+            prod = self.db.Product()
+        if self.session.query(self.db.Process).count() == 0:
+            proc = self.db.Process()
+            proc.process_name = 'proc name'
+            proc.output_product = 1
+            self.session.add(proc)
+            self.session.commit()
+
+    def addFile(self):
+        if self.session.query(self.db.Product).count() == 0:
+            prod = self.db.Product()
+        if self.session.query(self.db.File).count() == 0:
+            file = self.db.File()
+            file.filename = 'filename'
+            file.data_level = 1
+            file.interface_version = 1
+            file.quality_version = 1
+            file.revision_version = 1
+            file.file_create_date = datetime.datetime.now()
+            file.exists_on_disk = False
+            file.quality_checked = False
+            file.product_id = 1
+            file.newest_version = True
+            file.utc_start_time = datetime.datetime(2000, 1, 1)
+            file.utc_stop_time = datetime.datetime(2000, 1, 2)
+            self.session.add(file)
+            self.session.commit()
+
+    def addCode(self):
+        # add a process
+        if self.session.query(self.db.Process).count() == 0:
+            prod = self.db.Process()
+        if self.session.query(self.db.Code).count() == 0:
+            code = self.db.Code()
+            code.filename = 'code filename'
+            code.relative_path = 'rel path'
+            code.code_start_date = datetime.datetime(2000, 1, 1)
+            code.code_stop_date = datetime.datetime(2000, 1, 10)
+            code.code_description = 'code_description'
+            code.process_id = 1
+            code.interface_version = 1
+            code.quality_version = 0
+            code.revision_version = 0
+            code.output_interface_version = 1
+            code.active_code = True
+            code.date_written = datetime.datetime(2000, 1, 1)
+            code.newest_version = True
+            code.arguments = 'args'
+            self.session.add(code)
+            self.session.commit()
+
+    def addLogging(self):
+        if self.session.query(self.db.Mission).count() == 0:
+            self.addMission()
+        if self.session.query(self.db.Logging).count() == 0:
+            log = self.db.Logging()
+            log.currently_processing = False
+            log.processing_start_time = datetime.datetime(2000, 1, 1, 1, 1, 1)
+            log.mission_id = 1
+            log.user = 'username'
+            log.hostname = 'hostname'
+            self.session.add(log)
             self.session.commit()
 
     def test_mission_rootdir(self):
@@ -274,22 +339,919 @@ class CreateDBTests(unittest.TestCase):
         self.session.add(ipl)
         self.assertRaises(IntegrityError, self.session.commit)
 
+    def test_process_process_name(self):
+        """Process table process_name not null"""
+        # add a product
+        self.addProduct()
+        proc = self.db.Process()
+        proc.output_product = 1
+        self.session.add(proc)
+        self.assertRaises(IntegrityError, self.session.commit)
 
+    def test_process_output_product(self):
+        """Process table output_product not null"""
+        # add a product
+        self.addProduct()
+        proc = self.db.Process()
+        proc.process_name = 'proc name'
+        self.session.add(proc)
+        self.assertRaises(IntegrityError, self.session.commit)
 
+    def test_process_unique(self):
+        """Process table has unique pairs"""
+        # add a product
+        self.addProduct()
+        # add a Process
+        self.addProcess()
+        proc = self.db.Process()
+        proc.process_name = 'proc name'
+        proc.output_product = 1
+        self.session.add(proc)
+        self.assertRaises(IntegrityError, self.session.commit)
 
+    def test_productprocesslink_process_id(self):
+        """productprocesslink table process_id is not nullable"""
+        # add process
+        self.addProcess()
+        ppl = self.db.Productprocesslink()
+        ppl.input_product_id = 1
+        self.session.add(ppl)
+        self.assertRaises(IntegrityError, self.session.commit)
 
+    def test_productprocesslink_input_product_id(self):
+        """productprocesslink table process_id is not nullable"""
+        # add process
+        self.addProcess()
+        ppl = self.db.Productprocesslink()
+        ppl.process_id = 1
+        self.session.add(ppl)
+        self.assertRaises(IntegrityError, self.session.commit)
 
-        #data_table = schema.Table('process', metadata,
-        #    schema.Column('process_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-        #    schema.Column('process_name', types.String(20), nullable=False),  # hmm long enough?
-        #    schema.Column('output_product', types.Integer,
-        #                  schema.ForeignKey('product.product_id'), nullable=False, unique=True),
-        #    schema.Column('super_process_id', types.Integer, nullable=True),
-        #)
+    def test_productprocesslink_unique(self):
+        """productprocesslink table has unique pairs"""
+        # add process
+        self.addProcess()
+        ppl = self.db.Productprocesslink()
+        ppl.process_id = 1
+        ppl.input_product_id = 1
+        self.session.add(ppl)
+        self.session.commit()
+        self.assertEqual(self.session.query(self.db.Productprocesslink).count(), 1)
+        ppl = self.db.Productprocesslink()
+        ppl.process_id = 1
+        ppl.input_product_id = 1
+        self.session.add(ppl)
+        self.assertRaises(IntegrityError, self.session.commit)
 
+    def test_file_filename(self):
+        """file table filename cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        # file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_data_level(self):
+        """file table data_level cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        # file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_interface_version(self):
+        """file table interface_version cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        # file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_interface_version_range(self):
+        """file table interface_version cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 0
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_quality_version(self):
+        """file table quality_version cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        # file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_revision_version(self):
+        """file table revision_version cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        # file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_file_create_date(self):
+        """file table file_create_date cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        # file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_exists_on_disk(self):
+        """file table exists_on_disk cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        # file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_product_id(self):
+        """file table product_id cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        # file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_newest_version(self):
+        """file table newest_version cannot be null"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        # file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_utc_met_start(self):
+        """file table either utc or met spcified start"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        # file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_utc_met_stop(self):
+        """file table either utc or met spcified start"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        # file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_utc_start_stop(self):
+        """file table utc_start_time < utc_stop_time"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 2)
+        file.utc_stop_time = datetime.datetime(2000, 1, 1)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_met_start_stop(self):
+        """file table met_start_time < met_stop_time"""
+        # add a product
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        # file.utc_start_time = datetime.datetime(2000, 1, 2)
+        # file.utc_stop_time = datetime.datetime(2000, 1, 1)
+        file.met_start_time = 100
+        file.met_stop_time  =  99
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_file_filename_unique(self):
+        """file table filename is unique"""
+        self.addFile()
+        self.addProduct()
+        file = self.db.File()
+        file.filename = 'filename'
+        file.data_level = 1
+        file.interface_version = 1
+        file.quality_version = 1
+        file.revision_version = 1
+        file.file_create_date = datetime.datetime.now()
+        file.exists_on_disk = False
+        file.quality_checked = False
+        file.product_id = 1
+        file.newest_version = True
+        file.utc_start_time = datetime.datetime(2000, 1, 1)
+        file.utc_stop_time = datetime.datetime(2000, 1, 2)
+        self.session.add(file)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_filefilelink_source_file(self):
+        """filefilelink table source_file is not nullable"""
+        # add a file
+        self.addFile()
+        ffl = self.db.Filefilelink()
+        ffl.resulting_file = 1
+        # ffl.source_file = 1
+        self.session.add(ffl)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_filefilelink_resulting_file(self):
+        """filefilelink table resulting_file is not nullable"""
+        self.addFile()
+        ffl = self.db.Filefilelink()
+        # ffl.resulting_file = 1
+        ffl.source_file = 1
+        self.session.add(ffl)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_filefilelink_unique(self):
+        """filefilelink table unique pairs"""
+        self.addFile()
+        ffl = self.db.Filefilelink()
+        ffl.resulting_file = 1
+        ffl.source_file = 1
+        self.session.add(ffl)
+        self.session.commit()
+        self.assertEqual(self.session.query(self.db.Filefilelink).count(), 1)
+        ffl = self.db.Filefilelink()
+        ffl.resulting_file = 1
+        ffl.source_file = 1
+        self.session.add(ffl)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_filename(self):
+        """code table filename is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        # code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_relative_path(self):
+        """code table relative_path is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        # code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_code_start_date(self):
+        """code table code_start_date is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        # code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_code_stop_date(self):
+        """code table code_stop_date is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        # code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_code_description(self):
+        """code table code_description is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        # code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_process_id(self):
+        """code table process_id is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        # code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_interface_version(self):
+        """code table interface_version is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        # code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_interface_version_range(self):
+        """code table interface_version is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 0
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_quality_version(self):
+        """code table quality_version is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        # code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_revision_version(self):
+        """code table revision_version is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        # code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_output_interface_version(self):
+        """code table output_interface_version is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        # code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_active_code(self):
+        """code table active_code is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        # code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.session.commit()
+        self.assertEqual(self.session.query(self.db.Code).count(), 1)
+        self.assertEqual(self.session.query(self.db.Code.active_code).all()[0][0], False)
+
+    def test_code_date_written(self):
+        """code table date_written is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        # code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_newest_version(self):
+        """code table newest_version is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        # code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_arguments(self):
+        """code table arguments is not nullable"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 1)
+        code.code_stop_date = datetime.datetime(2000, 1, 10)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        # code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_code_code_stopstart_order(self):
+        """code table code_stop_date code_start_date in order"""
+        # add a process
+        self.addProcess()
+        code = self.db.Code()
+        code.filename = 'code filename'
+        code.relative_path = 'rel path'
+        code.code_start_date = datetime.datetime(2000, 1, 10)
+        code.code_stop_date = datetime.datetime(2000, 1, 1)
+        code.code_description = 'code_description'
+        code.process_id = 1
+        code.interface_version = 1
+        code.quality_version = 0
+        code.revision_version = 0
+        code.output_interface_version = 1
+        code.active_code = True
+        code.date_written = datetime.datetime(2000, 1, 1)
+        code.newest_version = True
+        code.arguments = 'args'
+        self.session.add(code)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_filecodelink_resulting_file(self):
+        """filecodelink table resulting_file not null"""
+        # add Code
+        self.addCode()
+        # add file
+        self.addFile()
+        fcl = self.db.Filecodelink()
+        # fcl.resulting_file = 1
+        fcl.source_code = 1
+        self.session.add(fcl)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_filecodelink_source_code(self):
+        """filecodelink table source_code not null"""
+        # add Code
+        self.addCode()
+        # add file
+        self.addFile()
+        fcl = self.db.Filecodelink()
+        fcl.resulting_file = 1
+        # fcl.source_code = 1
+        self.session.add(fcl)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_filecodelink_unique(self):
+        """filecodelink table unique pairs"""
+        # add Code
+        self.addCode()
+        # add file
+        self.addFile()
+        fcl = self.db.Filecodelink()
+        fcl.resulting_file = 1
+        fcl.source_code = 1
+        self.session.add(fcl)
+        self.session.commit()
+        self.assertEqual(self.session.query(self.db.Filecodelink).count(), 1)
+        fcl = self.db.Filecodelink()
+        fcl.resulting_file = 1
+        fcl.source_code = 1
+        self.session.add(fcl)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_logging_currently_processing(self):
+        """logging table currently_processing has a default"""
+        log = self.db.Logging()
+        # log.currently_processing = False
+        log.pid = 100
+        log.processing_start_time = datetime.datetime(2000, 1, 1, 1, 1, 1)
+        log.mission_id = 1
+        log.user = 'username'
+        log.hostname = 'hostname'
+        self.session.add(log)
+        self.session.commit()
+        self.assertEqual(self.session.query(self.db.Logging.currently_processing).all()[0][0], False)
+
+    def test_logging_processing_start_time(self):
+        """logging table processing_start_time is not nullable"""
+        log = self.db.Logging()
+        log.currently_processing = False
+        # log.processing_start_time = datetime.datetime(2000, 1, 1, 1, 1, 1)
+        log.mission_id = 1
+        log.user = 'username'
+        log.hostname = 'hostname'
+        self.session.add(log)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_logging_mission_id(self):
+        """logging table mission_id is not nullable"""
+        log = self.db.Logging()
+        log.currently_processing = False
+        log.processing_start_time = datetime.datetime(2000, 1, 1, 1, 1, 1)
+        # log.mission_id = 1
+        log.user = 'username'
+        log.hostname = 'hostname'
+        self.session.add(log)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_logging_user(self):
+        """logging table user is not nullable"""
+        log = self.db.Logging()
+        log.currently_processing = False
+        log.processing_start_time = datetime.datetime(2000, 1, 1, 1, 1, 1)
+        log.mission_id = 1
+        # log.user = 'username'
+        log.hostname = 'hostname'
+        self.session.add(log)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_logging_hostname(self):
+        """logging table hostname is not nullable"""
+        log = self.db.Logging()
+        log.currently_processing = False
+        log.processing_start_time = datetime.datetime(2000, 1, 1, 1, 1, 1)
+        log.mission_id = 1
+        log.user = 'username'
+        # log.hostname = 'hostname'
+        self.session.add(log)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_logging_processing_start_time_order(self):
+        """logging table processing_start_time order matters """
+
+        log = self.db.Logging()
+        log.currently_processing = False
+        log.processing_start_time = datetime.datetime(2000, 1, 1, 1, 1, 1)
+        log.processing_end_time = datetime.datetime(1999, 1, 1, 1, 1, 1)
+        log.mission_id = 1
+        log.user = 'username'
+        log.hostname = 'hostname'
+        self.session.add(log)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_logging_file_logging_id(self):
+        """logging_file table logging_id is not nullable"""
+        # add a file
+        self.addFile()
+        # add a code
+        self.addCode()
+        # add logging
+        self.addLogging()
+        lf = self.db.Logging_file()
+        # lf.logging_id = 1
+        lf.file_id = 1
+        lf.code_id = 1
+        self.session.add(lf)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_logging_file_file_id(self):
+        """logging_file table file_id is not nullable"""
+        # add a file
+        self.addFile()
+        # add a code
+        self.addCode()
+        # add logging
+        self.addLogging()
+        lf = self.db.Logging_file()
+        lf.logging_id = 1
+        # lf.file_id = 1
+        lf.code_id = 1
+        self.session.add(lf)
+        self.assertRaises(IntegrityError, self.session.commit)
+
+    def test_logging_file_code_id(self):
+        """logging_file table code_id is not nullable"""
+        # add a file
+        self.addFile()
+        # add a code
+        self.addCode()
+        # add logging
+        self.addLogging()
+        lf = self.db.Logging_file()
+        lf.logging_id = 1
+        lf.file_id = 1
+        # lf.code_id = 1
+        self.session.add(lf)
+        self.assertRaises(IntegrityError, self.session.commit)
 
 
 
 
 if __name__ == '__main__':
-    unittest.main()
+    ut.main()

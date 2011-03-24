@@ -1,0 +1,17 @@
+creator: Brian Larsen <balarsen@lanl.gov>
+
+
+reporter: Brian Larsen <balarsen@lanl.gov>
+
+
+severity: minor
+
+
+status: closed
+
+
+summary: logging needs BigInterger primary key, not sure how to do this
+
+
+time: Thu, 24 Mar 2011 20:49:56 +0000
+

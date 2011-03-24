@@ -10,22 +10,10 @@ Module to create the database structure for dbprocessing
 """
 from __future__ import division # may not be needed but start with it
 
-import datetime
-import operator
-import sys
 import os
-import socket
-import threading
-import time
 
-import numpy
-import spacepy.toolbox as tb
-from spacepy.datamodel import dmarray
-
-import sqlalchemy
-from sqlalchemy import schema, types, exceptions, orm, Table
+from sqlalchemy import schema, types, Table, orm
 from sqlalchemy.engine import create_engine
-from sqlalchemy.exceptions import SQLAlchemyError
 
 
 class dbprocessing_db(object):
@@ -146,6 +134,7 @@ class dbprocessing_db(object):
             schema.Column('output_product', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False, unique=True),
             schema.Column('super_process_id', types.Integer, nullable=True),
+            schema.UniqueConstraint('process_name', 'output_product')
         )
 
         data_table = schema.Table('productprocesslink', metadata,
@@ -176,15 +165,16 @@ class dbprocessing_db(object):
             schema.Column('met_start_time', types.BigInteger, nullable=True),
             schema.Column('met_stop_time', types.BigInteger, nullable=True),
             schema.Column('exists_on_disk', types.Boolean, nullable=False),
-            schema.Column('quality_checked', types.Boolean, default=False),
+            schema.Column('quality_checked', types.Boolean, nullable=True, default=False),
             schema.Column('product_id', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False),
             schema.Column('md5sum', types.String(32), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
             schema.CheckConstraint('utc_stop_time is not NULL OR met_stop_time is not NULL'),
             schema.CheckConstraint('utc_start_time is not NULL OR met_start_time is not NULL'),
-            schema.CheckConstraint('met_start_time < utc_stop_time'),
+            schema.CheckConstraint('met_start_time < met_stop_time'),
             schema.CheckConstraint('utc_start_time < utc_stop_time'),
+            schema.CheckConstraint('interface_version >= 1'),
         )
 
         data_table = schema.Table('filefilelink', metadata,
@@ -212,8 +202,10 @@ class dbprocessing_db(object):
             schema.Column('date_written', types.Date, nullable=False),
             schema.Column('md5sum', types.String(32), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
-            schema.Column('arguments', types.Text),
+            schema.Column('arguments', types.Text, nullable=False),
             schema.CheckConstraint('code_start_date < code_stop_date'),
+            schema.CheckConstraint('interface_version >= 1'),
+            schema.CheckConstraint('output_interface_version >= 1'),
         )
 
         data_table = schema.Table('filecodelink', metadata,
@@ -225,7 +217,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('logging', metadata,
-            schema.Column('logging_id', types.BigInteger, autoincrement=True, nullable=False),
+            schema.Column('logging_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('currently_processing', types.Boolean, nullable=False, default=False),
             schema.Column('pid', types.Integer, nullable=True),
             schema.Column('processing_start_time', types.DateTime, nullable=False),  # might have to be a TIMESTAMP
@@ -235,20 +227,20 @@ class dbprocessing_db(object):
                           schema.ForeignKey('mission.mission_id'), nullable=False),
             schema.Column('user', types.String(20), nullable=False),
             schema.Column('hostname', types.String(50), nullable=False),
-            schema.PrimaryKeyConstraint('logging_id'),
+            #schema.PrimaryKeyConstraint('logging_id'),
             schema.CheckConstraint('processing_start_time < processing_end_time'),
         )
 
         data_table = schema.Table('logging_file', metadata,
-            schema.Column('logging_file_id', types.BigInteger, autoincrement=True, nullable=False),
-            schema.Column('logging_id', types.BigInteger,
-                          schema.ForeignKey('logging.logging_id'), nullable=False, default=False),
+            schema.Column('logging_file_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('logging_id', types.Integer,
+                          schema.ForeignKey('logging.logging_id'), nullable=False),
             schema.Column('file_id', types.Integer,
                           schema.ForeignKey('file.file_id'), nullable=False),
             schema.Column('code_id', types.Integer,
                           schema.ForeignKey('code.code_id'), nullable=False),
             schema.Column('comments', types.Text, nullable=True),
-            schema.PrimaryKeyConstraint('logging_file_id'),
+            #schema.PrimaryKeyConstraint('logging_file_id'),
         )
 
 
