@@ -3,13 +3,30 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to dbprocessing's documentation!
-========================================
 
-Contents:
+dbprocessing documentation
+========================================
+:Release: |version|
+:Date: |today|
+
+
+
+This code is teh processing database for RBSP and future missions that need
+autoamted data processing.
+The idea here is that as files arrive at LANL they can be dropped into
+``incoming/`` and all the automatic processing can then take place on the file.
+
+
+
+Classes
+=======
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
+
+    version
+
+
 
 Indices and tables
 ==================
@@ -17,4 +34,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
