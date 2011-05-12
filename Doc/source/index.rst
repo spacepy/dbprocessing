@@ -24,8 +24,8 @@ Classes
 .. toctree::
     :maxdepth: 2
 
-    version
-
+    Version
+    Diskfile
 
 
 Indices and tables

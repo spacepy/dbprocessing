@@ -12,33 +12,7 @@ The version scheme is X,Y,Z where:
 `Note:` The interface version starts at 1
 
 
-Examples
---------
-    >>> import Version
-    >>> v = Version.Version(1,1,1)
-    >>> print(v)
-    1.1.1
-
-    Version objects can perform boolean operations
-
-    >>> v2 = Version.Version(1,2,1)
-    >>> print(v2 > v)
-    True
-
-    Incrementing the version
-
-    >>> v.incQuality()
-    >>> print(v)
-    1.2.1
-
-    Same version is equal
-
-    >>> v == v2
-    True
-
-
 Classes
 -------
 .. automodule:: Version
     :members:
-

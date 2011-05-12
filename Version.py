@@ -36,6 +36,40 @@ class Version(object):
         the quality version for the object
     revision_version : int
         the revision version of the object
+
+    Attributes
+    ==========
+    interface : int
+        interface version of the object
+    quality : int
+        quality version of the object
+    revision : int
+        revision version of the object
+
+
+    Examples
+    ========
+    >>> import Version
+    >>> v = Version.Version(1,1,1)
+    >>> print(v)
+    1.1.1
+
+    Version objects can perform boolean operations
+
+    >>> v2 = Version.Version(1,2,1)
+    >>> print(v2 > v)
+    True
+
+    Incrementing the version
+
+    >>> v.incQuality()
+    >>> print(v)
+    1.2.1
+
+    Same version is equal
+
+    >>> v == v2
+    True
     """
 
     def __init__(self,

@@ -16,13 +16,10 @@ __version__ = '2.0.3'
 
 # TODO look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isnt called
 class ReadError(Exception):
-    """Exception that a file is not readable by the script, probably doesnt exist
+    """
+    Exception that a file is not readable by the script, probably doesnt exist
 
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
-
-    @version: V1: 05-Oct-2010 (BAL)
+    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         DBlogging.dblogger.error("ReadError raised")
@@ -32,50 +29,42 @@ class FilenameError(Exception):
     """
     Exception especially for created filenames showing that they are wrong
 
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
-
-    @version: V1: 26-Oct-2010 (BAL)
+    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         DBlogging.dblogger.error("FilenameError raised")
 
 
 class WriteError(Exception):
-    """Exception that a file is not writeable by the script, probably doesnt exist or in a ro directory
+    """
+    Exception that a file is not writeable by the script, probably doesnt exist or in a ro directory
 
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
-
-    @version: V1: 05-Oct-2010 (BAL)
+    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         DBlogging.dblogger.error("WriteError raised")
 
 class InputError(Exception):
-    """Exception that input is bad to the DiskFile class
+    """
+    Exception that input is bad to the DiskFile class
 
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
-
-    @version: V1: 05-Oct-2010 (BAL)
+    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         DBlogging.dblogger.error("InputError raised")
 
 
 class DigestError(Exception):
-    """Exception that is thrown by calcDigest.
-    #TODO maybe just combine this with ReadError for the current purpose
+    """
+    Exception that is thrown by calcDigest.
 
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
+    TODO
+    ====
+    maybe just combine this with ReadError for the current purpose
 
-    @version: V1: 05-Oct-2010 (BAL)
+
+    `Author:` Brian Larsen, LANL
+
     """
     def __init__(self, *params):
         DBlogging.dblogger.error("DigestError raised")
@@ -83,11 +72,7 @@ class DigestError(Exception):
 class NoParseMatch(Exception):
     """Exception that is thrown when a file in incoming does not parse to any mission
 
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
-
-    @version: V1: 05-Oct-2010 (BAL)
+    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         DBlogging.dblogger.error("NoParseMatch raised")
@@ -99,11 +84,20 @@ class Diskfile(object):
     all parsing for what mission files belog to is contined in here
     to add a new mission code must be added here.
 
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
+    `Author:` Brian Larsen, LANL
 
-    @version: V1: 05-Oct-2010 (BAL)
+
+    Parameters
+    ==========
+    infile : str
+        a file to create a diskfile around
+    dbu :  DBUtils2
+        pass in the current DBUtils2 session so that a new connection is not made
+
+    Attributes
+    ==========
+    params : ``dict`` dictionary to hold all the parameters of the file
+
     """
 
     def __init__(self,
@@ -114,16 +108,9 @@ class Diskfile(object):
         setup a Diskfile class, takes in a filename and creates a params dict ro hold information about the file
         then tests to see what mission the file is from
 
-        @param infile: a file to create a diskfile around
-        @type infile: str
-        @param dbu: pass in the current DBUtils2 session so that a new connection is not made
-        @type dbu: DBUtils2
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
 
-        @version: V1: 05-Oct-2010 (BAL)
+        `Author:` Brian Larsen, LANL
         """
 
         DBlogging.dblogger.info("Entered Diskfile")
@@ -174,12 +161,7 @@ class Diskfile(object):
         """
         A few simple tests of the input file to be sure the script has the correct access
 
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 05-Oct-2010 (BAL)
+        `Author:` Brian Larsen, LANL
         """
         # need both read and write access
         self.READ_ACCESS = os.access(self.infile, os.R_OK)
@@ -279,7 +261,7 @@ class Diskfile(object):
                                      PRODUCT=prods[i][3],
                                      INSTRUMENT=prods[i][2],
                                      ) + '$'
-                                     
+
             #TODO what to do with the IGNORE code?  Maybe it doesnt need to exist
             if filename == None:
                 DBlogging.dblogger.debug("Matching %d:%s against %s" % (prods[i][4], expression,  os.path.basename(self.filename)))
@@ -376,16 +358,20 @@ class Diskfile(object):
 def calcDigest( infile):
     """Calculate the MD5 digest from a file.
 
-    @param file: path to the file
-    @type file: string
-    @return: hex digits of L{file}'s md5
-    @rtype: string
+    `Author:` Jon Niehof, LANL
 
-    @author: Jon Niehof
-    @organization: Los Alamos National Lab
-    @contact: jniehof@lanl.gov
+    .. _file:
+    
+    Parameters
+    ==========
+    file : str
+        path to the file
 
-    @version: V1: 20-Sep-2010 (JN) - stolen from command parser (BAL)
+    Returns
+    =======
+    out : str
+        hex digits of the file_ md5
+
     """
     m = hashlib.md5()
     try:
