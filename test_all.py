@@ -2,13 +2,13 @@
 
 """Combined unit test suite for all dbprocessing classes"""
 
-from DBfile_test import *
-from DBqueue_test import *
-from DBUtils2_test import *
-from Diskfile_test import *
-from ProcessQueue_test import *
-from Version_test import *
-from testDBStrings import *
+from test_DBfile import *
+from test_DBqueue import *
+from test_DBUtils2 import *
+from test_Diskfile import *
+from test_ProcessQueue import *
+from test_Version import *
+from test_DBStrings import *
 
 
 __version__ = '2.0.3'

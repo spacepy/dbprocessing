@@ -217,10 +217,7 @@ class DBUtils2(object):
 #        try:
         for val in table_dict:
             if verbose: print val
-            c0 = compile('a = self.%s()' % (val), '', 'exec')
-            try:
-                exec(c0)
-            except AttributeError:
+            if not hasattr(self, val):  # then make it
                 c1 = compile("""class %s(object):\n\tpass""" % (val), '', 'exec')
                 c2 = compile("%s = Table('%s', self.metadata, autoload=True)" % (str(table_dict[val]), table_dict[val]) , '', 'exec')
                 c3 = compile("mapper(%s, %s)" % (val, str(table_dict[val])), '', 'exec')
