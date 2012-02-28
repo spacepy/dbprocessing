@@ -20,7 +20,10 @@ import os
 import datetime
 
 from sqlalchemy import orm
-from sqlalchemy.exceptions import IntegrityError
+try: # version change issue
+    from sqlalchemy.exceptions import IntegrityError
+except ImportError:
+    from sqlalchemy.exc import IntegrityError
 
 import CreateDB
 

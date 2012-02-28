@@ -1,8 +1,5 @@
-#import datetime
-#import hashlib
 import DBUtils2
 import Diskfile
-#from sqlalchemy.exceptions import IntegrityError
 import shutil
 
 __version__ = '2.0.3'

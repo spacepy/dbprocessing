@@ -5,7 +5,10 @@ import datetime
 from sqlalchemy import Table #Column, Integer, String, DateTime, BigInteger, Boolean, Date, Float, Table
 from sqlalchemy.orm import mapper # sessionmaker
 import numpy as np
-from sqlalchemy.exceptions import IntegrityError
+try: # new version changed this annoyingly
+    from sqlalchemy.exceptions import IntegrityError
+except ImportError:
+    from sqlalchemy.exc import IntegrityError    
 from sqlalchemy.sql.expression import asc #, desc
 import DBlogging
 import socket # to get the local hostname
