@@ -1141,7 +1141,7 @@ class DBUtils2(object):
         c1.code_description = code_description
         c1.process_id = process_id
         c1.interface_version = version.interface
-        c1.quality_version =version. quality
+        c1.quality_version =version.quality
         c1.revision_version = version.revision
         c1.active_code = active_code
         c1.date_written = date_written
@@ -1156,6 +1156,74 @@ class DBUtils2(object):
             raise(DBError(IE))
         sq1 = self.session.query(self.Code).filter_by(filename = filename)
         return sq1[0].code_id
+
+
+    def _addInspector(self,
+                           filename,
+                           relative_path,
+                           description,
+                           version,
+                           active_code,
+                           date_written,
+                           output_interface_version,
+                           newest_version, 
+                           product):
+        """
+        Add an executable code to the DB
+
+        @param filename: the filename of the code
+        @type filename: str
+        @param relative_path: the relative path (relative to mission base dir)
+        @type relative_path: str
+        @param description: description of th code (50 char)
+        @type description: str
+        @param product: the id of the product this inspector finds
+        @type product: int
+        @param version: the version of the code
+        @type version: Version.Version
+        @param active_code: boolean True means the code is active
+        @type active_code: boolean
+        @param date_written: the dat the cod was written
+        @type date_written: date
+        @param output_interface_version: the interface version of the output (effects the data file names)
+        @type output_interface_version: int
+        @param newest_version: is this code the newestversion in the DB?
+        @type newest_version: bool
+
+        @return: the inspector_id of the newly inserted code
+        @rtype: long
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 17-Apr-2012 (BAL)
+
+        """
+        try:
+            c1 = self.Inspector()
+        except:
+            raise(DBError("Class Inspector not found was it created?"))
+        c1.filename = filename
+        c1.relative_path = relative_path
+        c1.description = description
+        c1.product = product
+        c1.interface_version = version.interface
+        c1.quality_version = version.quality
+        c1.revision_version = version.revision
+        c1.active_code = active_code
+        c1.date_written = date_written
+        c1.output_interface_version = output_interface_version
+        c1.newest_version = newest_version
+
+        self.session.add(c1)
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        sq1 = self.session.query(self.Inspector).filter_by(filename = filename)
+        return sq1[0].inspector_id
 
 
     def _closeDB(self):
@@ -1523,7 +1591,7 @@ class DBUtils2(object):
         except IndexError:
             return None
 
-        return root_dir + os.path.sep + rel_path + os.path.sep + filename
+        return os.path.join(root_dir, rel_path, filename)
 
 
     def _getMissionID(self):
@@ -1712,6 +1780,27 @@ class DBUtils2(object):
             return sq[0]
 
 
+    def getActiveInspectors(self):
+        """
+        query the db and return a list ofall the active inspector filenames
+        """
+        sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
+        basedir = self._getMissionDirectory()
+        retval = [(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments) for ans in sq]
+        return retval            
+
+    def inspectorToProduct(self, inspector_name):
+        """
+        given an inspector name return the product_id
+        """
+        try:
+            product_id = self.session.query(self.Inspector.product).filter(self.Inspector.filename == os.path.basename(inspector_name))[0][0]
+        except IndexError:
+            product_id = None
+        return product_id
+        
+        
+
     def _getProductID(self,
                      product_name):
         """
@@ -1811,8 +1900,8 @@ class DBUtils2(object):
         """
         Parse a filename from incoming (or anywhere) and return a file object populated with the infomation
 
-        @param filename: the filename to parse (or a list  filenames)
-        @type filename: str
+        @param filename: list of filenames to parse 
+        @type filename: list
         @return: file object populated from the filename
         @rtype: DBUtils2.File
 
@@ -1822,8 +1911,6 @@ class DBUtils2(object):
 
         @version: V1: 20-Sep-2010 (BAL)
         """
-        if isinstance(filename, str):  # if it is just a filename make it a list and parse the list
-            filename = [filename]
         output = []
         for val in filename:
             # this is an if elif block testing by mission
