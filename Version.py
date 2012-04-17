@@ -76,9 +76,9 @@ class Version(object):
             interface_version,
             quality_version,
             revision_version):
-        self.interface = interface_version
-        self.revision = revision_version
-        self.quality = quality_version
+        self.interface = int(interface_version)
+        self.revision = int(revision_version)
+        self.quality = int(quality_version)
         self.__checkVersion()
 
     def __checkVersion(self):
@@ -95,7 +95,7 @@ class Version(object):
             raise(VersionError("interface_version starts at 1"))
 
     def __repr__(self):
-        return str(self.interface) + '.' + str(self.quality) + '.' + \
+        return 'Version: ' + str(self.interface) + '.' + str(self.quality) + '.' + \
             str(self.revision)
 
     __str__ = __repr__
