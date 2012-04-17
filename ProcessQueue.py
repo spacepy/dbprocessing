@@ -435,7 +435,7 @@ if __name__ == "__main__":
 
     try:
         pq.checkIncoming()
-        while len(pq.queue) != 0 or len(pq.findChildren) !=0 or len(pq.childrenQueue):
+        while len(pq.queue) != 0 or len(pq.findChildren) !=0 or len(pq.childrenQueue) != 0:
             pq.importFromIncoming()
             pq.findChildrenProducts()
             pq.buildChildren()
