@@ -143,7 +143,7 @@ class ProcessQueue(object):
             fname = Diskfile.Diskfile(val, self.dbu)
             prod = fname.figureProduct()
             if prod == None:
-                DBlogging.dblogger.debug("prod==None so moving to error")
+                DBlogging.dblogger.info("Found no product moving to error, {0}".format(fname.filename))
                 self.moveToError(val)
                 continue
             DBlogging.dblogger.debug("fname created %s" % (fname.filename))
