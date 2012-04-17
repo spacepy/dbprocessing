@@ -240,6 +240,26 @@ class dbprocessing_db(object):
             #schema.PrimaryKeyConstraint('logging_file_id'),
         )
 
+        data_table = schema.Table('inspector', metadata,
+            schema.Column('inspector_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('filename', types.String(50), nullable=False, unique=True),  # hmm long enough?
+            schema.Column('relative_path', types.String(50), nullable=False),
+            schema.Column('description', types.String(50), nullable=False),
+            schema.Column('interface_version', types.SmallInteger, nullable=False),
+            schema.Column('quality_version', types.SmallInteger, nullable=False),
+            schema.Column('revision_version', types.SmallInteger, nullable=False),
+            schema.Column('output_interface_version', types.SmallInteger, nullable=False),
+            schema.Column('active_code', types.Boolean, nullable=False, default=False),
+            schema.Column('date_written', types.Date, nullable=False),
+            schema.Column('md5sum', types.String(32), nullable=True),
+            schema.Column('newest_version', types.Boolean, nullable=False),
+            schema.Column('arguments', types.Text, nullable=False),
+            schema.CheckConstraint('interface_version >= 1'),
+            schema.CheckConstraint('output_interface_version >= 1'),
+            schema.Column('product', types.Integer,
+                          schema.ForeignKey('product.product_id'), nullable=False),
+        )
+
 
         #TODO move this out so that the user chooses the db type
         engine = create_engine('sqlite:///' + self.filename, echo=False)
