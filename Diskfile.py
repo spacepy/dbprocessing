@@ -1,15 +1,16 @@
 #!/usr/bin/env python2.6
 # -*- coding: utf-8 -*-
 
-import os
-import os.path
-import DBUtils2
 import datetime
 import hashlib
-import Version
+import imp
+import os
+import os.path
 import re
 
 import DBlogging
+import DBUtils2
+import Version
 
 __version__ = '2.0.3'
 
@@ -199,7 +200,7 @@ class Diskfile(object):
                                    INSTRUMENT=instrument,
                                    QACODE=qacode,
                                    datetime=date)
-        if self.figureProduct(filename) != productID:
+        if self. Product(filename) != productID:
             raise(FilenameError("Created filename did not match convention"))
 
         DBlogging.dblogger.debug("Filename: %s created" % (filename))
@@ -207,153 +208,70 @@ class Diskfile(object):
         return filename
 
 
-    def figureProduct(self, filename = None):
+    def figureProduct(self):
         """
-        go through the db and figure out what product we have
-        codes are defined in Document XXX
-        %MISSION – the mission name in its entirety
-        %SPACECRAFT – the spacecraft name
-        %PRODUCT – the product name from the database
-        %INSTRUMENT – the instrument name from the database
-        %Y – 4-digit year (1900-2200)
-        %y – 2-digit year (58-57)
-        %m – 2-digit month of year (1-12)
-        %d – 2 digit day of month (1-31)
-        %VERSION – version string (e.g. v1.1.1)
-        %b – month name
-        %j – 3-diiut day of year (0-366)
-        %H – 2-digit hour
-        %M – 2-digit minute
-        %s – 2-digut second
-        %MILLI – 3-digit millisecond
-        %MICRO – 3-digit microsecond
-        %IGNORE – ignore this section can be anything
-        %QACODE – Q/A code form pngwalk (OK, PROBLEM, IGNORE)
+        This funtion imports the inspectors and figures out whcih inspectors claim the file
         """
-        ## if filename != None:
-        ##     # get just the filename not the path
-        ##     filename = os.path.basename(filename)
-
-        #TODO is this the best way to do this?
-        # step through each product format looking for that can match the input filename
-        p_formats = self.dbu._getProductFormats()
-        prods = self.dbu._getProductNames()
-        # these two are not required to be in the same order, so we need to do something about that.
-
-        # this checks for a DB error where the INstrument Product Link was not filled in
-        if len(p_formats) != len(prods):
-            raise(DBUtils2.DBError('self.dbu._getProductFormats() and self.dbu._getProductNames(), differnet length, check instrumentproductlink'))
-
-        missions = zip(*prods)[0]
-        satellites = zip(*prods)[1]
-        instruments = zip(*prods)[2]
-        products = zip(*prods)[3]
-        p_ids = zip(*p_formats)[1]
-        formats = zip(*p_formats)[0]
-
-        matches = []
-        for i in range(len(products)):
-            # this format has which fields in it?
-            expression = r'^' + \
-                         self.dbu.re(formats[i],
-                                     MISSION=prods[i][0],
-                                     SPACECRAFT=prods[i][1],
-                                     PRODUCT=prods[i][3],
-                                     INSTRUMENT=prods[i][2],
-                                     ) + '$'
-
-            #TODO what to do with the IGNORE code?  Maybe it doesnt need to exist
-            if filename == None:
-                DBlogging.dblogger.debug("Matching %d:%s against %s" % (prods[i][4], expression,  os.path.basename(self.filename)))
-                if re.match(expression, os.path.basename(self.filename)):
-                    matches.append(prods[i][4])
-                    DBlogging.dblogger.debug("Match found for product: %d" % (matches[-1]))
-            else:
-                DBlogging.dblogger.debug("Matching %s against %s" % (expression,  os.path.basename(filename)))
-                if re.match(expression, os.path.basename(filename)):
-                    matches.append(prods[i][4])
-                    DBlogging.dblogger.debug("Match found for product: %d" % (matches[-1]))
-
-        if len(matches) == 0:
-            return None
-        elif len(matches) > 1:
-            raise(DBUtils2.DBError("File %s matched more than one product, there is a DB error"))
-        elif len(matches) == 1:
-            self.mission = self.dbu._getProductNames(matches[0])[0]
-
-            # go through and fill in the params dict with info
-            # TODO much of this should come from the file, figure out how to handle that
-
-            # build a date
-            # need year month day from the format or year DOY
-            format = self.dbu._getProductFormats(matches[0])[0]  # get the format again for the correct product
-            if not ('{Y}' in format ) or ('{y}' in format):
-                raise(DBUtils2.DBError("Format %s has no year field"% (format)))
-            DBlogging.dblogger.debug("Found a year in %s" % (format))
-            if not (('{m}' in format or '{b}' in format) and ('{d}' in format)) or ('{j}' in format):
-                raise(DBUtils2.DBError("Format %s has no month/day or DOY  field"% (format)))
-            DBlogging.dblogger.debug("Found month/day or DOY in  %s" % (format))
-            # now that we know we have a date fill in those fields
-            #TODO utc_end_time and utc_start_time should come from file or something
-            if '{y}' in format:
-                pass # TODO there is a 2 digit year, do somehting
-            else:
-                splitter = format[format.find('{Y}')-1]
-                try:
-                    year = filename.split(splitter)[-2][0:4]
-                except AttributeError:
-                    year = self.filename.split(splitter)[-2][0:4]
-            if '{j}' in format:
-                pass # TODO do something with DOY info
-            if '{m}' in format or '{b}' in format:
-                if '{b}' in format:
-                    pass # TODO do something with a 3 char month name
-                pass
-
-            # do a larger less general case to see if we can: '%Y%m%d'
-            if '{Y}{m}{d}' in format:
-                splitter = format[format.find('{Y}{m}{d}')-1]
-                try:
-                    date = filename.split(splitter)[-2]
-                except AttributeError:
-                    date = self.filename.split(splitter)[-2]
-                year = int(date[0:4])
-                month = int(date[4:6])
-                day = int(date[6:8])
-
-            date = datetime.date(year, month, day)
-            self.params['utc_file_date'] = date
-            self.params['utc_start_time'] = datetime.datetime.combine(date, datetime.time(0, 0, 0))
-            self.params['utc_stop_time'] = datetime.datetime.combine(date, datetime.time(23, 59, 59, 999999))
-
-
-
-            self.params['data_level'] = float(self.filename.split('_')[1][1])
-            self.params['check_date'] = None
-            self.params['verbose_provenance'] = None
-            self.params['quality_comment'] = None
-            self.params['caveats'] = None
-            self.params['release_number'] = None
+        act_insp = self.dbu.getActiveInspectors()
+        claimed = []
+        for code, arg in act_insp:
             try:
-                mtime = os.path.getmtime(self.infile)
-                self.params['file_create_date'] = datetime.datetime.fromtimestamp(mtime)
-            except OSError:
-                pass #TODO why did I do this?
-            self.params['met_start_time'] = None
-            self.params['met_stop_time'] = None
-            self.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
-            self.params['quality_checked'] = None
-            product_name = self.filename.split('-')[1].split('_')[1] + '_' + self.filename.split('-')[1].split('_')[2]
-            # TODO where does the product_id get set?
-            self.params['product_id'] = matches[0]
-            # self.params['md5sum'] = calcDigest(self.infile)
-            self.params['version'] = Version.Version(int(self.filename.split('_')[-1].split('.')[0][1:]),
-                                                                                                    int(self.filename.split('.')[1]),
-                                                                                                    int(self.filename.split('.')[2]))
-            DBlogging.dblogger.debug("Returning product %d:%s" % (matches[0], self.dbu._getProductNames(matches[0])[3]))
-            return matches[0]
-        else:
-            return None  # can't get here
+                inspect = imp.load_source('inspect', code)
+            except IOError, msg:
+                DBlogging.dblogger.error("Inspector: {0} not found: {1}".format(code, msg))
+                continue
+            if arg != None:
+                if inspect.inspect(self.filename, **arg):
+                    DBlogging.dblogger.debug("Match found: {0}: {1}".format(self.filename, code))
+                    claimed.append(self.dbu.inspectorToProduct(code))
+            else:
+                if inspect.inspect(self.filename):
+                    DBlogging.dblogger.debug("Match found: {0}: {1}".format(self.filename, code))
+                    claimed.append(self.dbu.inspectorToProduct(code))
+                
+        if len(claimed) == 0: # no match
+            DBlogging.dblogger.info("File {0} found no inspector match".format(self.filename))
+            return None        
+        if len(claimed) > 1:
+            DBlogging.dblogger.error("File {0} matched more than one product, there is a DB error".format(self.filename))
+            raise(DBUtils2.DBError("File {0} matched more than one product, there is a DB error".format(self.filename)))
+
+        return claimed[0]  # return the product number
+
+        1/0
+        
+
+        date = datetime.date(year, month, day)
+        self.params['utc_file_date'] = date
+        self.params['utc_start_time'] = datetime.datetime.combine(date, datetime.time(0, 0, 0))
+        self.params['utc_stop_time'] = datetime.datetime.combine(date, datetime.time(23, 59, 59, 999999))
+
+
+
+        self.params['data_level'] = float(self.filename.split('_')[1][1])
+        self.params['check_date'] = None
+        self.params['verbose_provenance'] = None
+        self.params['quality_comment'] = None
+        self.params['caveats'] = None
+        self.params['release_number'] = None
+        try:
+            mtime = os.path.getmtime(self.infile)
+            self.params['file_create_date'] = datetime.datetime.fromtimestamp(mtime)
+        except OSError:
+            pass #TODO why did I do this?
+        self.params['met_start_time'] = None
+        self.params['met_stop_time'] = None
+        self.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
+        self.params['quality_checked'] = None
+        product_name = self.filename.split('-')[1].split('_')[1] + '_' + self.filename.split('-')[1].split('_')[2]
+        # TODO where does the product_id get set?
+        self.params['product_id'] = matches[0]
+        # self.params['md5sum'] = calcDigest(self.infile)
+        self.params['version'] = Version.Version(int(self.filename.split('_')[-1].split('.')[0][1:]),
+                                                                                                int(self.filename.split('.')[1]),
+                                                                                                int(self.filename.split('.')[2]))
+        DBlogging.dblogger.debug("Returning product %d:%s" % (matches[0], self.dbu._getProductNames(matches[0])[3]))
+        return matches[0]
 
 def calcDigest( infile):
     """Calculate the MD5 digest from a file.
