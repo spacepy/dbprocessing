@@ -195,6 +195,7 @@ class DBUtils2(object):
         >>>  pnl._createTableObjects()
 
         """
+        DBlogging.dblogger.debug("Entered _createTableObjects()")
 
 ## ask for the table names form the database (does not grab views)
         table_names = self.engine.table_names()
@@ -227,6 +228,8 @@ class DBUtils2(object):
                 exec(c3)
                 exec(c4)
                 if verbose: print("Class %s created" % (val))
+                DBlogging.dblogger.debug("Class %s created" % (val))
+
 
 
 ###################################
