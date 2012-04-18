@@ -517,8 +517,6 @@ class DBUtils2(object):
 
 
 
-
-
     def _startLogging(self):
         """
         Add an entry to the logging table in the DB, logging
@@ -1596,6 +1594,12 @@ class DBUtils2(object):
 
         return os.path.join(root_dir, rel_path, filename)
 
+    def getProductLevel(self, productID):
+        """
+        given a product ID return the level
+        """
+        sq = self.session.query(self.Product).filter_by(product_id = productID)
+        return sq[0].level
 
     def _getMissionID(self):
         """
