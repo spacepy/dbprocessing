@@ -4,6 +4,7 @@ import os
 import os.path
 import shutil
 import subprocess
+import tempfile
 import traceback
 
 import DBfile
@@ -43,6 +44,7 @@ class ProcessQueue(object):
         dbu = DBUtils2.DBUtils2(mission)
         dbu._openDB()
         dbu._createTableObjects()
+        self.temp_dir = None
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()
         self.moved = DBqueue.DBqueue()
@@ -50,6 +52,18 @@ class ProcessQueue(object):
         self.queue = DBqueue.DBqueue()
         self.findChildren = DBqueue.DBqueue()
         DBlogging.dblogger.info("Entering ProcessQueue")
+
+    def __del__(self):
+        """
+        attempt a bit of cleanup
+        """
+        self.rm_tempdir()        
+
+    def rm_tempdir(self):
+        if self.temp_dir != None:
+            shutil.rmtree(self.temp_dir)
+            self.temp_dir = None
+            DBlogging.dblogger.debug("Temp dir deleted: {0}".format(self.temp_dir))
 
     def depDict(self, infile, file=None, code=None):
         """
@@ -146,7 +160,12 @@ class ProcessQueue(object):
                 DBlogging.dblogger.info("Found no product moving to error, {0}".format(fname.filename))
                 self.moveToError(val)
                 continue
-            DBlogging.dblogger.debug("fname created %s" % (fname.filename))
+            retval = fname.populateParameters()
+            if retval == None:
+                DBlogging.dblogger.info("File has no Epoch or MET, moving to Error: {0}".format(fname.filename))
+                self.moveToError(val)
+                continue                
+            print fname.mission
             if fname.mission == self.dbu.mission:
                 # if the file is the wrong mission skip it
                 dbf = DBfile.DBfile(fname, self.dbu)
@@ -161,16 +180,19 @@ class ProcessQueue(object):
                 # add to findChildren queue
                 self.findChildren.append(dbf)
 
-                DBlogging.dblogger.debug("f_id = %s" % (str(f_id)))
+                DBlogging.dblogger.debug("File {0} entered in DB, f_id={1}".format(fname.filename, f_id))
                 self.depends.append(self.depDict(f_id))
 
                 mov = dbf.move()
                 self.moved.append(mov[1])  # only want to dest file
                 DBlogging.dblogger.debug("file %s moved to  %s" % \
-                                         (mov[0], mov[1]))
+                                         (os.path.basename(mov[0]), os.path.dirname(mov[1])))
 
                 DBlogging.dblogger.debug("Length of findChildren is %d" % \
                                          (len(self.findChildren)))
+            else:  # wrong mission for this processing
+                DBlogging.dblogger.info("File is not the active mission ({1}), skipping: {0}".format(fname.filename, fname.mission))
+                
 
     def getProcessFromOutputProduct(self, outProd):
         """
@@ -290,7 +312,10 @@ class ProcessQueue(object):
 
             date = val[0].diskfile.params['utc_file_date']
             version = val[0].diskfile.params['version']
-            out_path = '/tmp/' + val[0].diskfile.makeProductFilename(product, date, version)
+            self.tmp_dir = tempfile.mkdtemp('_dbprocessing')
+            DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tmp_dir))
+            
+            out_path = os.path.join(self.tmp_dir, val[0].diskfile.makeProductFilename(product, date, version))
             # now we have everything it takes to build the file
 
             arg_subs = {'datetime': date,
@@ -321,6 +346,7 @@ class ProcessQueue(object):
                                                  "(in_path)")
                         raise(ForException())
             except ForException:
+                self.rm_tempdir()
                 continue
 
             args = self.getCodeArgs([code_id])[0]
@@ -337,6 +363,8 @@ class ProcessQueue(object):
                 if os.path.exists(out_path):
                     os.remove(out_path)
                 continue
+            # done with the temp file, clean it up
+            self.rm_tempdir()
             self.queue.append(out_path)
             self.importFromIncoming()  # we added something it is time to import it
 

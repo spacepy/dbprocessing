@@ -8,6 +8,8 @@ import os
 import os.path
 import re
 
+from spacepy import pycdf
+
 import DBlogging
 import DBUtils2
 import Version
@@ -106,7 +108,7 @@ class Diskfile(object):
                  dbu,
                  parse=False):
         """
-        setup a Diskfile class, takes in a filename and creates a params dict ro hold information about the file
+        setup a Diskfile class, takes in a filename and creates a params dict to hold information about the file
         then tests to see what mission the file is from
 
 
@@ -200,8 +202,8 @@ class Diskfile(object):
                                    INSTRUMENT=instrument,
                                    QACODE=qacode,
                                    datetime=date)
-        if self. Product(filename) != productID:
-            raise(FilenameError("Created filename did not match convention"))
+#        if self.params['product_id'] != productID:
+#            raise(FilenameError("Created filename did not match convention"))
 
         DBlogging.dblogger.debug("Filename: %s created" % (filename))
 
@@ -221,13 +223,13 @@ class Diskfile(object):
                 DBlogging.dblogger.error("Inspector: {0} not found: {1}".format(code, msg))
                 continue
             if arg != None:
-                if inspect.inspect(self.filename, **arg):
-                    DBlogging.dblogger.debug("Match found: {0}: {1}".format(self.filename, code))
-                    claimed.append(self.dbu.inspectorToProduct(code))
+                ver = inspect.inspect(self.filename, **arg)
             else:
-                if inspect.inspect(self.filename):
-                    DBlogging.dblogger.debug("Match found: {0}: {1}".format(self.filename, code))
-                    claimed.append(self.dbu.inspectorToProduct(code))
+                ver = inspect.inspect(self.filename)           
+            if ver:
+                self.params['version'] = ver
+                claimed.append(self.dbu.inspectorToProduct(code))
+                DBlogging.dblogger.debug("Match found: {0}: {1}: {2}".format(self.filename, code, claimed[-1]))
                 
         if len(claimed) == 0: # no match
             DBlogging.dblogger.info("File {0} found no inspector match".format(self.filename))
@@ -236,42 +238,55 @@ class Diskfile(object):
             DBlogging.dblogger.error("File {0} matched more than one product, there is a DB error".format(self.filename))
             raise(DBUtils2.DBError("File {0} matched more than one product, there is a DB error".format(self.filename)))
 
+        self.params['product_id'] = claimed[0] 
         return claimed[0]  # return the product number
 
-        1/0
-        
+    def populateParameters(self):
+        """
+        go through the file and populate the parameters needs for the db
+        """
+        self.mission = self.dbu._getProductNames(productID=self.params['product_id'])[0] # mission name is 0
 
-        date = datetime.date(year, month, day)
-        self.params['utc_file_date'] = date
-        self.params['utc_start_time'] = datetime.datetime.combine(date, datetime.time(0, 0, 0))
-        self.params['utc_stop_time'] = datetime.datetime.combine(date, datetime.time(23, 59, 59, 999999))
+        ## assume it is a istp cdf
+        try:
+            cdf = pycdf.CDF(self.infile)
+        except pycdf.CDFError:
+            DBlogging.dblogger.info("File {0} is not a cdf".format(self.filename))
+            print("Only CDF file are currently supported")
+            return None
 
+        ## get the start cdf time from the file
+        try:
+            self.params['utc_start_time'] = cdf['Epoch'][0]
+            self.params['utc_stop_time']  = cdf['Epoch'][-1]
+        except KeyError: # file does not have Epoch, better have MET
+            DBlogging.dblogger.debug("File {0} does not have Epoch, reverting to MET".format(self.filename))
+            try:
+                self.params['met_start_time'] = cdf['MET'][0]
+                self.params['met_stop_time']  = cdf['MET'][0]
+            except KeyError:
+                DBlogging.dblogger.error("File {0} does not have Epoch or MET".format(self.filename))
+                return None # this will move it to error in ProcessQueue
+                
+        # TODO is this what we want here?
+        self.params['utc_file_date'] = cdf['Epoch'][0]
+        DBlogging.dblogger.debug("File {0}, utc_file_date set sub-optimally".format(self.filename))
 
-
-        self.params['data_level'] = float(self.filename.split('_')[1][1])
+        self.params['data_level'] = self.dbu.getProductLevel(self.params['product_id'])
         self.params['check_date'] = None
         self.params['verbose_provenance'] = None
         self.params['quality_comment'] = None
         self.params['caveats'] = None
         self.params['release_number'] = None
-        try:
-            mtime = os.path.getmtime(self.infile)
-            self.params['file_create_date'] = datetime.datetime.fromtimestamp(mtime)
-        except OSError:
-            pass #TODO why did I do this?
-        self.params['met_start_time'] = None
-        self.params['met_stop_time'] = None
+        self.params['file_create_date'] = datetime.datetime.fromtimestamp(os.path.getmtime(self.infile))
+
         self.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
         self.params['quality_checked'] = None
-        product_name = self.filename.split('-')[1].split('_')[1] + '_' + self.filename.split('-')[1].split('_')[2]
-        # TODO where does the product_id get set?
-        self.params['product_id'] = matches[0]
-        # self.params['md5sum'] = calcDigest(self.infile)
-        self.params['version'] = Version.Version(int(self.filename.split('_')[-1].split('.')[0][1:]),
-                                                                                                int(self.filename.split('.')[1]),
-                                                                                                int(self.filename.split('.')[2]))
-        DBlogging.dblogger.debug("Returning product %d:%s" % (matches[0], self.dbu._getProductNames(matches[0])[3]))
-        return matches[0]
+        
+        self.params['md5sum'] = calcDigest(self.infile)
+        
+        DBlogging.dblogger.debug("DiskFile object fully populated for {0}".format(self.filename))
+        return True
 
 def calcDigest( infile):
     """Calculate the MD5 digest from a file.
