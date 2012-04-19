@@ -1985,6 +1985,12 @@ class DBUtils2(object):
         path = os.path.join(basedir, 'incoming/')
         return path
 
+    def getFileMission(self):
+        """
+        return the mission name from a file_id
+        """
+        raise(NotImplemented("Not yet implemented"))
+
     def getErrorPath(self):
         """
         return the erro path for the current mission
