@@ -205,6 +205,12 @@ class dbprocessing_db(object):
             schema.CheckConstraint('output_interface_version >= 1'),
         )
 
+        data_table = schema.Table('processqueue', metadata,
+            schema.Column('processqueue_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('file_id', types.Integer,  
+                          schema.ForeignKey('file.file_id'), nullable=False, unique=True, ),
+        )
+
         data_table = schema.Table('filecodelink', metadata,
             schema.Column('resulting_file', types.Integer,
                           schema.ForeignKey('file.file_id'), nullable=False),
