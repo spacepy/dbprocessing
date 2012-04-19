@@ -164,8 +164,7 @@ class ProcessQueue(object):
 
         @version: V1: 02-Dec-2010 (BAL)
         """
-        DBlogging.dblogger.debug("Entering importFromIncoming, %d to import" %  \
-                                 (len(self.queue)))
+        DBlogging.dblogger.debug("Entering importFromIncoming, {0} to import".format(len(self.queue)))
 
         for val in self.queue.popleftiter() :
             self.current_file = val
@@ -181,70 +180,19 @@ class ProcessQueue(object):
                 dbf = DBfile.DBfile(df, self.dbu)
                 try:
                     f_id = dbf.addFileToDB()
+                    DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
                 except (DBUtils2.DBInputError, DBUtils2.DBError) as errmsg:
                     DBlogging.dblogger.warning("Except adding file to db so" + \
                                                " moving to error: %s" % (errmsg))
                     self.moveToError(val)
                     continue
+                # add to processqueue for later processing
+                self.dbu.processqueuePush(f_id)
+                # move the file to the its correct home
+                dbf.move()
 
-                # add to findChildren queue
-                self.findChildren.append(dbf)
-
-                DBlogging.dblogger.debug("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
-                self.depends.append(self.depDict(f_id))
-
-                mov = dbf.move()
-                self.moved.append(mov[1])  # only want to dest file
-                DBlogging.dblogger.debug("file %s moved to  %s" % \
-                                         (os.path.basename(mov[0]), os.path.dirname(mov[1])))
-
-                DBlogging.dblogger.debug("Length of findChildren is %d" % \
-                                         (len(self.findChildren)))
             else:  # wrong mission for this processing
                 DBlogging.dblogger.info("File is not the active mission ({1}), skipping: {0}".format(df.filename, df.mission))
-
-    def importFile(self, filename):
-        """
-        actualy do the importing, can be called on created products
-        TODO this should not share with importFromIncoming so much
-        """
-        DBlogging.dblogger.debug("Entering importFile")
-
-        val = filename
-        self.current_file = val
-        DBlogging.dblogger.debug("importing {0} " % (self.current_file))
-        df = self.figureProduct()
-        if df is None:
-            DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.current_file))
-            self.moveToError(self.current_file)
-            return
-
-        if df.mission[0] == self.dbu.mission:
-            # if the file is the wrong mission skip it
-            dbf = DBfile.DBfile(df, self.dbu)
-            try:
-                f_id = dbf.addFileToDB()
-            except (DBUtils2.DBInputError, DBUtils2.DBError) as errmsg:
-                DBlogging.dblogger.warning("Except adding file to db so" + \
-                                           " moving to error: %s" % (errmsg))
-                self.moveToError(val)
-                return
-                
-            # add to findChildren queue
-            self.findChildren.append(dbf)
-
-            DBlogging.dblogger.debug("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
-            self.depends.append(self.depDict(f_id))
-
-            mov = dbf.move()
-            self.moved.append(mov[1])  # only want to dest file
-            DBlogging.dblogger.debug("file %s moved to  %s" % \
-                                     (os.path.basename(mov[0]), os.path.dirname(mov[1])))
-
-            DBlogging.dblogger.debug("Length of findChildren is %d" % \
-                                     (len(self.findChildren)))
-        else:  # wrong mission for this processing
-            DBlogging.dblogger.info("File is not the active mission ({1}), skipping: {0}".format(df.filename, df.mission))        
 
     def figureProduct(self):
         """
@@ -434,7 +382,16 @@ class ProcessQueue(object):
             cmd = cmd.split(' ')
             DBlogging.dblogger.debug('Executing: %s' % ' '.join(cmd))
             print cmd
-            subprocess.check_call(cmd, shell=True)
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if proc.returncode != 0 and proc.returncode is not None:
+                DBlogging.dblogger.error("Non-zero return code ({1}) from: {0}".format(cmd[0], proc.returncode))
+            (stdoutdata, stderrdata) = proc.communicate()
+            if stderrdata != '':
+                DBlogging.dblogger.error("Code {0} stderr messages\n{1}".format(cmd[0], stderrdata))
+            if stdoutdata != '':
+                DBlogging.dblogger.debug("Code {0} stdout messages\n{1}".format(cmd[0], stdoutdata))
+
+
             self.moveToIncoming(out_path)
             1/0
             inc_path = self.dbu.getIncomingPath()
@@ -451,13 +408,13 @@ class ProcessQueue(object):
                 self.dbu._addFilefilelink(self.dbu._getFileID(os.path.basename(val[0].diskfile.filename)),
                                           self.dbu._getFileID(os.path.basename(out_path)) )
             except DBUtils2.DBError:
-                DBlogging.dblogger.error("Could not create file_file_link due to error with created file: {0}".format(out_path))                
+                DBlogging.dblogger.error("Could not create file_file_link due to error with created file: {0}".format(out_path))
             # TODO, think here if this is really ok to do
             try:
                 self.dbu._addFilecodelink(self.dbu._getFileID(os.path.basename(out_path)),
                                           self.dbu._getCodeID(os.path.basename(codep)) )
             except DBUtils2.DBError:
-                DBlogging.dblogger.error("Could not create file_code_link due to error with created file: {0}".format(out_path))                
+                DBlogging.dblogger.error("Could not create file_code_link due to error with created file: {0}".format(out_path))
 
     def findChildrenProducts(self):
         """
