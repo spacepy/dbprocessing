@@ -1,4 +1,5 @@
 import sqlalchemy
+import glob
 from sqlalchemy.orm import sessionmaker
 import os.path
 import datetime
@@ -1875,7 +1876,6 @@ class DBUtils2(object):
             raise(DBError('Mission %s was not found' % (self.mission)))
         return sq.first()[0]  # there can be only one of each name
 
-
     def _checkIncoming(self):
         """
         check the incoming directory for the current mision and add those files to the geting list
@@ -1890,17 +1890,35 @@ class DBUtils2(object):
 
         @version: V1: 20-Sep-2010 (BAL)
         """
+        path = self.getIncomingPath()
+        files = glob.glob(os.path.join(path, '*'))
+        return files
+
+    def getIncomingPath(self):
+        """
+        return the incoming path for the current mission
+        """
         try:
             self.Mission
         except AttributeError:
             self._createTableObjects()
 
         basedir = self._getMissionDirectory()
-        files = os.listdir(basedir + '/incoming/')
-        for i in range(len(files)):
-            files[i] = basedir + '/incoming/' + files[i]
-        return files
+        path = os.path.join(basedir, 'incoming/')
+        return path
 
+    def getErrorPath(self):
+        """
+        return the erro path for the current mission
+        """
+        try:
+            self.Mission
+        except AttributeError:
+            self._createTableObjects()
+
+        basedir = self._getMissionDirectory()
+        path = os.path.join(basedir, 'errors/')
+        return path
 
     def _parseFileName(self,
                        filename):

@@ -152,6 +152,11 @@ class Diskfile(object):
         #dbu._createTableObjects()
         self.dbu = dbu
 
+    def __repr__(self):
+        return "<Diskfile.Diskfile object: {0}>".format(self.infile)
+    
+    __str__ = __repr__
+
     def checkAccess(self):
         """
         A few simple tests of the input file to be sure the script has the correct access

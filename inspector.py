@@ -3,7 +3,9 @@
 """
 inspector requirements:
     - one product per inspector file
-    - must implement inspect(filename, **kwargs)
+    - must implement a class called Inspector(inspector.inspector)
+    - must implement the abstract method inspect(kwargs) # yes takes in a dict
+    - must implement code_name = 'codename.py' at the self level
     - inspect() must return a complete DiskFile instance or False (no other or exceptions allowed)
         - this means populating the following items: (* user parameters)
             mission : string name of the mission (filled by base class)
@@ -39,9 +41,7 @@ import os
 import re
 
 import DBlogging
-import DBUtils2
 import Diskfile
-import Version
 
 class inspector(object):
     """
@@ -51,7 +51,7 @@ class inspector(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, filename, dbu, **kwargs):
-        DBlogging.dblogger.info("Entered inspector {0}".format(type(self).__name__))
+        DBlogging.dblogger.info("Entered inspector {0}".format(self.code_name))
         self.dbu = dbu # give us access to DBUtils2
         self.filename = filename
         self.diskfile = Diskfile.Diskfile(self.filename, self.dbu)
@@ -74,7 +74,7 @@ class inspector(object):
         self.diskfile.params['file_create_date'] = datetime.datetime.fromtimestamp(os.path.getmtime(self.diskfile.infile))
         self.diskfile.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
         self.diskfile.params['md5sum'] = Diskfile.calcDigest(self.diskfile.infile)
-        self.diskfile.params['product_id'] = self.dbu.inspectorToProduct(str(type(self).__name__) + os.extsep + 'py')
+        self.diskfile.params['product_id'] = self.dbu.inspectorToProduct(self.code_name)
 
     def _check(self):
         """
@@ -82,30 +82,44 @@ class inspector(object):
         return None if not or the Diskfile object if so
         """
         match = self.diskfile
+        if match is not None:
+            DBlogging.dblogger.debug("Checking the inspector has filled all the values: {0}".format(self.code_name))
+
         if self.diskfile.mission is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.mission is None".format(self.code_name))
         elif self.diskfile.params['filename'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['filename'] is None".format(self.code_name))
         elif self.diskfile.params['utc_file_date'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['utc_file_date'] is None".format(self.code_name))
         elif self.diskfile.params['utc_start_time'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['utc_start_time'] is None".format(self.code_name))
         elif self.diskfile.params['utc_stop_time'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['utc_stop_time'] is None".format(self.code_name))
         elif self.diskfile.params['data_level'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['data_level'] is None".format(self.code_name))
         elif self.diskfile.params['file_create_date'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['file_create_date'] is None".format(self.code_name))
         elif self.diskfile.params['exists_on_disk'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['exists_on_disk'] is None".format(self.code_name))
         elif self.diskfile.params['product_id'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['product_id'] is None".format(self.code_name))
         elif self.diskfile.params['version'] is None:
             match = None
+            DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['version'] is None".format(self.code_name))
+
         if match is None:
-            DBlogging.dblogger.info("No match found for inspector {0}: {1}".format(type(self).__name__, self.diskfile.filename))
+            DBlogging.dblogger.info("No match found for inspector {0}: {1}".format(self.code_name, self.diskfile.filename))
         else:
-            DBlogging.dblogger.info("Match found for inspector {0}: {1}".format(type(self).__name__, self.diskfile.filename))
+            DBlogging.dblogger.info("Match found for inspector {0}: {1}".format(self.code_name, self.diskfile.filename))
         return match
 
     @classmethod
@@ -130,12 +144,22 @@ class inspector(object):
 def extract_YYYYMMDD(filename):
     """
     go through the filename and extract the first valid YYYYMMDD as a datetime
+    
+    Parameters
+    ==========
+    filename : str
+        filename to parse for a YYYYMMDD format
+    
+    Returns
+    =======
+    out : (None, datetime.datetime)
+        the datetime found in the filename or None
     """
     # cmp = re.compile("[12][90]\d2[01]\d[0-3]\d")
     # return a datetime if there is one from YYYYMMDD
     try:
         dt = datetime.datetime.strptime(re.search("[12][90]\d2[01]\d[0-3]\d", filename).group(), "%Y%m%d")
-    except ValueError: # there is not one
+    except (ValueError, AttributeError): # there is not one
         return None
     if dt < datetime.datetime(1957, 10, 4, 19, 28, 34): # Sputnik 1 launch datetime
         dt = None

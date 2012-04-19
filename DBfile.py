@@ -62,6 +62,10 @@ class DBfile(object):
         self.diskfile = diskfile
         self.checkVersion()
 
+    def __repr__(self):
+        return "<DBfile.DBfile object: {0}>".format(self.diskfile.infile)
+    
+    __str__ = __repr__
 
     def checkVersion(self):
         """

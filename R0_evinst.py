@@ -12,7 +12,9 @@ import DBlogging
 import inspector
 import Version
 
-class R0_evinst(inspector.inspector):
+class Inspector(inspector.inspector):
+    code_name = 'R0_evinst.py'
+    
     def inspect(self, kwargs):
         """
         look for a filename that matches this product
