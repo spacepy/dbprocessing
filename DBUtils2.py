@@ -724,8 +724,8 @@ class DBUtils2(object):
         
         Returns
         =======
-        processqueueid : int
-            the id of the processqueue entry
+        file_id : int
+            the file_id that was passed in, but grabbed from the db
         """
         try:
             fileid = int(fileid)
@@ -740,8 +740,8 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
-        pqid = self.session.query(self.Processqueue.processqueue_id).filter_by(file_id = fileid)
-        return pqid[0]
+        pqid = self.session.query(self.Processqueue.file_id).all()
+        return pqid[-1]
 
     def processqueuePop(self, index=0):
         """
@@ -1984,6 +1984,12 @@ class DBUtils2(object):
         basedir = self._getMissionDirectory()
         path = os.path.join(basedir, 'incoming/')
         return path
+
+    def getFileMission(self):
+        """
+        return the mission name from a file_id
+        """
+        raise(NotImplemented("Not yet implemented"))
 
     def getErrorPath(self):
         """
