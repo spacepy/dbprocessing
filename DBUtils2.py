@@ -760,6 +760,8 @@ class DBUtils2(object):
         num = self.session.query(self.Processqueue).count()
         if num == 0:
             return None
+        if index >= num:
+            return None            
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
