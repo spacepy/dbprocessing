@@ -1,6 +1,5 @@
 import os
 
-import DBUtils2
 import DBlogging
 import Diskfile
 import shutil
