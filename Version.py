@@ -98,7 +98,9 @@ class Version(object):
         return 'Version: ' + str(self.interface) + '.' + str(self.quality) + '.' + \
             str(self.revision)
 
-    __str__ = __repr__
+    def __str__(self):
+        return str(self.interface) + '.' + str(self.quality) + '.' + \
+            str(self.revision)
 
     def incInterface(self):
         """increment the interface version"""
