@@ -43,12 +43,28 @@ import re
 import DBlogging
 import Diskfile
 
+def EphemeralCallable(basetype):
+    def _new_caller(cls, *args, **kwargs):
+        return cls.__ephemeral_encapsulated__(*args, **kwargs)()
+    class _EphemeralMetaclass(basetype):
+        def __new__(cls, name, bases, dct):
+            encbases = tuple([b.__ephemeral_encapsulated__
+                              if hasattr(b, '__ephemeral_encapsulated__')
+                              else b for b in bases])
+            encaps = super(_EphemeralMetaclass, cls).__new__(
+                cls, '_' + name + '_ephemeral_encapsulated', encbases, dct)
+            return super(_EphemeralMetaclass, cls).__new__(
+                cls, name, bases,
+                {'__new__': _new_caller,
+                 '__ephemeral_encapsulated__': encaps})
+    return _EphemeralMetaclass
+
 class inspector(object):
     """
     ABC for inspectors to be sure the user has implemented what is required
     and to provide for utility routes common to many inspectors
     """
-    __metaclass__ = ABCMeta
+    __metaclass__ = EphemeralCallable(ABCMeta)
 
     def __init__(self, filename, dbu, **kwargs):
         DBlogging.dblogger.info("Entered inspector {0}".format(self.code_name))
@@ -76,7 +92,7 @@ class inspector(object):
         self.diskfile.params['md5sum'] = Diskfile.calcDigest(self.diskfile.infile)
         self.diskfile.params['product_id'] = self.dbu.inspectorToProduct(self.code_name)
 
-    def _check(self):
+    def __call__(self):
         """
         do the check if the file is of the given type
         return None if not or the Diskfile object if so
@@ -121,15 +137,6 @@ class inspector(object):
         else:
             DBlogging.dblogger.info("Match found for inspector {0}: {1}".format(self.code_name, self.diskfile.filename))
         return match
-
-    @classmethod
-    def check(cls, filename, dbu, **kwargs):
-        """
-        fill in tethings that this base class knows how to do, user can override if they
-        really need to
-        ** THIS IS WHAT YOU CALL, DON'T INSTANCIATE THE CLASS **
-        """
-        return cls(filename, dbu, **kwargs)._check()
 
     #==============================================================================
     # Helper routines

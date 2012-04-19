@@ -207,9 +207,9 @@ class ProcessQueue(object):
                 DBlogging.dblogger.error("Inspector: {0} not found: {1}".format(code, msg))
                 continue
             if arg is not None:
-                df = inspect.Inspector.check(self.current_file, self.dbu,  **arg)
+                df = inspect.Inspector(self.current_file, self.dbu,  **arg)
             else:
-                df = inspect.Inspector.check(self.current_file, self.dbu, )
+                df = inspect.Inspector(self.current_file, self.dbu, )
             if df is not None:
                 claimed.append(df)
                 DBlogging.dblogger.debug("Match found: {0}: {1}".format(self.current_file, code, ))
