@@ -1934,6 +1934,82 @@ class DBUtils2(object):
             raise(DBError('Satellite %s was not found' % (sat_name)))
         return sq.first()[0]  # there can be only one of each name
 
+    def getCodePath(self, code_id):
+        """
+        Given a code_id list return the full name (path and all) of the code
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 02-Dec-2010 (BAL)
+        """
+        DBlogging.dblogger.debug("Entered getCodePath:")
+
+        ans = []
+        for val in code_id:
+            sq1 =  self.session.query(self.dbu.Code.relative_path).filter_by(code_id = val)  # should only have one value
+            sq2 =  self.session.query(self.dbu.Mission.rootdir).filter_by(mission_name = self.dbu.mission)  # should only have one value
+            sq3 =  self.session.query(self.dbu.Code.filename).filter_by(code_id = val)  # should only have one value
+            ans.append(os.path.join(sq2[0][0], sq1[0][0], sq3[0][0]))  # the [0][0] is ok (ish) since there can only be one
+        return ans
+
+    def getProcessFromOutputProduct(self, outProd):
+        """
+        Gets process from the db that have the output product
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 02-Dec-2010 (BAL)
+        """
+        # TODO maybe this should move to DBUtils2
+        DBlogging.dblogger.debug("Entered getProcessFromOutputProduct:")
+
+        ans = []
+        for val in outProd:
+            sq1 =  self.session.query(self.dbu.Process.process_id).filter_by(output_product = val)  # should only have one value
+            ans.extend( sq1[0] )
+        return ans
+
+    def getCodeFromProcess(self, proc_id):
+        """
+        given a process id return the code that makes perfoms that process
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 02-Dec-2010 (BAL)
+        """
+        DBlogging.dblogger.debug("Entered getCodeFromProcess:")
+
+        ans = []
+        for val in proc_id:
+            sq1 =  self.session.query(self.dbu.Code.code_id).filter_by(process_id = val)  # should only have one value
+            try:
+                ans.extend( sq1[0])
+            except IndexError:
+                continue
+        return ans
+        
+    def getCodeArgs(self, code_id):
+        """
+        Given a code_id list return the arguments to the code
+
+        @author: Jon Niehof after L{getCodePath}
+        @organization: Los Alamos National Lab
+        @contact: jniehof@lanl.gov
+
+        @version: V1: 07-Jan-2011 (JTN)
+        """
+        DBlogging.dblogger.debug("Entered getCodeArgs:")
+        ans = []
+        for val in code_id:
+            sq1 =  self.session.query(self.dbu.Code.arguments).filter_by(code_id = val)  # should only have one value
+            ans.append(sq1[0][0])  # the [0][0] is ok (ish) since there can only be one
+        return ans
 
     def _getMissionDirectory(self):
         """
