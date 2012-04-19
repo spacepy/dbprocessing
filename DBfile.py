@@ -1,4 +1,7 @@
+import os
+
 import DBUtils2
+import DBlogging
 import Diskfile
 import shutil
 
@@ -142,8 +145,6 @@ class DBfile(object):
         path = str(basepath) + '/' + str(relative_path)
         return path
 
-
-
     def move(self):
         """
         Move the DBfile from its current location to where it belongs
@@ -160,5 +161,7 @@ class DBfile(object):
         @TODO  add a check that the file is not already there before doing a move
         """
         path = self.getDirectory()
-        shutil.move(self.diskfile.infile, path + '/' + self.diskfile.params['filename'])
-        return (self.diskfile.infile, path + '/' + self.diskfile.params['filename'])
+        shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
+        DBlogging.dblogger.info("file {0} moved to {1}".format(os.path.basename(self.diskfile.infile), os.path.dirname(os.path.join(path, self.diskfile.params['filename']))))
+
+        return (self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
