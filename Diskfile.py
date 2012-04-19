@@ -205,7 +205,7 @@ class Diskfile(object):
 
 
 def calcDigest( infile):
-    """Calculate the MD5 digest from a file.
+    """Calculate the SHA1 digest from a file.
 
     `Author:` Jon Niehof, LANL
 
@@ -219,10 +219,10 @@ def calcDigest( infile):
     Returns
     =======
     out : str
-        hex digits of the file_ md5
+        hex digits of the file_, SHA1 (40 bytes)
 
     """
-    m = hashlib.md5()
+    m = hashlib.sha1()
     try:
         with open(infile, 'rb') as f:
             m.update(f.read())
