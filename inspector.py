@@ -43,7 +43,7 @@ import re
 import DBlogging
 import Diskfile
 
-def EphemeralCallable(basetype):
+def EphemeralCallable(basetype=type):
     def _new_caller(cls, *args, **kwargs):
         return cls.__ephemeral_encapsulated__(*args, **kwargs)()
     class _EphemeralMetaclass(basetype):
