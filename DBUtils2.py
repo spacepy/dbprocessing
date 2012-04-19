@@ -743,9 +743,14 @@ class DBUtils2(object):
         pqid = self.session.query(self.Processqueue.processqueue_id).filter_by(file_id = fileid)
         return pqid[0]
 
-    def processqueuePop(self):
+    def processqueuePop(self, index=0):
         """
         pop a file off the process queue (from the left)
+
+        Other Parameters
+        ================
+        index : int
+            the index in the queue to pop               
                
         Returns
         =======
@@ -756,14 +761,16 @@ class DBUtils2(object):
         if num == 0:
             return None
         else:
-            for fid in self.session.query(self.Processqueue).limit(1):
-                self.session.delete(fid)
-            fid_ret = fid.file_id
-            try:
-                self.session.commit()
-            except IntegrityError as IE:
-                self.session.rollback()
-                raise(DBError(IE))
+            for ii, fid in enumerate(self.session.query(self.Processqueue)):
+                if ii == index:
+                    self.session.delete(fid)
+                    fid_ret = fid.file_id
+                    break # there can be only one
+                try:
+                    self.session.commit()
+                except IntegrityError as IE:
+                    self.session.rollback()
+                    raise(DBError(IE))
             return fid_ret
 
     def processqueueGet(self):
