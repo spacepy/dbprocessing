@@ -713,7 +713,76 @@ class DBUtils2(object):
             raise(DBError(IE))
         return counter
 
+    def processqueuePush(self, fileid):
+        """
+        push a file onto the process queue (onto the right)
+        
+        Parameters
+        ==========
+        fileid : (int, string)
+            the file id (or name to put on the process queue)
+        
+        Returns
+        =======
+        processqueueid : int
+            the id of the processqueue entry
+        """
+        try:
+            fileid = int(fileid)
+        except ValueError: # must have been a filename
+            fileid = self._getFileID(fileid)
+        pq1 = self.Processqueue()
+        pq1.file_id = fileid
+        self.session.add(pq1)
+        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self._getFilename(fileid) ) )
+        try:
+            self.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBError(IE))
+        pqid = self.session.query(self.Processqueue.processqueue_id).filter_by(file_id = fileid)
+        return pqid[0]
 
+    def processqueuePop(self):
+        """
+        pop a file off the process queue (from the left)
+               
+        Returns
+        =======
+        file_id : int
+            the file_id of the file popped from the queue
+        """
+        num = self.session.query(self.Processqueue).count()
+        if num == 0:
+            return None
+        else:
+            for fid in self.session.query(self.Processqueue).limit(1):
+                self.session.delete(fid)
+            fid_ret = fid.file_id
+            try:
+                self.session.commit()
+            except IntegrityError as IE:
+                self.session.rollback()
+                raise(DBError(IE))
+            return fid_ret
+
+    def processqueueGet(self):
+        """
+        get the file at the head of the queue (from the left)
+               
+        Returns
+        =======
+        file_id : int
+            the file_id of the file popped from the queue
+        """
+        num = self.session.query(self.Processqueue).count()
+        if num == 0:
+            return None
+        else:
+            fid = self.session.query(self.Processqueue).limit(1)
+            fid_ret = fid[0].file_id
+            return fid_ret
+       
     def _purgeFileFromDB(self, filename=None):
         """
         removes a file from the DB
