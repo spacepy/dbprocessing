@@ -37,7 +37,6 @@ class DBUtils2AddTests(unittest.TestCase):
         """_addMission wont work until the Mission class is created from the DB"""
         self.assertRaises(DBUtils2.DBError, self.dbu._addMission, 'filename', 'path')
 
-
     def test_addSatelliteInput(self):
         """_addSatellite should only accept strig input"""
         self.assertRaises(DBUtils2.DBInputError, self.dbu._addSatellite, 1234, 'id string')
@@ -47,7 +46,6 @@ class DBUtils2AddTests(unittest.TestCase):
     def test_addSatelliteOrder(self):
         """_addSatellite wont work until the Mission class is created from the DB"""
         self.assertRaises(DBUtils2.DBError, self.dbu._addSatellite, 'satname', 1234)
-
 
     def test_addInstrumentInput(self):
         """_addInstrument should only accept strig input"""
@@ -105,11 +103,10 @@ class DBUtils2ClassMethodTests(unittest.TestCase):
         for i, val in enumerate(dat_in):
             self.assertEqual(real_ans[i], DBUtils2.DBUtils2._build_fname(*val))
 
-
     def test_test_SQLAlchemy_version(self):
         """The testing of the SQLAlchemy version should work"""
         self.assertTrue(DBUtils2.DBUtils2._test_SQLAlchemy_version())
-        errstr = 'SQLAlchemy version wrong_Ver was not expected, expected 0.6.x'
+        errstr = 'SQLAlchemy version wrong_Ver was not expected, expected 0.7.x'
         try:
             DBUtils2.DBUtils2._test_SQLAlchemy_version('wrong_Ver')
         except DBUtils2.DBError:
@@ -130,6 +127,7 @@ class DBUtils2DBTests(unittest.TestCase):
     def test_opencloseDB(self):
         """_open should open a db in memory and _close should close it"""
         self.dbp._openDB()
+        self.assertTrue(self.dbp._openDB() is None)
         try:
             self.dbp.engine
         except:
@@ -144,7 +142,12 @@ class DBUtils2DBTests(unittest.TestCase):
             self.fail("Session not created")
         ## should think up a better test here
         self.dbp._closeDB()
+        self.assertTrue(self.dbp._closeDB() is None)
 
+
+    def test_init(self):
+        """__init__ has an exception to test"""
+        self.assertRaises(DBUtils2.DBError, DBUtils2.DBUtils2, None)
 
     def test_repr(self):
         """__repr__ should print a known output"""

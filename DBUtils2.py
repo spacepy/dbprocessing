@@ -70,7 +70,7 @@ class DBUtils2(object):
     @classmethod
     def _test_SQLAlchemy_version(self, version= sqlalchemy.__version__):
         """This tests the version to be sure that it is compatable"""
-        expected = '0.6'
+        expected = '0.7'
         if version[0:len(expected)] != expected:
             raise DBError(
                 "SQLAlchemy version %s was not expected, expected %s.x" %
