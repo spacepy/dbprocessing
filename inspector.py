@@ -31,10 +31,9 @@ inspector requirements:
             self.diskfile.params['filecodelink'] : long (filled by db)
             self.diskfile.params['newest_version'] : bool (filled by db)
 
-
 inspector suggestions:
-
 """
+
 from abc import ABCMeta, abstractmethod
 import datetime
 import os

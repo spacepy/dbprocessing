@@ -79,9 +79,9 @@ class Version(object):
         self.interface = int(interface_version)
         self.revision = int(revision_version)
         self.quality = int(quality_version)
-        self.__checkVersion()
+        self._checkVersion()
 
-    def __checkVersion(self):
+    def _checkVersion(self):
         """
         check a version to make sure it is valid, works on current object
         """
@@ -105,17 +105,17 @@ class Version(object):
     def incInterface(self):
         """increment the interface version"""
         self.interface += 1
-        self.__checkVersion()
+        self._checkVersion()
 
     def incQuality(self):
         """increment the quality version"""
         self.quality += 1
-        self.__checkVersion()
+        self._checkVersion()
 
     def incRevision(self):
         """increment the revision version"""
         self.revision += 1
-        self.__checkVersion()
+        self._checkVersion()
 
     def __eq__(self, other):
         """Same version numbers is equal"""

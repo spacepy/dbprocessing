@@ -21,7 +21,7 @@ class DiskfileStaticTests(unittest.TestCase):
         self.assertRaises(Diskfile.DigestError, Diskfile.calcDigest, 'idontexist.file')
         with open('IamAfileThatExists.file', 'wb') as f:
             f.write('I am some text in a file')
-        real_ans = '5fcab280bae1c870ddc3ca6c899bb29c'
+        real_ans = 'aa42c02f50c92203be933747670bdd512848385e'
         ans = Diskfile.calcDigest('IamAfileThatExists.file')
         self.assertEqual(real_ans, ans)
         with open('IamAfileThatExists.file', 'wb+') as f:
@@ -51,6 +51,10 @@ class DiskfileTests(unittest.TestCase):
         self.assertRaises(Diskfile.ReadError, Diskfile.Diskfile, 'wrong input',
                           self.dbo)
 
+    def test_repr(self):
+        """repr retuens a known string"""
+        self.assertEqual("DBProcessing class instance for mission Test, version: 2.0.3", self.dbo.__repr__())
+        
 
     def test_write_error(self):
         """given a file input that is not writeable WriteError"""

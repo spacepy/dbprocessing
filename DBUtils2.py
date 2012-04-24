@@ -839,7 +839,7 @@ class DBUtils2(object):
 
 
 
-    def _addMission(self,
+    def addMission(self,
                     mission_name,
                     rootdir):
         """ add a mission to the database
@@ -874,32 +874,26 @@ class DBUtils2(object):
             self.session.rollback()
             raise(DBError(IE))
 
-    def _addSatellite(self,
-                    satellite_name,
-                    mission_id):
+    def addSatellite(self,
+                    satellite_name,):
         """ add a satellite to the database
 
         @param satellite_name: the name of the mission
         @type satellite_name: str
-        @param mission_id: the root directory of the mission
-        @type mission_id: str
 
         @author: Brian Larsen
         @organization: Los Alamos National Lab
         @contact: balarsen@lanl.gov
 
-        @version: V1: 170-Sep-2010 (BAL)
         """
         if not isinstance(satellite_name, str):
             raise(DBInputError("Satellite name has to  a string"))
-        if not isinstance(mission_id, (int, long)):
-            raise(DBInputError("Mission_id must be an int"))
 
         try:
             s1 = self.Satellite()
         except AttributeError:
             raise(DBError  ("Class Satellite not found was it created?"))
-        s1.mission_id = mission_id
+        s1.mission_id = self._getMissionID()
         s1.satellite_name = satellite_name
         self.session.add(s1)
         try:
@@ -907,11 +901,11 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return self._getSatelliteID(satellite_name)
 
-    def _addProcess(self,
+    def addProcess(self,
                     process_name,
                     output_product,
-                    extra_params=None,
                     super_process_id=None):
         """ add a process to the database
 
@@ -939,8 +933,7 @@ class DBUtils2(object):
             raise(DBInputError("extra_params muct be string or None"))
         if not isinstance(super_process_id, (int, long)) and super_process_id != None:
             raise(DBInputError("super_process_id must be int or None"))
-
-
+            
         try:
             p1 = self.Process()
         except AttributeError:
@@ -955,13 +948,15 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return p1.process_id
 
-    def _addProduct(self,
+    def addProduct(self,
                     product_name,
                     instrument_id,
                     relative_path,
                     super_product_id,
-                    format):
+                    format, 
+                    level):
         """ add a product to the database
 
         @param product_name: the name of the product
@@ -994,14 +989,16 @@ class DBUtils2(object):
         p1.relative_path = relative_path
         p1.super_product_id = super_product_id
         p1.format = format
+        p1.level = level
         self.session.add(p1)
         try:
             self.session.commit()
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return p1.product_id
 
-    def _addproductprocesslink(self,
+    def addproductprocesslink(self,
                     input_product_id,
                     process_id):
         """ add a product process link to the database
@@ -1031,7 +1028,7 @@ class DBUtils2(object):
             self.session.rollback()
             raise(DBError(IE))
 
-    def _addFilecodelink(self,
+    def addFilecodelink(self,
                      resulting_file_id,
                      source_code):
         """ add a file code  link to the database
@@ -1061,8 +1058,7 @@ class DBUtils2(object):
             self.session.rollback()
             raise(DBError(IE))
 
-
-    def _addFilefilelink(self,
+    def addFilefilelink(self,
                      source_file,
                      resulting_file_id):
         """ add a file file  link to the database
@@ -1092,8 +1088,7 @@ class DBUtils2(object):
             self.session.rollback()
             raise(DBError(IE))
 
-
-    def _addInstrumentproductlink(self,
+    def addInstrumentproductlink(self,
                      instrument_id,
                      product_id):
         """ add a instrument product  link to the database
@@ -1123,8 +1118,7 @@ class DBUtils2(object):
             self.session.rollback()
             raise(DBError(IE))
 
-
-    def _addInstrument(self,
+    def addInstrument(self,
                     instrument_name,
                     satellite_id):
         """ add a Instrument to the database
@@ -1158,8 +1152,9 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return i1.instrument_id
 
-    def _addCode(self,
+    def addCode(self,
                            filename,
                            relative_path,
                            code_start_date,
@@ -1170,7 +1165,8 @@ class DBUtils2(object):
                            active_code,
                            date_written,
                            output_interface_version,
-                           newest_version):
+                           newest_version, 
+                           arguments=None):
         """
         Add an executable code to the DB
 
@@ -1227,6 +1223,8 @@ class DBUtils2(object):
         c1.date_written = date_written
         c1.output_interface_version = output_interface_version
         c1.newest_version = newest_version
+        if arguments is not None:
+            c1.arguments = arguments
 
         self.session.add(c1)
         try:
@@ -1234,11 +1232,9 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
-        sq1 = self.session.query(self.Code).filter_by(filename = filename)
-        return sq1[0].code_id
+        return c1.code_id
 
-
-    def _addInspector(self,
+    def addInspector(self,
                            filename,
                            relative_path,
                            description,
@@ -1304,7 +1300,6 @@ class DBUtils2(object):
             raise(DBError(IE))
         sq1 = self.session.query(self.Inspector).filter_by(filename = filename)
         return sq1[0].inspector_id
-
 
     def _closeDB(self):
         """
@@ -1700,6 +1695,20 @@ class DBUtils2(object):
         sq = self.session.query(self.Mission).filter_by(mission_name = self.mission)
         return sq[0].mission_id
 
+    def _getInstruemntID(self, name):
+        """
+        Return the instrument_id for a givem instrument 
+
+        @return: instrument_id - the instrument ID
+
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        """
+        sq = self.session.query(self.Instrument).filter_by(instrument_name = name)
+        return sq[0].instrument_id
 
     def _getMissions(self):
         sq = self.session.query(self.Mission.mission_name)
@@ -1814,7 +1823,6 @@ class DBUtils2(object):
         sq = self.session.query(self.Productprocesslink.input_product_id).filter_by(process_id = process_id)
         return [val[0] for val in sq.all()]  # the zero is because all() returns a list of one element tuples
 
-
     def _getProductFormats(self, productID=None):
         """
         Return the product formats for all the formats
@@ -1912,7 +1920,6 @@ class DBUtils2(object):
             return sq.first()[0]
         elif sq.count() > 1:
             return sq
-
 
     def _getSatelliteID(self,
                         sat_name):

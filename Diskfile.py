@@ -72,14 +72,6 @@ class DigestError(Exception):
     def __init__(self, *params):
         DBlogging.dblogger.error("DigestError raised")
 
-class NoParseMatch(Exception):
-    """Exception that is thrown when a file in incoming does not parse to any mission
-
-    `Author:` Brian Larsen, LANL
-    """
-    def __init__(self, *params):
-        DBlogging.dblogger.error("NoParseMatch raised")
-
 
 class Diskfile(object):
     """

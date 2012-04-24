@@ -77,14 +77,11 @@ class VersionTests(unittest.TestCase):
 
     def test_checkVersion(self):
         """_checkVersion should raise VersionError"""
-        ver = Version.Version(1, 0, 0)
-        try:
-            ver._Version__checkVersion()
-        except Version.VersionError:
-            self.fail()
-        self.assertRaises(Version.VersionError, Version.Version, 'string', 0, 0)
-        self.assertRaises(Version.VersionError, Version.Version, 0, 'string', 0)
-        self.assertRaises(Version.VersionError, Version.Version, 0, 0, 'string')
+        self.assertRaises(ValueError, Version.Version, 'string', 0, 0)
+        self.assertRaises(ValueError, Version.Version, 0, 'string', 0)
+        self.assertRaises(ValueError, Version.Version, 0, 0, 'string')
+
+
 
 
 if __name__ == "__main__":

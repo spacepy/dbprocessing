@@ -1,10 +1,12 @@
 #!/usr/bin/env python2.6
 
+import getopt
 import imp
 import os
 import os.path
 import shutil
 import subprocess
+import sys
 import tempfile
 import traceback
 
@@ -395,10 +397,39 @@ def processRunning(pid):
         return True
 
 
+def usage():
+    """
+    print the usage messag out
+    """
+    print "Usage: {0} [-i] [-p] [-m Test]".format("ProcessQueue")
+    print "   -i -> import"
+    print "   -p -> process"
+    print "   -m -> selects mission"
+    return
+
 if __name__ == "__main__":
     # TODO decide if we really want to run this way, works for now
+#    s = '--mission=Test --import --process'
+#    args = s.split()
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "pim:")
+    except getopt.GetoptError, err:
+        # print help information and exit:
+        print str(err) # will print something like "option -a not recognized"
+        usage()
+        sys.exit(2)
 
-    pq = ProcessQueue('Test')
+    if not '-i' in zip(*opts)[0] and not '-p' in zip(*opts)[0]:
+        usage()
+        sys.exit(2)
+
+    if '-m' in zip(*opts)[0]:
+        for o in opts:
+            if o[0] == '-m':
+                pq = ProcessQueue(o[1])
+    else:
+        pq = ProcessQueue('Test')
+
     # check currently processing
     curr_proc = pq.dbu._currentlyProcessing()
     if curr_proc:  # returns False or the PID
@@ -416,24 +447,41 @@ if __name__ == "__main__":
     # start logging as a lock
     pq.dbu._startLogging()
 
+    if '-i' in zip(*opts)[0]: # import selected
+        try:
+            pq.checkIncoming()
+            while len(pq.queue) != 0:
+                pq.importFromIncoming()
+        except:
+            #Generic top-level error handler, because otherwise people freak if
+            #they see an exception thrown.
+            print('Error in running processing chain; debugging details follow:')
+            tbstring = traceback.format_exc()
+            print tbstring
+            print('This probably indicates a programming error. Please pass '
+                  'this debugging\ninformation to the developer, along with '
+                  'any information on what was\nhappening at the time.')
+            DBlogging.dblogger.critical(tbstring)
+            pq.dbu._stopLogging('Abnormal exit on exception')
+        else:
+            pq.dbu._stopLogging('Nominal Exit')
+        pq.dbu._closeDB()
 
-    try:
-        pq.checkIncoming()
-        while len(pq.queue) != 0 or len(pq.findChildren) !=0 or len(pq.childrenQueue) != 0:
-            pq.importFromIncoming()
-            pq.findChildrenProducts()
-            pq.buildChildren()
-    except:
-        #Generic top-level error handler, because otherwise people freak if
-        #they see an exception thrown.
-        print('Error in running processing chain; debugging details follow:')
-        tbstring = traceback.format_exc()
-        print tbstring
-        print('This probably indicates a programming error. Please pass '
-              'this debugging\ninformation to the developer, along with '
-              'any information on what was\nhappening at the time.')
-        DBlogging.dblogger.critical(tbstring)
-        pq.dbu._stopLogging('Abnormal exit on exception')
-    else:
-        pq.dbu._stopLogging('Nominal Exit')
-    pq.dbu._closeDB()
+    if '-p' in zip(*opts)[0]: # process selected
+        try:
+            while len(pq.childrenQueue) != 0:
+                pq.buildChildren()
+        except:
+            #Generic top-level error handler, because otherwise people freak if
+            #they see an exception thrown.
+            print('Error in running processing chain; debugging details follow:')
+            tbstring = traceback.format_exc()
+            print tbstring
+            print('This probably indicates a programming error. Please pass '
+                  'this debugging\ninformation to the developer, along with '
+                  'any information on what was\nhappening at the time.')
+            DBlogging.dblogger.critical(tbstring)
+            pq.dbu._stopLogging('Abnormal exit on exception')
+        else:
+            pq.dbu._stopLogging('Nominal Exit')
+        pq.dbu._closeDB()
