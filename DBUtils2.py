@@ -1745,7 +1745,6 @@ class DBUtils2(object):
 
         @return: mission_id - the current mission ID
 
-
         @author: Brian Larsen
         @organization: Los Alamos National Lab
         @contact: balarsen@lanl.gov
@@ -1759,6 +1758,35 @@ class DBUtils2(object):
         sq = self.session.query(self.Mission).filter_by(mission_name = self.mission)
         return sq[0].mission_id
 
+    def _getMissionName(self, id=None):
+        """
+        Return the current mission ID
+
+        @return: mission_id - the current mission ID
+
+        @author: Brian Larsen
+        @organization: Los Alamos National Lab
+        @contact: balarsen@lanl.gov
+
+        @version: V1: 6-Jul-2010 (BAL)
+
+        >>> dbp = DBProcessing()
+        >>> dbp._getMissionID()
+        19
+        """
+        if id is None:
+            sq = self.session.query(self.Mission).filter_by(mission_name = self.mission)
+            return sq[0].mission_name
+        else:
+            if not isinstance(id, (tuple, list)):
+                id = [id]
+            i_out = []
+            for i in id:
+                sq = self.session.query(self.Mission.mission_name).filter_by(mission_id = i)
+                tmp = [v[0] for v in sq]
+                i_out.extend(tmp)
+            return i_out
+                
     def _getInstruemntID(self, name):
         """
         Return the instrument_id for a givem instrument
