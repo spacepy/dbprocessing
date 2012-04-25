@@ -859,7 +859,6 @@ class DBUtils2(object):
             raise(DBInputError("Mission name has to  a string"))
         if not isinstance(rootdir, str):
             raise(DBInputError("Rootdir must be a string"))
-
         try:
             m1 = self.Mission()
         except AttributeError:
@@ -873,6 +872,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return m1.mission_id
 
     def addSatellite(self,
                     satellite_name,):
