@@ -1027,6 +1027,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return ppl1.input_product_id, ppl1.process_id
 
     def addFilecodelink(self,
                      resulting_file_id,
@@ -1117,6 +1118,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return ipl1.instrument_id, ipl1.product_id
 
     def addInstrument(self,
                     instrument_name,
