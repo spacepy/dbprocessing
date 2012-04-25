@@ -9,7 +9,7 @@ import numpy as np
 try: # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
 except ImportError:
-    from sqlalchemy.exc import IntegrityError    
+    from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import asc #, desc
 import DBlogging
 import socket # to get the local hostname
@@ -717,12 +717,12 @@ class DBUtils2(object):
     def processqueuePush(self, fileid):
         """
         push a file onto the process queue (onto the right)
-        
+
         Parameters
         ==========
         fileid : (int, string)
             the file id (or name to put on the process queue)
-        
+
         Returns
         =======
         file_id : int
@@ -751,8 +751,8 @@ class DBUtils2(object):
         Other Parameters
         ================
         index : int
-            the index in the queue to pop               
-               
+            the index in the queue to pop
+
         Returns
         =======
         file_id : int
@@ -762,7 +762,7 @@ class DBUtils2(object):
         if num == 0:
             return None
         if index >= num:
-            return None            
+            return None
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
@@ -779,7 +779,7 @@ class DBUtils2(object):
     def processqueueGet(self):
         """
         get the file at the head of the queue (from the left)
-               
+
         Returns
         =======
         file_id : int
@@ -792,7 +792,7 @@ class DBUtils2(object):
             fid = self.session.query(self.Processqueue).limit(1)
             fid_ret = fid[0].file_id
             return fid_ret
-       
+
     def _purgeFileFromDB(self, filename=None):
         """
         removes a file from the DB
@@ -932,7 +932,7 @@ class DBUtils2(object):
             raise(DBInputError("extra_params muct be string or None"))
         if not isinstance(super_process_id, (int, long)) and super_process_id != None:
             raise(DBInputError("super_process_id must be int or None"))
-            
+
         try:
             p1 = self.Process()
         except AttributeError:
@@ -954,7 +954,7 @@ class DBUtils2(object):
                     instrument_id,
                     relative_path,
                     super_product_id,
-                    format, 
+                    format,
                     level):
         """ add a product to the database
 
@@ -1057,7 +1057,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
-        return fcl1.resulting_file, fcl1.source_code 
+        return fcl1.resulting_file, fcl1.source_code
 
     def addFilefilelink(self,
                      source_file,
@@ -1168,7 +1168,7 @@ class DBUtils2(object):
                    active_code,
                    date_written,
                    output_interface_version,
-                   newest_version, 
+                   newest_version,
                    arguments=None):
         """
         Add an executable code to the DB
@@ -1243,7 +1243,7 @@ class DBUtils2(object):
                    active_code,
                    date_written,
                    output_interface_version,
-                   newest_version, 
+                   newest_version,
                    product):
         """
         Add an executable code to the DB
@@ -1661,8 +1661,76 @@ class DBUtils2(object):
             root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
         except IndexError:
             return None
-
         return os.path.join(root_dir, rel_path, filename)
+
+    def getFileMission(self, filename):
+        """
+        given an a file name or a file ID return the mission(s) that file is
+        associated with
+        """
+        try:
+            f_id = int(filename)  # if a number
+        except ValueError:
+            f_id = self._getFileID(filename) # is a name
+        try:
+            product_id = self.session.query(self.File.product_id).filter_by(file_id = f_id)[0][0]
+        except IndexError:
+            return None
+        # get all the instruments
+        inst_id = self.getInstrumentFromProduct(product_id)
+        # get all the satellites
+        sat_id = self.getInstrumentSatellite(inst_id)
+        # get the missions
+        mission_id = self.getSatelliteMission(sat_id)
+        return mission_id
+
+    def getSatelliteMission(self, sat_name):
+        """
+        given a satellite or satellit id return the mission
+        """
+        if not isinstance(sat_name, (tuple, list)):
+            sat_name = [sat_name]
+        i_id = []
+        for val in sat_name:
+            try:
+                i_id.append(int(val))  # if a number
+            except ValueError:
+                i_id.append(self._getSatelliteID(val)) # is a name
+
+        m_id = []
+        for v in i_id:
+            sq = self.session.query(self.Satellite.mission_id).filter_by(satellite_id = v).all()
+            tmp = [v[0] for v in sq]
+            m_id.extend(tmp)
+        return m_id
+
+    def getInstrumentSatellite(self, instrument_name):
+        """
+        given an instrument name or ID return the satellite it is on
+        """
+        if not isinstance(instrument_name, (tuple, list)):
+            instrument_name = [instrument_name]
+        i_id = []
+        for val in instrument_name:
+            try:
+                i_id.append(int(val))  # if a number
+            except ValueError:
+                i_id.append(self._getInstruemntID(val)) # is a name
+
+        sat_id = []
+        for v in i_id:
+            sq = self.session.query(self.Instrument.satellite_id).filter_by(instrument_id = v).all()
+            tmp = [v[0] for v in sq]
+            sat_id.extend(tmp)
+        return sat_id
+
+    def getInstrumentFromProduct(self, product_id):
+        """
+        given a product ID get the instrument(s) id associated with it
+        """
+        sq = self.session.query(self.Instrumentproductlink.instrument_id).filter_by(product_id = product_id).all()
+        inst_id = [v[0] for v in sq]
+        return inst_id
 
     def getProductLevel(self, productID):
         """
@@ -1693,7 +1761,7 @@ class DBUtils2(object):
 
     def _getInstruemntID(self, name):
         """
-        Return the instrument_id for a givem instrument 
+        Return the instrument_id for a givem instrument
 
         @return: instrument_id - the instrument ID
 
@@ -1874,7 +1942,7 @@ class DBUtils2(object):
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
         basedir = self._getMissionDirectory()
         retval = [(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments) for ans in sq]
-        return retval            
+        return retval
 
     def inspectorToProduct(self, inspector_name):
         """
@@ -1885,8 +1953,8 @@ class DBUtils2(object):
         except IndexError:
             product_id = None
         return product_id
-        
-        
+
+
 
     def _getProductID(self,
                      product_name):
@@ -1993,7 +2061,7 @@ class DBUtils2(object):
             except IndexError:
                 continue
         return ans
-        
+
     def getCodeArgs(self, code_id):
         """
         Given a code_id list return the arguments to the code
@@ -2061,12 +2129,6 @@ class DBUtils2(object):
         path = os.path.join(basedir, 'incoming/')
         return path
 
-    def getFileMission(self):
-        """
-        return the mission name from a file_id
-        """
-        raise(NotImplemented("Not yet implemented"))
-
     def getErrorPath(self):
         """
         return the erro path for the current mission
@@ -2085,7 +2147,7 @@ class DBUtils2(object):
         """
         Parse a filename from incoming (or anywhere) and return a file object populated with the infomation
 
-        @param filename: list of filenames to parse 
+        @param filename: list of filenames to parse
         @type filename: list
         @return: file object populated from the filename
         @rtype: DBUtils2.File
