@@ -676,6 +676,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return pf1.logging_file_id
 
     def _checkDiskForFile(self, fix=False):
         """
@@ -836,8 +837,6 @@ class DBUtils2(object):
             self.session.rollback()
             raise(DBError(IE))
         return True  # need some error checking here
-
-
 
     def addMission(self,
                     mission_name,
@@ -1058,6 +1057,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return fcl1.resulting_file, fcl1.source_code 
 
     def addFilefilelink(self,
                      source_file,
@@ -1088,6 +1088,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
+        return ffl1.source_file, ffl1.resulting_file
 
     def addInstrumentproductlink(self,
                      instrument_id,
@@ -1157,18 +1158,18 @@ class DBUtils2(object):
         return i1.instrument_id
 
     def addCode(self,
-                           filename,
-                           relative_path,
-                           code_start_date,
-                           code_stop_date,
-                           code_description,
-                           process_id,
-                           version,
-                           active_code,
-                           date_written,
-                           output_interface_version,
-                           newest_version, 
-                           arguments=None):
+                   filename,
+                   relative_path,
+                   code_start_date,
+                   code_stop_date,
+                   code_description,
+                   process_id,
+                   version,
+                   active_code,
+                   date_written,
+                   output_interface_version,
+                   newest_version, 
+                   arguments=None):
         """
         Add an executable code to the DB
 
@@ -1205,8 +1206,6 @@ class DBUtils2(object):
         @version: V1: 18-Jun-2010 (BAL)
         @version: V2: 17-Sep-2010 (BAL - updated to new DB format)
         @version: V3: 04-Oct-2010 (BAL - added return of code_id)
-
-
         """
         try:
             c1 = self.Code()
@@ -1237,15 +1236,15 @@ class DBUtils2(object):
         return c1.code_id
 
     def addInspector(self,
-                           filename,
-                           relative_path,
-                           description,
-                           version,
-                           active_code,
-                           date_written,
-                           output_interface_version,
-                           newest_version, 
-                           product):
+                   filename,
+                   relative_path,
+                   description,
+                   version,
+                   active_code,
+                   date_written,
+                   output_interface_version,
+                   newest_version, 
+                   product):
         """
         Add an executable code to the DB
 
@@ -1300,8 +1299,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
-        sq1 = self.session.query(self.Inspector).filter_by(filename = filename)
-        return sq1[0].inspector_id
+        return c1.inspector_id
 
     def _closeDB(self):
         """
@@ -1330,24 +1328,24 @@ class DBUtils2(object):
 
 
     def _addFile(self,
-                        filename = None,
-                        data_level = None,
-                        version = None,
-                        file_create_date = None,
-                        exists_on_disk = None,
-                        utc_file_date = None,
-                        utc_start_time = None,
-                        utc_stop_time = None,
-                        check_date = None,
-                        verbose_provenance = None,
-                        quality_comment = None,
-                        caveats = None,
-                        met_start_time = None,
-                        met_stop_time = None,
-                        release_number = None,
-                        product_id = None,
-                        newest_version = None,
-                        md5sum = None):
+                filename = None,
+                data_level = None,
+                version = None,
+                file_create_date = None,
+                exists_on_disk = None,
+                utc_file_date = None,
+                utc_start_time = None,
+                utc_stop_time = None,
+                check_date = None,
+                verbose_provenance = None,
+                quality_comment = None,
+                caveats = None,
+                met_start_time = None,
+                met_stop_time = None,
+                release_number = None,
+                product_id = None,
+                newest_version = None,
+                md5sum = None):
         """
         add a datafile to the database
 
@@ -1430,9 +1428,7 @@ class DBUtils2(object):
         except IntegrityError as IE:
             self.session.rollback()
             raise(DBError(IE))
-        sq1 = self.session.query(self.File).filter_by(filename = filename)
-        return sq1[0].file_id
-
+        return d1.file_id
 
     def _codeIsActive(self, ec_id, date):
         """
@@ -1645,8 +1641,6 @@ class DBUtils2(object):
             self.session.rollback()
             raise(DBError(IE))
 
-
-
     def _getFileFullPath(self, filename):
         """
         return the full path to a file given the name or id
@@ -1739,7 +1733,6 @@ class DBUtils2(object):
         except IndexError: # no file_id found
             raise(DBError("No filename %s found in the DB" % (filename)))
 
-
     def _getCodeID(self, codename):
         """
         Return the codeID for the input code
@@ -1763,7 +1756,6 @@ class DBUtils2(object):
         except IndexError: # no file_id found
             raise(DBError("No filename %s found in the DB" % (filename)))
 
-
     def _getFilename(self, file_id):
         """
         Return the filename for the input file_id
@@ -1783,7 +1775,6 @@ class DBUtils2(object):
         """
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].filename
-
 
     def _getFileUTCfileDate(self, file_id):
         """
