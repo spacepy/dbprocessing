@@ -419,10 +419,14 @@ if __name__ == "__main__":
         usage()
         sys.exit(2)
 
-    if not '-i' in zip(*opts)[0] and not '-p' in zip(*opts)[0]:
+    try:
+        if not '-i' in zip(*opts)[0] and not '-p' in zip(*opts)[0]:
+            usage()
+            sys.exit(2)
+    except IndexError:
         usage()
         sys.exit(2)
-
+        
     if '-m' in zip(*opts)[0]:
         for o in opts:
             if o[0] == '-m':
