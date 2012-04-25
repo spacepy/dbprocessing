@@ -139,6 +139,7 @@ class dbprocessing_db(object):
                           schema.ForeignKey('process.process_id'), nullable=False),
             schema.Column('input_product_id', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False),
+            schema.Column('optional', types.Boolean, nullable=False),
             schema.PrimaryKeyConstraint('process_id', 'input_product_id' )
         )
 
