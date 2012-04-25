@@ -744,6 +744,12 @@ class DBUtils2(object):
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
 
+    def processqueueLen(self):
+        """
+        return the number of files in the process queue
+        """
+        return self.session.query(self.Processqueue).count()
+    
     def processqueuePop(self, index=0):
         """
         pop a file off the process queue (from the left)
@@ -758,10 +764,10 @@ class DBUtils2(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        num = self.session.query(self.Processqueue).count()
+        num = self.processqueueLen()
         if num == 0:
             return None
-        if index >= num:
+        elif index >= num:
             return None
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
@@ -776,7 +782,7 @@ class DBUtils2(object):
                     raise(DBError(IE))
             return fid_ret
 
-    def processqueueGet(self):
+    def processqueueGet(self, index=0):
         """
         get the file at the head of the queue (from the left)
 
@@ -788,9 +794,15 @@ class DBUtils2(object):
         num = self.session.query(self.Processqueue).count()
         if num == 0:
             return None
+        elif index >= num:
+            return None
         else:
-            fid = self.session.query(self.Processqueue).limit(1)
-            fid_ret = fid[0].file_id
+            for ii, fid in enumerate(self.session.query(self.Processqueue)):
+                if ii == index:
+                    fid_ret = fid.file_id
+                    if self._getMissionName(self.getFileMission(fid_ret)) != self.mission: # file does not below to this mission
+                        fid_ret = self.processqueueGet(ii+1)
+                    break # there can be only one
             return fid_ret
 
     def _purgeFileFromDB(self, filename=None):
@@ -999,7 +1011,8 @@ class DBUtils2(object):
 
     def addproductprocesslink(self,
                     input_product_id,
-                    process_id):
+                    process_id, 
+                    optional):
         """ add a product process link to the database
 
         @param input_product_id: id of the produc to link
@@ -1013,13 +1026,15 @@ class DBUtils2(object):
 
         @version: V1: 17-Sep-2010 (BAL)
         """
-
+        if not isinstance(optional, bool):
+            raise(ValueError("optional must be a boolean"))
         try:
             ppl1 = self.Productprocesslink()
         except AttributeError:
             raise(DBError("Class Productprocesslink not found was it created?"))
         ppl1.input_product_id = input_product_id
         ppl1.process_id = process_id
+        ppl1.optional = optional
         self.session.add(ppl1)
         try:
             self.session.commit()
