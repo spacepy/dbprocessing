@@ -69,6 +69,7 @@ class inspector(object):
         DBlogging.dblogger.info("Entered inspector {0}".format(self.code_name))
         self.dbu = dbu # give us access to DBUtils2
         self.filename = filename
+        self.basename = os.path.basename(self.filename)
         self.diskfile = Diskfile.Diskfile(self.filename, self.dbu)
         if self.inspect(kwargs) is not None:  # mandates the diskfile is not full and nota match
             self._populate()
