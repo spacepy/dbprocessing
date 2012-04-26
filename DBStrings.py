@@ -31,7 +31,7 @@ class DBFormatter(string.Formatter):
            Also, it might make more sense to let the exception throw if fields
            aren't filled.
     """
-    
+
     SPECIAL_FIELDS = {
         'Y': ('{Y:04d}', '(19|2\d)\d\d'),
         'm': ('{m:02d}', '(0\d|1[0-2])'),
@@ -47,6 +47,12 @@ class DBFormatter(string.Formatter):
         'QACODE': ('{QACODE}', 'ok|ignore|problem'),
         'VERSION': ('{VERSION}', '\d\.\d\.\d'),
         'DATE': ('{DATE}', '(19|2\d)\d\d(0\d|1[0-2])[0-3]\d'),
+        '??': ( '{??}', '..' ),
+        '???': ( '{???}', '...' ),
+        '????': ( '{????}', '....' ),
+        'nn': ( '{nn}', '\d\d' ),
+        'nnn': ( '{nnn}', '\d\d\d' ),
+        'nnnn': ( '{nnnn}', '\d\d\d' ),
         }
 
     def format(self, format_string, *args, **kwargs):
@@ -111,7 +117,7 @@ class DBFormatter(string.Formatter):
         If the format spec/conversion is not provided or matches that in
         L{SPECIAL_FIELDS}, and the field is not found in L{kwargs}, replace
         with the regular expression from L{SPECIAL_FIELDS}.
-        
+
         Everything else is returned verbatim.
 
         @param format_string: the format string to convert
