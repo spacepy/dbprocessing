@@ -3,15 +3,10 @@
 
 import datetime
 import hashlib
-import imp
 import os
 import os.path
-import re
-
-from spacepy import pycdf
 
 import DBlogging
-import DBUtils2
 import Version
 
 __version__ = '2.0.3'
@@ -136,13 +131,13 @@ class Diskfile(object):
         self.params['filecodelink'] = None
         self.params['newest_version'] = None
 
-        self.mission = None  # keeps track if we found a parsematch
-
         # this keeps opening connecitons
         #dbu = DBUtils2.DBUtils2('Test')
         #dbu._openDB()
         #dbu._createTableObjects()
         self.dbu = dbu
+        self.mission = self.dbu.mission  # keeps track if we found a parsematch
+
 
     def __repr__(self):
         return "<Diskfile.Diskfile object: {0}>".format(self.infile)
@@ -177,6 +172,7 @@ class Diskfile(object):
 
         filename = self.dbu._getProductFormats(productID)[0] # just for the format
         mission, satellite, instrument, product, product_id = self.dbu._getProductNames(productID)
+        print 'mission', mission, 'product_id', product_id
 
         if qacode == None:
             qacode = 'ok'

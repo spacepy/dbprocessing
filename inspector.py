@@ -66,12 +66,12 @@ class inspector(object):
     __metaclass__ = EphemeralCallable(ABCMeta)
 
     def __init__(self, filename, dbu, **kwargs):
-        DBlogging.dblogger.info("Entered inspector {0}".format(self.code_name))
+        DBlogging.dblogger.info("Entered inspector {0} with kwargs: {1}".format(self.code_name, kwargs))
         self.dbu = dbu # give us access to DBUtils2
         self.filename = filename
         self.basename = os.path.basename(self.filename)
         self.diskfile = Diskfile.Diskfile(self.filename, self.dbu)
-        if self.inspect(kwargs) is not None:  # mandates the diskfile is not full and nota match
+        if self.inspect(kwargs) is not None:  # mandates the diskfile is not full and not a match
             self._populate()
 
     @abstractmethod
