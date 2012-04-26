@@ -51,7 +51,13 @@ class DBUtils2(object):
         fmtr = DBStrings.DBFormatter()
         self.format = fmtr.format
         self.re = fmtr.re
-
+        
+    def __del__(self):
+        """
+        try and clean up a little bit
+        """
+        self._closeDB()
+        
     def __repr__(self):
         """
         @summary: Print out something usefule when one prints the class instance
@@ -148,21 +154,19 @@ class DBUtils2(object):
             return
         try:
 
-            if self.mission == 'Test':
+            if self.mission in  ['Test', 'rbsp']:
                 engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
-                DBlogging.dblogger.info("Database Connection opened")
 
                 # this holds the metadata, tables names, attributes, etc
             elif self.mission == 'Polar':
                 engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
-                DBlogging.dblogger.info("Database Connection opened")
 
             elif self.mission == 'unittest':
                 engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=False)
-                DBlogging.dblogger.info("Database Connection opened")
 
+            DBlogging.dblogger.info("Database Connection opened: {0}".format(str(engine)))
 
-        except:
+        except DBError: 
             (t, v, tb) = sys.exc_info()
             raise(DBError('Error creating engine: ' + str(v)))
         try:
@@ -791,18 +795,21 @@ class DBUtils2(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        num = self.session.query(self.Processqueue).count()
+        num = self.processqueueLen()
         if num == 0:
+            DBlogging.dblogger.info( "processqueueGet() returned: None (empty queue)")
             return None
         elif index >= num:
+            DBlogging.dblogger.info( "processqueueGet() returned: None (requested index larger than size)")
             return None
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
                     fid_ret = fid.file_id
-                    if self._getMissionName(self.getFileMission(fid_ret)) != self.mission: # file does not below to this mission
+                    if self.mission not in self._getMissionName(self.getFileMission(fid_ret)): # file does not below to this mission
                         fid_ret = self.processqueueGet(ii+1)
                     break # there can be only one
+            DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
 
     def _purgeFileFromDB(self, filename=None):
@@ -1678,10 +1685,9 @@ class DBUtils2(object):
             return None
         return os.path.join(root_dir, rel_path, filename)
 
-    def getFileMission(self, filename):
+    def getFileProduct(self, filename):
         """
-        given an a file name or a file ID return the mission(s) that file is
-        associated with
+        given a filename or file_id return the product id it belongs to
         """
         try:
             f_id = int(filename)  # if a number
@@ -1689,8 +1695,16 @@ class DBUtils2(object):
             f_id = self._getFileID(filename) # is a name
         try:
             product_id = self.session.query(self.File.product_id).filter_by(file_id = f_id)[0][0]
+            return product_id
         except IndexError:
-            return None
+            return None                    
+
+    def getFileMission(self, filename):
+        """
+        given an a file name or a file ID return the mission(s) that file is
+        associated with
+        """
+        product_id = self.getFileProduct(filename)
         # get all the instruments
         inst_id = self.getInstrumentFromProduct(product_id)
         # get all the satellites
@@ -2080,8 +2094,8 @@ class DBUtils2(object):
 
         ans = []
         for val in outProd:
-            sq1 =  self.session.query(self.dbu.Process.process_id).filter_by(output_product = val)  # should only have one value
-            ans.extend( sq1[0] )
+            sq1 =  self.session.query(self.Process.process_id).filter_by(output_product = val).all()  # should only have one value
+            ans.extend( sq1 )
         return ans
 
     def getCodeFromProcess(self, proc_id):
