@@ -1266,7 +1266,8 @@ class DBUtils2(object):
                    date_written,
                    output_interface_version,
                    newest_version,
-                   product):
+                   product, 
+                   arguments=None):
         """
         Add an executable code to the DB
 
@@ -1314,6 +1315,7 @@ class DBUtils2(object):
         c1.date_written = date_written
         c1.output_interface_version = output_interface_version
         c1.newest_version = newest_version
+        c1.arguments = arguments
 
         self.session.add(c1)
         try:
@@ -2170,6 +2172,7 @@ class DBUtils2(object):
         @version: V1: 20-Sep-2010 (BAL)
         """
         path = self.getIncomingPath()
+        DBlogging.dblogger.debug("Looking for files in {0}".format(path))
         files = glob.glob(os.path.join(path, '*'))
         return files
 
