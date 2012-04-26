@@ -44,7 +44,8 @@ class ProcessQueue(object):
     def __init__(self,
                  mission):
 
-        dbu = DBUtils2.DBUtils2(mission)
+        self.mission = mission
+        dbu = DBUtils2.DBUtils2(self.mission)
         dbu._openDB()
         dbu._createTableObjects()
         self.tempdir = None
@@ -136,7 +137,9 @@ class ProcessQueue(object):
         #TODO do I realy want to remove old version:?
             os.remove( os.path.join(path, os.path.basename(fname) ) )
             DBlogging.dblogger.warning("removed {0}, as it was under a copy".format(os.path.join(path, os.path.basename(fname) )))
-        shutil.move(fname, path + os.sep)
+        if path[-1] != os.sep:
+            path = path+os.sep
+        shutil.move(fname, path)
         DBlogging.dblogger.warning("**ERROR** {0} moved to {1}".format(fname, path))
 
     def moveToIncoming(self, fname):
@@ -177,24 +180,30 @@ class ProcessQueue(object):
                 self.moveToError(self.current_file)
                 continue
 
-            if df.mission[0] == self.dbu.mission:
-                # if the file is the wrong mission skip it
-                dbf = DBfile.DBfile(df, self.dbu)
-                try:
-                    f_id = dbf.addFileToDB()
-                    DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
-                except (DBUtils2.DBInputError, DBUtils2.DBError) as errmsg:
-                    DBlogging.dblogger.warning("Except adding file to db so" + \
-                                               " moving to error: %s" % (errmsg))
-                    self.moveToError(val)
-                    continue
-                # move the file to the its correct home
-                dbf.move()
-                # add to processqueue for later processing
-                self.dbu.processqueuePush(f_id)
+            # if the file is the wrong mission skip it
+            dbf = DBfile.DBfile(df, self.dbu)
+            try:
+                f_id = dbf.addFileToDB()
+                DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
+            except (DBUtils2.DBInputError, DBUtils2.DBError) as errmsg:
+                DBlogging.dblogger.warning("Except adding file to db so" + \
+                                           " moving to error: %s" % (errmsg))
+                self.moveToError(val)
+                continue
+            # move the file to the its correct home
+            dbf.move()
+            # add to processqueue for later processing
+            self.dbu.processqueuePush(f_id)
 
-            else:  # wrong mission for this processing
-                DBlogging.dblogger.info("File is not the active mission ({1}), skipping: {0}".format(df.filename, df.mission))
+    def _strargs_to_args(self, strargs):
+        """
+        read in the arguments string forn te db and change to a dict
+        """
+        kwargs = {}
+        for val in strargs.split():
+            tmp = val.split('=')            
+            kwargs[tmp[0]] = tmp[1]
+        return kwargs
 
     def figureProduct(self):
         """
@@ -209,7 +218,8 @@ class ProcessQueue(object):
                 DBlogging.dblogger.error("Inspector: {0} not found: {1}".format(code, msg))
                 continue
             if arg is not None:
-                df = inspect.Inspector(self.current_file, self.dbu,  **arg)
+                kwargs = self._strargs_to_args(arg)
+                df = inspect.Inspector(self.current_file, self.dbu,  **kwargs)
             else:
                 df = inspect.Inspector(self.current_file, self.dbu, )
             if df is not None:
@@ -225,7 +235,7 @@ class ProcessQueue(object):
 
         return claimed[0]  # return the diskfile
 
-    def buildChildren(self):
+    def buildChildren(self, file_id):
         """
         given the values in self.childrenQueue build them is possible
 
@@ -236,141 +246,126 @@ class ProcessQueue(object):
         @version: V1: 02-Dec-2010 (BAL)
         """
         # TODO maybe this should be broken up
-        DBlogging.dblogger.debug("Entered buildChildren:")
-        for val in self.childrenQueue.popleftiter():
-            # val is a dbfile, product id tuple
-            DBlogging.dblogger.debug("popleft %s from self.childrenQueue" % \
-                                     (str(val)))
+        DBlogging.dblogger.debug("Entered buildChildren: file_id: {0}".format(file_id))
 
-            # check to see if there is a process defined on this output product
-            proc_id = self.getProcessFromOutputProduct([val[1]])[0]
-            if proc_id == []:  #TODO should this be a None?
-                continue # there is no process defined
+        
+        # check to see if there is a process defined on this output product
+        proc_id = self.dbu.getProcessFromOutputProduct([file_id])
+        print 'proc_id', proc_id
+        proc_id = proc_id[0]
 
+        # since we have a process do we have a code that does it?
+        code_id = self.getCodeFromProcess([proc_id])
 
-            # since we have a process do we have a code that does it?
-            code_id = self.getCodeFromProcess([proc_id])
-            try:
-                code_id = code_id[0]
-            except IndexError:
-                continue  # The code_id was []
-            # figure out the codes name and path
-            codep = self.getCodePath([code_id])[0]
+        # figure out the codes name and path
+        codep = self.getCodePath([code_id])[0]
 
-            sq1 = self.dbu.session.query(self.dbu.Product).filter_by(product_id = val[1])[0]
-            product = sq1.product_id
-            root_path = self.dbu.session.query(self.dbu.Mission.rootdir).filter_by(mission_name = self.dbu.mission)[0][0]  # should only have one value
+        sq1 = self.dbu.session.query(self.dbu.Product).filter_by(product_id = val[1])[0]
+        product = sq1.product_id
+        root_path = self.dbu.session.query(self.dbu.Mission.rootdir).filter_by(mission_name = self.dbu.mission)[0][0]  # should only have one value
 
-            date = val[0].diskfile.params['utc_file_date']
-            version = val[0].diskfile.params['version']
-            self.tempdir = tempfile.mkdtemp('_dbprocessing')
-            DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
+        date = val[0].diskfile.params['utc_file_date']
+        version = val[0].diskfile.params['version']
+        self.tempdir = tempfile.mkdtemp('_dbprocessing')
+        DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
 
-            out_path = os.path.join(self.tempdir, val[0].diskfile.makeProductFilename(product, date, version))
-            # now we have everything it takes to build the file
+        out_path = os.path.join(self.tempdir, val[0].diskfile.makeProductFilename(product, date, version))
+        # now we have everything it takes to build the file
 
-            arg_subs = {'datetime': date,
-                        'BASEDIR': root_path,
-                        'OUTPATH': out_path,
-                        }
-            # ####### get all the input_product_id and filenames
-            #    make sure they all exist before we build the child.
-            # from the process get all the input_product_id
-            products = self.dbu._getInputProductID(proc_id)
-            # query for the files that match the products for the right date
-            # TODO this is another place that is one day to one day limited
-            try:
-                for pval in products:
-                    sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
-                    if sq1.count() == 0:
-                        DBlogging.dblogger.debug("Skipping file since " + \
-                                                 "requirement not available" + \
-                                                 "(sq1.count)")
-                        raise(ForException())
-                    DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
-                    # get an in_path for exe
-                    in_path = self.dbu._getFileFullPath(val[0].diskfile.makeProductFilename(pval, date, version))
-                    arg_subs['INPATH_{:d}'.format(pval)] = in_path
-                    if in_path == None:
-                        DBlogging.dblogger.debug("Skipping file since " + \
-                                                 "requirement not available" + \
-                                                 "(in_path)")
-                        raise(ForException())
-            except ForException:
-                self.rm_tempdir()
-                continue
-
-            args = self.getCodeArgs([code_id])[0]
-            # TODO fix this
-            cmd = codep + ' ' + self.dbu.format(args, **arg_subs)
-            cmd = cmd.split(' ')
-            DBlogging.dblogger.debug('Executing: %s' % ' '.join(cmd))
-            print cmd
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            if proc.returncode != 0 and proc.returncode is not None:
-                DBlogging.dblogger.error("Non-zero return code ({1}) from: {0}".format(cmd[0], proc.returncode))
-            (stdoutdata, stderrdata) = proc.communicate()
-            if stderrdata != '':
-                DBlogging.dblogger.error("Code {0} stderr messages\n{1}".format(cmd[0], stderrdata))
-            if stdoutdata != '':
-                DBlogging.dblogger.debug("Code {0} stdout messages\n{1}".format(cmd[0], stdoutdata))
-
-
-            self.moveToIncoming(out_path)
-            1/0
-            inc_path = self.dbu.getIncomingPath()
-            self.importFile(os.path.join(inc_path, os.path.sbaename(out_path)))
-            1/0
-            # done with the temp file, clean it up
+        arg_subs = {'datetime': date,
+                    'BASEDIR': root_path,
+                    'OUTPATH': out_path,
+                    }
+        # ####### get all the input_product_id and filenames
+        #    make sure they all exist before we build the child.
+        # from the process get all the input_product_id
+        products = self.dbu._getInputProductID(proc_id)
+        # query for the files that match the products for the right date
+        # TODO this is another place that is one day to one day limited
+        try:
+            for pval in products:
+                sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
+                if sq1.count() == 0:
+                    DBlogging.dblogger.debug("Skipping file since " + \
+                                             "requirement not available" + \
+                                             "(sq1.count)")
+                    raise(ForException())
+                DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
+                # get an in_path for exe
+                in_path = self.dbu._getFileFullPath(val[0].diskfile.makeProductFilename(pval, date, version))
+                arg_subs['INPATH_{:d}'.format(pval)] = in_path
+                if in_path == None:
+                    DBlogging.dblogger.debug("Skipping file since " + \
+                                             "requirement not available" + \
+                                             "(in_path)")
+                    raise(ForException())
+        except ForException:
             self.rm_tempdir()
+
+        args = self.getCodeArgs([code_id])[0]
+        # TODO fix this
+        cmd = codep + ' ' + self.dbu.format(args, **arg_subs)
+        cmd = cmd.split(' ')
+        DBlogging.dblogger.debug('Executing: %s' % ' '.join(cmd))
+        print cmd
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if proc.returncode != 0 and proc.returncode is not None:
+            DBlogging.dblogger.error("Non-zero return code ({1}) from: {0}".format(cmd[0], proc.returncode))
+        (stdoutdata, stderrdata) = proc.communicate()
+        if stderrdata != '':
+            DBlogging.dblogger.error("Code {0} stderr messages\n{1}".format(cmd[0], stderrdata))
+        if stdoutdata != '':
+            DBlogging.dblogger.debug("Code {0} stdout messages\n{1}".format(cmd[0], stdoutdata))
+
+
+        self.moveToIncoming(out_path)
+        1/0
+        inc_path = self.dbu.getIncomingPath()
+        self.importFile(os.path.join(inc_path, os.path.sbaename(out_path)))
+        1/0
+        # done with the temp file, clean it up
+        self.rm_tempdir()
 #            self.importFromIncoming()  # we added something it is time to import it
 
 
-            # we have all the info needed to add the links
-            # filefilelink is out_path in_path
-            try:
-                self.dbu._addFilefilelink(self.dbu._getFileID(os.path.basename(val[0].diskfile.filename)),
-                                          self.dbu._getFileID(os.path.basename(out_path)) )
-            except DBUtils2.DBError:
-                DBlogging.dblogger.error("Could not create file_file_link due to error with created file: {0}".format(out_path))
-            # TODO, think here if this is really ok to do
-            try:
-                self.dbu._addFilecodelink(self.dbu._getFileID(os.path.basename(out_path)),
-                                          self.dbu._getCodeID(os.path.basename(codep)) )
-            except DBUtils2.DBError:
-                DBlogging.dblogger.error("Could not create file_code_link due to error with created file: {0}".format(out_path))
+        # we have all the info needed to add the links
+        # filefilelink is out_path in_path
+        try:
+            self.dbu._addFilefilelink(self.dbu._getFileID(os.path.basename(val[0].diskfile.filename)),
+                                      self.dbu._getFileID(os.path.basename(out_path)) )
+        except DBUtils2.DBError:
+            DBlogging.dblogger.error("Could not create file_file_link due to error with created file: {0}".format(out_path))
+        # TODO, think here if this is really ok to do
+        try:
+            self.dbu._addFilecodelink(self.dbu._getFileID(os.path.basename(out_path)),
+                                      self.dbu._getCodeID(os.path.basename(codep)) )
+        except DBUtils2.DBError:
+            DBlogging.dblogger.error("Could not create file_code_link due to error with created file: {0}".format(out_path))
 
-    def findChildrenProducts(self):
+    def findChildrenProducts(self, file_id):
         """
-        from the queue self.findChildren go though and find all the products of
-        the children
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
+        given a file ID return all the products that use this as input
         """
         # childern is a sub sub query
         # select * from product where product_id = (SELECT output_product from
         #   process where process_id
         #  = (select product_id from productprocesslink where product_id = 16));
-        DBlogging.dblogger.debug( "Entered findChildrenProducts()" )
+        DBlogging.dblogger.debug( "Entered findChildrenProducts():  file_id: {0}".format(file_id) )
+        product_id = self.dbu.getFileProduct(file_id)
 
-        for val in self.findChildren.popleftiter():
-            DBlogging.dblogger.debug("popleftiter %s from self.findChildren" % \
-                                     (str(val)))
+        # get all the process ids that have this product as an input
+        proc_ids = self.dbu.session.query(self.dbu.Productprocesslink.process_id).filter_by(input_product_id = product_id)
 
-            proc_ids = self.dbu.session.query(self.dbu.Productprocesslink.process_id).filter_by(input_product_id = val.diskfile.params['product_id'])
-
-            for pval in proc_ids:
-                sq2 = self.dbu.session.query(self.dbu.Process.output_product).filter_by(process_id = pval[0]).subquery()
-
-                sq_ans = self.dbu.session.query(self.dbu.Product).filter_by(product_id = sq2)
-                for val2 in sq_ans:
-                    self.childrenQueue.append( (val, val2.product_id) )
-                    DBlogging.dblogger.debug( "found products for children: %s: %s" % \
-                                             (val, val2.product_id))
+        children = []
+        for pval in proc_ids:
+            sq2 = self.dbu.session.query(self.dbu.Process.output_product).filter_by(process_id = pval[0]).subquery()
+            sq_ans = self.dbu.session.query(self.dbu.Product).filter_by(product_id = sq2)
+            for val2 in sq_ans:
+                print (file_id, val2.product_id)
+                1/0
+                self.childrenQueue.append( (val, val2.product_id) )
+                DBlogging.dblogger.debug( "found products for children: %s: %s" % \
+                                         (val, val2.product_id))
 
 
 def processRunning(pid):
@@ -433,7 +428,7 @@ if __name__ == "__main__":
                 pq = ProcessQueue(o[1])
     else:
         pq = ProcessQueue('Test')
-
+    
     # check currently processing
     curr_proc = pq.dbu._currentlyProcessing()
     if curr_proc:  # returns False or the PID
@@ -473,8 +468,13 @@ if __name__ == "__main__":
 
     if '-p' in zip(*opts)[0]: # process selected
         try:
-            while len(pq.childrenQueue) != 0:
-                pq.buildChildren()
+            while pq.dbu.processqueueLen() > 0:
+                print 'processqueueLen', pq.dbu.processqueueLen()
+                file_id = pq.dbu.processqueueGet()
+                print 'file_id', file_id
+                if file_id is None:
+                    break
+                pq.findChildrenProducts(file_id)
         except:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
