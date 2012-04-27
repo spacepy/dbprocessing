@@ -835,6 +835,8 @@ class DBUtils2(object):
     def addProcess(self,
                     process_name,
                     output_product,
+                    output_timebase, 
+                    extra_params=None,
                     super_process_id=None):
         """ add a process to the database
 
@@ -855,14 +857,16 @@ class DBUtils2(object):
         """
         # TODO I think that the DB will deal with this...
         if not isinstance(process_name, str):
-            raise(DBInputError("process name has to  a string"))
+            raise(ValueError("process name has to  a string"))
         if not isinstance(output_product, (int, long)):
-            raise(DBInputError("output_product must be an int"))
+            raise(ValueError("output_product must be an int"))
         if not isinstance(extra_params, str) and extra_params != None:
-            raise(DBInputError("extra_params muct be string or None"))
+            raise(ValueError("extra_params muct be string or None"))
         if not isinstance(super_process_id, (int, long)) and super_process_id != None:
-            raise(DBInputError("super_process_id must be int or None"))
-
+            raise(ValueError("super_process_id must be int or None"))
+        if output_timebase not in ['O', 'D', 'W', 'M', 'Y']:
+            raise(ValueError("output_timebase invalid choice"))
+            
         try:
             p1 = self.Process()
         except AttributeError:
@@ -870,6 +874,7 @@ class DBUtils2(object):
         p1.output_product = output_product
         p1.process_name = process_name
         p1.extra_params = extra_params
+        p1.output_timebase = output_timebase
         p1.super_process_id = super_process_id
         self.session.add(p1)
         try:
