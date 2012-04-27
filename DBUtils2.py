@@ -629,6 +629,26 @@ class DBUtils2(object):
             raise(DBError(IE))
         return counter
 
+    def processqueueClear(self):
+        """
+        remove everyhting from he process queue
+        """
+        while self.processqueueLen() > 0:
+            self.processqueuePop()
+        DBlogging.dblogger.info( "Processqueue was cleared")        
+
+    def processqueueGetAll(self):
+        """
+        return the entire contents of the process queue
+        """
+        pqdata = [self.processqueueGet(ii) for ii in range(self.processqueueLen())]
+        if len(pqdata) != self.processqueueLen():            
+            DBlogging.dblogger.error( "Entire Processqueue was read incorrectly")
+        else:
+            self.processqueueClear()
+        DBlogging.dblogger.debug( "Entire Processqueue was read")
+        return pqdata
+
     def processqueuePush(self, fileid):
         """
         push a file onto the process queue (onto the right)
