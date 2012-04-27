@@ -629,7 +629,7 @@ class DBUtils2(object):
             raise(DBError(IE))
         return counter
 
-    def processqueueClear(self):
+    def processqueueFlush(self):
         """
         remove everyhting from he process queue
         """
@@ -644,8 +644,7 @@ class DBUtils2(object):
         pqdata = [self.processqueueGet(ii) for ii in range(self.processqueueLen())]
         if len(pqdata) != self.processqueueLen():            
             DBlogging.dblogger.error( "Entire Processqueue was read incorrectly")
-        else:
-            self.processqueueClear()
+            raise(DBError("Something went wrong with processqueue readall"))
         DBlogging.dblogger.debug( "Entire Processqueue was read")
         return pqdata
 
@@ -707,14 +706,16 @@ class DBUtils2(object):
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
+#                    if self.mission not in self._getMissionName(self.getFileMission(fid.file_id)): # file does not below to this mission
+#                        fid_ret = self.processqueueGet(ii+1)
                     self.session.delete(fid)
                     fid_ret = fid.file_id
                     break # there can be only one
-                try:
-                    self.session.commit()
-                except IntegrityError as IE:
-                    self.session.rollback()
-                    raise(DBError(IE))
+            try:
+                self.session.commit()
+            except IntegrityError as IE:
+                self.session.rollback()
+                raise(DBError(IE))
             return fid_ret
 
     def processqueueGet(self, index=0):
@@ -737,8 +738,8 @@ class DBUtils2(object):
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
                     fid_ret = fid.file_id
-                    if self.mission not in self._getMissionName(self.getFileMission(fid_ret)): # file does not below to this mission
-                        fid_ret = self.processqueueGet(ii+1)
+#                    if self.mission not in self._getMissionName(self.getFileMission(fid_ret)): # file does not below to this mission
+#                        fid_ret = self.processqueueGet(ii+1)
                     break # there can be only one
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
@@ -758,35 +759,17 @@ class DBUtils2(object):
 
         @version: V1: 18-Jun-2010 (BAL)
         """
-        # filenames are unique so no need to loop (DB assures uniqueness)
-        if not isinstance(filename, (list, np.ndarray)):
-            filename = [filename]
-        for fname in filename:
-            for sq_df in self.session.query(self.Data_files).filter_by(filename = fname):
-                self.__sq_df = sq_df
-                # not unique so loop
-                for sq_cd in self.session.query(self.Code_dependencies).filter_by(f_id = sq_df.f_id):
-                    self.session.delete(sq_cd)
-                try:
-                    self.session.commit()
-                except IntegrityError as IE:
-                    self.session.rollback()
-                    raise(DBError(IE))
-                for sq_fd in self.session.query(self.File_dependencies).filter_by(f_id = sq_df.f_id):
-                    self.session.delete(sq_fd)
-                try:
-                    self.session.commit()
-                except IntegrityError as IE:
-                    self.session.rollback()
-                    raise(DBError(IE))
-            self.session.delete(sq_df)
-            print("File %s purged" % (sq_df.filename))
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
-        return True  # need some error checking here
+        raise(NotImplemented('This went way and needs to be reimplemented'))
+
+    def getAllFilenames(self):
+        """
+        return all the filenames in the database
+        """
+        ans = []
+        sq = self.session.query(self.File.filename).all()
+        for v in sq:
+            ans.append( (v[0], self._getFileFullPath(v[0])) )
+        return ans
 
     def addMission(self,
                     mission_name,
@@ -1954,6 +1937,17 @@ class DBUtils2(object):
         retval = [(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments) for ans in sq]
         return retval
 
+    def getChildrenProducts(self, file_id):
+        """
+        given a file ID return all the products that use this as input
+        """
+        DBlogging.dblogger.debug( "Entered findChildrenProducts():  file_id: {0}".format(file_id) )
+        product_id = self.getFileProduct(file_id)
+
+        # get all the process ids that have this product as an input
+        proc_ids = self.getProcessFromInputProduct(product_id)
+        return proc_ids
+
     def inspectorToProduct(self, inspector_name):
         """
         given an inspector name return the product_id
@@ -2024,13 +2018,10 @@ class DBUtils2(object):
         """
         DBlogging.dblogger.debug("Entered getCodePath:")
 
-        ans = []
-        for val in code_id:
-            sq1 =  self.session.query(self.dbu.Code.relative_path).filter_by(code_id = val)  # should only have one value
-            sq2 =  self.session.query(self.dbu.Mission.rootdir).filter_by(mission_name = self.dbu.mission)  # should only have one value
-            sq3 =  self.session.query(self.dbu.Code.filename).filter_by(code_id = val)  # should only have one value
-            ans.append(os.path.join(sq2[0][0], sq1[0][0], sq3[0][0]))  # the [0][0] is ok (ish) since there can only be one
-        return ans
+        sq1 =  self.session.query(self.Code.relative_path).filter_by(code_id = code_id)  # should only have one value
+        sq2 =  self.session.query(self.Mission.rootdir).filter_by(mission_name = self.mission)  # should only have one value
+        sq3 =  self.session.query(self.Code.filename).filter_by(code_id = code_id)  # should only have one value
+        return os.path.join(sq2[0][0], sq1[0][0], sq3[0][0])  # the [0][0] is ok (ish) since there can only be one
 
     def getOutputProductFromProcess(self, process):
         """
@@ -2052,11 +2043,12 @@ class DBUtils2(object):
         """
         # TODO maybe this should move to DBUtils2
         DBlogging.dblogger.debug("Entered getProcessFromOutputProduct:")
-
+        if not isinstance(outProd, (list, tuple)):
+            outProd = [outProd]
         ans = []
         for val in outProd:
             sq1 =  self.session.query(self.Process.process_id).filter_by(output_product = val).all()  # should only have one value
-            ans.extend( sq1 )
+            ans.extend( sq1[0] )
         return ans
 
     def getCodeFromProcess(self, proc_id):
@@ -2070,10 +2062,12 @@ class DBUtils2(object):
         @version: V1: 02-Dec-2010 (BAL)
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess:")
+        if not isinstance(proc_id, (list, tuple)):
+            proc_id = [proc_id]
 
         ans = []
         for val in proc_id:
-            sq1 =  self.session.query(self.dbu.Code.code_id).filter_by(process_id = val)  # should only have one value
+            sq1 =  self.session.query(self.Code.code_id).filter_by(process_id = val)  # should only have one value
             try:
                 ans.extend( sq1[0])
             except IndexError:
@@ -2091,11 +2085,8 @@ class DBUtils2(object):
         @version: V1: 07-Jan-2011 (JTN)
         """
         DBlogging.dblogger.debug("Entered getCodeArgs:")
-        ans = []
-        for val in code_id:
-            sq1 =  self.session.query(self.dbu.Code.arguments).filter_by(code_id = val)  # should only have one value
-            ans.append(sq1[0][0])  # the [0][0] is ok (ish) since there can only be one
-        return ans
+        sq1 =  self.session.query(self.Code.arguments).filter_by(code_id = code_id)  # should only have one value
+        return sq1[0][0]  # the [0][0] is ok (ish) since there can only be one
 
     def _getMissionDirectory(self):
         """
