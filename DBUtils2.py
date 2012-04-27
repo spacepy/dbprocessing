@@ -2012,6 +2012,14 @@ class DBUtils2(object):
             ans.append(os.path.join(sq2[0][0], sq1[0][0], sq3[0][0]))  # the [0][0] is ok (ish) since there can only be one
         return ans
 
+    def getOutputProductFromProcess(self, process):
+        """
+        given an process id return the output product
+        """
+        sq2 = self.session.query(self.Process.output_product).filter_by(process_id = process)
+        # there can only be one
+        return sq2[0][0]
+
     def getProcessFromOutputProduct(self, outProd):
         """
         Gets process from the db that have the output product
