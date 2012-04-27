@@ -2,6 +2,7 @@
 
 import getopt
 import imp
+import itertools
 import os
 import os.path
 import shutil
@@ -10,12 +11,18 @@ import sys
 import tempfile
 import traceback
 
+import numpy as np 
+
 import DBfile
 import DBlogging
 import DBqueue
 import DBUtils2
-import Diskfile
+import Version
 
+try: # new version changed this annoyingly
+    from sqlalchemy.exceptions import IntegrityError
+except ImportError:
+    from sqlalchemy.exc import IntegrityError
 
 __version__ = '2.0.3'
 
@@ -57,11 +64,11 @@ class ProcessQueue(object):
         self.findChildren = DBqueue.DBqueue()
         DBlogging.dblogger.info("Entering ProcessQueue")
 
-#    def __del__(self):
-#        """
-#        attempt a bit of cleanup
-#        """
-#        self.rm_tempdir()
+    def __del__(self):
+        """
+        attempt a bit of cleanup
+        """
+        self.rm_tempdir()
 
     def rm_tempdir(self):
         if self.tempdir != None:
@@ -162,18 +169,12 @@ class ProcessQueue(object):
     def importFromIncoming(self):
         """
         Import a file from incoming into the database
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
         """
         DBlogging.dblogger.debug("Entering importFromIncoming, {0} to import".format(len(self.queue)))
 
         for val in self.queue.popleftiter() :
             self.current_file = val
-            DBlogging.dblogger.debug("popped '%s' from the queue" % (self.current_file))
+            DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.current_file, len(self.queue)))
             df = self.figureProduct()
             if df is None:
                 DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.current_file))
@@ -192,6 +193,23 @@ class ProcessQueue(object):
                 continue
             # move the file to the its correct home
             dbf.move()
+            # set files in the db of the same product and same utc_file_date to not be newest version
+            files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
+            print "dbf.diskfile.params['product_id']",             dbf.diskfile.params['product_id']
+            print "dbf.diskfile.params['utc_file_date']", dbf.diskfile.params['utc_file_date']
+            print 'files', files       
+            print zip(*files)[1]
+            mx = max(zip(*files)[1])
+            for f in files:
+                print "f[1] != mx", f[1], mx, f[1] != mx
+                if f[1] != mx: # this is not the max, newest_version should be False
+                    self.dbu.session.query(self.dbu.File).filter_by(file_id = f[0]).update({self.dbu.File.newest_version: False})
+                    DBlogging.dblogger.debug("set {0}.newest_version=False".format(f[0]))
+            try:
+                self.dbu.session.commit()
+            except IntegrityError as IE:
+                self.session.rollback()
+                raise(DBUtils2.DBError(IE))
             # add to processqueue for later processing
             self.dbu.processqueuePush(f_id)
 
@@ -201,7 +219,7 @@ class ProcessQueue(object):
         """
         kwargs = {}
         for val in strargs.split():
-            tmp = val.split('=')            
+            tmp = val.split('=')
             kwargs[tmp[0]] = tmp[1]
         return kwargs
 
@@ -235,36 +253,39 @@ class ProcessQueue(object):
 
         return claimed[0]  # return the diskfile
 
-    def buildChildren(self, file_id):
+    def buildChildren(self, file_id, product_id):
         """
-        given the values in self.childrenQueue build them is possible
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
+        go through and build the proiduct_id if possible
         """
         # TODO maybe this should be broken up
-        DBlogging.dblogger.debug("Entered buildChildren: file_id: {0}".format(file_id))
+        DBlogging.dblogger.debug("Entered buildChildren: file_id={0} product_id={1}".format(file_id, product_id))
 
+        ## we have an output product, what process makes it?
+        process_id = self.dbu.getProcessFromOutputProduct(product_id)
+        print 'proc_id', process_id
         
-        # check to see if there is a process defined on this output product
-        proc_id = self.dbu.getProcessFromOutputProduct([file_id])
-        print 'proc_id', proc_id
-        proc_id = proc_id[0]
+        ## get all the input products for that process, and if they are optional
+        input_product_id = self.dbu.getInputProductID(process_id) # this is a list
+        
+        ## from the input file see what the timebase is and grab all files for teneeded products 
+        ## that have data in the time (and one before and after)
+        # TODO do we need to go one before and after?
+        utc_file_date = self.dbu.session.query(self.dbu.File.utc_file_date).filter_by(file_id = file_id)[0][0]
+        print utc_file_date
+        for prod, optional in input_product_id:
+            pass
+            
 
         # since we have a process do we have a code that does it?
-        code_id = self.getCodeFromProcess([proc_id])
+        code_id = self.getCodeFromProcess(proc_id)
 
-        # figure out the codes name and path
-        codep = self.getCodePath([code_id])[0]
+        # figure out the code path so that it can be called
+        codepath = self.getCodePath([code_id])
 
-        sq1 = self.dbu.session.query(self.dbu.Product).filter_by(product_id = val[1])[0]
-        product = sq1.product_id
-        root_path = self.dbu.session.query(self.dbu.Mission.rootdir).filter_by(mission_name = self.dbu.mission)[0][0]  # should only have one value
-
-        date = val[0].diskfile.params['utc_file_date']
+        root_path = self.dbu._getMissionDirectory()
+        
+        
+        val[0].diskfile.params['utc_file_date']
         version = val[0].diskfile.params['version']
         self.tempdir = tempfile.mkdtemp('_dbprocessing')
         DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
@@ -342,30 +363,48 @@ class ProcessQueue(object):
         except DBUtils2.DBError:
             DBlogging.dblogger.error("Could not create file_code_link due to error with created file: {0}".format(out_path))
 
-    def findChildrenProducts(self, file_id):
+    def queueClean(self):
         """
-        given a file ID return all the products that use this as input
+        go through the process queue and clear out lower versions of the same files
+        this is determined by product and utc_file_date
         """
-        # childern is a sub sub query
-        # select * from product where product_id = (SELECT output_product from
-        #   process where process_id
-        #  = (select product_id from productprocesslink where product_id = 16));
-        DBlogging.dblogger.debug( "Entered findChildrenProducts():  file_id: {0}".format(file_id) )
-        product_id = self.dbu.getFileProduct(file_id)
-
-        # get all the process ids that have this product as an input
-        proc_ids = self.dbu.session.query(self.dbu.Productprocesslink.process_id).filter_by(input_product_id = product_id)
-
-        children = []
-        for pval in proc_ids:
-            sq2 = self.dbu.session.query(self.dbu.Process.output_product).filter_by(process_id = pval[0]).subquery()
-            sq_ans = self.dbu.session.query(self.dbu.Product).filter_by(product_id = sq2)
-            for val2 in sq_ans:
-                print (file_id, val2.product_id)
-                1/0
-                self.childrenQueue.append( (val, val2.product_id) )
-                DBlogging.dblogger.debug( "found products for children: %s: %s" % \
-                                         (val, val2.product_id))
+        # TODO this might break with weekly input files
+        try:
+            pqdata = self.dbu.processqueueGetAll()
+        except DBUtils2.DBError:
+            return None
+        # build up a list of tuples file_id, product_id, utc_file_date, version
+        data = []
+        for val in pqdata:
+            file_id = val
+            sq = self.dbu.session.query(self.dbu.File).filter_by(file_id = val)
+            try:
+                product_id = sq[0].product_id
+                utc_file_date = sq[0].utc_file_date
+                version = Version.Version(sq[0].interface_version, sq[0].quality_version, sq[0].revision_version)
+                data.append( (file_id, product_id, utc_file_date, version) )
+            except IndexError: # None return, maybe off the end
+                pass
+        ## think here on better, but a dict makes for easy del
+        data2 = {}
+        for ii, val in enumerate(data):
+            data2[ii] = val
+        for k1, k2 in itertools.product(range(len(data2)), range(len(data2))):
+            if k1 == k2:
+                continue
+            try:
+                if data2[k1][1] == data2[k2][1] and data2[k1][2] == data2[k2][2]: # same product an date
+                    # drop the one with the lower version
+                    if data2[k1][3] > data2[k2][3]:
+                        del data2[k2]
+                    else:
+                        del data2[k1]
+            except KeyError: # we deleted one of them
+                continue
+        ## now we have a dict of just the unique files
+        self.dbu.processqueueFlush()
+        for key in data2:
+            self.dbu.processqueuePush(data2[key][0]) # the file_id goes back on
 
 
 def processRunning(pid):
@@ -421,14 +460,14 @@ if __name__ == "__main__":
     except IndexError:
         usage()
         sys.exit(2)
-        
+
     if '-m' in zip(*opts)[0]:
         for o in opts:
             if o[0] == '-m':
                 pq = ProcessQueue(o[1])
     else:
         pq = ProcessQueue('Test')
-    
+
     # check currently processing
     curr_proc = pq.dbu._currentlyProcessing()
     if curr_proc:  # returns False or the PID
@@ -467,6 +506,7 @@ if __name__ == "__main__":
         pq.dbu._closeDB()
 
     if '-p' in zip(*opts)[0]: # process selected
+        pq.queueClean()  # get rid of duplicates
         try:
             while pq.dbu.processqueueLen() > 0:
                 print 'processqueueLen', pq.dbu.processqueueLen()
@@ -474,7 +514,15 @@ if __name__ == "__main__":
                 print 'file_id', file_id
                 if file_id is None:
                     break
-                pq.findChildrenProducts(file_id)
+                children = pq.dbu.getChildrenProducts(file_id)
+                if not children:
+                    pq.dbu.processqueuePop() # done in two steps for crashes
+                    continue
+                # loop through the children and see which to build
+                for child in children:
+                    ## are all the required inputs available? For the dates we are doing
+                    pq.buildChildren(file_id, child)
+
         except:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
