@@ -21,7 +21,7 @@ dblogger.setLevel(logging.DEBUG)
 
 # Add the log message handler to the logger
 handler = logging.handlers.RotatingFileHandler(
-              LOG_FILENAME, maxBytes=2000000, backupCount=5)
+              LOG_FILENAME, maxBytes=20000000, backupCount=5)
 
 
 LEVELS = {'debug': logging.DEBUG,
