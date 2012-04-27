@@ -16,6 +16,7 @@ import socket # to get the local hostname
 import sys
 
 import DBStrings
+import Version
 
 
 ## This goes in the processing comment field in the DB, do update it
@@ -1837,7 +1838,7 @@ class DBUtils2(object):
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].filename
 
-    def _getFileUTCfileDate(self, file_id):
+    def getFileUTCfileDate(self, file_id):
         """
         Return the utc_file_date for the input file_id
 
@@ -1857,7 +1858,17 @@ class DBUtils2(object):
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].utc_file_date
 
-    def _getInputProductID(self, process_id):
+    def getFiles_product_utc_file_date(self, product_id, date):
+        """
+        given a product id and a utc_file_date return all the files that match
+        """
+        if isinstance(date, datetime.datetime):
+            date = date.date()
+        sq = self.session.query(self.File).filter_by(product_id = product_id).filter_by(utc_file_date = date)
+        sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version) ) for v in sq]
+        return sq
+
+    def getInputProductID(self, process_id):
         """
         Return the fileID for the input filename
 
@@ -1874,8 +1885,22 @@ class DBUtils2(object):
 
         @version: V1: 15-Oct-2010 (BAL)
         """
-        sq = self.session.query(self.Productprocesslink.input_product_id).filter_by(process_id = process_id)
-        return [val[0] for val in sq.all()]  # the zero is because all() returns a list of one element tuples
+        sq = self.session.query(self.Productprocesslink).filter_by(process_id = process_id)
+        return [(val.input_product_id, val.optional) for val in sq.all()]  # the zero is because all() returns a list of one element tuples
+
+    def getFilesByProductDate(self, product_id, daterange):
+        """
+        return the files in the db by product id that have data in the date specified
+        """
+        sq1 = self.session.query(self.File).filter_by(product_id = product_id).filter_by(exists_on_disk = True).filter_by(newest_version = True).filter(self.File.utc_start_time >= daterange[0]).all()
+        sq1 = set([v.file_id for v in sq1])
+        sq2 = self.session.query(self.File).filter_by(product_id = product_id).filter_by(exists_on_disk = True).filter_by(newest_version = True).filter(self.File.utc_stop_time <= daterange[1]).all()
+        sq2 = set([v.file_id for v in sq2])
+        ans = sq1.intersection(sq2)
+        return list(ans)
+
+#        sq1 = self.session.query(self.File).filter_by(product_id = product_id).filter_by(exists_on_disk = True).filter_by(utc_start_time <= daterange[0]).filter_by(newest_version = True).all()
+
 
     def _getProductFormats(self, productID=None):
         """
@@ -2043,13 +2068,8 @@ class DBUtils2(object):
         """
         # TODO maybe this should move to DBUtils2
         DBlogging.dblogger.debug("Entered getProcessFromOutputProduct:")
-        if not isinstance(outProd, (list, tuple)):
-            outProd = [outProd]
-        ans = []
-        for val in outProd:
-            sq1 =  self.session.query(self.Process.process_id).filter_by(output_product = val).all()  # should only have one value
-            ans.extend( sq1[0] )
-        return ans
+        sq1 =  self.session.query(self.Process.process_id).filter_by(output_product = outProd).all()  # should only have one value
+        return sq1[0][0]
 
     def getCodeFromProcess(self, proc_id):
         """
