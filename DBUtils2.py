@@ -236,95 +236,6 @@ class DBUtils2(object):
                 DBlogging.dblogger.debug("Class %s created" % (val))
 
 
-
-###################################
-### Views #########################
-###################################
-
-
-#    def _createViews(self, verbose = False):
-#        """
-#        cycle through the database and build classes for each of the Views
-#        views cannot be dynamically allocated since you have to manually define the promary keys
-#        also views cannot be grabbed form the engine the same way that tables are.  They are typed so
-#        I wont change this to some standard.
-#        --- When creating a new verw make really usre it has something unique that can be used as
-#        --- a primary key. some below use f_id others use pk whisch is a call to a sequence
-#
-#        @keyword verbose: (optional) - print information out to the command line
-#
-#        @author: Brian Larsen
-#        @organization: Los Alamos National Lab
-#        @contact: balarsen@lanl.gov
-#
-#        @version: V1: 14-Jun-2010 (BAL)
-#        @version: V2: 25-Aug-2010 (BAL) - chnaged to throuw exception not return False
-#
-#        >>>  pnl._createViews()
-#        """
-#        try: self.Build_filenames  # if they already are defined dont do it again
-#        except AttributeError:
-#            try:
-#                class Build_filenames(object):
-#                    pass
-#                build_filenames = Table('build_filenames', self.metadata,
-#                                        Column('pk', BigInteger, primary_key=True),
-#                                        autoload=True)
-#                mapper(Build_filenames, build_filenames)
-#                self.Build_filenames = Build_filenames
-#                if verbose: print("Class %s created" % ('Build_filenames'))
-#
-#
-#                class Build_output_filenames(object):
-#                    pass
-#                build_output_filenames = Table('build_output_filenames', self.metadata,
-#                                               Column('pk', BigInteger, primary_key=True),
-#                                               autoload=True)
-#                mapper(Build_output_filenames, build_output_filenames)
-#                self.Build_output_filenames = Build_output_filenames
-#                if verbose: print("Class %s created" % ('Build_output_filenames'))
-#
-#                class Files_by_mission(object):
-#                    pass
-#                files_by_mission = Table('files_by_mission', self.metadata,
-#                                         Column('f_id', BigInteger,  primary_key=True),
-#                                         autoload = True)
-#                mapper(Files_by_mission,files_by_mission)
-#                self.Files_by_mission = Files_by_mission
-#                if verbose: print("Class %s created" % ('Files_by_mission'))
-#
-#
-#                class Data_product_by_mission(object):
-#                    pass
-#                data_product_by_mission = Table('data_product_by_mission', self.metadata,
-#                                                Column('dp_id', BigInteger, primary_key=True),
-#                                                autoload=True)
-#                mapper(Data_product_by_mission,data_product_by_mission)
-#                self.Data_product_by_mission = Data_product_by_mission
-#                if verbose: print("Class %s created" % ('Data_product_by_mission'))
-#
-#
-#                class Processing_paths(object):
-#                    pass
-#                processing_paths = Table('processing_paths', self.metadata,
-#                                         Column('pk', BigInteger, primary_key=True),
-#                                         autoload=True)
-#                mapper(Processing_paths, processing_paths)
-#                self.Processing_paths = Processing_paths
-#                if verbose: print("Class %s created" % ('Processing_paths'))
-#
-#                class Build_reprocess_filenames(object):
-#                    pass
-#                build_reprocess_filenames = Table('build_reprocess_filenames', self.metadata,
-#                                               Column('pk', BigInteger, primary_key=True),
-#                                               autoload=True)
-#                mapper(Build_reprocess_filenames, build_reprocess_filenames)
-#                self.Build_reprocess_filenames = Build_reprocess_filenames
-#                if verbose: print("Class %s created" % ('Build_reprocess_filenames'))
-#
-#            except:
-#                raise(DBError('error creating view<->class mapping'))
-
 ######################################
 ### Gather files from DB #############
 ######################################
@@ -1686,6 +1597,21 @@ class DBUtils2(object):
         except IndexError:
             return None
         return os.path.join(root_dir, rel_path, filename)
+
+    def getProcessFromInputProduct(self, product):
+        """
+        given an product name or id return all the processes that user that as an input
+        """        
+        if isinstance(product, (str, unicode)):
+            p_id = self._getProductID(product)
+        else:
+            p_id = product
+        
+        sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
+        ans = []
+        for v in sq: 
+            ans.append((v.process_id, v.optional)) 
+        return ans
 
     def getFileProduct(self, filename):
         """
