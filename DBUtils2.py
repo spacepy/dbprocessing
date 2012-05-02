@@ -65,12 +65,6 @@ class DBUtils2(object):
         @summary: Print out something usefule when one prints the class instance
 
         @return: DBProcessing class instance for mission <mission name>
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 7-Jul-2010 (BAL)
         """
         return 'DBProcessing class instance for mission ' + self.mission + ', version: ' + __version__
 
@@ -112,12 +106,6 @@ class DBUtils2(object):
 
         @return: A full filename that can be used by OS calls
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 14-Jun-2010 (BAL)
-
         >>> nl._ProcessNext__build_fname('/root/file/', 'relative/', 'Test', 'test1', 'Prod1', '20100614', 1, 1, 1)
             Out[9]: '/root/file/relative/Test-test1_Prod1_20100614_v1.1.1.cdf'
 
@@ -139,14 +127,6 @@ class DBUtils2(object):
         setup python to talk to the database, this is where it is, name and password.
 
         @keyword verbose: (optional) - print information out to the command line
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 14-Jun-2010 (BAL)
-        @version: V2: 7-Jul-2010 (BAL) added verbose and printing
-        @version: V3: 25-Aug-2010 (BAL) added DBerror instead of False return
 
         @todo: change the user form owner to ops as DB permnissons are fixed
 
@@ -192,15 +172,7 @@ class DBUtils2(object):
 
         @keyword verbose: (optional) - print information out to the command line
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 14-Jun-2010 (BAL)
-        @version: V2: 25-Aug-2010 (BAL) - chnaged to throuw exception not return False
-
         >>>  pnl._createTableObjects()
-
         """
         DBlogging.dblogger.debug("Entered _createTableObjects()")
 
@@ -250,12 +222,6 @@ class DBUtils2(object):
 
         @return: list of Data_files objects
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 14-Jun-2010 (BAL)
-
         >>>  pnl._gatherFiles()
         123
         """
@@ -281,12 +247,6 @@ class DBUtils2(object):
         @keyword verbose: (optional) - print out lots of info
 
         @return: Counter - number of files added to the list from this check
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 16-Jun-2010 (BAL)
 
         >>>  pnl._procCodeDates()
         """
@@ -316,13 +276,6 @@ class DBUtils2(object):
         @keyword bool: (optional) if set answers the question is there a newer version of the file?
 
         @return: id of the newest version
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 18-Jun-2010 (BAL)
-        @version: V2: 1-Jul-2010 (BAL) added bool keyword
 
         >>>  pnl._newerFileVersion(101)
         101
@@ -380,13 +333,6 @@ class DBUtils2(object):
         @return: false or the pid
         @rtype: (bool, long)
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Jun-2010 (BAL)
-        @version: V2: 02-Dec-2010 (BAL) - returns False or the PID
-
         >>>  pnl._currentlyProcessing()
         """
         DBlogging.dblogger.info("Checking currently_processing")
@@ -407,12 +353,6 @@ class DBUtils2(object):
 
         @keyword comment: the comment to enter into the processing log DB
         @return: True - Success, False - Failure
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Jun-2010 (BAL)
 
         >>>  pnl._resetProcessingFlag()
         """
@@ -438,12 +378,6 @@ class DBUtils2(object):
     def _startLogging(self):
         """
         Add an entry to the logging table in the DB, logging
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Jun-2010 (BAL)
 
         >>>  pnl._startLogging()
         """
@@ -525,14 +459,6 @@ class DBUtils2(object):
         @param comment: (optional) a comment to insert intot he DB
         @type param: str
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Jun-2010 (BAL)
-        @version: V2: 17-Sep-2010 (BAL) - updated for new DB format
-        @version: V3: 02-Dec-2010 (BAL) - added dblogging not verbose
-
         >>>  pnl._stopLogging()
         """
         try: self.__p1
@@ -572,13 +498,6 @@ class DBUtils2(object):
         @type code_id: int
         @keyword comment: comment on the logged file
         @type comment: str
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Jun-2010 (BAL)
-        @version: V2: 17-Sep-2010 (BAL) - updated for new DB format
         """
         pf1 = self.Logging_files()
         pf1.logging_id = logging_id
@@ -603,11 +522,6 @@ class DBUtils2(object):
            this is **NOT** sure to be safe
         @return: count - return the count of out of sync files
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Jun-2010 (BAL)
         """
         counter = 0  # count how many were wrong
         for fname in self.bf:
@@ -755,11 +669,6 @@ class DBUtils2(object):
 
         >>>  pnl._purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 18-Jun-2010 (BAL)
         """
         raise(NotImplemented('This went way and needs to be reimplemented'))
 
@@ -783,11 +692,6 @@ class DBUtils2(object):
         @param rootdir: the root directory of the mission
         @type rootdir: str
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 170-Sep-2010 (BAL)
         """
         if not isinstance(mission_name, str):
             raise(DBInputError("Mission name has to  a string"))
@@ -814,11 +718,6 @@ class DBUtils2(object):
 
         @param satellite_name: the name of the mission
         @type satellite_name: str
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
         """
         if not isinstance(satellite_name, str):
             raise(DBInputError("Satellite name has to  a string"))
@@ -854,11 +753,6 @@ class DBUtils2(object):
         @keyword super_process_id: th process id of the superprocess for this process
         @type super_process_id: int
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Sep-2010 (BAL)
         """
         # TODO I think that the DB will deal with this...
         if not isinstance(process_name, str):
@@ -909,13 +803,6 @@ class DBUtils2(object):
         @param format: the format of the product files
         @type super_product_id: str
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Sep-2010 (BAL)
-        @version: V2 20-Sep-2010 (BAL) updated to new DB format
-        @version: V3 17-Nov-2010 (BAL) added format and changed super_product_id to param
         """
 
         try:
@@ -948,11 +835,6 @@ class DBUtils2(object):
         @param process_id: id of the process to link
         @type process_id: int
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Sep-2010 (BAL)
         """
         if not isinstance(optional, bool):
             raise(ValueError("optional must be a boolean"))
@@ -981,11 +863,6 @@ class DBUtils2(object):
         @param source_code: id of the process to link
         @type source_code: int
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Sep-2010 (BAL)
         """
 
         try:
@@ -1012,11 +889,6 @@ class DBUtils2(object):
         @param resulting_file_id: id of the process to link
         @type resulting_file_id: int
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Sep-2010 (BAL)
         """
 
         try:
@@ -1042,12 +914,6 @@ class DBUtils2(object):
         @type instrument_id: int
         @param product_id: id of the product to link
         @type product_id: int
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Sep-2010 (BAL)
         """
 
         try:
@@ -1073,12 +939,6 @@ class DBUtils2(object):
         @type instrument_name: str
         @param satellite_id: the root directory of the mission
         @type satellite_id: int
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 170-Sep-2010 (BAL)
         """
         if not isinstance(instrument_name, str):
             raise(DBInputError("Instrument name has to  a string"))
@@ -1142,13 +1002,6 @@ class DBUtils2(object):
         @return: the code_id of the newly inserted code
         @rtype: long
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 18-Jun-2010 (BAL)
-        @version: V2: 17-Sep-2010 (BAL - updated to new DB format)
-        @version: V3: 04-Oct-2010 (BAL - added return of code_id)
         """
         try:
             c1 = self.Code()
@@ -1214,12 +1067,6 @@ class DBUtils2(object):
         @return: the inspector_id of the newly inserted code
         @rtype: long
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Apr-2012 (BAL)
-
         """
         try:
             c1 = self.Inspector()
@@ -1251,13 +1098,6 @@ class DBUtils2(object):
         Close the database connection
 
         @keyword verbose: (optional) print information out to the command line
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 14-Jun-2010 (BAL)
-        @version: V2: 25-Aug-2010 (BAL) - changed to raise exception not returtn False
 
         >>>  pnl._closeDB()
         """
@@ -1328,16 +1168,6 @@ class DBUtils2(object):
 
         @ return: file_id of the newly inserted file
         @rtype: long
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 18-Jun-2010 (BAL)
-        @version: V2: 19-Sep-2010 (BAL) - revised fo new DB format
-        @version: V3: 04-Oct-2010 (BAL) - added return
-
-
         """
         try:
             d1 = self.File()
@@ -1384,11 +1214,6 @@ class DBUtils2(object):
 
         @return: True - the code is active for that date, False otherwise
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 1-Jul-2010 (BAL)
         """
         try: self.Executable_codes
         except AttributeError: self._createTableObjects()
@@ -1415,11 +1240,6 @@ class DBUtils2(object):
              - id of the newest version if bool is False
              - True there is a newer version, False otherwise if bool is set
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 1-Jul-2010 (BAL)
         """
         try: self.Executable_codes
         except AttributeError: self._createTableObjects()
@@ -1478,12 +1298,6 @@ class DBUtils2(object):
         @param quality_version: new quality version
         @param revision_version: new revision version
         @return: True - Success, False - Failure
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 6-Jul-2010 (BAL)
 
         >>> dbp = DBProcessing()
         >>> dbp._copyDataFile(18,999 , 1 ,1)
@@ -1551,11 +1365,6 @@ class DBUtils2(object):
 
         @return: True = Success / False = Failure
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 6-Jul-2010 (BAL)
         """
         if self.__dbIsOpen == False:
             self._openDB()
@@ -1591,11 +1400,6 @@ class DBUtils2(object):
         return the full path to a file given the name or id
         (name or id is based on type)
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 2-DEC-2010 (BAL)
         """
         if isinstance(filename, (int, long)):
             filename = self._getFilename(filename)
@@ -1660,7 +1464,7 @@ class DBUtils2(object):
 
     def getFileVersion(self, filename):
         """
-        given a filename or fileid return a Versio instance
+        given a filename or fileid return a Version instance
         """
         try:
             f_id = int(filename)  # if a number
@@ -1744,12 +1548,6 @@ class DBUtils2(object):
 
         @return: mission_id - the current mission ID
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 6-Jul-2010 (BAL)
-
         >>> dbp = DBProcessing()
         >>> dbp._getMissionID()
         19
@@ -1762,12 +1560,6 @@ class DBUtils2(object):
         Return the current mission ID
 
         @return: mission_id - the current mission ID
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 6-Jul-2010 (BAL)
 
         >>> dbp = DBProcessing()
         >>> dbp._getMissionID()
@@ -1792,11 +1584,6 @@ class DBUtils2(object):
 
         @return: instrument_id - the instrument ID
 
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
         """
         sq = self.session.query(self.Instrument).filter_by(instrument_name = name)
         return sq[0].instrument_id
@@ -1814,13 +1601,6 @@ class DBUtils2(object):
 
         @return: file_id: file_id of the input file
         @rtype: long
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 4-Oct-2010 (BAL)
         """
         sq = self.session.query(self.File).filter_by(filename = filename)
         try:
@@ -1837,13 +1617,6 @@ class DBUtils2(object):
 
         @return: code_id: code_id of the input file
         @rtype: long
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 16-Nov-2010 (BAL)
         """
         sq = self.session.query(self.Code).filter_by(filename = codename)
         try:
@@ -1860,13 +1633,6 @@ class DBUtils2(object):
 
         @return: filename: filename associated with the file_id
         @rtype: str
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 6-Oct-2010 (BAL)
         """
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].filename
@@ -1880,13 +1646,6 @@ class DBUtils2(object):
 
         @return: utc_file_date: date of the file  associated with the file_id
         @rtype: datetime
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 15-Oct-2010 (BAL)
         """
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].utc_file_date
@@ -1949,13 +1708,6 @@ class DBUtils2(object):
 
         @return: list of input_product_ids
         @rtype: list
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 15-Oct-2010 (BAL)
         """
         sq = self.session.query(self.Productprocesslink).filter_by(process_id = process_id)
         return [(val.input_product_id, val.optional) for val in sq.all()]  # the zero is because all() returns a list of one element tuples
@@ -1979,14 +1731,6 @@ class DBUtils2(object):
         Return the product formats for all the formats
 
         @return: list of all the product format strings and ids from the database
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 25-Oct-2010 (BAL)
-
         """
         if productID == None:
             sq = self.session.query(self.Product.format, self.Product.product_id)
@@ -2000,14 +1744,6 @@ class DBUtils2(object):
         Return the mission, Satellite, Instrument,  product, product_id   names as a tuple
 
         @return: list of tuples of the mission, Satellite, Instrument,  product, product id  names
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 26-Oct-2010 (BAL)
-
         """
         if productID == None:
             sq = self.session.query(self.Mission.mission_name,
@@ -2054,14 +1790,6 @@ class DBUtils2(object):
         @type product_name: str
 
         @return: product_id -the product  ID for the input product name
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 20-Sep-2010 (BAL)
-
         """
         sq = self.session.query(self.Product.product_id).filter_by(product_name = product_name)
         if sq.count() == 0:
@@ -2078,13 +1806,6 @@ class DBUtils2(object):
         @type sat_name: str
 
         @return: satellite_id - the requested satellite  ID
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 17-Sep-2010 (BAL)
         """
         sq = self.session.query(self.Satellite.satellite_id).filter_by(mission_id = self._getMissionID()).filter_by(satellite_name = sat_name)
         if sq.count() == 0:
@@ -2094,12 +1815,6 @@ class DBUtils2(object):
     def getCodePath(self, code_id):
         """
         Given a code_id list return the full name (path and all) of the code
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
         """
         DBlogging.dblogger.debug("Entered getCodePath:")
 
@@ -2119,12 +1834,6 @@ class DBUtils2(object):
     def getProcessFromOutputProduct(self, outProd):
         """
         Gets process from the db that have the output product
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
         """
         # TODO maybe this should move to DBUtils2
         DBlogging.dblogger.debug("Entered getProcessFromOutputProduct:")
@@ -2134,12 +1843,6 @@ class DBUtils2(object):
     def getCodeFromProcess(self, proc_id):
         """
         given a process id return the code that makes perfoms that process
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess:")
         if not isinstance(proc_id, (list, tuple)):
@@ -2157,12 +1860,6 @@ class DBUtils2(object):
     def getCodeArgs(self, code_id):
         """
         Given a code_id list return the arguments to the code
-
-        @author: Jon Niehof after L{getCodePath}
-        @organization: Los Alamos National Lab
-        @contact: jniehof@lanl.gov
-
-        @version: V1: 07-Jan-2011 (JTN)
         """
         DBlogging.dblogger.debug("Entered getCodeArgs:")
         sq1 =  self.session.query(self.Code.arguments).filter_by(code_id = code_id)  # should only have one value
@@ -2174,13 +1871,6 @@ class DBUtils2(object):
 
         @return: base directory for thcurrent mission
         @rtype: str
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 20-Sep-2010 (BAL)
         """
         sq = self.session.query(self.Mission.rootdir).filter_by(mission_name  = self.mission)
         if sq.count() == 0:
@@ -2193,13 +1883,6 @@ class DBUtils2(object):
 
         @return: processing list of file ids
         @rtype: list
-
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 20-Sep-2010 (BAL)
         """
         path = self.getIncomingPath()
         DBlogging.dblogger.debug("Looking for files in {0}".format(path))
@@ -2241,12 +1924,6 @@ class DBUtils2(object):
         @type filename: list
         @return: file object populated from the filename
         @rtype: DBUtils2.File
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 20-Sep-2010 (BAL)
         """
         output = []
         for val in filename:
