@@ -1175,8 +1175,6 @@ class DBUtils2(object):
         except AttributeError:
             raise(DBError("Class File not found was it created?"))
 
-        print "process_keywords", process_keywords
-
         self._createTableObjects()
         d1 = self.File()
         d1.filename = filename
@@ -1645,7 +1643,7 @@ class DBUtils2(object):
         given a file_id return the process keywords string
         """
         sq = self.session.query(self.File).filter_by(file_id = file_id)
-        return sq[0].filename        
+        return sq[0].process_keywords        
 
     def getFileUTCfileDate(self, file_id):
         """
@@ -1749,8 +1747,8 @@ class DBUtils2(object):
             sq = self.session.query(self.Product.format, self.Product.product_id)
             return sq.order_by(asc(self.Product.product_id)).all()
         else:
-            sq = self.session.query(self.Product.format, self.Product.product_id).filter_by(product_id = productID)
-            return sq[0]
+            sq = self.session.query(self.Product.format).filter_by(product_id = productID)
+            return sq[0][0]
 
     def _getProductNames(self, productID=None):
         """

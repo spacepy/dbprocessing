@@ -160,37 +160,7 @@ class Diskfile(object):
             raise(WriteError("file is not writeable, wont be able to move it to proper location"))
         DBlogging.dblogger.debug("Access Checked out OK")
 
-    def makeProductFilename(self, productID, date, version, qacode = None):
-        """
-        go through the DB and make a filename from the product format string
-        """
-        if not isinstance(version, Version.Version):
-            raise(InputError("Version must be an instance of a Version object"))
-        if not isinstance(date, (datetime.datetime, datetime.date)):
-            raise(InputError("date must be an instance of a date or datetime  object"))
-        if not qacode in ['ok', 'ignore', 'problem', None]:
-            raise(InputError("qacode invalid, can be ok, ignore, problem, or None "))
 
-        filename = self.dbu._getProductFormats(productID)[0] # just for the format
-        mission, satellite, instrument, product, product_id = self.dbu._getProductNames(productID)
-        print 'mission', mission, 'product_id', product_id
-
-        if qacode == None:
-            qacode = 'ok'
-        filename = self.dbu.format(filename,
-                                   MISSION=mission,
-                                   SPACECRAFT=satellite,
-                                   PRODUCT=product,
-                                   VERSION=str(version),
-                                   INSTRUMENT=instrument,
-                                   QACODE=qacode,
-                                   datetime=date)
-#        if self.params['product_id'] != productID:
-#            raise(FilenameError("Created filename did not match convention"))
-
-        DBlogging.dblogger.debug("Filename: %s created" % (filename))
-
-        return filename
 
 
 def calcDigest( infile):

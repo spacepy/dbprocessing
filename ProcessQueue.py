@@ -218,9 +218,18 @@ class ProcessQueue(object):
         read in the arguments string forn te db and change to a dict
         """
         kwargs = {}
-        for val in strargs.split():
-            tmp = val.split('=')
-            kwargs[tmp[0]] = tmp[1]
+        if isinstance(strargs, (list, tuple)): # we have multiple to deal with 
+            for val in strargs:
+                tmp = self._strargs_to_args(val)
+                for key in tmp:
+                    kwargs[key] = tmp[key]
+            return kwargs
+        try:
+            for val in strargs.split():
+                tmp = val.split('=')
+                kwargs[tmp[0]] = tmp[1]
+        except AttributeError: # it was None
+            pass
         return kwargs
 
     def figureProduct(self):
@@ -324,6 +333,44 @@ class ProcessQueue(object):
         self.tempdir = tempfile.mkdtemp('_dbprocessing')
         DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
 
+        out_prod = self.dbu.getOutputProductFromProcess(process_id)
+        print "out_prod", out_prod
+        format_str = self.dbu._getProductFormats(out_prod) 
+        print "format_str", format_str
+        # get the process_keywords from the file if there are any
+        process_keywords = self._strargs_to_args([self.dbu.getFileProcess_keywords(fid) for fid in input_files])
+        print "process_keywords", process_keywords
+        for key in process_keywords:
+            format_str = format_str.replace('{'+key+'}', process_keywords[key])
+
+        
+        print "format_str", format_str
+
+
+
+        1/0
+        if not qacode in ['ok', 'ignore', 'problem', None]:
+            raise(InputError("qacode invalid, can be ok, ignore, problem, or None "))
+
+        # get the format string
+        
+        mission, satellite, instrument, product, product_id = self.dbu._getProductNames(productID)
+        print 'mission', mission, 'product_id', product_id
+
+        filename = self.dbu.format(filename,
+                                   MISSION=mission,
+                                   SPACECRAFT=satellite,
+                                   PRODUCT=product,
+                                   VERSION=str(version),
+                                   INSTRUMENT=instrument,
+                                   QACODE=qacode,
+                                   datetime=date)
+#        if self.params['product_id'] != productID:
+#            raise(FilenameError("Created filename did not match convention"))
+
+        DBlogging.dblogger.debug("Filename: %s created" % (filename))
+
+        return filename
 
         1/0
 
