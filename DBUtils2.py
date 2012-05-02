@@ -1635,7 +1635,7 @@ class DBUtils2(object):
         else:
             p_id = product
         sq = self.session.query(self.Process.output_timebase).filter_by(process_id = p_id).all()
-        return sq[0]
+        return sq[0][0]
             
     def getProcessID(self, proc_name):
         """
