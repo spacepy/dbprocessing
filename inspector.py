@@ -65,11 +65,13 @@ class inspector(object):
     """
     __metaclass__ = EphemeralCallable(ABCMeta)
 
-    def __init__(self, filename, dbu, **kwargs):
+    def __init__(self, filename, dbu, product, **kwargs):
         DBlogging.dblogger.info("Entered inspector {0} with kwargs: {1}".format(self.code_name, kwargs))
         self.dbu = dbu # give us access to DBUtils2
         self.filename = filename
         self.basename = os.path.basename(self.filename)
+        self.dirname = os.path.dirname(self.filename)
+        self.product = product
         self.diskfile = Diskfile.Diskfile(self.filename, self.dbu)
         if self.inspect(kwargs) is not None:  # mandates the diskfile is not full and not a match
             self._populate()
@@ -90,7 +92,7 @@ class inspector(object):
         self.diskfile.params['file_create_date'] = datetime.datetime.fromtimestamp(os.path.getmtime(self.diskfile.infile))
         self.diskfile.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
         self.diskfile.params['md5sum'] = Diskfile.calcDigest(self.diskfile.infile)
-        self.diskfile.params['product_id'] = self.dbu.inspectorToProduct(self.code_name)
+        self.diskfile.params['product_id'] = self.product
 
     def __call__(self):
         """
