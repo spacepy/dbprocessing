@@ -52,7 +52,7 @@ class DBFormatter(string.Formatter):
         '????': ( '{????}', '....' ),
         'nn': ( '{nn}', '\d\d' ),
         'nnn': ( '{nnn}', '\d\d\d' ),
-        'nnnn': ( '{nnnn}', '\d\d\d' ),
+        'nnnn': ( '{nnnn}', '\d\d\d\d' ),
         }
 
     def format(self, format_string, *args, **kwargs):
