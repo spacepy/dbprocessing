@@ -130,6 +130,7 @@ class Diskfile(object):
         self.params['filefilelink'] = None
         self.params['filecodelink'] = None
         self.params['newest_version'] = None
+        self.params['process_keywords'] = None
 
         # this keeps opening connecitons
         #dbu = DBUtils2.DBUtils2('Test')

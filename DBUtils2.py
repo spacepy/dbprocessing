@@ -1130,7 +1130,8 @@ class DBUtils2(object):
                 release_number = None,
                 product_id = None,
                 newest_version = None,
-                md5sum = None):
+                md5sum = None, 
+                process_keywords = None):
         """
         add a datafile to the database
 
@@ -1174,6 +1175,7 @@ class DBUtils2(object):
         except AttributeError:
             raise(DBError("Class File not found was it created?"))
 
+        print "process_keywords", process_keywords
 
         self._createTableObjects()
         d1 = self.File()
@@ -1197,6 +1199,7 @@ class DBUtils2(object):
         d1.exists_on_disk = exists_on_disk
         d1. newest_version  = newest_version
         d1.md5sum = md5sum
+        d1.process_keywords = process_keywords
         self.session.add(d1)
         try:
             self.session.commit()
@@ -1636,6 +1639,13 @@ class DBUtils2(object):
         """
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].filename
+
+    def getFileProcess_keywords(self, file_id):
+        """
+        given a file_id return the process keywords string
+        """
+        sq = self.session.query(self.File).filter_by(file_id = file_id)
+        return sq[0].filename        
 
     def getFileUTCfileDate(self, file_id):
         """
