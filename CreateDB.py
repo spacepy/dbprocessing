@@ -168,6 +168,7 @@ class dbprocessing_db(object):
                           schema.ForeignKey('product.product_id'), nullable=False),
             schema.Column('md5sum', types.String(40), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
+            schema.Column('process_keywords', types.Text, nullable=False),
             schema.CheckConstraint('utc_stop_time is not NULL OR met_stop_time is not NULL'),
             schema.CheckConstraint('utc_start_time is not NULL OR met_start_time is not NULL'),
             schema.CheckConstraint('met_start_time <= met_stop_time'), # in case of one entry
