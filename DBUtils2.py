@@ -1,3 +1,4 @@
+import itertools
 import sqlalchemy
 import glob
 from sqlalchemy.orm import sessionmaker
@@ -1609,19 +1610,40 @@ class DBUtils2(object):
 
     def getProcessFromInputProduct(self, product):
         """
-        given an product name or id return all the processes that user that as an input
-        """        
-        if isinstance(product, (str, unicode)):
+        given an product name or id return all the processes that use that as an input
+        """
+        try:
+            product = int(product)
+        except ValueError: # it was a string
             p_id = self._getProductID(product)
         else:
             p_id = product
-        
         sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
         ans = []
         for v in sq: 
-            ans.append((v.process_id, v.optional)) 
+            ans.append(v.process_id) 
         return ans
 
+    def getProcessTimebase(self, process):
+        """
+        given a product id or product name return the timebase
+        """
+        try:
+            product = int(process)
+        except ValueError: # it was a string
+            p_id = self.getProcessID(process)
+        else:
+            p_id = product
+        sq = self.session.query(self.Process.output_timebase).filter_by(process_id = p_id).all()
+        return sq[0]
+            
+    def getProcessID(self, proc_name):
+        """
+        given a process name return its id
+        """
+        sq = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()
+        return sq[0]        
+            
     def getFileProduct(self, filename):
         """
         given a filename or file_id return the product id it belongs to
@@ -1868,6 +1890,45 @@ class DBUtils2(object):
         sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version) ) for v in sq]
         return sq
 
+    def getFiles_product_utc_file_daterange(self, product_id, daterange):
+        """
+        given a product id and a utc_file_date return all the files that have data in the range
+        """
+        sq11 = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_stop_time >= daterange[0]).filter(self.File.utc_start_time <= daterange[1]).all()
+        vers = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version) ) for v in sq11]
+        # need to drop all the same files with lower versions
+        ans = self.file_id_Clean(vers)
+        return ans
+
+    def file_id_Clean(self, invals):
+        """
+        given an input tuple (file_id, version) from he same product go through and clear out lower versions of the same files
+        this is determined by product and utc_file_date
+        """
+        # TODO this might break with weekly input files
+        # build up a list of tuples file_id, product_id, utc_file_date, version
+        file_dates = [self.getFileUTCfileDate(file_id) for file_id, ver in invals]
+
+        ## think here on better, but a dict makes for easy del
+        data2 = {}
+        for ii, val in enumerate(invals):
+            data2[ii] = (val[0], val[1], file_dates[11])
+        for k1, k2 in itertools.product(range(len(data2)), range(len(data2))):
+            if k1 == k2:
+                continue
+            try:
+                if data2[k1][2] == data2[k2][2]: # same product an date
+                    # drop the one with the lower version
+                    if data2[k1][1] > data2[k2][1]:
+                        del data2[k2]
+                    else:
+                        del data2[k1]
+            except KeyError: # we deleted one of them
+                continue
+        ## now we have a dict of just the unique files
+        ans = [(data2[key][0], data2[key][1]) for key in data2]
+        return ans
+
     def getInputProductID(self, process_id):
         """
         Return the fileID for the input filename
@@ -1955,16 +2016,16 @@ class DBUtils2(object):
 
     def getActiveInspectors(self):
         """
-        query the db and return a list ofall the active inspector filenames
+        query the db and return a list of all the active inspector filenames [(filename, arguments, product), ...]
         """
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
         basedir = self._getMissionDirectory()
-        retval = [(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments) for ans in sq]
+        retval = [(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments, ans.product) for ans in sq]
         return retval
 
     def getChildrenProducts(self, file_id):
         """
-        given a file ID return all the products that use this as input
+        given a file ID return all the processes that use this as input
         """
         DBlogging.dblogger.debug( "Entered findChildrenProducts():  file_id: {0}".format(file_id) )
         product_id = self.getFileProduct(file_id)
@@ -1972,18 +2033,6 @@ class DBUtils2(object):
         # get all the process ids that have this product as an input
         proc_ids = self.getProcessFromInputProduct(product_id)
         return proc_ids
-
-    def inspectorToProduct(self, inspector_name):
-        """
-        given an inspector name return the product_id
-        """
-        try:
-            product_id = self.session.query(self.Inspector.product).filter(self.Inspector.filename == os.path.basename(inspector_name))[0][0]
-        except IndexError:
-            product_id = None
-        return product_id
-
-
 
     def _getProductID(self,
                      product_name):
@@ -2197,3 +2246,8 @@ class DBUtils2(object):
             f1.filename = val
             file_date
             f1.utc_file_date = None
+            
+
+
+
+
