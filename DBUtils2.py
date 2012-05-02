@@ -1658,6 +1658,17 @@ class DBUtils2(object):
         except IndexError:
             return None                    
 
+    def getFileVersion(self, filename):
+        """
+        given a filename or fileid return a Versio instance
+        """
+        try:
+            f_id = int(filename)  # if a number
+        except ValueError:
+            f_id = self._getFileID(filename) # is a name
+        sq = self.session.query(self.File).filter_by(file_id = f_id)[0]
+        return Version.Version(sq.interface_version, sq.quality_version, sq.revision_version)
+
     def getFileMission(self, filename):
         """
         given an a file name or a file ID return the mission(s) that file is
