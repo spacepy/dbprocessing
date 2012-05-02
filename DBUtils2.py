@@ -53,13 +53,13 @@ class DBUtils2(object):
         fmtr = DBStrings.DBFormatter()
         self.format = fmtr.format
         self.re = fmtr.re
-        
+
     def __del__(self):
         """
         try and clean up a little bit
         """
         self._closeDB()
-        
+
     def __repr__(self):
         """
         @summary: Print out something usefule when one prints the class instance
@@ -148,7 +148,7 @@ class DBUtils2(object):
 
             DBlogging.dblogger.info("Database Connection opened: {0}".format(str(engine)))
 
-        except DBError: 
+        except DBError:
             (t, v, tb) = sys.exc_info()
             raise(DBError('Error creating engine: ' + str(v)))
         try:
@@ -551,14 +551,14 @@ class DBUtils2(object):
         """
         while self.processqueueLen() > 0:
             self.processqueuePop()
-        DBlogging.dblogger.info( "Processqueue was cleared")        
+        DBlogging.dblogger.info( "Processqueue was cleared")
 
     def processqueueGetAll(self):
         """
         return the entire contents of the process queue
         """
         pqdata = [self.processqueueGet(ii) for ii in range(self.processqueueLen())]
-        if len(pqdata) != self.processqueueLen():            
+        if len(pqdata) != self.processqueueLen():
             DBlogging.dblogger.error( "Entire Processqueue was read incorrectly")
             raise(DBError("Something went wrong with processqueue readall"))
         DBlogging.dblogger.debug( "Entire Processqueue was read")
@@ -599,7 +599,7 @@ class DBUtils2(object):
         return the number of files in the process queue
         """
         return self.session.query(self.Processqueue).count()
-    
+
     def processqueuePop(self, index=0):
         """
         pop a file off the process queue (from the left)
@@ -739,7 +739,7 @@ class DBUtils2(object):
     def addProcess(self,
                     process_name,
                     output_product,
-                    output_timebase, 
+                    output_timebase,
                     extra_params=None,
                     super_process_id=None):
         """ add a process to the database
@@ -765,7 +765,7 @@ class DBUtils2(object):
             raise(ValueError("super_process_id must be int or None"))
         if output_timebase not in ['O', 'D', 'W', 'M', 'Y']:
             raise(ValueError("output_timebase invalid choice"))
-            
+
         try:
             p1 = self.Process()
         except AttributeError:
@@ -826,7 +826,7 @@ class DBUtils2(object):
 
     def addproductprocesslink(self,
                     input_product_id,
-                    process_id, 
+                    process_id,
                     optional):
         """ add a product process link to the database
 
@@ -1040,7 +1040,7 @@ class DBUtils2(object):
                    date_written,
                    output_interface_version,
                    newest_version,
-                   product, 
+                   product,
                    arguments=None):
         """
         Add an executable code to the DB
@@ -1424,8 +1424,8 @@ class DBUtils2(object):
             p_id = product
         sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
         ans = []
-        for v in sq: 
-            ans.append(v.process_id) 
+        for v in sq:
+            ans.append(v.process_id)
         return ans
 
     def getProcessTimebase(self, process):
@@ -1440,14 +1440,14 @@ class DBUtils2(object):
             p_id = product
         sq = self.session.query(self.Process.output_timebase).filter_by(process_id = p_id).all()
         return sq[0][0]
-            
+
     def getProcessID(self, proc_name):
         """
         given a process name return its id
         """
         sq = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()
-        return sq[0]        
-            
+        return sq[0]
+
     def getFileProduct(self, filename):
         """
         given a filename or file_id return the product id it belongs to
@@ -1460,7 +1460,7 @@ class DBUtils2(object):
             product_id = self.session.query(self.File.product_id).filter_by(file_id = f_id)[0][0]
             return product_id
         except IndexError:
-            return None                    
+            return None
 
     def getFileVersion(self, filename):
         """
@@ -1577,7 +1577,7 @@ class DBUtils2(object):
                 tmp = [v[0] for v in sq]
                 i_out.extend(tmp)
             return i_out
-                
+
     def _getInstruemntID(self, name):
         """
         Return the instrument_id for a givem instrument
@@ -1652,7 +1652,7 @@ class DBUtils2(object):
 
     def getFiles_product_utc_file_date(self, product_id, date):
         """
-        given a product id and a utc_file_date return all the files that match [(file_id, Version, product_id, utc_file_date), ]
+        given a product id and a utc_file_date return all the files that match [(file_id, Version, product_id, product_id, utc_file_date), ]
         """
         if isinstance(date, datetime.datetime):
             date = date.date()
@@ -1684,13 +1684,13 @@ class DBUtils2(object):
         for k1, k2 in itertools.combinations(data2, 2):
             ## TODO this can be done cleaner
             try: # if the key is gone, move on
-#                print '@@@@',  k1, k2, data2[k1], data2[k2]     
+#                print '@@@@',  k1, k2, data2[k1], data2[k2]
                 tmp = data2[k1]
                 tmp = data2[k2]
             except KeyError:
 #                print '\n'
                 continue
-            if data2[k1][1] != data2[k2][1]:   # not the same product 
+            if data2[k1][1] != data2[k2][1]:   # not the same product
                 continue
             if data2[k1][2] == data2[k2][2]: # same date
                 # drop the one with the lower version
@@ -1699,7 +1699,7 @@ class DBUtils2(object):
                 else:
                     del data2[k1]
         ## now we have a dict of just the unique files
-        ans = [data2[key] for key in data2]
+        ans = [(key, data2[key][0], data2[key][1], data2[key][2]) for key in data2]
         return ans
 
     def getInputProductID(self, process_id):
@@ -1820,11 +1820,10 @@ class DBUtils2(object):
         Given a code_id list return the full name (path and all) of the code
         """
         DBlogging.dblogger.debug("Entered getCodePath:")
-
         sq1 =  self.session.query(self.Code.relative_path).filter_by(code_id = code_id)  # should only have one value
-        sq2 =  self.session.query(self.Mission.rootdir).filter_by(mission_name = self.mission)  # should only have one value
+        sq2 =  self._getMissionDirectory()
         sq3 =  self.session.query(self.Code.filename).filter_by(code_id = code_id)  # should only have one value
-        return os.path.join(sq2[0][0], sq1[0][0], sq3[0][0])  # the [0][0] is ok (ish) since there can only be one
+        return os.path.join(sq2, sq1[0][0], sq3[0][0])  # the [0][0] is ok (ish) since there can only be one
 
     def getOutputProductFromProcess(self, process):
         """
@@ -1848,17 +1847,8 @@ class DBUtils2(object):
         given a process id return the code that makes perfoms that process
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess:")
-        if not isinstance(proc_id, (list, tuple)):
-            proc_id = [proc_id]
-
-        ans = []
-        for val in proc_id:
-            sq1 =  self.session.query(self.Code.code_id).filter_by(process_id = val)  # should only have one value
-            try:
-                ans.extend( sq1[0])
-            except IndexError:
-                continue
-        return ans
+        sq1 =  self.session.query(self.Code.code_id).filter_by(process_id = proc_id)  # should only have one value
+        return sq1[0][0]
 
     def getCodeArgs(self, code_id):
         """
@@ -1937,7 +1927,7 @@ class DBUtils2(object):
             f1.filename = val
             file_date
             f1.utc_file_date = None
-            
+
 
 
 
