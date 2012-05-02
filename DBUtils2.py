@@ -1652,51 +1652,54 @@ class DBUtils2(object):
 
     def getFiles_product_utc_file_date(self, product_id, date):
         """
-        given a product id and a utc_file_date return all the files that match
+        given a product id and a utc_file_date return all the files that match [(file_id, Version, product_id, utc_file_date), ]
         """
         if isinstance(date, datetime.datetime):
             date = date.date()
         sq = self.session.query(self.File).filter_by(product_id = product_id).filter_by(utc_file_date = date)
-        sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version) ) for v in sq]
+        sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
         return sq
 
     def getFiles_product_utc_file_daterange(self, product_id, daterange):
         """
-        given a product id and a utc_file_date return all the files that have data in the range
+        given a product id and a utc_file_date return all the files that have data in the range [(file_id, Version, product_id, utc_file_date), ]
         """
         sq11 = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_stop_time >= daterange[0]).filter(self.File.utc_start_time <= daterange[1]).all()
-        vers = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version) ) for v in sq11]
+        vers = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq11]
         # need to drop all the same files with lower versions
         ans = self.file_id_Clean(vers)
         return ans
 
     def file_id_Clean(self, invals):
         """
-        given an input tuple (file_id, version) from he same product go through and clear out lower versions of the same files
-        this is determined by product and utc_file_date
+        given an input tuple (file_id, Version, product_id, utc_file_date) go through and clear out lower versions of the same files
+        this is determined by utc_file_date
         """
         # TODO this might break with weekly input files
         # build up a list of tuples file_id, product_id, utc_file_date, version
-        file_dates = [self.getFileUTCfileDate(file_id) for file_id, ver in invals]
 
         ## think here on better, but a dict makes for easy del
-        data2 = {}
-        for ii, val in enumerate(invals):
-            data2[ii] = (val[0], val[1], file_dates[11])
-        for k1, k2 in itertools.product(range(len(data2)), range(len(data2))):
-            if k1 == k2:
+        data2 = dict((x, (y1, y2, y3)) for x, y1, y2, y3 in invals)
+
+        for k1, k2 in itertools.combinations(data2, 2):
+            ## TODO this can be done cleaner
+            try: # if the key is gone, move on
+#                print '@@@@',  k1, k2, data2[k1], data2[k2]     
+                tmp = data2[k1]
+                tmp = data2[k2]
+            except KeyError:
+#                print '\n'
                 continue
-            try:
-                if data2[k1][2] == data2[k2][2]: # same product an date
-                    # drop the one with the lower version
-                    if data2[k1][1] > data2[k2][1]:
-                        del data2[k2]
-                    else:
-                        del data2[k1]
-            except KeyError: # we deleted one of them
+            if data2[k1][1] != data2[k2][1]:   # not the same product 
                 continue
+            if data2[k1][2] == data2[k2][2]: # same date
+                # drop the one with the lower version
+                if data2[k1][0] > data2[k2][0]:
+                    del data2[k2]
+                else:
+                    del data2[k1]
         ## now we have a dict of just the unique files
-        ans = [(data2[key][0], data2[key][1]) for key in data2]
+        ans = [data2[key] for key in data2]
         return ans
 
     def getInputProductID(self, process_id):
