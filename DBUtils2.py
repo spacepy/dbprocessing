@@ -753,24 +753,11 @@ class DBUtils2(object):
         @type extra_params: str
         @keyword super_process_id: th process id of the superprocess for this process
         @type super_process_id: int
-
         """
-        # TODO I think that the DB will deal with this...
-        if not isinstance(process_name, str):
-            raise(ValueError("process name has to  a string"))
-        if not isinstance(output_product, (int, long)):
-            raise(ValueError("output_product must be an int"))
-        if not isinstance(extra_params, str) and extra_params != None:
-            raise(ValueError("extra_params muct be string or None"))
-        if not isinstance(super_process_id, (int, long)) and super_process_id != None:
-            raise(ValueError("super_process_id must be int or None"))
         if output_timebase not in ['O', 'D', 'W', 'M', 'Y']:
             raise(ValueError("output_timebase invalid choice"))
 
-        try:
-            p1 = self.Process()
-        except AttributeError:
-            raise(DBError("Class process not found was it created?"))
+        p1 = self.Process()
         p1.output_product = output_product
         p1.process_name = process_name
         p1.extra_params = extra_params
@@ -803,13 +790,8 @@ class DBUtils2(object):
         @type super_product_id: int
         @param format: the format of the product files
         @type super_product_id: str
-
         """
-
-        try:
-            p1 = self.Product()
-        except AttributeError:
-            raise(DBError("Class product not found was it created?"))
+        p1 = self.Product()
 
         p1.instrument_id = instrument_id
         p1.product_name = product_name
@@ -941,15 +923,7 @@ class DBUtils2(object):
         @param satellite_id: the root directory of the mission
         @type satellite_id: int
         """
-        if not isinstance(instrument_name, str):
-            raise(ValueError("Instrument name has to  a string"))
-        if not isinstance(satellite_id, (int, long)):
-            raise(ValueError("Satellite_id must be an int"))
-
-        try:
-            i1 = self.Instrument()
-        except:
-            raise(DBError("Class Instrument not found was it created?"))
+        i1 = self.Instrument()
 
         i1.satellite_id = satellite_id
         i1.instrument_name = instrument_name

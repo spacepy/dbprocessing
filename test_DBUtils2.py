@@ -118,7 +118,36 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addMission()
         id = self.dbu.addSatellite('satname')
         self.assertEqual(id, 1)
+        self.assertRaises(DBUtils2.DBError, self.addSatellite)
 
+    def addSatellite(self):
+        """add satellite utility"""
+        self.satellite = self.dbu.addSatellite('satname')
+
+    def test_addInstrument(self):
+        """testing addInstrument"""
+        self.addMission()
+        self.addSatellite()
+        id = self.dbu.addInstrument('instname', 1)
+        self.assertEqual(id, 1)
+        self.assertRaises(DBUtils2.DBError, self.addInstrument)
+
+    def addInstrument(self):
+        """addInstrument utility"""
+        self.instrument = self.dbu.addInstrument('instname', 1)
+
+    def test_addProduct(self):
+        """test addProduct"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        id = self.dbu.addProduct('prod1', 1, 'prod1_path', None, 'format', 0)
+        self.assertEqual(id, 1)
+        self.assertRaises(DBUtils2.DBError, self.addProduct)        
+
+    def addProduct(self):
+        """addProduct utility"""
+        self.product = self.dbu.addProduct('prod1', 1, 'prod1_path', None, 'format', 0)
         
         
 #    def test_startLogging(self):
@@ -160,16 +189,6 @@ class DBUtils2AddTests(unittest.TestCase):
     def test_addSatelliteOrder(self):
         """_addSatellite wont work until the Mission class is created from the DB"""
         self.assertRaises(DBUtils2.DBError, self.dbu.addSatellite, 'satname', )
-
-    def test_addInstrumentInput(self):
-        """_addInstrument should only accept strig input"""
-        self.assertRaises(ValueError, self.dbu.addInstrument, 1234, 'id string')
-        self.assertRaises(ValueError, self.dbu.addInstrument, 1234, 1234)
-        self.assertRaises(ValueError, self. dbu.addInstrument, 'instname', 'id string')
-
-    def test_addInstrumentOrder(self):
-        """_addInstrument wont work until the Mission class is created from the DB"""
-        self.assertRaises(DBUtils2.DBError, self.dbu.addInstrument, 'instname', 1234)
 
     def test_addProcessInput(self):
         """_addProcess should only accept correct input"""
