@@ -18,7 +18,7 @@ class DBUtils2AddTests(unittest.TestCase):
     
     def setUp(self):
         super(DBUtils2AddTests, self).setUp()
-        self.dbu = DBUtils2.DBUtils2()
+        self.dbu = DBUtils2.DBUtils2(mission='unittest')
         self.dbu._openDB()
         self.dbu._createTableObjects()
 
@@ -29,50 +29,43 @@ class DBUtils2AddTests(unittest.TestCase):
 
     def test_addMissionInput(self):
         """_addMission should only accept strig input"""
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addMission, 1234, 12345)
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addMission, 1234, 'path')
-        self.assertRaises(DBUtils2.DBInputError, self. dbu._addMission, 'filename', 12345)
+        self.assertRaises(DBUtils2.DBInputError, self.dbu.addMission, 1234, 12345)
+        self.assertRaises(DBUtils2.DBInputError, self.dbu.addMission, 1234, 'path')
+        self.assertRaises(DBUtils2.DBInputError, self. dbu.addMission, 'filename', 12345)
 
     def test_addMissionOrder(self):
         """_addMission wont work until the Mission class is created from the DB"""
-        self.assertRaises(DBUtils2.DBError, self.dbu._addMission, 'filename', 'path')
+        self.assertRaises(DBUtils2.DBError, self.dbu.addMission, 'filename', 'path')
 
     def test_addSatelliteInput(self):
-        """_addSatellite should only accept strig input"""
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addSatellite, 1234, 'id string')
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addSatellite, 1234, 1234)
-        self.assertRaises(DBUtils2.DBInputError, self. dbu._addSatellite, 'filename', 'id string')
+        """_addSatellite should only accept string input"""
+        self.assertRaises(DBUtils2.DBInputError, self.dbu.addSatellite, 1234)
 
     def test_addSatelliteOrder(self):
         """_addSatellite wont work until the Mission class is created from the DB"""
-        self.assertRaises(DBUtils2.DBError, self.dbu._addSatellite, 'satname', 1234)
+        self.assertRaises(DBUtils2.DBError, self.dbu.addSatellite, 'satname', )
 
     def test_addInstrumentInput(self):
         """_addInstrument should only accept strig input"""
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addInstrument, 1234, 'id string')
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addInstrument, 1234, 1234)
-        self.assertRaises(DBUtils2.DBInputError, self. dbu._addInstrument, 'instname', 'id string')
+        self.assertRaises(DBUtils2.DBInputError, self.dbu.addInstrument, 1234, 'id string')
+        self.assertRaises(DBUtils2.DBInputError, self.dbu.addInstrument, 1234, 1234)
+        self.assertRaises(DBUtils2.DBInputError, self. dbu.addInstrument, 'instname', 'id string')
 
     def test_addInstrumentOrder(self):
         """_addInstrument wont work until the Mission class is created from the DB"""
-        self.assertRaises(DBUtils2.DBError, self.dbu._addInstrument, 'instname', 1234)
+        self.assertRaises(DBUtils2.DBError, self.dbu.addInstrument, 'instname', 1234)
 
     def test_addProcessInput(self):
         """_addProcess should only accept correct input"""
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addProcess, 1234, 'id string', 123, 'string')
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addProcess, 'process', 1234, 1234)
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addProcess, 'process', 1234, 'string', 'string')
-        self.assertRaises(DBUtils2.DBInputError, self.dbu._addProcess, 'process', 1234, None, 'string')
+        self.assertRaises(ValueError, self.dbu.addProcess, 1234, 'id string', 123, 'string')
+        self.assertRaises(ValueError, self.dbu.addProcess, 'process', 1234, 1234)
+        self.assertRaises(ValueError, self.dbu.addProcess, 'process', 1234, 'string', 'string')
+        self.assertRaises(ValueError, self.dbu.addProcess, 'process', 1234, None, 'string')
 
     def test_addProcessOrder(self):
         """_addProcess wont work until the Process class is created from the DB"""
-        self.assertRaises(DBUtils2.DBError, self.dbu._addProcess, 'instname', 1234)
-        self.assertRaises(DBUtils2.DBError, self.dbu._addProcess, 'instname', 1234, 'string')
-        self.assertRaises(DBUtils2.DBError, self.dbu._addProcess, 'instname', 1234, 'string', 1234)
-
-    ## def test_addProductOrder(self):
-    ##     """_addProduct wont work until the Product class is created from the DB"""
-    ##     self.assertRaises(DBUtils2.DBError, self.dbu._addProduct, 'pname' , 11, 'rel_path', 1234, 'path')
+        self.assertRaises(TypeError, self.dbu.addProcess, 'instname', 1234)
+        self.assertRaises(ValueError, self.dbu.addProcess, 'instname', 1234, 'string')
 
     def test_addCodeOrder(self):
         """_addCode wont work until the Code class is created from the DB"""
@@ -80,7 +73,7 @@ class DBUtils2AddTests(unittest.TestCase):
         startt = datetime.datetime(2010, 4, 5)
         stopt = datetime.datetime(2010, 4, 7)
         writet = datetime.datetime(2010, 6, 7)
-        self.assertRaises(DBUtils2.DBError, self.dbu._addCode, 'string',
+        self.assertRaises(DBUtils2.DBError, self.dbu.addCode, 'string',
                           'string', startt, stopt, 'string', 1234, ver,
                           False, startt, 1234, True)
 
@@ -89,7 +82,7 @@ class DBUtils2AddTests(unittest.TestCase):
         startt = datetime.datetime(2010, 4, 5)
         stopt = datetime.datetime(2010, 4, 7)
         ver =Version.Version(1, 0, 0)
-        self.assertRaises(DBUtils2.DBError, self.dbu._addCode, 'string', 'string', stopt, startt, 'string', 1234, ver, False, startt, 1, True)
+        self.assertRaises(DBUtils2.DBError, self.dbu.addCode, 'string', 'string', stopt, startt, 'string', 1234, ver, False, startt, 1, True)
 
 class DBUtils2ClassMethodTests(unittest.TestCase):
     """Tests for class methods of DBUtils2"""
@@ -121,7 +114,7 @@ class DBUtils2DBTests(unittest.TestCase):
     """Tests for database access through DBUtils2"""
 
     def __init__(self, *args):
-        self.dbp = DBUtils2.DBUtils2('unittest')
+        self.dbp = DBUtils2.DBUtils2(mission='unittest')
         super(DBUtils2DBTests, self).__init__(*args)
 
     def test_opencloseDB(self):
@@ -210,7 +203,7 @@ class DBUtils2DBUseTests(unittest.TestCase):
         super(DBUtils2DBUseTests, self).__init__(*args)
 
     def setUp(self):
-        self.dbu = DBUtils2.DBUtils2()
+        self.dbu = DBUtils2.DBUtils2(mission='unittest')
         self.dbu._openDB()
         self.dbu._createTableObjects()
         super(DBUtils2DBUseTests, self).setUp()
@@ -220,46 +213,6 @@ class DBUtils2DBUseTests(unittest.TestCase):
         self.dbu._closeDB()
         del self.dbu
         super(DBUtils2DBUseTests, self).tearDown()
-
-    def test_getMissionDirectory(self):
-        """ _getMissionDirectory should return known ouput for a known mission"""
-        self.assertEqual(u'/n/projects/cda/Test', self.dbu._getMissionDirectory())
-
-    def test_checkIncomming(self):
-        """ adding a file to incoming should be found by this method """
-        fd = open(self.dbu._getMissionDirectory() + '/incoming/unittest.tst', 'w')
-        fd.write('Test')
-        fd.close()
-        self.assertTrue(self.dbu._getMissionDirectory() + '/incoming/unittest.tst' in self.dbu._checkIncoming())
-        os.remove(self.dbu._getMissionDirectory() + '/incoming/unittest.tst')
-
-#    def test_addDataFile(self):
-#        """_addDataFile should add a file entry to the db"""
-#        import datetime
-#        in_val = ('Filename',
-#                  datetime.date(2010, 4, 5),
-#                  datetime.datetime(2010,4,5),
-#                  datetime.datetime(2010,4,5, 23, 59, 59),
-#                  0,
-#                  None,
-#                  1,
-#                  None,
-#                  False,
-#                  None,
-#                  None,
-#                  None,
-#                  1,
-#                  1,
-#                  1,
-#                  datetime.datetime(2010,7,5, 23, 59, 59),
-#                  4,
-#                  None,
-#                  None,
-#                  True,
-#                  'File'
-#                  )
-#        self.assertTrue(self.dbp._addDataFile(*in_val))
-#
 
 
 if __name__ == "__main__":
