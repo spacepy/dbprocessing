@@ -120,7 +120,7 @@ class DBUtils2(object):
 ###### DB and Tables ###############
 ####################################
 
-    def _openDB(self, verbose=False):
+    def _openDB(self, db_var=None, verbose=False):
         """
         setup python to talk to the database, this is where it is, name and password.
 
@@ -142,7 +142,10 @@ class DBUtils2(object):
                 engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
 
             elif self.mission == 'unittest':
-                engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=False)
+                if db_var is None:
+                    engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=False)
+                else:
+                    engine = db_var.engine
 
             DBlogging.dblogger.info("Database Connection opened: {0}".format(str(engine)))
 

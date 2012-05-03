@@ -6,11 +6,106 @@ import os.path
 import sys
 import unittest
 
+import CreateDB
 import DBUtils2
 import Version
 
 
 __version__ = '2.0.3'
+
+
+
+class DBUtils2DBTests(unittest.TestCase):
+    """Tests for database access through DBUtils2"""
+
+    def setUp(self):
+        super(DBUtils2DBTests, self).setUp()
+        db = CreateDB.dbprocessing_db(filename = ':memory:', create=True)
+        self.dbu = DBUtils2.DBUtils2(mission='unittest')
+        self.dbu._openDB(db_var=db)
+        self.dbu._createTableObjects()
+
+    def tearDown(self):
+        super(DBUtils2DBTests, self).tearDown()
+        self.dbu._closeDB()
+        del self.dbu
+
+    def test_opencloseDB(self):
+        """_open should open a db in memory and _close should close it"""
+        self.dbu._openDB()
+        self.assertTrue(self.dbu._openDB() is None)
+        try:
+            self.dbu.engine
+        except:
+            self.fail("engine was not created")
+        try:
+            self.dbu.metadata
+        except:
+            self.fail("Metadata not created")
+        try:
+            self.dbu.session
+        except:
+            self.fail("Session not created")
+        ## should think up a better test here
+        self.dbu._closeDB()
+        self.assertTrue(self.dbu._closeDB() is None)
+
+    def test_init(self):
+        """__init__ has an exception to test"""
+        self.assertRaises(DBUtils2.DBError, DBUtils2.DBUtils2, None)
+
+    def test_repr(self):
+        """__repr__ should print a known output"""
+        self.dbu._openDB()
+        self.assertEqual('DBProcessing class instance for mission ' + self.dbu.mission + ', version: ' + DBUtils2.__version__,
+                         self.dbu.__repr__())
+
+    def test_createTableObjects(self):
+        """_createTableObjects should do just that"""
+        from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, BigInteger, Date, DateTime, BigInteger, Boolean
+        self.dbu._openDB()
+        metadata = MetaData()
+        data_file_table = Table('data_files', metadata,
+                                Column('f_id', Integer, primary_key=True),
+                                Column('filename', String(50)),
+                                Column('utc_file_date', Date),
+                                Column('utc_start_time', DateTime),
+                                Column('utc_end_time', DateTime),
+                                Column('data_level', Integer),
+                                Column('consistency_check', DateTime),
+                                Column('interface_version', Integer),
+                                Column('verbose_provenance', String(500)),
+                                Column('quality_check', String(1)),
+                                Column('quality_comment', String(100)),
+                                Column('caveats', String(20)),
+                                Column('release_number', String(2)),
+                                Column('ds_id', Integer),
+                                Column('quality_version', Integer),
+                                Column('revision_version', Integer),
+                                Column('file_create_date', DateTime),
+                                Column('dp_id', Integer),
+                                Column('met_start_time', Integer),
+                                Column('met_stop_time', Integer),
+                                Column('exists_on_disk', Boolean),
+                                Column('base_filename', String(50))
+                                )
+        metadata.create_all(self.dbu.engine)
+        ## now the actual test
+        try:
+            self.dbu._createTableObjects()
+        except DBUtils2.DBError:
+            self.fail('Error is setting up table->class mapping')
+        try:
+            self.dbu.Data_files
+        except AttributeError:
+            self.fail('Class not created')
+
+    def test_addMission(self):
+        """add a mission to the DB"""
+        m = self.dbu.Mission()
+        m.mission_name = 'name'
+        m.rootdir = 'rootdir'
+
 
 
 class DBUtils2AddTests(unittest.TestCase):
@@ -108,90 +203,6 @@ class DBUtils2ClassMethodTests(unittest.TestCase):
         else:
             self.fail('Should have raised DBError: ' +
                       errstr)
-
-
-class DBUtils2DBTests(unittest.TestCase):
-    """Tests for database access through DBUtils2"""
-
-    def __init__(self, *args):
-        self.dbp = DBUtils2.DBUtils2(mission='unittest')
-        super(DBUtils2DBTests, self).__init__(*args)
-
-    def test_opencloseDB(self):
-        """_open should open a db in memory and _close should close it"""
-        self.dbp._openDB()
-        self.assertTrue(self.dbp._openDB() is None)
-        try:
-            self.dbp.engine
-        except:
-            self.fail("engine was not created")
-        try:
-            self.dbp.metadata
-        except:
-            self.fail("Metadata not created")
-        try:
-            self.dbp.session
-        except:
-            self.fail("Session not created")
-        ## should think up a better test here
-        self.dbp._closeDB()
-        self.assertTrue(self.dbp._closeDB() is None)
-
-
-    def test_init(self):
-        """__init__ has an exception to test"""
-        self.assertRaises(DBUtils2.DBError, DBUtils2.DBUtils2, None)
-
-    def test_repr(self):
-        """__repr__ should print a known output"""
-        self.dbp._openDB()
-        self.assertEqual('DBProcessing class instance for mission ' + self.dbp.mission + ', version: ' + DBUtils2.__version__,
-                         self.dbp.__repr__())
-
-    def test_createTableObjects(self):
-        """_createTableObjects should do just that"""
-        from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, BigInteger, Date, DateTime, BigInteger, Boolean
-        self.dbp._openDB()
-        metadata = MetaData()
-        data_file_table = Table('data_files', metadata,
-                                Column('f_id', Integer, primary_key=True),
-                                Column('filename', String(50)),
-                                Column('utc_file_date', Date),
-                                Column('utc_start_time', DateTime),
-                                Column('utc_end_time', DateTime),
-                                Column('data_level', Integer),
-                                Column('consistency_check', DateTime),
-                                Column('interface_version', Integer),
-                                Column('verbose_provenance', String(500)),
-                                Column('quality_check', String(1)),
-                                Column('quality_comment', String(100)),
-                                Column('caveats', String(20)),
-                                Column('release_number', String(2)),
-                                Column('ds_id', Integer),
-                                Column('quality_version', Integer),
-                                Column('revision_version', Integer),
-                                Column('file_create_date', DateTime),
-                                Column('dp_id', Integer),
-                                Column('met_start_time', Integer),
-                                Column('met_stop_time', Integer),
-                                Column('exists_on_disk', Boolean),
-                                Column('base_filename', String(50))
-                                )
-        metadata.create_all(self.dbp.engine)
-        ## now the actual test
-        try:
-            self.dbp._createTableObjects()
-        except DBUtils2.DBError:
-            self.fail('Error is setting up table->class mapping')
-        try:
-            self.dbp.Data_files
-        except AttributeError:
-            self.fail('Class not created')
-
-    def test_createViews(self):
-        """_createViews should do just that"""
-        # TODO define a test here, not sure how to crate views from within SQLAlchemy
-        pass
 
 
 class DBUtils2DBUseTests(unittest.TestCase):
