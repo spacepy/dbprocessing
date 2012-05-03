@@ -148,8 +148,44 @@ class DBUtils2DBTests(unittest.TestCase):
     def addProduct(self):
         """addProduct utility"""
         self.product = self.dbu.addProduct('prod1', 1, 'prod1_path', None, 'format', 0)
+
+    def addProductOutput(self):
+        """addProductOutput utility"""
+        self.productOutput = self.dbu.addProduct('prod2', 1, 'prod2_path', None, 'format', 0)
         
-        
+    def test_addProcess(self):
+        """test addProcess"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()      
+        self.assertRaises(ValueError, self.dbu.addProcess, 'process1', 1, 'BADVAL', extra_params='Extra=extra', super_process_id=None)
+        id = self.dbu.addProcess('process1', 1, 'DAILY', extra_params='Extra=extra', super_process_id=None)
+        self.assertEqual(id, 1)        
+        self.assertRaises(DBUtils2.DBError, self.addProcess)
+
+    def addProcess(self):
+        """addProcess utility"""
+        self.process = self.dbu.addProcess('process1', 1, 'DAILY', extra_params='Extra=extra', super_process_id=None)
+
+    def test_addproductprocesslink(self):
+        """test addproductprocesslink"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct() 
+        self.addProductOutput()
+        self.addProcess()
+        in_id, proc_id = self.dbu.addproductprocesslink(1, 1, False)
+        self.assertEqual(in_id, 1)        
+        self.assertEqual(proc_id, 1)        
+        self.assertRaises(DBUtils2.DBError, self.addproductprocesslink)
+
+    def addproductprocesslink(self):
+        """addproductprocesslink utility"""
+        self.productprocesslink = self.dbu.addproductprocesslink(1, 1, False)
+
+
 #    def test_startLogging(self):
 #        """_startLogging should enter data into db"""
 #        self.dbu._startLogging()
@@ -189,18 +225,6 @@ class DBUtils2AddTests(unittest.TestCase):
     def test_addSatelliteOrder(self):
         """_addSatellite wont work until the Mission class is created from the DB"""
         self.assertRaises(DBUtils2.DBError, self.dbu.addSatellite, 'satname', )
-
-    def test_addProcessInput(self):
-        """_addProcess should only accept correct input"""
-        self.assertRaises(ValueError, self.dbu.addProcess, 1234, 'id string', 123, 'string')
-        self.assertRaises(ValueError, self.dbu.addProcess, 'process', 1234, 1234)
-        self.assertRaises(ValueError, self.dbu.addProcess, 'process', 1234, 'string', 'string')
-        self.assertRaises(ValueError, self.dbu.addProcess, 'process', 1234, None, 'string')
-
-    def test_addProcessOrder(self):
-        """_addProcess wont work until the Process class is created from the DB"""
-        self.assertRaises(TypeError, self.dbu.addProcess, 'instname', 1234)
-        self.assertRaises(ValueError, self.dbu.addProcess, 'instname', 1234, 'string')
 
     def test_addCodeOrder(self):
         """_addCode wont work until the Code class is created from the DB"""

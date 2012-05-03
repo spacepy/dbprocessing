@@ -754,7 +754,7 @@ class DBUtils2(object):
         @keyword super_process_id: th process id of the superprocess for this process
         @type super_process_id: int
         """
-        if output_timebase not in ['O', 'D', 'W', 'M', 'Y']:
+        if output_timebase not in ['ORBIT', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'FILE']:
             raise(ValueError("output_timebase invalid choice"))
 
         p1 = self.Process()
@@ -819,12 +819,7 @@ class DBUtils2(object):
         @type process_id: int
 
         """
-        if not isinstance(optional, bool):
-            raise(ValueError("optional must be a boolean"))
-        try:
-            ppl1 = self.Productprocesslink()
-        except AttributeError:
-            raise(DBError("Class Productprocesslink not found was it created?"))
+        ppl1 = self.Productprocesslink()
         ppl1.input_product_id = input_product_id
         ppl1.process_id = process_id
         ppl1.optional = optional
