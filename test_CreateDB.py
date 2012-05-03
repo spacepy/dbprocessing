@@ -389,6 +389,7 @@ class CreateDBTests(unittest.TestCase):
         ppl = self.db.Productprocesslink()
         ppl.process_id = 1
         ppl.input_product_id = 1
+        ppl.optional = False
         self.session.add(ppl)
         self.session.commit()
         self.assertEqual(self.session.query(self.db.Productprocesslink).count(), 1)
