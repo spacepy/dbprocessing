@@ -102,10 +102,31 @@ class DBUtils2DBTests(unittest.TestCase):
 
     def test_addMission(self):
         """add a mission to the DB"""
-        m = self.dbu.Mission()
-        m.mission_name = 'name'
-        m.rootdir = 'rootdir'
+        m = self.dbu.addMission('unittest', 'rootdir')
+        self.assertEqual(m, 1)
+        self.assertEqual(self.dbu._getMissionID(), m)
+        self.assertEqual(self.dbu._getMissionDirectory(), 'rootdir')
+        self.assertEqual(self.dbu._getMissionName(), 'unittest')
+        self.assertRaises(DBUtils2.DBError, self.addMission)
 
+    def addMission(self):
+        """utility to add a mission"""
+        self.mission = self.dbu.addMission('unittest', 'rootdir')
+
+    def test_addSatellite(self):
+        """add a satellite to the DB"""
+        self.addMission()
+        id = self.dbu.addSatellite('satname')
+        self.assertEqual(id, 1)
+
+        
+        
+#    def test_startLogging(self):
+#        """_startLogging should enter data into db"""
+#        self.dbu._startLogging()
+#        sq = self.dbu.session.query(self.dbu.Logging.logging_id).all() # should be just one entry
+#        print "########################", sq
+#        self.assertEqual(sq[0], 1)
 
 
 class DBUtils2AddTests(unittest.TestCase):

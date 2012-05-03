@@ -1554,8 +1554,8 @@ class DBUtils2(object):
         >>> dbp._getMissionID()
         19
         """
-        sq = self.session.query(self.Mission).filter_by(mission_name = self.mission)
-        return sq[0].mission_id
+        sq = self.session.query(self.Mission.mission_id).filter_by(mission_name = self.mission)
+        return sq[0][0]
 
     def _getMissionName(self, id=None):
         """
