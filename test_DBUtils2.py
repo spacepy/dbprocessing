@@ -143,7 +143,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addInstrument()
         id = self.dbu.addProduct('prod1', 1, 'prod1_path', None, 'format', 0)
         self.assertEqual(id, 1)
-        self.assertRaises(DBUtils2.DBError, self.addProduct)        
+        self.assertRaises(DBUtils2.DBError, self.addProduct)
 
     def addProduct(self):
         """addProduct utility"""
@@ -152,16 +152,16 @@ class DBUtils2DBTests(unittest.TestCase):
     def addProductOutput(self):
         """addProductOutput utility"""
         self.productOutput = self.dbu.addProduct('prod2', 1, 'prod2_path', None, 'format', 0)
-        
+
     def test_addProcess(self):
         """test addProcess"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()
-        self.addProduct()      
+        self.addProduct()
         self.assertRaises(ValueError, self.dbu.addProcess, 'process1', 1, 'BADVAL', extra_params='Extra=extra', super_process_id=None)
         id = self.dbu.addProcess('process1', 1, 'DAILY', extra_params='Extra=extra', super_process_id=None)
-        self.assertEqual(id, 1)        
+        self.assertEqual(id, 1)
         self.assertRaises(DBUtils2.DBError, self.addProcess)
 
     def addProcess(self):
@@ -173,17 +173,56 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addMission()
         self.addSatellite()
         self.addInstrument()
-        self.addProduct() 
+        self.addProduct()
         self.addProductOutput()
         self.addProcess()
         in_id, proc_id = self.dbu.addproductprocesslink(1, 1, False)
-        self.assertEqual(in_id, 1)        
-        self.assertEqual(proc_id, 1)        
+        self.assertEqual(in_id, 1)
+        self.assertEqual(proc_id, 1)
         self.assertRaises(DBUtils2.DBError, self.addproductprocesslink)
 
     def addproductprocesslink(self):
         """addproductprocesslink utility"""
         self.productprocesslink = self.dbu.addproductprocesslink(1, 1, False)
+
+    def test_addCode(self):
+        """test addCode"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        code_id = self.dbu.addCode('code_filename',
+                                   'code_path',
+                                   datetime.datetime(2000, 1, 1),
+                                   datetime.datetime(2013, 1, 1),
+                                   'code description',
+                                   1,
+                                   Version.Version(1,0,0),
+                                   True,
+                                   datetime.datetime(2012, 5, 3),
+                                   1,
+                                   True,
+                                   arguments='arguments')
+        self.assertEqual(code_id, 1)
+        self.assertRaises(DBUtils2.DBError, self.addCode)
+
+    def addCode(self):
+        """addCode utility"""
+        self.code = self.dbu.addCode('code_filename',
+                                   'code_path',
+                                   datetime.datetime(2000, 1, 1),
+                                   datetime.datetime(2013, 1, 1),
+                                   'code description',
+                                   1,
+                                   Version.Version(1,0,0),
+                                   True,
+                                   datetime.datetime(2012, 5, 3),
+                                   1,
+                                   True,
+                                   arguments='arguments')
+
 
 
 #    def test_startLogging(self):
@@ -196,7 +235,7 @@ class DBUtils2DBTests(unittest.TestCase):
 
 class DBUtils2AddTests(unittest.TestCase):
     """Tests for add methods (?) of DBUtils2"""
-    
+
     def setUp(self):
         super(DBUtils2AddTests, self).setUp()
         self.dbu = DBUtils2.DBUtils2(mission='unittest')
@@ -226,22 +265,6 @@ class DBUtils2AddTests(unittest.TestCase):
         """_addSatellite wont work until the Mission class is created from the DB"""
         self.assertRaises(DBUtils2.DBError, self.dbu.addSatellite, 'satname', )
 
-    def test_addCodeOrder(self):
-        """_addCode wont work until the Code class is created from the DB"""
-        ver =Version.Version(1, 0, 0)
-        startt = datetime.datetime(2010, 4, 5)
-        stopt = datetime.datetime(2010, 4, 7)
-        writet = datetime.datetime(2010, 6, 7)
-        self.assertRaises(DBUtils2.DBError, self.dbu.addCode, 'string',
-                          'string', startt, stopt, 'string', 1234, ver,
-                          False, startt, 1234, True)
-
-    def test_code_dats(self):
-        """Stop date must be after start date"""
-        startt = datetime.datetime(2010, 4, 5)
-        stopt = datetime.datetime(2010, 4, 7)
-        ver =Version.Version(1, 0, 0)
-        self.assertRaises(DBUtils2.DBError, self.dbu.addCode, 'string', 'string', stopt, startt, 'string', 1234, ver, False, startt, 1, True)
 
 class DBUtils2ClassMethodTests(unittest.TestCase):
     """Tests for class methods of DBUtils2"""
@@ -271,7 +294,7 @@ class DBUtils2ClassMethodTests(unittest.TestCase):
 
 class DBUtils2DBUseTests(unittest.TestCase):
     """Tests for DBUtils2"""
-    
+
     def __init__(self, *args):
         # TODO change this to a test DB not the real one
 

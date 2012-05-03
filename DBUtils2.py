@@ -367,11 +367,7 @@ class DBUtils2(object):
             val.comment = 'Overridden:' + comment + ':' + __version__
             DBlogging.dblogger.error( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
             self.session.add(val)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return True
 
 
@@ -446,11 +442,7 @@ class DBUtils2(object):
         l1.processing_end_time = processing_end_time
         l1.comment = comment
         self.session.add(l1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return l1    # so we can use the same session to stop the logging
 
     def _stopLogging(self, comment):
@@ -476,11 +468,7 @@ class DBUtils2(object):
         self.__p1.currently_processing = False
         self.__p1.comment = comment+':' + __version__
         self.session.add(self.__p1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         DBlogging.dblogger.info( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) )
 
     def _addLoggingFile(self,
@@ -508,11 +496,7 @@ class DBUtils2(object):
         self.session.add(pf1)
         DBlogging.dblogger.info( "File Logging added for file:%d code:%d with comment:%s"  % (pf1.file_id, pf1.code_id, pf1.comment) )
         # TODO  think on if session should be left open or if a list shoud be passed in
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return pf1.logging_file_id
 
     def _checkDiskForFile(self, fix=False):
@@ -539,11 +523,7 @@ class DBUtils2(object):
                         if fix == True:
                             sq.exists_on_disk = True
                             self.session.add(sq)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return counter
 
     def processqueueFlush(self):
@@ -587,11 +567,7 @@ class DBUtils2(object):
         pq1.file_id = fileid
         self.session.add(pq1)
         DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self._getFilename(fileid) ) )
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
 
@@ -628,11 +604,7 @@ class DBUtils2(object):
                     self.session.delete(fid)
                     fid_ret = fid.file_id
                     break # there can be only one
-            try:
-                self.session.commit()
-            except IntegrityError as IE:
-                self.session.rollback()
-                raise(DBError(IE))
+            self._commitDB()
             return fid_ret
 
     def processqueueGet(self, index=0):
@@ -706,11 +678,7 @@ class DBUtils2(object):
         m1.mission_name = mission_name
         m1.rootdir = rootdir
         self.session.add(m1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return m1.mission_id
 
     def addSatellite(self,
@@ -730,11 +698,7 @@ class DBUtils2(object):
         s1.mission_id = self._getMissionID()
         s1.satellite_name = satellite_name
         self.session.add(s1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return self._getSatelliteID(satellite_name)
 
     def addProcess(self,
@@ -764,11 +728,7 @@ class DBUtils2(object):
         p1.output_timebase = output_timebase
         p1.super_process_id = super_process_id
         self.session.add(p1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return p1.process_id
 
     def addProduct(self,
@@ -800,11 +760,7 @@ class DBUtils2(object):
         p1.format = format
         p1.level = level
         self.session.add(p1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return p1.product_id
 
     def addproductprocesslink(self,
@@ -824,11 +780,7 @@ class DBUtils2(object):
         ppl1.process_id = process_id
         ppl1.optional = optional
         self.session.add(ppl1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return ppl1.input_product_id, ppl1.process_id
 
     def addFilecodelink(self,
@@ -850,11 +802,7 @@ class DBUtils2(object):
         fcl1.resulting_file = resulting_file_id
         fcl1.source_code = source_code
         self.session.add(fcl1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return fcl1.resulting_file, fcl1.source_code
 
     def addFilefilelink(self,
@@ -876,11 +824,7 @@ class DBUtils2(object):
         ffl1.source_file = source_file
         ffl1.resulting_file = resulting_file_id
         self.session.add(ffl1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return ffl1.source_file, ffl1.resulting_file
 
     def addInstrumentproductlink(self,
@@ -901,11 +845,7 @@ class DBUtils2(object):
         ipl1.instrument_id = instrument_id
         ipl1.product_id = product_id
         self.session.add(ipl1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return ipl1.instrument_id, ipl1.product_id
 
     def addInstrument(self,
@@ -923,11 +863,7 @@ class DBUtils2(object):
         i1.satellite_id = satellite_id
         i1.instrument_name = instrument_name
         self.session.add(i1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return i1.instrument_id
 
     def addCode(self,
@@ -971,12 +907,8 @@ class DBUtils2(object):
 
         @return: the code_id of the newly inserted code
         @rtype: long
-
         """
-        try:
-            c1 = self.Code()
-        except:
-            raise(DBError("Class Code not found was it created?"))
+        c1 = self.Code()
         c1.filename = filename
         c1.relative_path = relative_path
         c1.code_start_date = code_start_date
@@ -990,15 +922,10 @@ class DBUtils2(object):
         c1.date_written = date_written
         c1.output_interface_version = output_interface_version
         c1.newest_version = newest_version
-        if arguments is not None:
-            c1.arguments = arguments
+        c1.arguments = arguments
 
         self.session.add(c1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return c1.code_id
 
     def addInspector(self,
@@ -1038,10 +965,7 @@ class DBUtils2(object):
         @rtype: long
 
         """
-        try:
-            c1 = self.Inspector()
-        except:
-            raise(DBError("Class Inspector not found was it created?"))
+        c1 = self.Inspector()
         c1.filename = filename
         c1.relative_path = relative_path
         c1.description = description
@@ -1056,12 +980,18 @@ class DBUtils2(object):
         c1.arguments = arguments
 
         self.session.add(c1)
+        self._commitDB()
+        return c1.inspector_id
+
+    def _commitDB(self):
+        """
+        do the commit to the DB
+        """
         try:
             self.session.commit()
         except IntegrityError as IE:
             self.session.rollback()
-            raise(DBError(IE))
-        return c1.inspector_id
+            raise(DBError(IE))        
 
     def _closeDB(self):
         """
@@ -1100,7 +1030,7 @@ class DBUtils2(object):
                 release_number = None,
                 product_id = None,
                 newest_version = None,
-                md5sum = None, 
+                md5sum = None,
                 process_keywords = None):
         """
         add a datafile to the database
@@ -1169,11 +1099,7 @@ class DBUtils2(object):
         d1.md5sum = md5sum
         d1.process_keywords = process_keywords
         self.session.add(d1)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
         return d1.file_id
 
     def _codeIsActive(self, ec_id, date):
@@ -1310,11 +1236,7 @@ class DBUtils2(object):
                ##       DF.quality_version != sq.quality_version,
                ##       DF.revision_version != sq.revision_version]).any()
         self.session.add(DF)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
 
 
     def _copyExecutableCode(self,
@@ -1360,11 +1282,7 @@ class DBUtils2(object):
         EC.filename = new_filename
 
         self.session.add(EC)
-        try:
-            self.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBError(IE))
+        self._commitDB()
 
     def _getFileFullPath(self, filename):
         """
@@ -1613,7 +1531,7 @@ class DBUtils2(object):
         given a file_id return the process keywords string
         """
         sq = self.session.query(self.File).filter_by(file_id = file_id)
-        return sq[0].process_keywords        
+        return sq[0].process_keywords
 
     def getFileUTCfileDate(self, file_id):
         """
