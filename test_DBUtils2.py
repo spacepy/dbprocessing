@@ -29,9 +29,9 @@ class DBUtils2AddTests(unittest.TestCase):
 
     def test_addMissionInput(self):
         """_addMission should only accept strig input"""
-        self.assertRaises(DBUtils2.DBInputError, self.dbu.addMission, 1234, 12345)
-        self.assertRaises(DBUtils2.DBInputError, self.dbu.addMission, 1234, 'path')
-        self.assertRaises(DBUtils2.DBInputError, self. dbu.addMission, 'filename', 12345)
+        self.assertRaises(ValueError, self.dbu.addMission, 1234, 12345)
+        self.assertRaises(ValueError, self.dbu.addMission, 1234, 'path')
+        self.assertRaises(ValueError, self. dbu.addMission, 'filename', 12345)
 
     def test_addMissionOrder(self):
         """_addMission wont work until the Mission class is created from the DB"""
@@ -39,7 +39,7 @@ class DBUtils2AddTests(unittest.TestCase):
 
     def test_addSatelliteInput(self):
         """_addSatellite should only accept string input"""
-        self.assertRaises(DBUtils2.DBInputError, self.dbu.addSatellite, 1234)
+        self.assertRaises(ValueError, self.dbu.addSatellite, 1234)
 
     def test_addSatelliteOrder(self):
         """_addSatellite wont work until the Mission class is created from the DB"""
@@ -47,9 +47,9 @@ class DBUtils2AddTests(unittest.TestCase):
 
     def test_addInstrumentInput(self):
         """_addInstrument should only accept strig input"""
-        self.assertRaises(DBUtils2.DBInputError, self.dbu.addInstrument, 1234, 'id string')
-        self.assertRaises(DBUtils2.DBInputError, self.dbu.addInstrument, 1234, 1234)
-        self.assertRaises(DBUtils2.DBInputError, self. dbu.addInstrument, 'instname', 'id string')
+        self.assertRaises(ValueError, self.dbu.addInstrument, 1234, 'id string')
+        self.assertRaises(ValueError, self.dbu.addInstrument, 1234, 1234)
+        self.assertRaises(ValueError, self. dbu.addInstrument, 'instname', 'id string')
 
     def test_addInstrumentOrder(self):
         """_addInstrument wont work until the Mission class is created from the DB"""
@@ -181,7 +181,7 @@ class DBUtils2DBTests(unittest.TestCase):
         ## now the actual test
         try:
             self.dbp._createTableObjects()
-        except DBError:
+        except DBUtils2.DBError:
             self.fail('Error is setting up table->class mapping')
         try:
             self.dbp.Data_files

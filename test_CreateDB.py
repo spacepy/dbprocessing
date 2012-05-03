@@ -16,7 +16,6 @@ except ImportError:
     import unittest as ut
 import unittest
 
-import os
 import datetime
 
 from sqlalchemy import orm

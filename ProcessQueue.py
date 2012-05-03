@@ -186,7 +186,7 @@ class ProcessQueue(object):
             try:
                 f_id = dbf.addFileToDB()
                 DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
-            except (DBUtils2.DBInputError, DBUtils2.DBError) as errmsg:
+            except (ValueError, DBUtils2.DBError) as errmsg:
                 DBlogging.dblogger.warning("Except adding file to db so" + \
                                            " moving to error: %s" % (errmsg))
                 self.moveToError(val)

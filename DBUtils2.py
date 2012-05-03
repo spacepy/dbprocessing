@@ -4,9 +4,9 @@ import glob
 from sqlalchemy.orm import sessionmaker
 import os.path
 import datetime
+import numpy as np
 from sqlalchemy import Table #Column, Integer, String, DateTime, BigInteger, Boolean, Date, Float, Table
 from sqlalchemy.orm import mapper # sessionmaker
-import numpy as np
 try: # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
 except ImportError:
@@ -27,8 +27,6 @@ __version__ = '2.0.3'
 class DBError(Exception):
     pass
 class DBProcessingError(Exception):
-    pass
-class DBInputError(Exception):
     pass
 class FilenameParse(Exception):
     pass
@@ -694,9 +692,9 @@ class DBUtils2(object):
 
         """
         if not isinstance(mission_name, str):
-            raise(DBInputError("Mission name has to  a string"))
+            raise(ValueError("Mission name has to  a string"))
         if not isinstance(rootdir, str):
-            raise(DBInputError("Rootdir must be a string"))
+            raise(ValueError("Rootdir must be a string"))
         try:
             m1 = self.Mission()
         except AttributeError:
@@ -720,7 +718,7 @@ class DBUtils2(object):
         @type satellite_name: str
         """
         if not isinstance(satellite_name, str):
-            raise(DBInputError("Satellite name has to  a string"))
+            raise(ValueError("Satellite name has to  a string"))
 
         try:
             s1 = self.Satellite()
@@ -941,9 +939,9 @@ class DBUtils2(object):
         @type satellite_id: int
         """
         if not isinstance(instrument_name, str):
-            raise(DBInputError("Instrument name has to  a string"))
+            raise(ValueError("Instrument name has to  a string"))
         if not isinstance(satellite_id, (int, long)):
-            raise(DBInputError("Satellite_id must be an int"))
+            raise(ValueError("Satellite_id must be an int"))
 
         try:
             i1 = self.Instrument()
