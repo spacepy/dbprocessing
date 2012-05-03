@@ -153,6 +153,25 @@ class DBUtils2DBTests(unittest.TestCase):
         """addProductOutput utility"""
         self.productOutput = self.dbu.addProduct('prod2', 1, 'prod2_path', None, 'format', 0)
 
+    def test_getProductID(self):
+        """test _getProductID"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.assertEqual(self.dbu._getProductID('prod1'), 1)
+        self.addProductOutput()
+        self.assertEqual(self.dbu._getProductID('prod2'), 2)
+
+    def test_getProductNames(self):
+        """test _getProductNames"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.assertEqual(self.dbu._getProductNames(), ['prod1', 'prod2'])
+
     def test_addProcess(self):
         """test addProcess"""
         self.addMission()
@@ -167,6 +186,25 @@ class DBUtils2DBTests(unittest.TestCase):
     def addProcess(self):
         """addProcess utility"""
         self.process = self.dbu.addProcess('process1', 1, 'DAILY', extra_params='Extra=extra', super_process_id=None)
+
+    def test_getProcessTimebase(self):
+        """test getProcessTimebase"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProcess()
+        self.assertEqual(self.dbu.getProcessTimebase(1), 'DAILY')
+        self.assertEqual(self.dbu.getProcessTimebase('process1'), 'DAILY')
+
+    def test_getProcessID(self):
+        """test getProcessID"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProcess()
+        self.assertEqual(self.dbu.getProcessID('process1'), 1)
 
     def test_addproductprocesslink(self):
         """test addproductprocesslink"""
@@ -222,6 +260,184 @@ class DBUtils2DBTests(unittest.TestCase):
                                    1,
                                    True,
                                    arguments='arguments')
+
+    def test_codeIsActive(self):
+        """ test of _codeIsActive()"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.assertTrue(self.dbu._codeIsActive(1, datetime.datetime(2001, 1, 1) ) )
+        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(1999, 1, 1) ) )
+        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2015, 1, 1) ) )
+        self.assertFalse(self.dbu._codeIsActive(1, datetime.date(1999, 1, 1) ) )
+        self.assertFalse(self.dbu._codeIsActive(1, datetime.date(2015, 1, 1) ) )
+        sq = self.dbu.session.query(self.dbu.Code).all()
+        sq[0].active_code = False
+        self.dbu._commitDB()
+        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2001, 1, 1) ) )
+
+    def test_getCodeArgs(self):
+        """test getCodeArgs"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.assertEqual(self.dbu.getCodeArgs(1), 'arguments')
+
+    def test_getCodePath(self):
+        """test getCodePath"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.assertEqual(self.dbu.getCodePath('code_filename'), 1)
+
+    def test_getCodeID(self):
+        """test _getCodeID"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.assertEqual(self.dbu._getCodeID(1), 'rootdir/code_path/code_filename')
+                
+
+    def test_addFile(self):
+        """test addFile"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        file_id = self.dbu._addFile('file_filename',
+                                    0,
+                                    Version.Version(1,0,0),
+                                    file_create_date = datetime.datetime.now(),
+                                    exists_on_disk=False,
+                                    utc_file_date=datetime.date.today(),
+                                    utc_start_time=datetime.datetime(2012, 1, 1),
+                                    utc_stop_time=datetime.datetime(2012, 1, 1),
+                                    product_id = 1,
+                                    newest_version=True,
+                                    )
+        self.assertEqual(file_id, 1)
+
+    def addFile(self):
+        """utility to addFile to the db"""
+        self.file = self.dbu._addFile('file_filename',
+                                    0,
+                                    Version.Version(1,0,0),
+                                    file_create_date = datetime.datetime.now(),
+                                    exists_on_disk=False,
+                                    utc_file_date=datetime.date(2012, 5, 4),
+                                    utc_start_time=datetime.datetime(2012, 1, 1),
+                                    utc_stop_time=datetime.datetime(2012, 1, 1),
+                                    product_id = 1,
+                                    newest_version=True,
+                                    process_keywords='process_keywords=foo',
+                                    )
+
+    def test_getFileProduct(self):
+        """test getFileProduct"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.assertEqual(self.dbu.getFileProduct(1), 1)
+        self.assertEqual(self.dbu.getFileProduct('file_filename'), 1)        
+        self.assertEqual(self.dbu.getFileProduct(5), None) # there s no file 5
+
+    def test_getFileUTCfileDate(self):
+        """test getFileUTCfileDate"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.assertEqual(self.dbu.getFileUTCfileDate(1), datetime.date(2012, 5, 4))
+
+    def test_getFileProcess_keywords(self):
+        """test getFileProcess_keywords"""    
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()        
+        self.assertEqual(self.dbu.getFileProcess_keywords(1), 'process_keywords=foo')        
+
+    def test_getFileFullPath(self):
+        """_getFileFullPath tests"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.assertEqual(self.dbu._getFileFullPath(1), 'rootdir/prod1_path/file_filename')
+        self.assertEqual(self.dbu._getFileFullPath('file_filename'), 'rootdir/prod1_path/file_filename')
+        self.assertRaises(IndexError, self.dbu._getFileFullPath, 3)
+
+    def test_getFileVersion(self):
+        """test getFileVersion"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.assertEqual(self.dbu.getFileVersion(1), Version.Version(1,0,0))
+        self.assertEqual(self.dbu.getFileVersion('file_filename'), Version.Version(1,0,0))
+
+    def test_getFileMission(self):
+        """test getFileMission"""       
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.assertEqual(self.dbu.getFileMission(1), 1)
+
+    def test_getErrorPath(self):
+        """test getErrorPath"""
+        self.addMission()
+        self.assertEqual(self.dbu.getErrorPath(), 'rootdir/errors/')
+
+    def test_getIncomingPath(self):
+        """test getIncomingPath"""
+        self.addMission()
+        self.assertEqual(self.dbu.getIncomingPath(), 'rootdir/incoming/')
+
 
 
 

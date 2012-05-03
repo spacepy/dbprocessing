@@ -131,6 +131,7 @@ class dbprocessing_db(object):
             schema.Column('output_product', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False, unique=True),
             schema.Column('super_process_id', types.Integer, nullable=True),
+            schema.Column('output_timebase', types.String(10), nullable=True),
             schema.UniqueConstraint('process_name', 'output_product')
         )
 

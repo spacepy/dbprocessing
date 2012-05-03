@@ -1070,10 +1070,7 @@ class DBUtils2(object):
         @ return: file_id of the newly inserted file
         @rtype: long
         """
-        try:
-            d1 = self.File()
-        except AttributeError:
-            raise(DBError("Class File not found was it created?"))
+        d1 = self.File()
 
         self._createTableObjects()
         d1 = self.File()
@@ -1112,17 +1109,20 @@ class DBUtils2(object):
         @return: True - the code is active for that date, False otherwise
 
         """
-        try: self.Executable_codes
-        except AttributeError: self._createTableObjects()
-
         # can only be one here (sq)
-        for sq in self.session.query(self.Executable_codes).filter_by(ec_id = ec_id):
+        for sq in self.session.query(self.Code).filter_by(code_id = ec_id):
             if sq.active_code == False:
                 return False
-            if sq.code_start_date > date:
-                return False
-            if sq.code_stop_date < date:
-                return False
+            try:
+                if sq.code_start_date > date:
+                    return False
+                if sq.code_stop_date < date:
+                    return False
+            except TypeError:
+                if sq.code_start_date > date.date():
+                    return False
+                if sq.code_stop_date < date.date():
+                    return False                
         return True
 
     def _newerCodeVersion(self, ec_id, date=None, bool=False, verbose=False):
@@ -1335,7 +1335,7 @@ class DBUtils2(object):
         given a process name return its id
         """
         sq = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()
-        return sq[0]
+        return sq[0][0]
 
     def getFileProduct(self, filename):
         """
@@ -1368,12 +1368,16 @@ class DBUtils2(object):
         associated with
         """
         product_id = self.getFileProduct(filename)
+        print "product_id", product_id
         # get all the instruments
         inst_id = self.getInstrumentFromProduct(product_id)
+        print "inst_id", inst_id
         # get all the satellites
         sat_id = self.getInstrumentSatellite(inst_id)
+        print "sat_id", sat_id
         # get the missions
         mission_id = self.getSatelliteMission(sat_id)
+        print "mission_id", mission_id
         return mission_id
 
     def getSatelliteMission(self, sat_name):
@@ -1507,11 +1511,8 @@ class DBUtils2(object):
         @return: code_id: code_id of the input file
         @rtype: long
         """
-        sq = self.session.query(self.Code).filter_by(filename = codename)
-        try:
-            return sq[0].code_id
-        except IndexError: # no file_id found
-            raise(DBError("No filename %s found in the DB" % (filename)))
+        sq = self.session.query(self.Code.code_id).filter_by(filename = codename).all()
+        return sq[0][0]
 
     def _getFilename(self, file_id):
         """
@@ -1691,12 +1692,7 @@ class DBUtils2(object):
         @return: product_id -the product  ID for the input product name
         """
         sq = self.session.query(self.Product.product_id).filter_by(product_name = product_name)
-        if sq.count() == 0:
-            raise(DBError('Product %s was not found' % (product_name)))
-        if sq.count() == 1:
-            return sq.first()[0]
-        elif sq.count() > 1:
-            return sq
+        return sq.first()[0]
 
     def _getSatelliteID(self,
                         sat_name):
@@ -1707,8 +1703,6 @@ class DBUtils2(object):
         @return: satellite_id - the requested satellite  ID
         """
         sq = self.session.query(self.Satellite.satellite_id).filter_by(mission_id = self._getMissionID()).filter_by(satellite_name = sat_name)
-        if sq.count() == 0:
-            raise(DBError('Satellite %s was not found' % (sat_name)))
         return sq.first()[0]  # there can be only one of each name
 
     def getCodePath(self, code_id):
@@ -1762,8 +1756,6 @@ class DBUtils2(object):
         @rtype: str
         """
         sq = self.session.query(self.Mission.rootdir).filter_by(mission_name  = self.mission)
-        if sq.count() == 0:
-            raise(DBError('Mission %s was not found' % (self.mission)))
         return sq.first()[0]  # there can be only one of each name
 
     def _checkIncoming(self):
@@ -1782,11 +1774,6 @@ class DBUtils2(object):
         """
         return the incoming path for the current mission
         """
-        try:
-            self.Mission
-        except AttributeError:
-            self._createTableObjects()
-
         basedir = self._getMissionDirectory()
         path = os.path.join(basedir, 'incoming/')
         return path
@@ -1795,36 +1782,8 @@ class DBUtils2(object):
         """
         return the erro path for the current mission
         """
-        try:
-            self.Mission
-        except AttributeError:
-            self._createTableObjects()
-
         basedir = self._getMissionDirectory()
         path = os.path.join(basedir, 'errors/')
         return path
-
-    def _parseFileName(self,
-                       filename):
-        """
-        Parse a filename from incoming (or anywhere) and return a file object populated with the infomation
-
-        @param filename: list of filenames to parse
-        @type filename: list
-        @return: file object populated from the filename
-        @rtype: DBUtils2.File
-        """
-        output = []
-        for val in filename:
-            # this is an if elif block testing by mission
-            if not self.__isTestFile(val):
-                raise(FilenameParse("filename %s not found to belong to mission %s" %   ( val, self.mission)))
-            f1 = self.File()
-            f1.filename = val
-            file_date
-            f1.utc_file_date = None
-
-
-
 
 
