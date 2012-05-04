@@ -108,10 +108,17 @@ class DBUtils2DBTests(unittest.TestCase):
         self.assertEqual(self.dbu._getMissionDirectory(), 'rootdir')
         self.assertEqual(self.dbu._getMissionName(), 'unittest')
         self.assertRaises(DBUtils2.DBError, self.addMission)
+        self.assertEqual(self.dbu._getMissionName(id=1), ['unittest'])
 
     def addMission(self):
         """utility to add a mission"""
         self.mission = self.dbu.addMission('unittest', 'rootdir')
+
+    def test_getMissions(self):
+        """test _getInputProductID"""
+        self.assertEqual([], self.dbu._getMissions())
+        self.addMission()
+        self.assertEqual(['unittest'], self.dbu._getMissions())
 
     def test_addSatellite(self):
         """add a satellite to the DB"""
@@ -135,6 +142,13 @@ class DBUtils2DBTests(unittest.TestCase):
     def addInstrument(self):
         """addInstrument utility"""
         self.instrument = self.dbu.addInstrument('instname', 1)
+        
+    def test_getInstrumentID(self):
+        """test _getInstrumentID"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.assertEqual(self.dbu._getInstruemntID('instname'), 1)        
 
     def test_addProduct(self):
         """test addProduct"""
@@ -148,6 +162,7 @@ class DBUtils2DBTests(unittest.TestCase):
     def addProduct(self):
         """addProduct utility"""
         self.product = self.dbu.addProduct('prod1', 1, 'prod1_path', None, 'format', 0)
+        self.dbu.addInstrumentproductlink(1, 1)
 
     def addProductOutput(self):
         """addProductOutput utility"""
@@ -163,6 +178,14 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProductOutput()
         self.assertEqual(self.dbu._getProductID('prod2'), 2)
 
+    def test_getProductLevel(self):
+        """test getProductLevel"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.assertEqual(self.dbu.getProductLevel(1), 0)
+                
     def test_getProductNames(self):
         """test _getProductNames"""
         self.addMission()
@@ -171,6 +194,16 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProduct()
         self.addProductOutput()
         self.assertEqual(self.dbu._getProductNames(), ['prod1', 'prod2'])
+
+    def test_addInstrumentproductlink(self):
+        """test addInstrumentproductlink"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        i, p = self.dbu.addInstrumentproductlink(1, 1)
+        self.assertEqual(i, 1)
+        self.assertEqual(p, 1)
 
     def test_addProcess(self):
         """test addProcess"""

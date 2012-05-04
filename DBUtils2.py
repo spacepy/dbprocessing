@@ -1368,17 +1368,13 @@ class DBUtils2(object):
         associated with
         """
         product_id = self.getFileProduct(filename)
-        print "product_id", product_id
         # get all the instruments
         inst_id = self.getInstrumentFromProduct(product_id)
-        print "inst_id", inst_id
         # get all the satellites
         sat_id = self.getInstrumentSatellite(inst_id)
-        print "sat_id", sat_id
         # get the missions
         mission_id = self.getSatelliteMission(sat_id)
-        print "mission_id", mission_id
-        return mission_id
+        return mission_id[0]
 
     def getSatelliteMission(self, sat_name):
         """
@@ -1482,6 +1478,7 @@ class DBUtils2(object):
         return sq[0].instrument_id
 
     def _getMissions(self):
+        """return a list of all the missions"""
         sq = self.session.query(self.Mission.mission_name)
         return [val[0] for val in sq.all()]
 

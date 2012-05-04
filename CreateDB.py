@@ -113,6 +113,7 @@ class dbprocessing_db(object):
                           schema.ForeignKey('instrument.instrument_id'), nullable=False,),
             schema.Column('relative_path', types.String(50), nullable=False),  # hmm long enough?
             schema.Column('super_product_id', types.Integer, nullable=True),
+            schema.Column('level', types.Integer, nullable=False),
             schema.Column('format', types.String(20), nullable=False),  # hmm long enough?
             schema.UniqueConstraint('product_name', 'instrument_id', 'relative_path', name='unique_triplet_product')
         )
@@ -263,10 +264,10 @@ class dbprocessing_db(object):
             schema.Column('md5sum', types.String(40), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
             schema.Column('arguments', types.Text, nullable=False),
-            schema.CheckConstraint('interface_version >= 1'),
-            schema.CheckConstraint('output_interface_version >= 1'),
             schema.Column('product', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False),
+            schema.CheckConstraint('interface_version >= 1'),
+            schema.CheckConstraint('output_interface_version >= 1'),
         )
 
 
