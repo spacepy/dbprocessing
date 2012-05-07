@@ -1654,9 +1654,9 @@ class DBUtils2(object):
                                         self.Satellite.satellite_name,
                                         self.Instrument.instrument_name,
                                         self.Product.product_name,
-                                        self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == productID)
-            return sq[0]
-
+                                        self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == productID).all()
+            print sq
+            return tuple(sq[0])
 
     def getActiveInspectors(self):
         """
@@ -1712,6 +1712,14 @@ class DBUtils2(object):
         sq3 =  self.session.query(self.Code.filename).filter_by(code_id = code_id)  # should only have one value
         return os.path.join(sq2, sq1[0][0], sq3[0][0])  # the [0][0] is ok (ish) since there can only be one
 
+    def getCodeVersion(self, code_id):
+        """
+        Given a code_id the code version
+        """
+        DBlogging.dblogger.debug("Entered getCodeVersion:")
+        sq =  self.session.query(self.Code.interface_version, self.Code.quality_version, self.Code.revision_version).filter_by(code_id = code_id)  # should only have one value
+        return Version.Version(*sq[0])
+        
     def getOutputProductFromProcess(self, process):
         """
         given an process id return the output product

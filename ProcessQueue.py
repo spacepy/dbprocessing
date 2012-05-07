@@ -16,6 +16,7 @@ import numpy as np
 
 import DBfile
 import DBlogging
+import DBStrings
 import DBqueue
 import DBUtils2
 import Version
@@ -328,11 +329,6 @@ class ProcessQueue(object):
         print "codepath", codepath
         DBlogging.dblogger.debug("Going to run code: {0} located at {1}".format(code_id, codepath))
 
-
-
-        self.tempdir = tempfile.mkdtemp('_dbprocessing')
-        DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
-
         out_prod = self.dbu.getOutputProductFromProcess(process_id)
         print "out_prod", out_prod
         format_str = self.dbu._getProductFormats(out_prod) 
@@ -347,32 +343,37 @@ class ProcessQueue(object):
         print "format_str", format_str
 
 
-
-        1/0
-        if not qacode in ['ok', 'ignore', 'problem', None]:
-            raise(InputError("qacode invalid, can be ok, ignore, problem, or None "))
-
         # get the format string
         
-        mission, satellite, instrument, product, product_id = self.dbu._getProductNames(productID)
+        mission, satellite, instrument, product, product_id = self.dbu._getProductNames(out_prod)
         print 'mission', mission, 'product_id', product_id
 
-        filename = self.dbu.format(filename,
-                                   MISSION=mission,
-                                   SPACECRAFT=satellite,
-                                   PRODUCT=product,
-                                   VERSION=str(version),
-                                   INSTRUMENT=instrument,
-                                   QACODE=qacode,
-                                   datetime=date)
-#        if self.params['product_id'] != productID:
-#            raise(FilenameError("Created filename did not match convention"))
+        ## need to build a version string for the output file
+        version = self.dbu.getCodeVersion(code_id)
 
-        DBlogging.dblogger.debug("Filename: %s created" % (filename))
+        fmtr = DBStrings.DBFormatter()
+        format_str = fmtr.expand_format(format_str, {'SPACECRAFT':satellite, 
+                                                     'PRODUCT':product, 
+                                                     'VERSION':str(Version.Version(version.interface, 0, 0))})
+        print "format_str", format_str
 
-        return filename
 
+        DBlogging.dblogger.debug("Filename: %s created" % (format_str))
+
+        # make a directory to run the code
+        self.tempdir = tempfile.mkdtemp('_dbprocessing')
+        DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
+
+        ## build the command line we are to run
+        cmdline = [codepath]   
+        for i_fid in input_files:
+            cmdline.append(self.dbu._getFileFullPath(i_fid))
+        cmdline.append(os.path.join(self.tempdir, format_str))
+        print cmdline
+        subprocess.check_call(cmdline)
         1/0
+
+
 
         date=val[0].diskfile.params['utc_file_date']
         version = val[0].diskfile.params['version']

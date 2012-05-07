@@ -52,6 +52,9 @@ class DBFormatter(string.Formatter):
         'nn': ( '{nn}', '\d\d' ),
         'nnn': ( '{nnn}', '\d\d\d' ),
         'nnnn': ( '{nnnn}', '\d\d\d\d' ),
+        'MISSION': ('{MISSION}', None),
+        'PRODUCT': ('{PRODUCT}', None),
+        'SPACECRAFT': ('{SPACECRAFT}', None),
         }
 
     def format(self, format_string, *args, **kwargs):
@@ -132,25 +135,13 @@ class DBFormatter(string.Formatter):
         result = []
         for literal, field, format, conversion in self.parse(format_string):
             result.append(literal)
-            orig = self.assemble('', field, format, conversion)
             if field in self.SPECIAL_FIELDS:
-                if kwargs == None or field in kwargs:
-                    #assume field is provided
-                    if (not format) and (not conversion):
-                        result.append(self.SPECIAL_FIELDS[field][0])
-                    else:
-                        result.append(orig)
+                if field in kwargs:
+                    result.append(kwargs[field])
                 else:
-                    #field not provided, put in regex instead
-                    if (not format and not conversion) \
-                       or self.SPECIAL_FIELDS[field][0] == orig:
-                        new_re = '(' + self.SPECIAL_FIELDS[field][1].replace(
-                            '{', '{{').replace('}', '}}') + ')'
-                        result.append(new_re)
-                    else:
-                        result.append(orig)
-            else:
-                result.append(orig)
+                    result.append(self.SPECIAL_FIELDS[field][0])
+#            else:
+#                result.append(literal)
         return ''.join(result)
 
     def assemble(self, literal, field, format, conversion):
