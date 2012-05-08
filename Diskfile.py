@@ -105,8 +105,8 @@ class Diskfile(object):
         self.infile = infile
         self.checkAccess()
 
-        self.path = os.path.split(self.infile)[0]
-        self.filename = os.path.split(self.infile)[1]
+        self.path = os.path.dirname(self.infile)
+        self.filename = os.path.basename(self.infile)
 
         self.params = {}
         self.params['filename'] = self.filename
