@@ -802,8 +802,8 @@ class DBUtils2(object):
         return fcl1.resulting_file, fcl1.source_code
 
     def addFilefilelink(self,
-                     source_file,
-                     resulting_file_id):
+                     resulting_file_id, 
+                     source_file,):
         """ add a file file  link to the database
 
         @param source_file: id of the product to link
@@ -1574,11 +1574,9 @@ class DBUtils2(object):
         for k1, k2 in itertools.combinations(data2, 2):
             ## TODO this can be done cleaner
             try: # if the key is gone, move on
-#                print '@@@@',  k1, k2, data2[k1], data2[k2]
                 tmp = data2[k1]
                 tmp = data2[k2]
             except KeyError:
-#                print '\n'
                 continue
             if data2[k1][1] != data2[k2][1]:   # not the same product
                 continue
@@ -1651,7 +1649,6 @@ class DBUtils2(object):
                                         self.Instrument.instrument_name,
                                         self.Product.product_name,
                                         self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == productID).all()
-            print sq
             return tuple(sq[0])
 
     def getActiveInspectors(self):
