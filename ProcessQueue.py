@@ -160,8 +160,8 @@ class ProcessQueue(object):
 
         @version: V1: 18-Apr-2012 (BAL)
         """
-        DBlogging.dblogger.debug("Entered moveToIncoming: {0}".format(fname))
         inc_path = self.dbu.getIncomingPath()
+        DBlogging.dblogger.debug("Entered moveToIncoming: {0} {1}".format(fname), inc_path)
         if os.path.isfile(os.path.join(inc_path, os.path.basename(fname))):
         #TODO do I realy want to remove old version:?
             os.remove( os.path.join(inc_path, os.path.basename(fname)) )
@@ -322,31 +322,20 @@ class ProcessQueue(object):
 
         # since we have a process do we have a code that does it?
         code_id = self.dbu.getCodeFromProcess(process_id)
-        print "code_id", code_id
 
         # figure out the code path so that it can be called
         codepath = self.dbu.getCodePath(code_id)
-        print "codepath", codepath
         DBlogging.dblogger.debug("Going to run code: {0} located at {1}".format(code_id, codepath))
 
         out_prod = self.dbu.getOutputProductFromProcess(process_id)
-        print "out_prod", out_prod
         format_str = self.dbu._getProductFormats(out_prod) 
-        print "format_str", format_str
         # get the process_keywords from the file if there are any
         process_keywords = self._strargs_to_args([self.dbu.getFileProcess_keywords(fid) for fid in input_files])
-        print "process_keywords", process_keywords
         for key in process_keywords:
             format_str = format_str.replace('{'+key+'}', process_keywords[key])
 
-        
-        print "format_str", format_str
-
-
-        # get the format string
-        
+        # get the format string       
         mission, satellite, instrument, product, product_id = self.dbu._getProductNames(out_prod)
-        print 'mission', mission, 'product_id', product_id
 
         ## need to build a version string for the output file
         version = self.dbu.getCodeVersion(code_id)
@@ -355,8 +344,6 @@ class ProcessQueue(object):
         format_str = fmtr.expand_format(format_str, {'SPACECRAFT':satellite, 
                                                      'PRODUCT':product, 
                                                      'VERSION':str(Version.Version(version.interface, 0, 0))})
-        print "format_str", format_str
-
 
         DBlogging.dblogger.debug("Filename: %s created" % (format_str))
 
@@ -369,90 +356,26 @@ class ProcessQueue(object):
         for i_fid in input_files:
             cmdline.append(self.dbu._getFileFullPath(i_fid))
         cmdline.append(os.path.join(self.tempdir, format_str))
-        print cmdline
+
         DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))        
-        subprocess.check_call(cmdline)
-        1/0
-
-
-
-        date=val[0].diskfile.params['utc_file_date']
-        version = val[0].diskfile.params['version']
-
-        out_path = os.path.join(self.tempdir, val[0].diskfile.makeProductFilename(product, date, version))
-        # now we have everything it takes to build the file
-        print "out_path",out_path
-        1/0
-
-        arg_subs = {'datetime': date,
-                    'BASEDIR': root_path,
-                    'OUTPATH': out_path,
-                    }
-        # ####### get all the input_product_id and filenames
-        #    make sure they all exist before we build the child.
-        # from the process get all the input_product_id
-        products = self.dbu._getInputProductID(proc_id)
-        # query for the files that match the products for the right date
-        # TODO this is another place that is one day to one day limited
+        # TODO, think gere on how to grab the output        
         try:
-            for pval in products:
-                sq1 = self.dbu.session.query(self.dbu.File).filter_by(product_id = pval).filter_by(utc_file_date = date)
-                if sq1.count() == 0:
-                    DBlogging.dblogger.debug("Skipping file since " + \
-                                             "requirement not available" + \
-                                             "(sq1.count)")
-                    raise(ForException())
-                DBlogging.dblogger.debug("<>Looking for product %d for date %s" % (pval, date))
-                # get an in_path for exe
-                in_path = self.dbu._getFileFullPath(val[0].diskfile.makeProductFilename(pval, date, version))
-                arg_subs['INPATH_{:d}'.format(pval)] = in_path
-                if in_path == None:
-                    DBlogging.dblogger.debug("Skipping file since " + \
-                                             "requirement not available" + \
-                                             "(in_path)")
-                    raise(ForException())
-        except ForException:
-            self.rm_tempdir()
+            subprocess.check_call(cmdline, stderr=subprocess.STDOUT) 
+        except subprocess.CalledProcessError: 
+            # TODO figure out how to print what the return code was
+            DBlogging.dblogger.error("Command returned a non-zero return code")
+            # assume the file is bad and move it to error
+            self.moveToError(format_str)
+            self.rm_tempdir() # clean up
+            
+        # the code worked and thefile should not go to incoming (it had better have an inspector)
+        self.moveToIncoming(os.path.join(self.tempdir, format_str))
+        self.rm_tempdir() # clean up
+        ## TODO several additions have to be made here
+        # -- befoe the process is run the DB needs to check that the name is right for this most current version of a file
+        # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
+        #    -- maybe instead of moving this to incoming we add it to the db now with the links
 
-        args = self.getCodeArgs([code_id])[0]
-        # TODO fix this
-        cmd = codep + ' ' + self.dbu.format(args, **arg_subs)
-        cmd = cmd.split(' ')
-        DBlogging.dblogger.debug('Executing: %s' % ' '.join(cmd))
-        print cmd
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if proc.returncode != 0 and proc.returncode is not None:
-            DBlogging.dblogger.error("Non-zero return code ({1}) from: {0}".format(cmd[0], proc.returncode))
-        (stdoutdata, stderrdata) = proc.communicate()
-        if stderrdata != '':
-            DBlogging.dblogger.error("Code {0} stderr messages\n{1}".format(cmd[0], stderrdata))
-        if stdoutdata != '':
-            DBlogging.dblogger.debug("Code {0} stdout messages\n{1}".format(cmd[0], stdoutdata))
-
-
-        self.moveToIncoming(out_path)
-        1/0
-        inc_path = self.dbu.getIncomingPath()
-        self.importFile(os.path.join(inc_path, os.path.sbaename(out_path)))
-        1/0
-        # done with the temp file, clean it up
-        self.rm_tempdir()
-#            self.importFromIncoming()  # we added something it is time to import it
-
-
-        # we have all the info needed to add the links
-        # filefilelink is out_path in_path
-        try:
-            self.dbu._addFilefilelink(self.dbu._getFileID(os.path.basename(val[0].diskfile.filename)),
-                                      self.dbu._getFileID(os.path.basename(out_path)) )
-        except DBUtils2.DBError:
-            DBlogging.dblogger.error("Could not create file_file_link due to error with created file: {0}".format(out_path))
-        # TODO, think here if this is really ok to do
-        try:
-            self.dbu._addFilecodelink(self.dbu._getFileID(os.path.basename(out_path)),
-                                      self.dbu._getCodeID(os.path.basename(codep)) )
-        except DBUtils2.DBError:
-            DBlogging.dblogger.error("Could not create file_code_link due to error with created file: {0}".format(out_path))
 
     def queueClean(self):
         """
