@@ -794,11 +794,7 @@ class DBUtils2(object):
         @type source_code: int
 
         """
-
-        try:
-            fcl1 = self.Filecodelink()
-        except AttributeError:
-            raise(DBError("Class Filecodelink not found was it created?"))
+        fcl1 = self.Filecodelink()
         fcl1.resulting_file = resulting_file_id
         fcl1.source_code = source_code
         self.session.add(fcl1)
@@ -825,7 +821,7 @@ class DBUtils2(object):
         ffl1.resulting_file = resulting_file_id
         self.session.add(ffl1)
         self._commitDB()
-        return ffl1.source_file, ffl1.resulting_file
+        return ffl1.source_file, ffl1.resulting_file 
 
     def addInstrumentproductlink(self,
                      instrument_id,
@@ -1791,4 +1787,22 @@ class DBUtils2(object):
         path = os.path.join(basedir, 'errors/')
         return path
 
+    def getFilefilelink_byresult(self, file_id):
+        """
+        given a file_id return all the other file_ids that went into making it
+        """
+        sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = file_id).all() 
+        try:
+            return zip(*sq)[0]
+        except IndexError:
+            return None       
 
+    def getFilecodelink_byfile(self, file_id):
+        """
+        given a file_id return the code_id associated with it, or None
+        """
+        sq = self.session.query(self.Filecodelink.source_code).filter_by(resulting_file = file_id).all() # can only be one
+        try:
+            return sq[0][0]
+        except IndexError:
+            return None
