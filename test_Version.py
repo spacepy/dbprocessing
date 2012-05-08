@@ -21,9 +21,9 @@ class VersionTests(unittest.TestCase):
         ver.incRevision()
         self.assertEqual(Version.Version(1, 0, 1), ver)
         ver.incQuality()
-        self.assertEqual(Version.Version(1, 1, 1), ver)
+        self.assertEqual(Version.Version(1, 1, 0), ver)
         ver.incInterface()
-        self.assertEqual(Version.Version(2, 1, 1), ver)
+        self.assertEqual(Version.Version(2, 0, 0), ver)
 
     def test_Version_repr(self):
         """__repr__ should have a known output"""

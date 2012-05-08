@@ -103,13 +103,16 @@ class Version(object):
             str(self.revision)
 
     def incInterface(self):
-        """increment the interface version"""
+        """increment the interface version and reset the other two"""
         self.interface += 1
+        self.quality = 0
+        self.revision = 0
         self._checkVersion()
 
     def incQuality(self):
-        """increment the quality version"""
+        """increment the quality version and reset the revision"""
         self.quality += 1
+        self.revision = 0
         self._checkVersion()
 
     def incRevision(self):
