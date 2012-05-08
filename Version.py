@@ -85,12 +85,6 @@ class Version(object):
         """
         check a version to make sure it is valid, works on current object
         """
-        if not isinstance(self.interface, (int, long)):
-            raise(VersionError("Versions are int or long"))
-        if not isinstance(self.quality, (int, long)):
-            raise(VersionError("Versions are int or long"))
-        if not isinstance(self.revision, (int, long)):
-            raise(VersionError("Versions are int or long"))
         if self.interface == 0:
             raise(VersionError("interface_version starts at 1"))
 
@@ -157,3 +151,12 @@ class Version(object):
             return True
         else:
             return False
+
+    def __sub__(self, other):
+        return [self.interface - other.interface, self.quality - other.quality, self.revision - other.revision]
+
+    def __add__(self, other):
+        return [self.interface + other.interface, self.quality + other.quality, self.revision + other.revision]
+    
+    
+
