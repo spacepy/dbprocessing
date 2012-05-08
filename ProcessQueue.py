@@ -161,7 +161,7 @@ class ProcessQueue(object):
         @version: V1: 18-Apr-2012 (BAL)
         """
         inc_path = self.dbu.getIncomingPath()
-        DBlogging.dblogger.debug("Entered moveToIncoming: {0} {1}".format(fname), inc_path)
+        DBlogging.dblogger.debug("Entered moveToIncoming: {0} {1}".format(fname, inc_path))
         if os.path.isfile(os.path.join(inc_path, os.path.basename(fname))):
         #TODO do I realy want to remove old version:?
             os.remove( os.path.join(inc_path, os.path.basename(fname)) )
@@ -341,12 +341,77 @@ class ProcessQueue(object):
         version = self.dbu.getCodeVersion(code_id)
 
         fmtr = DBStrings.DBFormatter()
-        format_str = fmtr.expand_format(format_str, {'SPACECRAFT':satellite, 
-                                                     'PRODUCT':product, 
-                                                     'VERSION':str(Version.Version(version.interface, 0, 0))})
+        output_file_version = Version.Version(version.interface, 0, 0)
+        
+        incCode = True
+        incFiles = True
+        while True:
+            filename = fmtr.expand_format(format_str, {'SPACECRAFT':satellite, 
+                                                         'PRODUCT':product, 
+                                                         'VERSION':str(output_file_version)})
+            DBlogging.dblogger.debug("Filename: %s created" % (filename))
+            # if this filename is already in the DB we have to figure out which version number to increment
+            try:
+                f_id_db = self.dbu._getFileID(filename)
+                DBlogging.dblogger.debug("Filename: {0} is in the DB, have to make different version".format(filename))
+                # the file is in the DB, has the code changed version?
+                ## we are planning to use code_id code was this used before?
+                db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
+                if db_code_id is None:
+                    DBlogging.dblogger.error("Database inconsistency found!! A generate file {0} does not have a filecodelink".format(filename))
+                if incCode:
+                    if db_code_id != code_id: # did the code change
+                        ver_diff = (self.dbu.getCodeVersion(code_id) - self.dbu.getCodeVersion(db_code_id))
+                        # order matters here by the way these reset earch other
+                        ## did the revision change?
+                        if ver_diff[2] > 0:
+                            output_file_version.incRevision()
+                            DBlogging.dblogger.debug("Filename: {0} incRevision()".format(filename))
+                        ## did the quality change?
+                        if ver_diff[1] > 0:
+                            output_file_version.incQuality()
+                            DBlogging.dblogger.debug("Filename: {0} incQuality()".format(filename))
+                        ## did the interface change?
+                        if ver_diff[0] > 0:
+                            output_file_version.incInterface()
+                            DBlogging.dblogger.debug("Filename: {0} incInterface()".format(filename))
+                        incCode = False
+                if incFiles:
+                    db_files = self.dbu.getFilefilelink_byresult(f_id_db)
+                    # go through and see if all the same files are present, 
+                    ## if not quality is incremented
+                    file_vers = [0,0,0]
+                    for db_file in db_files:
+                        if not db_file in input_files:
+                            output_file_version.incQuality()
+                            break # out of the for loop to try again
+                        # the file is there is it the same version
+                        db_file_version = self.dbu.getFileVersion(db_file)
+                        input_file_version = self.dbu.getFileVersion(input_files[input_files.index(db_file)])
+                        ver_diff =  input_file_version - db_file_version
+                        ## did the revision change?
+                        if ver_diff[2] > 0:
+                            file_vers[2] += 1
+                        ## did the quality change?
+                        if ver_diff[1] > 0:
+                            file_vers[1] += 1
+                        ## did the interface change?
+                        if ver_diff[0] > 0:
+                            file_vers[0] += 1
+                        if file_vers[0] > 0:
+                            output_file_version.incInterface()
+                            break # out of the for loop
+                        elif file_vers[1] > 0:             
+                            output_file_version.incQuality()
+                            break # out of the for loop
+                        elif file_vers[0] > 0:             
+                            output_file_version.incRevision()
+                            break # out of the for loop
 
-        DBlogging.dblogger.debug("Filename: %s created" % (format_str))
-
+            except DBUtils2.DBError: # this is for self.dbu._getFileID(filename)
+                DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(filename))
+                break # leave the while loop and do the processing
+            
         # make a directory to run the code
         self.tempdir = tempfile.mkdtemp('_dbprocessing')
         DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
@@ -355,7 +420,7 @@ class ProcessQueue(object):
         cmdline = [codepath]   
         for i_fid in input_files:
             cmdline.append(self.dbu._getFileFullPath(i_fid))
-        cmdline.append(os.path.join(self.tempdir, format_str))
+        cmdline.append(os.path.join(self.tempdir, filename))
 
         DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))        
         # TODO, think gere on how to grab the output        
@@ -365,14 +430,13 @@ class ProcessQueue(object):
             # TODO figure out how to print what the return code was
             DBlogging.dblogger.error("Command returned a non-zero return code")
             # assume the file is bad and move it to error
-            self.moveToError(format_str)
+            self.moveToError(filename)
             self.rm_tempdir() # clean up
             
         # the code worked and thefile should not go to incoming (it had better have an inspector)
-        self.moveToIncoming(os.path.join(self.tempdir, format_str))
+        self.moveToIncoming(os.path.join(self.tempdir, filename))
         self.rm_tempdir() # clean up
         ## TODO several additions have to be made here
-        # -- befoe the process is run the DB needs to check that the name is right for this most current version of a file
         # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
         #    -- maybe instead of moving this to incoming we add it to the db now with the links
 
