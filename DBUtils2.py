@@ -60,7 +60,7 @@ class DBUtils2(object):
 
     def __repr__(self):
         """
-        @summary: Print out something usefule when one prints the class instance
+        @summary: Print out something useful when one prints the class instance
 
         @return: DBProcessing class instance for mission <mission name>
         """
@@ -69,7 +69,7 @@ class DBUtils2(object):
 
     @classmethod
     def _test_SQLAlchemy_version(self, version= sqlalchemy.__version__):
-        """This tests the version to be sure that it is compatable"""
+        """This tests the version to be sure that it is compatible"""
         expected = '0.7'
         if version[0:len(expected)] != expected:
             raise DBError(
@@ -90,7 +90,7 @@ class DBUtils2(object):
                      quality = '',
                      revision = '',
                      extension = '.cdf'):
-        """This builds a filename from the peices contained in the filename
+        """This builds a filename from the pieces contained in the filename
 
         @keyword rootdir: root directory of the filename to create (default '')
         @keyword relative_path: relative path for filename (default '')
@@ -180,17 +180,17 @@ class DBUtils2(object):
 ## ask for the table names form the database (does not grab views)
         table_names = self.engine.table_names()
 
-## create a dictionary of all the table names that will be used as calss names.
-## this uses the db table name as the tabel name and a cap 1st letter as the class
+## create a dictionary of all the table names that will be used as class names.
+## this uses the db table name as the table name and a cap 1st letter as the class
 ## when interacting using python use the class
         table_dict = {}
         for val in table_names:
             table_dict[val[0].upper() + val[1:]] = val
 
-##  dynamincally create all the classes (c1)
-##  dynamicallly create all the tables in the db (c2)
-##  dynaminically create all the mapping between class and table (c3)
-## this just saves a lot of typing and is equilivant to:
+##  dynamically create all the classes (c1)
+##  dynamically create all the tables in the db (c2)
+##  dynamically create all the mapping between class and table (c3)
+## this just saves a lot of typing and is equivalent to:
 ##     class Missions(object):
 ##         pass
 ##     missions = Table('missions', metadata, autoload=True)
@@ -262,7 +262,7 @@ class DBUtils2(object):
                 if self.bf[fname]['utc_file_date'] < sq.code_start_date or self.bf[fname]['utc_file_date'] > sq.code_stop_date:
                     all_false = np.append(all_false, True)
             if ~all_false.any() and len(all_false) != 0:
-                print("\t<procCodeDates> %s didnt have valid, %s, %s, %s" % (fname, sq.code_start_date, sq.code_stop_date, all_false))
+                print("\t<procCodeDates> %s didn't have valid, %s, %s, %s" % (fname, sq.code_start_date, sq.code_stop_date, all_false))
                 self.del_names.append(fname)
                 counter += 1
         return counter
@@ -329,7 +329,7 @@ class DBUtils2(object):
 
     def _currentlyProcessing(self):
         """
-        Checks the db to see if it is currently processing, dont want to do 2 at the same time
+        Checks the db to see if it is currently processing, don't want to do 2 at the same time
 
         @return: false or the pid
         @rtype: (bool, long)
@@ -378,7 +378,7 @@ class DBUtils2(object):
 
         >>>  pnl._startLogging()
         """
-        # this is the logging of the processing, no real use for it yet but maybe we will inthe future
+        # this is the logging of the processing, no real use for it yet but maybe we will in the future
         # helps to know is the process ran and if it succeeded
         if self._currentlyProcessing():
             raise(DBError('A Currently Processing flag is still set, cannot process now'))
@@ -404,13 +404,13 @@ class DBUtils2(object):
                     processing_end_time= None,
                     comment=None):
         """
-        add an entry to th logging table
+        add an entry to the logging table
 
         @param currently_processing: is the db currently processing?
         @type currently_processing: bool
-        @param processing_start_time: the time the proessing started
+        @param processing_start_time: the time the processing started
         @type processing_start_time: datetime.datetime
-        @param mission_id: the mission idthe processing if for
+        @param mission_id: the mission id the processing if for
         @type mission_id: int
         @param user: the user doing the processing
         @type user: str
@@ -421,7 +421,7 @@ class DBUtils2(object):
         @type pid: int
         @keyword processing_end_time: the time the processing stopped
         @type processing_end_time: datetime.datetime
-        @keyword comment: commen about the processing run
+        @keyword comment: comment about the processing run
         @type comment: str
 
         @return: instance of the Logging class
@@ -449,7 +449,7 @@ class DBUtils2(object):
         """
         Finish the entry to the processing table in the DB, logging
 
-        @param comment: (optional) a comment to insert intot he DB
+        @param comment: (optional) a comment to insert into he DB
         @type param: str
 
         >>>  pnl._stopLogging()
@@ -458,7 +458,7 @@ class DBUtils2(object):
         except:
             DBlogging.dblogger.warning( "Logging was not started, can't stop")
             raise(DBProcessingError("Logging was not started"))
-        # clean up the logging, we are done processing and we can realease the lock (currently_processing) and
+        # clean up the logging, we are done processing and we can release the lock (currently_processing) and
         # put in the complete time
         if comment == None:
             print("Must enter a comment for the log")
@@ -495,13 +495,13 @@ class DBUtils2(object):
         pf1.comment = comment
         self.session.add(pf1)
         DBlogging.dblogger.info( "File Logging added for file:%d code:%d with comment:%s"  % (pf1.file_id, pf1.code_id, pf1.comment) )
-        # TODO  think on if session should be left open or if a list shoud be passed in
+        # TODO  think on if session should be left open or if a list should be passed in
         self._commitDB()
         return pf1.logging_file_id
 
     def _checkDiskForFile(self, fix=False):
         """
-        Check the filesystem tosee if the file exits or not as it says in the db
+        Check the filesystem to see if the file exits or not as it says in the db
 
         @keyword fix: (optional) set to have the DB fixed to match the filesystem
            this is **NOT** sure to be safe
@@ -519,7 +519,7 @@ class DBUtils2(object):
                             sq.exists_on_disk = False
                             self.session.add(sq)
                     else:
-                        print("%s file in filesystem, DB didnt have it so, manually added?" % (self.bf[fname]['absolute_name']))
+                        print("%s file in filesystem, DB didn't have it so, manually added?" % (self.bf[fname]['absolute_name']))
                         if fix == True:
                             sq.exists_on_disk = True
                             self.session.add(sq)
@@ -528,7 +528,7 @@ class DBUtils2(object):
 
     def processqueueFlush(self):
         """
-        remove everyhting from he process queue
+        remove everything from he process queue
         """
         while self.processqueueLen() > 0:
             self.processqueuePop()
@@ -541,7 +541,7 @@ class DBUtils2(object):
         pqdata = [self.processqueueGet(ii) for ii in range(self.processqueueLen())]
         if len(pqdata) != self.processqueueLen():
             DBlogging.dblogger.error( "Entire Processqueue was read incorrectly")
-            raise(DBError("Something went wrong with processqueue readall"))
+            raise(DBError("Something went wrong with processqueue read all"))
         DBlogging.dblogger.debug( "Entire Processqueue was read")
         return pqdata
 
@@ -713,9 +713,9 @@ class DBUtils2(object):
         @type process_name: str
         @param output_product: the output product id
         @type output_product: int
-        @keyword extra_params: extra paramerts to pass to the code
+        @keyword extra_params: extra parameters to pass to the code
         @type extra_params: str
-        @keyword super_process_id: th process id of the superprocess for this process
+        @keyword super_process_id: the process id of the superprocess for this process
         @type super_process_id: int
         """
         if output_timebase not in ['ORBIT', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'FILE']:
@@ -744,9 +744,9 @@ class DBUtils2(object):
         @type product_name: str
         @param instrument_id: the instrument   the product is from
         @type instrument_id: int
-        @param relative_path:relative path for th product
+        @param relative_path:relative path for the product
         @type relative_path: str
-        @param super_product_id: th product id of the super product for this product
+        @param super_product_id: the product id of the super product for this product
         @type super_product_id: int
         @param format: the format of the product files
         @type super_product_id: str
@@ -769,7 +769,7 @@ class DBUtils2(object):
                     optional):
         """ add a product process link to the database
 
-        @param input_product_id: id of the produc to link
+        @param input_product_id: id of the product to link
         @type input_product_id: int
         @param process_id: id of the process to link
         @type process_id: int
@@ -788,7 +788,7 @@ class DBUtils2(object):
                      source_code):
         """ add a file code  link to the database
 
-        @param resulting_file_id: id of the produc to link
+        @param resulting_file_id: id of the product to link
         @type resulting_file_id: int
         @param source_code: id of the process to link
         @type source_code: int
@@ -810,8 +810,8 @@ class DBUtils2(object):
                      resulting_file_id):
         """ add a file file  link to the database
 
-        @param source_file: id of the produc to link
-        @type souce_file: int
+        @param source_file: id of the product to link
+        @type source_file: int
         @param resulting_file_id: id of the process to link
         @type resulting_file_id: int
 
@@ -886,23 +886,23 @@ class DBUtils2(object):
         @type filename: str
         @param relative_path: the relative path (relative to mission base dir)
         @type relative_path: str
-        @param code_start_date: start of valaitdy of the code (datetime)
+        @param code_start_date: start of validity of the code (datetime)
         @type code_start_date: datetime
         @param code_stop_date: end of validity of the code (datetime)
         @type code_stop_date: datetime
-        @param code_description: description of th code (50 char)
+        @param code_description: description of the code (50 char)
         @type code_description: str
         @param process_id: the id of the process this code is part of
         @type process_id: int
         @param version: the version of the code
         @type version: Version.Version
-        @param active_code: boolean True means the code is active
-        @type active_code: boolean
-        @param date_written: the dat the cod was written
+        @param active_code: Boolean True means the code is active
+        @type active_code: Boolean
+        @param date_written: the date the cod was written
         @type date_written: date
         @param output_interface_version: the interface version of the output (effects the data file names)
         @type output_interface_version: int
-        @param newest_version: is this code the newestversion in the DB?
+        @param newest_version: is this code the newest version in the DB?
         @type newest_version: bool
 
         @return: the code_id of the newly inserted code
@@ -946,19 +946,19 @@ class DBUtils2(object):
         @type filename: str
         @param relative_path: the relative path (relative to mission base dir)
         @type relative_path: str
-        @param description: description of th code (50 char)
+        @param description: description of the code (50 char)
         @type description: str
         @param product: the id of the product this inspector finds
         @type product: int
         @param version: the version of the code
         @type version: Version.Version
-        @param active_code: boolean True means the code is active
-        @type active_code: boolean
-        @param date_written: the dat the cod was written
+        @param active_code: Boolean True means the code is active
+        @type active_code: Boolean
+        @param date_written: the date the cod was written
         @type date_written: date
         @param output_interface_version: the interface version of the output (effects the data file names)
         @type output_interface_version: int
-        @param newest_version: is this code the newestversion in the DB?
+        @param newest_version: is this code the newest version in the DB?
         @type newest_version: bool
 
         @return: the inspector_id of the newly inserted code
@@ -1041,9 +1041,9 @@ class DBUtils2(object):
         @type data_level: float
         @param version: the version of te file to create
         @type version: Version.Version
-        @param file_create_date: dat the fie was created
+        @param file_create_date: date the fie was created
         @type file_create_date: datetime.datetime
-        @param exists_on_disk: dpes the file exist on disk?
+        @param exists_on_disk: does the file exist on disk?
         @type exists_on_disk: bool
         @param product_id: the product id of he product he file belongs to
         @type product_id: int
@@ -1052,7 +1052,7 @@ class DBUtils2(object):
         @type utc_file_date: datetime.date
         @keyword utc_start_time: utc start time of the file
         @type utc_start_time: datetime.datetime
-        @keyword utc_end_time: itc end time of the file
+        @keyword utc_end_time: utc end time of the file
         @type utc_end_time: datetime.datetime
         @keyword check_date: the date the file was quality checked
         @type check_date: datetime.datetime
@@ -1060,11 +1060,11 @@ class DBUtils2(object):
         @type verbose_provenance: str
         @keyword quality_comment: comment on quality from quality check
         @type quality_comment: str
-        @keyword caveats: caveates associated with the file
+        @keyword caveats: caveats associated with the file
         @type caveates: str
         @keyword met_start_time: met start time of the file
         @type met_start_time: long
-        @keyword met_stop_time: metstop time of the file
+        @keyword met_stop_time: met stop time of the file
         @type met_stop_time: long
 
         @ return: file_id of the newly inserted file
@@ -1128,11 +1128,11 @@ class DBUtils2(object):
     def _newerCodeVersion(self, ec_id, date=None, bool=False, verbose=False):
         """
         given a executable_code ID decide if there is a newer version
-        # TODO think on if this needs to check avtive dates etc
+        # TODO think on if this needs to check active dates etc
 
         @param ec_id: the executable code id to check
         @keyword date: (optional) the date to check for the newer version
-        @keyword bool: if set return boolean True=there s a newer version
+        @keyword bool: if set return Boolean True=there s a newer version
         @return
              - id of the newest version if bool is False
              - True there is a newer version, False otherwise if bool is set
@@ -1141,7 +1141,7 @@ class DBUtils2(object):
         try: self.Executable_codes
         except AttributeError: self._createTableObjects()
 
-        # if bool then we just wat to know if this is the newest version
+        # if bool then we just want to know if this is the newest version
         mul = []
         vall = []
         for sq_bf in self.session.query(self.Executable_codes).filter_by(p_id = self._getPID(ec_id)):
@@ -1247,7 +1247,7 @@ class DBUtils2(object):
                             revision_version,
                             active_code = True):
         """
-        Given an input executable code change its version ands insert it to DB
+        Given an input executable code change its version and insert it to DB
 
         @param ec_id: the file_id to copy
         @param new_filename: the new name of the file
@@ -1378,7 +1378,7 @@ class DBUtils2(object):
 
     def getSatelliteMission(self, sat_name):
         """
-        given a satellite or satellit id return the mission
+        given a satellite or satellite id return the mission
         """
         if not isinstance(sat_name, (tuple, list)):
             sat_name = [sat_name]
@@ -1469,7 +1469,7 @@ class DBUtils2(object):
 
     def _getInstruemntID(self, name):
         """
-        Return the instrument_id for a givem instrument
+        Return the instrument_id for a given instrument
 
         @return: instrument_id - the instrument ID
 
@@ -1600,7 +1600,7 @@ class DBUtils2(object):
         """
         Return the fileID for the input filename
 
-        @param process_id: process_)id to return the inout_product_id for
+        @param process_id: process_)id to return the input_product_id for
         @type process_id: long
 
         @return: list of input_product_ids
@@ -1694,7 +1694,7 @@ class DBUtils2(object):
     def _getSatelliteID(self,
                         sat_name):
         """
-        @param sat_name: the satellie name to look up the id
+        @param sat_name: the satellite name to look up the id
         @type sat_name: str
 
         @return: satellite_id - the requested satellite  ID
@@ -1739,7 +1739,7 @@ class DBUtils2(object):
 
     def getCodeFromProcess(self, proc_id):
         """
-        given a process id return the code that makes perfoms that process
+        given a process id return the code that makes performs that process
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess:")
         sq1 =  self.session.query(self.Code.code_id).filter_by(process_id = proc_id)  # should only have one value
@@ -1755,9 +1755,9 @@ class DBUtils2(object):
 
     def _getMissionDirectory(self):
         """
-        return the base direcorty for the current mission
+        return the base directory for the current mission
 
-        @return: base directory for thcurrent mission
+        @return: base directory for current mission
         @rtype: str
         """
         sq = self.session.query(self.Mission.rootdir).filter_by(mission_name  = self.mission)
@@ -1765,7 +1765,7 @@ class DBUtils2(object):
 
     def _checkIncoming(self):
         """
-        check the incoming directory for the current mision and add those files to the geting list
+        check the incoming directory for the current mission and add those files to the getting list
 
         @return: processing list of file ids
         @rtype: list
@@ -1785,7 +1785,7 @@ class DBUtils2(object):
 
     def getErrorPath(self):
         """
-        return the erro path for the current mission
+        return the error path for the current mission
         """
         basedir = self._getMissionDirectory()
         path = os.path.join(basedir, 'errors/')

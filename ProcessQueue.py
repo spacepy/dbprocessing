@@ -216,7 +216,7 @@ class ProcessQueue(object):
 
     def _strargs_to_args(self, strargs):
         """
-        read in the arguments string forn te db and change to a dict
+        read in the arguments string forn the db and change to a dict
         """
         kwargs = {}
         if isinstance(strargs, (list, tuple)): # we have multiple to deal with 
@@ -370,6 +370,7 @@ class ProcessQueue(object):
             cmdline.append(self.dbu._getFileFullPath(i_fid))
         cmdline.append(os.path.join(self.tempdir, format_str))
         print cmdline
+        DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))        
         subprocess.check_call(cmdline)
         1/0
 

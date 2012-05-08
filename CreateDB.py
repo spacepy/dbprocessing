@@ -40,23 +40,23 @@ class dbprocessing_db(object):
         @contact: balarsen@lanl.gov
 
         @version: V1: 14-Jun-2010 (BAL)
-        @version: V2: 25-Aug-2010 (BAL) - chnaged to throuw exception not return False
+        @version: V2: 25-Aug-2010 (BAL) - changed to throw exception not return False
 
         >>>  pnl._createTableObjects()
         """
         table_names = self.engine.table_names()
 
-        ## create a dictionary of all the table names that will be used as calss names.
-        ## this uses the db table name as the tabel name and a cap 1st letter as the class
+        ## create a dictionary of all the table names that will be used as class names.
+        ## this uses the db table name as the table name and a cap 1st letter as the class
         ## when interacting using python use the class
         table_dict = {}
         for val in table_names:
             table_dict[val[0].upper() + val[1:]] = val
 
-        ##  dynamincally create all the classes (c1)
-        ##  dynamicallly create all the tables in the db (c2)
-        ##  dynaminically create all the mapping between class and table (c3)
-        ## this just saves a lot of typing and is equilivant to:
+        ##  dynamically create all the classes (c1)
+        ##  dynamically create all the tables in the db (c2)
+        ##  dynamically create all the mapping between class and table (c3)
+        ## this just saves a lot of typing and is equivalent to:
         ##     class Missions(object):
         ##         pass
         ##     missions = Table('missions', metadata, autoload=True)
@@ -76,8 +76,8 @@ class dbprocessing_db(object):
 
     def createDB(self):
         """
-        Step through and create the DB structre, relationships and constriants
-        **Note that order matters here, have to defive a Table before you can link to it**
+        Step through and create the DB structure, relationships and constraints
+        **Note that order matters here, have to define a Table before you can link to it**
         """
         if self.overwrite:
             raise(NotImplementedError('overwrite is not yet implemented'))
