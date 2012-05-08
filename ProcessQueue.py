@@ -12,8 +12,6 @@ import sys
 import tempfile
 import traceback
 
-import numpy as np
-
 import DBfile
 import DBlogging
 import DBStrings
@@ -58,6 +56,7 @@ class ProcessQueue(object):
         dbu._openDB()
         dbu._createTableObjects()
         self.tempdir = None
+        self.current_file = None
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()
         self.moved = DBqueue.DBqueue()
@@ -167,6 +166,44 @@ class ProcessQueue(object):
             os.remove( os.path.join(inc_path, os.path.basename(fname)) )
         shutil.move(fname, inc_path + os.sep)
 
+    def diskfileToDB(self, df):
+        """
+        given a diskfile go through and do all the steps to add it into the db
+        """
+        if df is None:
+            DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.current_file))
+            self.moveToError(self.current_file)
+            return None
+
+        # if the file is the wrong mission skip it
+        dbf = DBfile.DBfile(df, self.dbu)
+        try:
+            f_id = dbf.addFileToDB()
+            DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
+        except (ValueError, DBUtils2.DBError) as errmsg:
+            DBlogging.dblogger.warning("Except adding file to db so" + \
+                                       " moving to error: %s" % (errmsg))
+            self.moveToError(df.filename)
+            return None
+
+        # move the file to the its correct home
+        dbf.move()
+        # set files in the db of the same product and same utc_file_date to not be newest version
+        files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
+        mx = max(zip(*files)[1])
+        for f in files:
+            if f[1] != mx: # this is not the max, newest_version should be False
+                self.dbu.session.query(self.dbu.File).filter_by(file_id = f[0]).update({self.dbu.File.newest_version: False})
+                DBlogging.dblogger.debug("set {0}.newest_version=False".format(f[0]))
+        try:
+            self.dbu.session.commit()
+        except IntegrityError as IE:
+            self.session.rollback()
+            raise(DBUtils2.DBError(IE))
+        # add to processqueue for later processing
+        self.dbu.processqueuePush(f_id)
+        return f_id
+
     def importFromIncoming(self):
         """
         Import a file from incoming into the database
@@ -177,42 +214,7 @@ class ProcessQueue(object):
             self.current_file = val
             DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.current_file, len(self.queue)))
             df = self.figureProduct()
-            if df is None:
-                DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.current_file))
-                self.moveToError(self.current_file)
-                continue
-
-            # if the file is the wrong mission skip it
-            dbf = DBfile.DBfile(df, self.dbu)
-            try:
-                f_id = dbf.addFileToDB()
-                DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
-            except (ValueError, DBUtils2.DBError) as errmsg:
-                DBlogging.dblogger.warning("Except adding file to db so" + \
-                                           " moving to error: %s" % (errmsg))
-                self.moveToError(val)
-                continue
-            # move the file to the its correct home
-            dbf.move()
-            # set files in the db of the same product and same utc_file_date to not be newest version
-            files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
-            print "dbf.diskfile.params['product_id']", dbf.diskfile.params['product_id']
-            print "dbf.diskfile.params['utc_file_date']", dbf.diskfile.params['utc_file_date']
-            print 'files', files
-            print zip(*files)[1]
-            mx = max(zip(*files)[1])
-            for f in files:
-                print "f[1] != mx", f[1], mx, f[1] != mx
-                if f[1] != mx: # this is not the max, newest_version should be False
-                    self.dbu.session.query(self.dbu.File).filter_by(file_id = f[0]).update({self.dbu.File.newest_version: False})
-                    DBlogging.dblogger.debug("set {0}.newest_version=False".format(f[0]))
-            try:
-                self.dbu.session.commit()
-            except IntegrityError as IE:
-                self.session.rollback()
-                raise(DBUtils2.DBError(IE))
-            # add to processqueue for later processing
-            self.dbu.processqueuePush(f_id)
+            self.diskfileToDB(df)
 
     def _strargs_to_args(self, strargs):
         """
@@ -314,7 +316,6 @@ class ProcessQueue(object):
                     return None
 
         input_files = zip(*files)[0]
-        print "input_files", input_files
 
 #==============================================================================
 # setup and do the processing
@@ -440,7 +441,19 @@ class ProcessQueue(object):
         # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
         #    -- maybe instead of moving this to incoming we add it to the db now with the links
 
-
+        # need to add the current file to the DB so that we have the filefilelink and filecodelink info
+        current_file = self.current_file # so we can put it back
+        self.current_file = os.path.join(self.dbu.getIncomingPath(), filename)
+        df = self.figureProduct() 
+        f_id = self.diskfileToDB(df)
+        ## here the file is in the DB so we can add the filefilelink an filecodelinks
+        if f_id is not None: # None comes back if the file goes to error
+            self.dbu.addFilecodelink(f_id, code_id)
+            for val in input_files: # add a link for each input file
+                self.dbu.addFilefilelink(f_id, val)            
+        self.current_file = current_file # so we can put it back
+                    
+                    
     def queueClean(self):
         """
         go through the process queue and clear out lower versions of the same files
@@ -569,6 +582,7 @@ if __name__ == "__main__":
 
     if '-i' in zip(*opts)[0]: # import selected
         try:
+            start_len = pq.dbu.processqueueLen()
             pq.checkIncoming()
             while len(pq.queue) != 0:
                 pq.importFromIncoming()
@@ -586,16 +600,15 @@ if __name__ == "__main__":
         else:
             pq.dbu._stopLogging('Nominal Exit')
         pq.dbu._closeDB()
+        print("Import finished: {0} files added".format(pq.dbu.processqueueLen()-start_len))
 
     if '-p' in zip(*opts)[0]: # process selected
-        pq.queueClean()  # get rid of duplicates
         try:
             DBlogging.dblogger.debug("pq.dbu.processqueueLen(): {0}".format(pq.dbu.processqueueLen()))
             while pq.dbu.processqueueLen() > 0:
-                print 'processqueueLen', pq.dbu.processqueueLen()
+                pq.queueClean()  # get rid of duplicates
                 file_id = pq.dbu.processqueueGet()
                 DBlogging.dblogger.debug("popped {0} from pq.dbu.processqueueGet()".format(file_id))
-                print 'file_id', file_id
                 if file_id is None:
                     break
                 children = pq.dbu.getChildrenProducts(file_id) # returns process
