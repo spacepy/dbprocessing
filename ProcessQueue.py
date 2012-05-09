@@ -33,13 +33,13 @@ class ProcessException(Exception):
 
 
 class ForException(Exception):
-    """Cheezy but separate excpetion for breaking out of a nested loop"""
+    """Cheezy but separate exception for breaking out of a nested loop"""
     pass
 
 
 class ProcessQueue(object):
     """
-    Main code used to process the Queue, looks in incioming and builds all
+    Main code used to process the Queue, looks in incoming and builds all
     possible files
 
     @author: Brian Larsen
@@ -141,7 +141,7 @@ class ProcessQueue(object):
 
         path = self.dbu.getErrorPath()
         if os.path.isfile(os.path.join(path, os.path.basename(fname) ) ):
-        #TODO do I realy want to remove old version:?
+        #TODO do I really want to remove old version:?
             os.remove( os.path.join(path, os.path.basename(fname) ) )
             DBlogging.dblogger.warning("removed {0}, as it was under a copy".format(os.path.join(path, os.path.basename(fname) )))
         if path[-1] != os.sep:
@@ -162,7 +162,7 @@ class ProcessQueue(object):
         inc_path = self.dbu.getIncomingPath()
         DBlogging.dblogger.debug("Entered moveToIncoming: {0} {1}".format(fname, inc_path))
         if os.path.isfile(os.path.join(inc_path, os.path.basename(fname))):
-        #TODO do I realy want to remove old version:?
+        #TODO do I really want to remove old version:?
             os.remove( os.path.join(inc_path, os.path.basename(fname)) )
         shutil.move(fname, inc_path + os.sep)
 
@@ -183,7 +183,7 @@ class ProcessQueue(object):
         except (ValueError, DBUtils2.DBError) as errmsg:
             DBlogging.dblogger.warning("Except adding file to db so" + \
                                        " moving to error: %s" % (errmsg))
-            self.moveToError(df.filename)
+            self.moveToError(os.path.join(df.path, df.filename))
             return None
 
         # move the file to the its correct home
@@ -237,7 +237,7 @@ class ProcessQueue(object):
 
     def figureProduct(self):
         """
-        This funtion imports the inspectors and figures out whcih inspectors claim the file
+        This function imports the inspectors and figures out which inspectors claim the file
         """
         act_insp = self.dbu.getActiveInspectors()
         claimed = []
@@ -277,7 +277,7 @@ class ProcessQueue(object):
         utc_file_date = self.dbu.getFileUTCfileDate(file_id)
         DBlogging.dblogger.debug("Finding input files for {0}".format(utc_file_date))
 
-        ## here decide how we build putput and do it.
+        ## here decide how we build output and do it.
         timebase = self.dbu.getProcessTimebase(process_id)
         if timebase == 'FILE': # taking one file to te next file
             DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
@@ -316,6 +316,7 @@ class ProcessQueue(object):
                     return None
 
         input_files = zip(*files)[0]
+        DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
 #==============================================================================
 # setup and do the processing
@@ -363,7 +364,7 @@ class ProcessQueue(object):
                 if incCode:
                     if db_code_id != code_id: # did the code change
                         ver_diff = (self.dbu.getCodeVersion(code_id) - self.dbu.getCodeVersion(db_code_id))
-                        # order matters here by the way these reset earch other
+                        # order matters here by the way these reset each other
                         ## did the revision change?
                         if ver_diff[2] > 0:
                             output_file_version.incRevision()
@@ -377,19 +378,31 @@ class ProcessQueue(object):
                             output_file_version.incInterface()
                             DBlogging.dblogger.debug("Filename: {0} incInterface()".format(filename))
                         incCode = False
+                db_files = self.dbu.getFilefilelink_byresult(f_id_db)
+                did_inc = False
+                for in_file in input_files:
+                    DBlogging.dblogger.debug("in_file: {0}, db_files: {1}  in_file in db_files or len(db_files) != len(input_files):{2}".format(in_file, db_files, in_file not in db_files or len(db_files) != len(input_files)))                    
+                    if in_file not in db_files or len(db_files) != len(input_files):
+                        output_file_version.incQuality()
+                        DBlogging.dblogger.debug("Filename: {0} found a file that was not in the original version".format(filename))                            
+                        did_inc = True                        
+                        break # out of the for loop to try again
+                if did_inc:
+                    continue # another loop of the while
                 if incFiles:
-                    db_files = self.dbu.getFilefilelink_byresult(f_id_db)
+                    DBlogging.dblogger.debug("db_files: {0}  f_id_db: {1}".format(db_files, f_id_db))                    
+                    DBlogging.dblogger.debug("input_files: {0}  ".format(input_files))                    
                     # go through and see if all the same files are present, 
                     ## if not quality is incremented
                     file_vers = [0,0,0]
-                    for db_file in db_files:
-                        if not db_file in input_files:
-                            output_file_version.incQuality()
-                            break # out of the for loop to try again
+                    for in_file in input_files:
                         # the file is there is it the same version
-                        db_file_version = self.dbu.getFileVersion(db_file)
-                        input_file_version = self.dbu.getFileVersion(input_files[input_files.index(db_file)])
+                        input_file_version = self.dbu.getFileVersion(in_file)
+                        DBlogging.dblogger.debug("self.dbu.getFileVersion(in_file): {0}".format(self.dbu.getFileVersion(in_file)))                            
+                        db_file_version = self.dbu.getFileVersion(db_files[db_files.index(in_file)])
+                        DBlogging.dblogger.debug("self.dbu.getFileVersion(input_files[input_files.index(in_file)]): {0}".format(self.dbu.getFileVersion(input_files[input_files.index(in_file)])))                            
                         ver_diff =  input_file_version - db_file_version
+                        DBlogging.dblogger.debug("ver_diff: {0}".format(ver_diff))                            
                         ## did the revision change?
                         if ver_diff[2] > 0:
                             file_vers[2] += 1
@@ -399,6 +412,7 @@ class ProcessQueue(object):
                         ## did the interface change?
                         if ver_diff[0] > 0:
                             file_vers[0] += 1
+                        DBlogging.dblogger.debug("file_vers: {0}".format(file_vers))                            
                         if file_vers[0] > 0:
                             output_file_version.incInterface()
                             break # out of the for loop
@@ -408,6 +422,9 @@ class ProcessQueue(object):
                         elif file_vers[0] > 0:             
                             output_file_version.incRevision()
                             break # out of the for loop
+                        else: # this file would be the same as what we already have, don't process it
+                            DBlogging.dblogger.debug("Filename: {0} found all the same files".format(filename))                            
+                            return None
 
             except DBUtils2.DBError: # this is for self.dbu._getFileID(filename)
                 DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(filename))
@@ -424,7 +441,7 @@ class ProcessQueue(object):
         cmdline.append(os.path.join(self.tempdir, filename))
 
         DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))        
-        # TODO, think gere on how to grab the output        
+        # TODO, think here on how to grab the output        
         try:
             subprocess.check_call(cmdline, stderr=subprocess.STDOUT) 
         except subprocess.CalledProcessError: 
@@ -433,8 +450,9 @@ class ProcessQueue(object):
             # assume the file is bad and move it to error
             self.moveToError(filename)
             self.rm_tempdir() # clean up
+        DBlogging.dblogger.info("command finished")        
             
-        # the code worked and thefile should not go to incoming (it had better have an inspector)
+        # the code worked and the file should not go to incoming (it had better have an inspector)
         self.moveToIncoming(os.path.join(self.tempdir, filename))
         self.rm_tempdir() # clean up
         ## TODO several additions have to be made here
@@ -568,15 +586,15 @@ if __name__ == "__main__":
     if curr_proc:  # returns False or the PID
         # check if the PID is running
         if processRunning(curr_proc):
-            # we still have an instance processing, dont start another
+            # we still have an instance processing, don't start another
             pq.dbu._closeDB()
             DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
             raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
         else:
-            # There is a processing flag set but it died, dont start another
+            # There is a processing flag set but it died, don't start another
             pq.dbu._closeDB()
-            DBlogging.dblogger.error( "There is a processing flag set but it died, dont start another" )
-            raise(ProcessException("There is a processing flag set but it died, dont start another"))
+            DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
+            raise(ProcessException("There is a processing flag set but it died, don't start another"))
     # start logging as a lock
     pq.dbu._startLogging()
 
