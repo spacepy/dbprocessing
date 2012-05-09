@@ -41,6 +41,7 @@ import re
 
 import DBlogging
 import Diskfile
+import Version
 
 def EphemeralCallable(basetype=type):
     def _new_caller(cls, *args, **kwargs):
@@ -188,6 +189,18 @@ def valid_YYYYMMDD(inval):
     if isinstance(ans, datetime.datetime):
         return True
 
+def extract_Version(filename):
+    """
+    go through the filename and pull out the fist valid vX.Y.Z and return as a 
+    Version object
+    """
+    res = re.search("[vV]\d+\.\d+\.\d+\.", filename)
+    if res:
+        tmp = res.group().split('.')
+        ver = Version.Version(tmp[0][1:], tmp[1], tmp[2])
+        return ver
+    else:
+        return None
 
 
 
