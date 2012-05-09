@@ -291,7 +291,7 @@ class ProcessQueue(object):
 
         elif timebase == 'DAILY':
             DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
-            raise(NotImplemented('Not implented yet (1001)'))
+            raise(NotImplementedError('Not implented yet (1001)'))
             ## from the input file see what the timebase is and grab all files that go into process
 
             ########## this is giving bad answers!!!  getFiles_product_utc_file_daterange
@@ -359,10 +359,12 @@ class ProcessQueue(object):
                 # the file is in the DB, has the code changed version?
                 ## we are planning to use code_id code was this used before?
                 db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
+                DBlogging.dblogger.debug("f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
                 if db_code_id is None:
                     DBlogging.dblogger.error("Database inconsistency found!! A generate file {0} does not have a filecodelink".format(filename))
                 if incCode:
                     if db_code_id != code_id: # did the code change
+                        DBlogging.dblogger.debug("code_id: {0}   db_code_id: {1}".format(code_id, db_code_id))
                         ver_diff = (self.dbu.getCodeVersion(code_id) - self.dbu.getCodeVersion(db_code_id))
                         # order matters here by the way these reset each other
                         ## did the revision change?
@@ -631,6 +633,7 @@ if __name__ == "__main__":
                     break
                 children = pq.dbu.getChildrenProducts(file_id) # returns process
                 if not children:
+                    DBlogging.dblogger.debug("No children found for {0}".format(file_id))
                     pq.dbu.processqueuePop() # done in two steps for crashes
                     continue
                 ## right here we have a list of processes that should run

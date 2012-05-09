@@ -1711,8 +1711,11 @@ class DBUtils2(object):
         """
         DBlogging.dblogger.debug("Entered getCodeVersion:")
         sq =  self.session.query(self.Code.interface_version, self.Code.quality_version, self.Code.revision_version).filter_by(code_id = code_id)  # should only have one value
-        return Version.Version(*sq[0])
-        
+        try:
+            return Version.Version(*sq[0])
+        except IndexError:
+            raise(ValueError("No code number {0} in the db".format(code_id)))
+
     def getOutputProductFromProcess(self, process):
         """
         given an process id return the output product
