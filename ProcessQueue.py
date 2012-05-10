@@ -271,207 +271,238 @@ class ProcessQueue(object):
         """
         DBlogging.dblogger.debug("Entered buildChildren: process_id={0}".format(process_id))
 
-        ## get all the input products for that process, and if they are optional
-        input_product_id = self.dbu.getInputProductID(process_id) # this is a list
+        daterange = self.dbu.getFileDaterange(file_id)
+        dates = self.dbu.daterange_to_dates(daterange)
 
-        utc_file_date = self.dbu.getFileUTCfileDate(file_id)
-        DBlogging.dblogger.debug("Finding input files for {0}".format(utc_file_date))
+        for utc_file_date in dates:            
+                
+            ## get all the input products for that process, and if they are optional
+            input_product_id = self.dbu.getInputProductID(process_id) # this is a list
+    
+            DBlogging.dblogger.debug("Finding input files for {0}".format(utc_file_date))
+    
+            ## here decide how we build output and do it.
+            timebase = self.dbu.getProcessTimebase(process_id)
+            if timebase == 'FILE': # taking one file to te next file
+                DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
+                files = []
+                for val, opt in input_product_id:
+                    # TODO there is a suspect danger here that multiple files have the same date with different start stop
+                    tmp = self.dbu.getFiles_product_utc_file_date(val, utc_file_date)
+                    if tmp != []:
+                        files.extend(tmp)
+                DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
+                files = self.dbu.file_id_Clean(files)
+    
+            elif timebase == 'DAILY':
+                DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
+                ## from the input file see what the timebase is and grab all files that go into process
+                DBlogging.dblogger.debug("Finding input files for {0}".format(daterange))
+    
+                ########## this is giving bad answers!!!  getFiles_product_utc_file_daterange
+                files = []
+                for val, opt in input_product_id:
+                    # TODO there is a suspect danger here that multiple files have the same date with different start stop
+                    tmp = self.dbu.getFiles_product_utc_file_daterange(val, daterange)
+                    if tmp != []:
+                        files.extend(tmp)
+                DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
+                files = self.dbu.file_id_Clean(files)
+    
+            else:
+                DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
+                raise(NotImplementedError('Not implented yet (1001)'))
+                raise(ValueError('Bad timebase for product: {0}'.format(process_id)))
+    
+    #==============================================================================
+    # do we have the required files to do the build?
+    #==============================================================================
+            # get the products of the input files
+            ## need to go through the input_product_id and make sure we have a file for each required product
+            for prod, opt in input_product_id:
+                if not opt:
+                    if not prod in zip(*files)[2]: # the product ID
+                        DBlogging.dblogger.info("Required products not found, continuing.  Process:{0}, product{1}".format(process_id, prod))
+                        return None
+    
+            input_files = zip(*files)[0]
+            DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
+    
+    #==============================================================================
+    # setup and do the processing
+    #==============================================================================
+    
+            # since we have a process do we have a code that does it?
+            code_id = self.dbu.getCodeFromProcess(process_id)
+    
+            # figure out the code path so that it can be called
+            codepath = self.dbu.getCodePath(code_id)
+            DBlogging.dblogger.debug("Going to run code: {0} located at {1}".format(code_id, codepath))
 
-        ## here decide how we build output and do it.
-        timebase = self.dbu.getProcessTimebase(process_id)
-        if timebase == 'FILE': # taking one file to te next file
-            DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
-            files = []
-            for val, opt in input_product_id:
-                tmp = self.dbu.getFiles_product_utc_file_date(val, utc_file_date)
-                if tmp != []:
-                    files.extend(tmp)
-            DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
-            files = self.dbu.file_id_Clean(files)
-
-        elif timebase == 'DAILY':
-            DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
-            raise(NotImplementedError('Not implented yet (1001)'))
-            ## from the input file see what the timebase is and grab all files that go into process
-
-            ########## this is giving bad answers!!!  getFiles_product_utc_file_daterange
-            files = [self.dbu.getFiles_product_utc_file_daterange(val,
-                                                                   [datetime.datetime(utc_file_date.year, utc_file_date.month, utc_file_date.day),
-                                                                   datetime.datetime(utc_file_date.year, utc_file_date.month, utc_file_date.day+1) -
-                                                                   datetime.timedelta(microseconds=1)]) for val, opt in input_product_id ]
-
-        else:
-            DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
-            raise(ValueError('Bad timebase for product: {0}'.format(process_id)))
-
-#==============================================================================
-# do we have the required files to do the build?
-#==============================================================================
-        # get the products of the input files
-        ## need to go through the input_product_id and make sure we have a file for each required product
-        for prod, opt in input_product_id:
-            if not opt:
-                if not prod in zip(*files)[2]: # the product ID
-                    DBlogging.dblogger.info("Required products not found, continuing.  Process:{0}, product{1}".format(process_id, prod))
-                    return None
-
-        input_files = zip(*files)[0]
-        DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
-
-#==============================================================================
-# setup and do the processing
-#==============================================================================
-
-        # since we have a process do we have a code that does it?
-        code_id = self.dbu.getCodeFromProcess(process_id)
-
-        # figure out the code path so that it can be called
-        codepath = self.dbu.getCodePath(code_id)
-        DBlogging.dblogger.debug("Going to run code: {0} located at {1}".format(code_id, codepath))
-
-        out_prod = self.dbu.getOutputProductFromProcess(process_id)
-        format_str = self.dbu._getProductFormats(out_prod) 
-        # get the process_keywords from the file if there are any
-        process_keywords = self._strargs_to_args([self.dbu.getFileProcess_keywords(fid) for fid in input_files])
-        for key in process_keywords:
-            format_str = format_str.replace('{'+key+'}', process_keywords[key])
-
-        # get the format string       
-        mission, satellite, instrument, product, product_id = self.dbu._getProductNames(out_prod)
-
-        ## need to build a version string for the output file
-        version = self.dbu.getCodeVersion(code_id)
-
-        fmtr = DBStrings.DBFormatter()
-        output_file_version = Version.Version(version.interface, 0, 0)
-        
-        incCode = True
-        incFiles = True
-        while True:
-            filename = fmtr.expand_format(format_str, {'SPACECRAFT':satellite, 
-                                                         'PRODUCT':product, 
-                                                         'VERSION':str(output_file_version)})
-            DBlogging.dblogger.debug("Filename: %s created" % (filename))
-            # if this filename is already in the DB we have to figure out which version number to increment
-            try:
-                f_id_db = self.dbu._getFileID(filename)
-                DBlogging.dblogger.debug("Filename: {0} is in the DB, have to make different version".format(filename))
-                # the file is in the DB, has the code changed version?
-                ## we are planning to use code_id code was this used before?
-                db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
-                DBlogging.dblogger.debug("f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
-                if db_code_id is None:
-                    DBlogging.dblogger.error("Database inconsistency found!! A generate file {0} does not have a filecodelink".format(filename))
-                if incCode:
-                    if db_code_id != code_id: # did the code change
-                        DBlogging.dblogger.debug("code_id: {0}   db_code_id: {1}".format(code_id, db_code_id))
-                        ver_diff = (self.dbu.getCodeVersion(code_id) - self.dbu.getCodeVersion(db_code_id))
-                        # order matters here by the way these reset each other
-                        ## did the revision change?
-                        if ver_diff[2] > 0:
-                            output_file_version.incRevision()
-                            DBlogging.dblogger.debug("Filename: {0} incRevision()".format(filename))
-                        ## did the quality change?
-                        if ver_diff[1] > 0:
-                            output_file_version.incQuality()
-                            DBlogging.dblogger.debug("Filename: {0} incQuality()".format(filename))
-                        ## did the interface change?
-                        if ver_diff[0] > 0:
-                            output_file_version.incInterface()
-                            DBlogging.dblogger.debug("Filename: {0} incInterface()".format(filename))
-                        incCode = False
-                db_files = self.dbu.getFilefilelink_byresult(f_id_db)
-                did_inc = False
-                for in_file in input_files:
-                    DBlogging.dblogger.debug("in_file: {0}, db_files: {1}  in_file in db_files or len(db_files) != len(input_files):{2}".format(in_file, db_files, in_file not in db_files or len(db_files) != len(input_files)))                    
-                    if in_file not in db_files or len(db_files) != len(input_files):
-                        output_file_version.incQuality()
-                        DBlogging.dblogger.debug("Filename: {0} found a file that was not in the original version".format(filename))                            
-                        did_inc = True                        
-                        break # out of the for loop to try again
-                if did_inc:
-                    continue # another loop of the while
-                if incFiles:
-                    DBlogging.dblogger.debug("db_files: {0}  f_id_db: {1}".format(db_files, f_id_db))                    
-                    DBlogging.dblogger.debug("input_files: {0}  ".format(input_files))                    
-                    # go through and see if all the same files are present, 
-                    ## if not quality is incremented
-                    file_vers = [0,0,0]
+            out_prod = self.dbu.getOutputProductFromProcess(process_id)
+            format_str = self.dbu._getProductFormats(out_prod) 
+            # get the process_keywords from the file if there are any
+            process_keywords = self._strargs_to_args([self.dbu.getFileProcess_keywords(fid) for fid in input_files])
+            for key in process_keywords:
+                format_str = format_str.replace('{'+key+'}', process_keywords[key])
+    
+            # get the format string       
+            mission, satellite, instrument, product, product_id = self.dbu._getProductNames(out_prod)
+    
+            ## need to build a version string for the output file
+            version = self.dbu.getCodeVersion(code_id)
+    
+            fmtr = DBStrings.DBFormatter()
+            output_file_version = Version.Version(version.interface, 0, 0)
+            
+            incCode = True
+            incFiles = True
+            while True:
+                filename = fmtr.expand_format(format_str, {'SPACECRAFT':satellite, 
+                                                             'PRODUCT':product, 
+                                                             'VERSION':str(output_file_version), 
+                                                             'datetime':utc_file_date})
+                DBlogging.dblogger.debug("Filename: %s created" % (filename))
+                # if this filename is already in the DB we have to figure out which version number to increment
+                try:
+                    f_id_db = self.dbu._getFileID(filename)
+                    DBlogging.dblogger.debug("Filename: {0} is in the DB, have to make different version".format(filename))
+                    # the file is in the DB, has the code changed version?
+                    ## we are planning to use code_id code was this used before?
+                    db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
+                    DBlogging.dblogger.debug("f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
+                    if db_code_id is None:
+                        DBlogging.dblogger.error("Database inconsistency found!! A generate file {0} does not have a filecodelink".format(filename))
+                    if incCode:
+                        if db_code_id != code_id: # did the code change
+                            DBlogging.dblogger.debug("code_id: {0}   db_code_id: {1}".format(code_id, db_code_id))
+                            ver_diff = (self.dbu.getCodeVersion(code_id) - self.dbu.getCodeVersion(db_code_id))
+                            # order matters here by the way these reset each other
+                            ## did the revision change?
+                            if ver_diff[2] > 0:
+                                output_file_version.incRevision()
+                                DBlogging.dblogger.debug("Filename: {0} incRevision()".format(filename))
+                            ## did the quality change?
+                            if ver_diff[1] > 0:
+                                output_file_version.incQuality()
+                                DBlogging.dblogger.debug("Filename: {0} incQuality()".format(filename))
+                            ## did the interface change?
+                            if ver_diff[0] > 0:
+                                output_file_version.incInterface()
+                                DBlogging.dblogger.debug("Filename: {0} incInterface()".format(filename))
+                            incCode = False
+                    db_files = self.dbu.getFilefilelink_byresult(f_id_db)
+                    did_inc = False
                     for in_file in input_files:
-                        # the file is there is it the same version
-                        input_file_version = self.dbu.getFileVersion(in_file)
-                        DBlogging.dblogger.debug("self.dbu.getFileVersion(in_file): {0}".format(self.dbu.getFileVersion(in_file)))                            
-                        db_file_version = self.dbu.getFileVersion(db_files[db_files.index(in_file)])
-                        DBlogging.dblogger.debug("self.dbu.getFileVersion(input_files[input_files.index(in_file)]): {0}".format(self.dbu.getFileVersion(input_files[input_files.index(in_file)])))                            
-                        ver_diff =  input_file_version - db_file_version
-                        DBlogging.dblogger.debug("ver_diff: {0}".format(ver_diff))                            
-                        ## did the revision change?
-                        if ver_diff[2] > 0:
-                            file_vers[2] += 1
-                        ## did the quality change?
-                        if ver_diff[1] > 0:
-                            file_vers[1] += 1
-                        ## did the interface change?
-                        if ver_diff[0] > 0:
-                            file_vers[0] += 1
-                        DBlogging.dblogger.debug("file_vers: {0}".format(file_vers))                            
-                        if file_vers[0] > 0:
-                            output_file_version.incInterface()
-                            break # out of the for loop
-                        elif file_vers[1] > 0:             
+                        DBlogging.dblogger.debug("in_file: {0}, db_files: {1}  in_file in db_files or len(db_files) != len(input_files):{2}".format(in_file, db_files, in_file not in db_files or len(db_files) != len(input_files)))                    
+                        if in_file not in db_files or len(db_files) != len(input_files):
                             output_file_version.incQuality()
-                            break # out of the for loop
-                        elif file_vers[0] > 0:             
-                            output_file_version.incRevision()
-                            break # out of the for loop
-                        else: # this file would be the same as what we already have, don't process it
-                            DBlogging.dblogger.debug("Filename: {0} found all the same files".format(filename))                            
-                            return None
+                            DBlogging.dblogger.debug("Filename: {0} found a file that was not in the original version".format(filename))                            
+                            did_inc = True                        
+                            break # out of the for loop to try again
+                    if did_inc:
+                        continue # another loop of the while
+                    if incFiles:
+                        DBlogging.dblogger.debug("db_files: {0}  f_id_db: {1}".format(db_files, f_id_db))                    
+                        DBlogging.dblogger.debug("input_files: {0}  ".format(input_files))                    
+                        # go through and see if all the same files are present, 
+                        ## if not quality is incremented
+                        file_vers = [0,0,0]
+                        for in_file in input_files:
+                            # the file is there is it the same version
+                            input_file_version = self.dbu.getFileVersion(in_file)
+                            DBlogging.dblogger.debug("self.dbu.getFileVersion(in_file): {0}".format(self.dbu.getFileVersion(in_file)))                            
+                            db_file_version = self.dbu.getFileVersion(db_files[db_files.index(in_file)])
+                            DBlogging.dblogger.debug("self.dbu.getFileVersion(input_files[input_files.index(in_file)]): {0}".format(self.dbu.getFileVersion(input_files[input_files.index(in_file)])))                            
+                            ver_diff =  input_file_version - db_file_version
+                            DBlogging.dblogger.debug("ver_diff: {0}".format(ver_diff))                            
+                            ## did the revision change?
+                            if ver_diff[2] > 0:
+                                file_vers[2] += 1
+                            ## did the quality change?
+                            if ver_diff[1] > 0:
+                                file_vers[1] += 1
+                            ## did the interface change?
+                            if ver_diff[0] > 0:
+                                file_vers[0] += 1
+                            DBlogging.dblogger.debug("file_vers: {0}".format(file_vers))                            
+                            if file_vers[0] > 0:
+                                output_file_version.incInterface()
+                                break # out of the for loop
+                            elif file_vers[1] > 0:             
+                                output_file_version.incQuality()
+                                break # out of the for loop
+                            elif file_vers[0] > 0:             
+                                output_file_version.incRevision()
+                                break # out of the for loop
+                            else: # this file would be the same as what we already have, don't process it
+                                DBlogging.dblogger.debug("Filename: {0} found all the same files".format(filename))                            
+                                return None
+    
+                except DBUtils2.DBError: # this is for self.dbu._getFileID(filename)
+                    DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(filename))
+                    break # leave the while loop and do the processing
+                
+            # make a directory to run the code
+            self.tempdir = tempfile.mkdtemp('_dbprocessing')
+            DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
+    
+            ## build the command line we are to run
+            cmdline = [codepath]   
+            ## build the command line we are to run
+            cmdline = [codepath]
 
-            except DBUtils2.DBError: # this is for self.dbu._getFileID(filename)
-                DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(filename))
-                break # leave the while loop and do the processing
-            
-        # make a directory to run the code
-        self.tempdir = tempfile.mkdtemp('_dbprocessing')
-        DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
+            ## figure out how to put the arguments together
+            args = self.dbu.getCodeArgs(code_id)
+            if args is not None:
+                args = args.split()
+                for arg in args:
+                    if 'input' not in arg and 'output' not in arg:
+                        cmdline.append(arg)
+                        
+            for i_fid in input_files:
+                if args is not None:
+                   for arg in args:
+                       if 'input' in arg:
+                           cmdline.append(arg.split('=')[1])
+                cmdline.append(self.dbu._getFileFullPath(i_fid))
+            if args is not None:
+                for arg in args:
+                   if 'output' in arg:
+                       cmdline.append(arg.split('=')[1])
+            cmdline.append(os.path.join(self.tempdir, filename))
 
-        ## build the command line we are to run
-        cmdline = [codepath]   
-        for i_fid in input_files:
-            cmdline.append(self.dbu._getFileFullPath(i_fid))
-        cmdline.append(os.path.join(self.tempdir, filename))
-
-        DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))        
-        # TODO, think here on how to grab the output        
-        try:
-            subprocess.check_call(cmdline, stderr=subprocess.STDOUT) 
-        except subprocess.CalledProcessError: 
-            # TODO figure out how to print what the return code was
-            DBlogging.dblogger.error("Command returned a non-zero return code")
-            # assume the file is bad and move it to error
-            self.moveToError(filename)
+            DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))        
+    
+            # TODO, think here on how to grab the output        
+            try:
+                subprocess.check_call(cmdline, stderr=subprocess.STDOUT) 
+            except subprocess.CalledProcessError: 
+                # TODO figure out how to print what the return code was
+                DBlogging.dblogger.error("Command returned a non-zero return code")
+                # assume the file is bad and move it to error
+                self.moveToError(filename)
+                self.rm_tempdir() # clean up
+            DBlogging.dblogger.info("command finished")        
+                
+            # the code worked and the file should not go to incoming (it had better have an inspector)
+            self.moveToIncoming(os.path.join(self.tempdir, filename))
             self.rm_tempdir() # clean up
-        DBlogging.dblogger.info("command finished")        
-            
-        # the code worked and the file should not go to incoming (it had better have an inspector)
-        self.moveToIncoming(os.path.join(self.tempdir, filename))
-        self.rm_tempdir() # clean up
-        ## TODO several additions have to be made here
-        # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
-        #    -- maybe instead of moving this to incoming we add it to the db now with the links
-
-        # need to add the current file to the DB so that we have the filefilelink and filecodelink info
-        current_file = self.current_file # so we can put it back
-        self.current_file = os.path.join(self.dbu.getIncomingPath(), filename)
-        df = self.figureProduct() 
-        f_id = self.diskfileToDB(df)
-        ## here the file is in the DB so we can add the filefilelink an filecodelinks
-        if f_id is not None: # None comes back if the file goes to error
-            self.dbu.addFilecodelink(f_id, code_id)
-            for val in input_files: # add a link for each input file
-                self.dbu.addFilefilelink(f_id, val)            
-        self.current_file = current_file # so we can put it back
+            ## TODO several additions have to be made here
+            # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
+            #    -- maybe instead of moving this to incoming we add it to the db now with the links
+    
+            # need to add the current file to the DB so that we have the filefilelink and filecodelink info
+            current_file = self.current_file # so we can put it back
+            self.current_file = os.path.join(self.dbu.getIncomingPath(), filename)
+            df = self.figureProduct() 
+            f_id = self.diskfileToDB(df)
+            ## here the file is in the DB so we can add the filefilelink an filecodelinks
+            if f_id is not None: # None comes back if the file goes to error
+                self.dbu.addFilecodelink(f_id, code_id)
+                for val in input_files: # add a link for each input file
+                    self.dbu.addFilefilelink(f_id, val)            
+            self.current_file = current_file # so we can put it back
                     
                     
     def queueClean(self):

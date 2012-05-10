@@ -1347,6 +1347,20 @@ class DBUtils2(object):
         except IndexError:
             return None
 
+    def getFileDaterange(self, filename):
+        """
+        given a filename or file_id return the product id it belongs to
+        """
+        try:
+            f_id = int(filename)  # if a number
+        except ValueError:
+            f_id = self._getFileID(filename) # is a name
+        try:
+            dates = self.session.query(self.File.utc_start_time, self.File.utc_stop_time).filter_by(file_id = f_id)[0]
+            return [dates[0], dates[1]]
+        except IndexError:
+            return None
+        
     def getFileVersion(self, filename):
         """
         given a filename or fileid return a Version instance
@@ -1554,11 +1568,9 @@ class DBUtils2(object):
         """
         given a product id and a utc_file_date return all the files that have data in the range [(file_id, Version, product_id, utc_file_date), ]
         """
-        sq11 = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_stop_time >= daterange[0]).filter(self.File.utc_start_time <= daterange[1]).all()
-        vers = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq11]
-        # need to drop all the same files with lower versions
-        ans = self.file_id_Clean(vers)
-        return ans
+        sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_stop_time >= daterange[0]).filter(self.File.utc_start_time <= daterange[1])
+        sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
+        return sq
 
     def file_id_Clean(self, invals):
         """
@@ -1806,3 +1818,9 @@ class DBUtils2(object):
             return sq[0][0]
         except IndexError:
             return None
+            
+    def daterange_to_dates(self, daterange):
+        """
+        given a daterange return the dat objects for all days in the range
+        """
+        return [daterange[0] + datetime.timedelta(days=val) for val in xrange((daterange[1]-daterange[0]).days+1)]

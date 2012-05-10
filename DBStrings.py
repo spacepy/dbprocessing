@@ -108,6 +108,7 @@ class DBFormatter(string.Formatter):
                     kwargs['MILLI'] = int(dt.microsecond / 1000)
                 if not 'MICRO' in kwargs:
                     kwargs['MICRO'] = dt.microsecond % 1000
+            return kwargs
 
     def expand_format(self, format_string, kwargs=None):
         """Adds formatting codes to 'special' fields in format string
@@ -133,6 +134,7 @@ class DBFormatter(string.Formatter):
         @rtype: str
         """
         result = []
+        kwargs = self.expand_datetime(kwargs)
         for literal, field, format, conversion in self.parse(format_string):
             result.append(literal)
             if field in self.SPECIAL_FIELDS:
