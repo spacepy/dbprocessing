@@ -86,7 +86,6 @@ class DBUtils2(object):
                      satellite_name = '',
                      product_name = '',
                      date = '',
-                     release = '',
                      quality = '',
                      revision = '',
                      extension = '.cdf'):
@@ -98,7 +97,6 @@ class DBUtils2(object):
         @keyword satellite_name: satellite name  (default '')
         @keyword product_name: data product name (default '')
         @keyword date: file date (default '')
-        @keyword release: release version number (default '')
         @keyword quality: quality version number (default '')
         @keyword revision: revision version number  (default '')
 
@@ -802,7 +800,7 @@ class DBUtils2(object):
         return fcl1.resulting_file, fcl1.source_code
 
     def addFilefilelink(self,
-                     resulting_file_id, 
+                     resulting_file_id,
                      source_file,):
         """ add a file file  link to the database
 
@@ -821,7 +819,7 @@ class DBUtils2(object):
         ffl1.resulting_file = resulting_file_id
         self.session.add(ffl1)
         self._commitDB()
-        return ffl1.source_file, ffl1.resulting_file 
+        return ffl1.source_file, ffl1.resulting_file
 
     def addInstrumentproductlink(self,
                      instrument_id,
@@ -987,7 +985,7 @@ class DBUtils2(object):
             self.session.commit()
         except IntegrityError as IE:
             self.session.rollback()
-            raise(DBError(IE))        
+            raise(DBError(IE))
 
     def _closeDB(self):
         """
@@ -1023,7 +1021,6 @@ class DBUtils2(object):
                 caveats = None,
                 met_start_time = None,
                 met_stop_time = None,
-                release_number = None,
                 product_id = None,
                 newest_version = None,
                 md5sum = None,
@@ -1079,7 +1076,6 @@ class DBUtils2(object):
         d1.verbose_provenance = verbose_provenance
         d1.quality_comment = quality_comment
         d1.caveats = caveats
-        d1.release_number = release_number
         d1.interface_version = version.interface
         d1.quality_version = version.quality
         d1.revision_version = version.revision
@@ -1118,7 +1114,7 @@ class DBUtils2(object):
                 if sq.code_start_date > date.date():
                     return False
                 if sq.code_stop_date < date.date():
-                    return False                
+                    return False
         return True
 
     def _newerCodeVersion(self, ec_id, date=None, bool=False, verbose=False):
@@ -1214,7 +1210,6 @@ class DBUtils2(object):
         DF.quality_check = 0
         DF.quality_comment = None
         DF.caveats = None
-        DF.release_number = None
         DF.ds_id = sq[0].ds_id
         DF.quality_version = quality_version
         DF.revision_version = revision_version
@@ -1360,7 +1355,7 @@ class DBUtils2(object):
             return [dates[0], dates[1]]
         except IndexError:
             return None
-        
+
     def getFileVersion(self, filename):
         """
         given a filename or fileid return a Version instance
@@ -1803,11 +1798,11 @@ class DBUtils2(object):
         """
         given a file_id return all the other file_ids that went into making it
         """
-        sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = file_id).all() 
+        sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = file_id).all()
         try:
             return zip(*sq)[0]
         except IndexError:
-            return None       
+            return None
 
     def getFilecodelink_byfile(self, file_id):
         """
@@ -1818,9 +1813,72 @@ class DBUtils2(object):
             return sq[0][0]
         except IndexError:
             return None
-            
+
     def daterange_to_dates(self, daterange):
         """
         given a daterange return the dat objects for all days in the range
         """
         return [daterange[0] + datetime.timedelta(days=val) for val in xrange((daterange[1]-daterange[0]).days+1)]
+
+    def getMissionID(self, mission_name):
+        """
+        given a misio name return its ID
+        """
+        sq = self.session.query(self.Mission.mission_id).filter_by(mission_name = mission_name)
+        return sq[0][0]
+
+    def getNewestFiles(self):
+        """
+        for the current mission get a list of all file ids that are marked newest version
+        """
+        sq = self.session.query(self.File.file_id).filter_by(newest_version = True).all()
+        sq = zip(*sq)[0]
+        mission_id = self.getMissionID(self.mission)
+        for i in range(len(sq)-1, -1, -1):
+            if self.getFileMission(sq[i]) != mission_id:
+                del sq[i]
+        return sq
+
+    def tag_release(self, rel_num):
+        """
+        tag all thenewest versions of files to a release number (integer)
+        """
+        newest_files = self.getNewestFiles()
+        for f in newest_files:
+            self.addRelease(f, rel_num, commit=False)
+        self._commitDB()
+
+    def addRelease(self, filename, release, commit=False):
+        """
+        given a filename or file_id add an entry to the release table
+        """
+        try:
+            f_id = int(filename)  # if a number
+        except ValueError:
+            f_id = self._getFileID(filename) # is a name
+        rel = self.Release()
+        rel.file_id = f_id
+        rel.release_num = release
+        self.session.add(rel)
+        if commit: # so that if we are doing a lot it is faster
+            self._commitDB()
+
+    def list_release(self, rel_num, fullpath=True):
+        """
+        given a release number return a list of all the filenames with the release
+        """
+        sq = self.session.query(self.Release.file_id).filter_by(release_num = rel_num).all()
+        sq = list(zip(*sq)[0])
+        for i, v in enumerate(sq):
+            if fullpath:
+                sq[i] = self._getFileFullPath(v)
+            else:
+                sq[i] = self._getFilename(v)
+        return sq
+
+
+
+
+
+
+
