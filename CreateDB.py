@@ -160,7 +160,6 @@ class dbprocessing_db(object):
             schema.Column('check_date', types.DateTime, nullable=True),
             schema.Column('quality_comment', types.String(100), nullable=True),
             schema.Column('caveats', types.String(20), nullable=True),
-            schema.Column('release_number', types.String(2), nullable=True),
             schema.Column('file_create_date', types.DateTime, nullable=False),
             schema.Column('met_start_time', types.Float, nullable=True),
             schema.Column('met_stop_time', types.Float, nullable=True),

@@ -495,7 +495,8 @@ class ProcessQueue(object):
             # need to add the current file to the DB so that we have the filefilelink and filecodelink info
             current_file = self.current_file # so we can put it back
             self.current_file = os.path.join(self.dbu.getIncomingPath(), filename)
-            df = self.figureProduct() 
+            df = self.figureProduct()
+            df.params['verbose_provenance'] = ' '.join(cmdline)
             f_id = self.diskfileToDB(df)
             ## here the file is in the DB so we can add the filefilelink an filecodelinks
             if f_id is not None: # None comes back if the file goes to error

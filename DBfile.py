@@ -115,12 +115,10 @@ class DBfile(object):
                         caveats = self.diskfile.params['caveats'],
                         met_start_time = self.diskfile.params['met_start_time'],
                         met_stop_time = self.diskfile.params['met_stop_time'],
-                        release_number = self.diskfile.params['release_number'],
                         newest_version = self.diskfile.params['newest_version'],
                         md5sum = self.diskfile.params['md5sum'], 
                         process_keywords = self.diskfile.params['process_keywords'])
         return f_id
-
 
     def getDirectory(self):
         """
