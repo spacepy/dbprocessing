@@ -1643,7 +1643,7 @@ class DBUtils2(object):
 
         @return: list of tuples of the mission, Satellite, Instrument,  product, product id  names
         """
-        if productID == None:
+        if productID is None:
             sq = self.session.query(self.Mission.mission_name,
                                                     self.Satellite.satellite_name,
                                                     self.Instrument.instrument_name,
@@ -1656,7 +1656,10 @@ class DBUtils2(object):
                                         self.Instrument.instrument_name,
                                         self.Product.product_name,
                                         self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == productID).all()
+        try:
             return tuple(sq[0])
+        except IndexError:
+            return None
 
     def getActiveInspectors(self):
         """
