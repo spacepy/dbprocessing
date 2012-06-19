@@ -1,6 +1,5 @@
 #!/usr/bin/env python2.6
 
-import datetime
 import getopt
 import imp
 import itertools
@@ -12,12 +11,12 @@ import sys
 import tempfile
 import traceback
 
-import DBfile
-import DBlogging
-import DBStrings
-import DBqueue
-import DBUtils2
-import Version
+from dbprocessing import DBfile
+from dbprocessing import DBlogging
+from dbprocessing import DBStrings
+from dbprocessing import DBqueue
+from dbprocessing import DBUtils2
+from dbprocessing import Version
 
 try: # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
