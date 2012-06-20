@@ -30,7 +30,8 @@ class DBProcessingError(Exception):
     pass
 class FilenameParse(Exception):
     pass
-
+class DBNoData(Exception):
+    pass
 
 
 class DBUtils2(object):
@@ -532,6 +533,19 @@ class DBUtils2(object):
             self.processqueuePop()
         DBlogging.dblogger.info( "Processqueue was cleared")
 
+    def processqueueRemoveItem(self, item):
+        """
+        remove a file from the queue by name or number
+        """
+        if isinstance(item, str):
+            item = self._getFileID(item)
+        contents = self.processqueueGetAll()
+        try:
+            ind = contents.index(item)
+            self.processqueuePop(ind)
+        except ValueError:
+            raise(DBNoData("No Item ID={0} found".format(item)))
+
     def processqueueGetAll(self):
         """
         return the entire contents of the process queue
@@ -631,17 +645,38 @@ class DBUtils2(object):
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
 
-    def _purgeFileFromDB(self, filename=None):
+    def _purgeFileFromDB(self, filename=None, recursive=False):
         """
         removes a file from the DB
 
         @keyword filename: name of the file to remove (or a list of names)
         @return: True - Success, False - Failure
 
+        if recursive then it removes all files that depend on the one to remove
+
         >>>  pnl._purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
 
         """
-        raise(NotImplemented('This went way and needs to be reimplemented'))
+        if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
+            filename = [filename]
+        for f in filename:
+            f = self._getFileID(f)
+            # we need to look in each table that could have a reference to this file and delete that
+            ## processqueue
+            try:
+                self.processqueueRemoveItem(f)
+            except DBNoData:
+                pass
+            ## filefilelink
+            try:
+                self.delFilefilelink(f)
+            except DBNoData:
+                pass
+            ## filecodelink
+            try:
+                self.delFilecodelink(f)
+            except DBNoData:
+                pass
 
     def getAllFilenames(self):
         """
@@ -799,6 +834,29 @@ class DBUtils2(object):
         self._commitDB()
         return fcl1.resulting_file, fcl1.source_code
 
+    def delFilefilelink(self, f):
+        """
+        remove entries from Filefilelink, it will remove if the file is in either column
+        """
+        f = self._getFileID(f) # change a name to a number
+        n1 = self.session.query(self.Filefilelink).filter_by(source_file = f).delete()
+        n2 = self.session.query(self.Filefilelink).filter_by(resulting_file = f).delete()
+        if n1+n2 == 0:
+            raise(DBNoData("No entry for ID={0} found".format(f)))
+        else:
+            self._commitDB()
+
+    def delFilecodelink(self, f):
+        """
+        remove entries from Filecodelink fore a given file
+        """
+        f = self._getFileID(f) # change a name to a number
+        n2 = self.session.query(self.Filecodelink).filter_by(resulting_file = f).delete()
+        if n2 == 0:
+            raise(DBNoData("No entry for ID={0} found".format(f)))
+        else:
+            self._commitDB()
+
     def addFilefilelink(self,
                      resulting_file_id,
                      source_file,):
@@ -810,11 +868,7 @@ class DBUtils2(object):
         @type resulting_file_id: int
 
         """
-
-        try:
-            ffl1 = self.Filefilelink()
-        except AttributeError:
-            raise(DBError("Class Filefilelink not found was it created?"))
+        ffl1 = self.Filefilelink()
         ffl1.source_file = source_file
         ffl1.resulting_file = resulting_file_id
         self.session.add(ffl1)
@@ -831,11 +885,7 @@ class DBUtils2(object):
         @param product_id: id of the product to link
         @type product_id: int
         """
-
-        try:
-            ipl1 = self.Instrumentproductlink()
-        except AttributeError:
-            raise(DBError("Class Instrumentproductlink not found was it created?"))
+        ipl1 = self.Instrumentproductlink()
         ipl1.instrument_id = instrument_id
         ipl1.product_id = product_id
         self.session.add(ipl1)
@@ -1372,6 +1422,7 @@ class DBUtils2(object):
         given an a file name or a file ID return the mission(s) that file is
         associated with
         """
+        filename = self._getFileID(filename) # change a name to a number
         product_id = self.getFileProduct(filename)
         # get all the instruments
         inst_id = self.getInstrumentFromProduct(product_id)
@@ -1497,11 +1548,18 @@ class DBUtils2(object):
         @return: file_id: file_id of the input file
         @rtype: long
         """
-        sq = self.session.query(self.File).filter_by(filename = filename)
-        try:
-            return sq[0].file_id
-        except IndexError: # no file_id found
-            raise(DBError("No filename %s found in the DB" % (filename)))
+        if isinstance(filename, (int, long)):
+            sq = self.session.query(self.File).filter_by(file_id = filename)
+            try:
+                return sq[0].file_id
+            except IndexError: # no file_id found
+                raise(DBNoData("No file_id {0} found in the DB".format(filename)))
+        else:
+            sq = self.session.query(self.File).filter_by(filename = filename)
+            try:
+                return sq[0].file_id
+            except IndexError: # no file_id found
+                raise(DBNoData("No filename %s found in the DB" % (filename)))
 
     def _getCodeID(self, codename):
         """
