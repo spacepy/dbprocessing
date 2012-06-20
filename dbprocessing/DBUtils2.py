@@ -665,18 +665,27 @@ class DBUtils2(object):
             ## processqueue
             try:
                 self.processqueueRemoveItem(f)
+                print "Removed from Processqueue"
             except DBNoData:
                 pass
             ## filefilelink
             try:
                 self.delFilefilelink(f)
+                print "Removed from Filefilelink"
             except DBNoData:
                 pass
             ## filecodelink
             try:
                 self.delFilecodelink(f)
+                print "Removed from Filecodelink"
             except DBNoData:
                 pass
+            ## file
+            n1 = self.session.query(self.File).filter_by(file_id = f).delete()
+            if n1 == 0:
+                raise(DBNoData("No entry for ID={0} found".format(f)))
+            else:
+                self._commitDB()
 
     def getAllFilenames(self):
         """
