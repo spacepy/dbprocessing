@@ -18,7 +18,7 @@ import sys
 
 import DBStrings
 import Version
-
+from Diskfile import calcDigest
 
 ## This goes in the processing comment field in the DB, do update it
 __version__ = '2.0.3'
@@ -498,32 +498,31 @@ class DBUtils2(object):
         self._commitDB()
         return pf1.logging_file_id
 
-    def _checkDiskForFile(self, fix=False):
+    def _checkDiskForFile(self, file_id, fix=False):
         """
         Check the filesystem to see if the file exits or not as it says in the db
 
+        return true is consistent, False otherwise
+
         @keyword fix: (optional) set to have the DB fixed to match the filesystem
            this is **NOT** sure to be safe
-        @return: count - return the count of out of sync files
-
         """
-        counter = 0  # count how many were wrong
-        for fname in self.bf:
-            for sq in self.session.query(self.Data_files).filter_by(f_id = self.bf[fname]['f_id']):
-                if sq.exists_on_disk != os.path.exists(self.bf[fname]['absolute_name']):
-                    counter += 1
-                    if sq.exists_on_disk == True:
-                        print("%s DB shows exists, must have been deleted" % (self.bf[fname]['absolute_name']))
-                        if fix == True:
-                            sq.exists_on_disk = False
-                            self.session.add(sq)
-                    else:
-                        print("%s file in filesystem, DB didn't have it so, manually added?" % (self.bf[fname]['absolute_name']))
-                        if fix == True:
-                            sq.exists_on_disk = True
-                            self.session.add(sq)
-        self._commitDB()
-        return counter
+        file_id = self._getFileID(file_id)
+        sq = self.session.query(self.File).filter_by(file_id = file_id)[0] # there can only be one
+        if sq.exists_on_disk:
+            file_path = self._getFileFullPath(file_id)
+            if not os.path.exists(file_path):
+                if fix:
+                    sq.exists_on_disk = False
+                    self.session.add(sq)
+                    self._commitDB()
+                    return self._checkDiskForFile(file_id) # call again to get the True
+                else:
+                    return False
+            else:
+                return True
+        else:
+            return True
 
     def processqueueFlush(self):
         """
@@ -1401,20 +1400,6 @@ class DBUtils2(object):
         except IndexError:
             return None
 
-    def getFileDaterange(self, filename):
-        """
-        given a filename or file_id return the product id it belongs to
-        """
-        try:
-            f_id = int(filename)  # if a number
-        except ValueError:
-            f_id = self._getFileID(filename) # is a name
-        try:
-            dates = self.session.query(self.File.utc_start_time, self.File.utc_stop_time).filter_by(file_id = f_id)[0]
-            return [dates[0], dates[1]]
-        except IndexError:
-            return None
-
     def getFileVersion(self, filename):
         """
         given a filename or fileid return a Version instance
@@ -1593,6 +1578,7 @@ class DBUtils2(object):
         @return: filename: filename associated with the file_id
         @rtype: str
         """
+        DBlogging.dblogger.debug( "Entered _getFilename():  file_id: {0}".format(file_id) )
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].filename
 
@@ -1600,6 +1586,7 @@ class DBUtils2(object):
         """
         given a file_id return the process keywords string
         """
+        DBlogging.dblogger.debug( "Entered getFileProcess_keywords():  file_id: {0}".format(file_id) )
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].process_keywords
 
@@ -1613,26 +1600,45 @@ class DBUtils2(object):
         @return: utc_file_date: date of the file  associated with the file_id
         @rtype: datetime
         """
+        DBlogging.dblogger.debug( "Entered getFileUTCfileDate():  file_id: {0}".format(file_id) )
         sq = self.session.query(self.File).filter_by(file_id = file_id)
         return sq[0].utc_file_date
+
+    def getFileDates(self, file_id):
+        """
+        given a file_id or name return the dates it spans
+        """
+        DBlogging.dblogger.debug( "Entered getFileDates():  file_id: {0}".format(file_id) )
+        try:
+            file_id = int(file_id)
+        except ValueError: # must have been a filename
+            file_id = self._getFileID(file_id)
+        sq = self.session.query(self.File).filter_by(file_id = file_id)
+        start_time = [val.utc_start_time.date() for val in sq]
+        stop_time = [val.utc_stop_time.date() for val in sq]
+        retval = start_time + stop_time
+        return np.unique(retval).tolist()
 
     def getFiles_product_utc_file_date(self, product_id, date):
         """
         given a product id and a utc_file_date return all the files that match [(file_id, Version, product_id, product_id, utc_file_date), ]
         """
+        DBlogging.dblogger.debug( "Entered getFiles_product_utc_file_date():  product_id: {0} date: {1}".format(product_id, date) )
         if isinstance(date, datetime.datetime):
             date = date.date()
-        sq = self.session.query(self.File).filter_by(product_id = product_id).filter_by(utc_file_date = date)
-        sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
-        return sq
+        retval = []
+        try:
+            for d in date:
+                sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
+                sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
+                retval.extend(sq)
+        except TypeError:
+            d = date
+            sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
+            sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
+            retval.extend(sq)
+        return retval
 
-    def getFiles_product_utc_file_daterange(self, product_id, daterange):
-        """
-        given a product id and a utc_file_date return all the files that have data in the range [(file_id, Version, product_id, utc_file_date), ]
-        """
-        sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_stop_time >= daterange[0]).filter(self.File.utc_start_time <= daterange[1])
-        sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
-        return sq
 
     def file_id_Clean(self, invals):
         """
@@ -1697,6 +1703,7 @@ class DBUtils2(object):
 
         @return: list of all the product format strings and ids from the database
         """
+        DBlogging.dblogger.debug( "Entered _getProductFormats():  productID: {0}".format(productID) )
         if productID == None:
             sq = self.session.query(self.Product.format, self.Product.product_id)
             return sq.order_by(asc(self.Product.product_id)).all()
@@ -1710,6 +1717,7 @@ class DBUtils2(object):
 
         @return: list of tuples of the mission, Satellite, Instrument,  product, product id  names
         """
+        DBlogging.dblogger.debug( "Entered _getProductNames():  productID: {0}".format(productID) )
         if productID is None:
             sq = self.session.query(self.Mission.mission_name,
                                                     self.Satellite.satellite_name,
@@ -1776,7 +1784,7 @@ class DBUtils2(object):
         """
         Given a code_id list return the full name (path and all) of the code
         """
-        DBlogging.dblogger.debug("Entered getCodePath:")
+        DBlogging.dblogger.debug("Entered getCodePath: {0}".format(code_id))
         sq1 =  self.session.query(self.Code.relative_path).filter_by(code_id = code_id)  # should only have one value
         sq2 =  self._getMissionDirectory()
         sq3 =  self.session.query(self.Code.filename).filter_by(code_id = code_id)  # should only have one value
@@ -1786,7 +1794,7 @@ class DBUtils2(object):
         """
         Given a code_id the code version
         """
-        DBlogging.dblogger.debug("Entered getCodeVersion:")
+        DBlogging.dblogger.debug("Entered getCodeVersion: {0}".format(code_id))
         sq =  self.session.query(self.Code.interface_version, self.Code.quality_version, self.Code.revision_version).filter_by(code_id = code_id)  # should only have one value
         try:
             return Version.Version(*sq[0])
@@ -1797,6 +1805,7 @@ class DBUtils2(object):
         """
         given an process id return the output product
         """
+        DBlogging.dblogger.debug("Entered getOutputProductFromProcess: {0}".format(process))
         sq2 = self.session.query(self.Process.output_product).filter_by(process_id = process)
         # there can only be one
         return sq2[0][0]
@@ -1805,8 +1814,7 @@ class DBUtils2(object):
         """
         Gets process from the db that have the output product
         """
-        # TODO maybe this should move to DBUtils2
-        DBlogging.dblogger.debug("Entered getProcessFromOutputProduct:")
+        DBlogging.dblogger.debug("Entered getProcessFromOutputProduct: {0}".format(outProd))
         sq1 =  self.session.query(self.Process.process_id).filter_by(output_product = outProd).all()  # should only have one value
         return sq1[0][0]
 
@@ -1814,7 +1822,7 @@ class DBUtils2(object):
         """
         given a process id return the code that makes performs that process
         """
-        DBlogging.dblogger.debug("Entered getCodeFromProcess:")
+        DBlogging.dblogger.debug("Entered getCodeFromProcess: {0}".format(proc_id))
         sq1 =  self.session.query(self.Code.code_id).filter_by(process_id = proc_id)  # should only have one value
         return sq1[0][0]
 
@@ -1822,7 +1830,7 @@ class DBUtils2(object):
         """
         Given a code_id list return the arguments to the code
         """
-        DBlogging.dblogger.debug("Entered getCodeArgs:")
+        DBlogging.dblogger.debug("Entered getCodeArgs: {0}".format(code_id))
         sq1 =  self.session.query(self.Code.arguments).filter_by(code_id = code_id)  # should only have one value
         return sq1[0][0]  # the [0][0] is ok (ish) since there can only be one
 
@@ -1833,6 +1841,7 @@ class DBUtils2(object):
         @return: base directory for current mission
         @rtype: str
         """
+        DBlogging.dblogger.debug("Entered _getMissionDirectory: ")
         sq = self.session.query(self.Mission.rootdir).filter_by(mission_name  = self.mission)
         return sq.first()[0]  # there can be only one of each name
 
@@ -1868,6 +1877,7 @@ class DBUtils2(object):
         """
         given a file_id return all the other file_ids that went into making it
         """
+        DBlogging.dblogger.debug("Entered getFilefilelink_byresult: file_id={0}".format(file_id))
         sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = file_id).all()
         try:
             return zip(*sq)[0]
@@ -1878,6 +1888,7 @@ class DBUtils2(object):
         """
         given a file_id return the code_id associated with it, or None
         """
+        DBlogging.dblogger.debug("Entered getFilecodelink_byfile: file_id={0}".format(file_id))
         sq = self.session.query(self.Filecodelink.source_code).filter_by(resulting_file = file_id).all() # can only be one
         try:
             return sq[0][0]
@@ -1888,6 +1899,7 @@ class DBUtils2(object):
         """
         given a daterange return the dat objects for all days in the range
         """
+        DBlogging.dblogger.debug("Entered daterange_to_dates: daterange={0}".format(daterange))
         return [daterange[0] + datetime.timedelta(days=val) for val in xrange((daterange[1]-daterange[0]).days+1)]
 
     def getMissionID(self, mission_name):
@@ -1945,6 +1957,43 @@ class DBUtils2(object):
             else:
                 sq[i] = self._getFilename(v)
         return sq
+
+    def getFileMD5sum(self, file_id):
+        """
+        return the checksum for a file by id or name
+        """
+        file_id = self._getFileID(file_id) # if a name convert to id
+        sq = self.session.query(self.File.md5sum).filter_by(file_id = file_id).all()
+        return sq[0] # there can only be one
+
+    def checkFileMD5(self, file_id):
+        """
+        given a file id or name check the db checksum and the file checksum
+        """
+        file_id = self._getFileID(file_id) # if a name convert to id
+        disk_sha = calcDigest(self._getFileFullPath(file_id))
+        db_sha = self.getFileMD5sum(file_id)[0]
+        if str(disk_sha) == str(db_sha):
+            return True
+        else:
+            return False
+
+    def checkFiles(self):
+        """
+        check files in the DB, return incinsistent files and why
+        """
+        files = zip(*self.getAllFilenames())[0]
+        ## check of existance and checksum
+        bad_list = []
+        for f in files:
+            try:
+                if not checkFileMD5(f):
+                    bad_list.append((f, 'bad checksum'))
+            except IOError:
+                bad_list.append((f, 'file not found'))
+
+
+
 
 
 
