@@ -1160,19 +1160,19 @@ class DBUtils2(object):
 
         """
         # can only be one here (sq)
-        for sq in self.session.query(self.Code).filter_by(code_id = ec_id):
-            if sq.active_code == False:
+        code = self.session.query(self.Code).get(ec_id)
+        if code.active_code == False:
+            return False
+        try:
+            if code.code_start_date > date:
                 return False
-            try:
-                if sq.code_start_date > date:
-                    return False
-                if sq.code_stop_date < date:
-                    return False
-            except TypeError:
-                if sq.code_start_date > date.date():
-                    return False
-                if sq.code_stop_date < date.date():
-                    return False
+            if code.code_stop_date < date:
+                return False
+        except TypeError:
+            if code.code_start_date > date.date():
+                return False
+            if code.code_stop_date < date.date():
+                return False
         return True
 
     def _newerCodeVersion(self, ec_id, date=None, bool=False, verbose=False):
@@ -1344,7 +1344,7 @@ class DBUtils2(object):
         # need to know file product and mission to get whole path
         try:
             product_id = self.session.query(self.File.product_id).filter_by(filename = filename)[0][0]
-            rel_path = self.session.query(self.Product.relative_path).filter_by(product_id = product_id)[0][0]
+            rel_path = self.session.query(self.Product).get(product_id).relative_path
             root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
         except IndexError:
             return None
@@ -1376,8 +1376,10 @@ class DBUtils2(object):
             p_id = self.getProcessID(process)
         else:
             p_id = product
-        sq = self.session.query(self.Process.output_timebase).filter_by(process_id = p_id).all()
-        return sq[0][0]
+        sq = self.session.query(self.Process).get(p_id)
+        if sq is None:
+            raise(DBNoData("No process: {0}".format(process)))
+        return sq.output_timebase
 
     def getProcessID(self, proc_name):
         """
@@ -1394,11 +1396,10 @@ class DBUtils2(object):
             f_id = int(filename)  # if a number
         except ValueError:
             f_id = self._getFileID(filename) # is a name
-        try:
-            product_id = self.session.query(self.File.product_id).filter_by(file_id = f_id)[0][0]
-            return product_id
-        except IndexError:
-            return None
+        product_id = self.session.query(self.File).get(f_id)
+        if sq is None:
+            raise(DBNoData("No file: {0}".format(filename)))
+        return product_id.product_id
 
     def getFileVersion(self, filename):
         """
@@ -1408,7 +1409,9 @@ class DBUtils2(object):
             f_id = int(filename)  # if a number
         except ValueError:
             f_id = self._getFileID(filename) # is a name
-        sq = self.session.query(self.File).filter_by(file_id = f_id)[0]
+        sq = self.session.query(self.File).get(f_id)
+        if sq is None:
+            raise(DBNoData("No file: {0}".format(filename)))
         return Version.Version(sq.interface_version, sq.quality_version, sq.revision_version)
 
     def getFileMission(self, filename):
@@ -1478,8 +1481,10 @@ class DBUtils2(object):
         """
         given a product ID return the level
         """
-        sq = self.session.query(self.Product).filter_by(product_id = productID)
-        return sq[0].level
+        sq = self.session.query(self.Product).get(productID)
+        if sq is None:
+            raise(DBNoData("No product: {0}".format(productID)))
+        return sq.level
 
     def _getMissionID(self):
         """
@@ -1579,16 +1584,20 @@ class DBUtils2(object):
         @rtype: str
         """
         DBlogging.dblogger.debug( "Entered _getFilename():  file_id: {0}".format(file_id) )
-        sq = self.session.query(self.File).filter_by(file_id = file_id)
-        return sq[0].filename
+        sq = self.session.query(self.File).get(file_id)
+        if sq is None:
+            raise(DBNoData("No file_id: {0}".format(file_id)))
+        return sq.filename
 
     def getFileProcess_keywords(self, file_id):
         """
         given a file_id return the process keywords string
         """
         DBlogging.dblogger.debug( "Entered getFileProcess_keywords():  file_id: {0}".format(file_id) )
-        sq = self.session.query(self.File).filter_by(file_id = file_id)
-        return sq[0].process_keywords
+        sq = self.session.query(self.File).get(file_id)
+        if sq is None:
+            raise(DBNoData("No file_id: {0}".format(file_id)))
+        return sq.process_keywords
 
     def getFileUTCfileDate(self, file_id):
         """
@@ -1601,8 +1610,10 @@ class DBUtils2(object):
         @rtype: datetime
         """
         DBlogging.dblogger.debug( "Entered getFileUTCfileDate():  file_id: {0}".format(file_id) )
-        sq = self.session.query(self.File).filter_by(file_id = file_id)
-        return sq[0].utc_file_date
+        sq = self.session.query(self.File).get(file_id)
+        if sq is None:
+            raise(DBNoData("No file_id: {0}".format(file_id)))
+        return sq.utc_file_date
 
     def getFileDates(self, file_id):
         """
@@ -1613,10 +1624,12 @@ class DBUtils2(object):
             file_id = int(file_id)
         except ValueError: # must have been a filename
             file_id = self._getFileID(file_id)
-        sq = self.session.query(self.File).filter_by(file_id = file_id)
-        start_time = [val.utc_start_time.date() for val in sq]
-        stop_time = [val.utc_stop_time.date() for val in sq]
-        retval = start_time + stop_time
+        sq = self.session.query(self.File).get(file_id)
+        if sq is None:
+            raise(DBNoData("No file_id: {0}".format(file_id)))
+        start_time = sq.utc_start_time.date()
+        stop_time =  sq.utc_stop_time.date()
+        retval = [start_time, stop_time]
         return np.unique(retval).tolist()
 
     def getFiles_product_utc_file_date(self, product_id, date):
@@ -1680,8 +1693,10 @@ class DBUtils2(object):
         @return: list of input_product_ids
         @rtype: list
         """
-        sq = self.session.query(self.Productprocesslink).filter_by(process_id = process_id)
-        return [(val.input_product_id, val.optional) for val in sq.all()]  # the zero is because all() returns a list of one element tuples
+        sq = self.session.query(self).get(process_id)
+        if sq is None:
+            raise(DBNoData("No process: {0}".format(process_id)))
+        return sq.Productprocesslink
 
     def getFilesByProductDate(self, product_id, daterange):
         """
@@ -1987,11 +2002,10 @@ class DBUtils2(object):
         bad_list = []
         for f in files:
             try:
-                if not checkFileMD5(f):
+                if not self.checkFileMD5(f):
                     bad_list.append((f, 'bad checksum'))
             except IOError:
                 bad_list.append((f, 'file not found'))
-
 
 
 
