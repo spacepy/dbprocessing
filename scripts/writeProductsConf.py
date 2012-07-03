@@ -67,16 +67,30 @@ def getStuff(prod_name, filename):
     print("Connected to DB")
     dbu._openDB()
     dbu._createTableObjects()
-    cfg['mission'] = {}
-    cfg['mission']['name'] = dbu.mission
-    cfg['mission']['directory'] = dbu._getMissionDirectory()
+    sq = dbu.session.query(dbu.Mission).get(dbu._getMissionID())
+    cfg[repr(sq.__module__).split('.')[-1][:-1]] = {}
+    attrs = dir(sq)
+    for val in attrs:
+        if val[0] != '_':
+            cfg[repr(sq.__module__).split('.')[-1][:-1]][val] = sq.__getattribute__(val)
+    sq = dbu.session.query(dbu.Satellite).get(dbu._getMissionID())
+    cfg[repr(sq.__module__).split('.')[-1][:-1]] = {}
+    attrs = dir(sq)
+    for val in attrs:
+        if val[0] != '_':
+            cfg[repr(sq.__module__).split('.')[-1][:-1]][val] = sq.__getattribute__(val)
 
-    writeconfig(cfg, )
+
+
+
+
+
+    writeconfig(cfg, filename)
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         usage()
         sys.exit(2)
-    getStuff(sys.argv[1], sys.srgv[2])
+    getStuff(sys.argv[1], sys.argv[2])
 

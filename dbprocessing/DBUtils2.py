@@ -2012,6 +2012,11 @@ class DBUtils2(object):
             except IOError:
                 bad_list.append((f, 'file not found'))
 
+    def getProductTraceback(self, prod_id):
+        """
+        given a product id return instances of all the tables it takes to define it
+        mission, satellite, instrument, product, inspector, Instrumentproductlink
+        """
 
 
 
