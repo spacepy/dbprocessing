@@ -161,5 +161,22 @@ class DBfile(object):
         path = self.getDirectory()
         shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
         DBlogging.dblogger.info("file {0} moved to {1}".format(os.path.basename(self.diskfile.infile), os.path.dirname(os.path.join(path, self.diskfile.params['filename']))))
+        ## TODO as a temp pngwalk tnhing we are moving files from <base>/pngwalk_tmp into the same place
+        ### TODO be a little smarter here with name match (like do one)
+        #### TODO both here and increate_pngwalk.py fix the hard code
+        DBlogging.dblogger.debug("self.diskfile.filename: {0}".format(self.diskfile.filename))
+        print '#######################', self.diskfile.filename.split(os.extsep)[-1], self.diskfile.filename
+        if self.diskfile.filename.split(os.extsep)[-1] == 'png':
+            files = os.listdir('/n/projects/cda/rbsp/pngwalk_tmp')
+            print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+            DBlogging.dblogger.debug("files: {0}".format(files))
+            for f in files:
+                print '&&&&&', os.path.join('/n/projects/cda/rbsp/pngwalk_tmp', f), os.path.isdir(os.path.join('/n/projects/cda/rbsp/pngwalk_tmp', f))
+                if f != 'thumbs400':
+                    shutil.move(os.path.join('/n/projects/cda/rbsp/pngwalk_tmp', f), os.path.join(path, f))
+                else:
+                    for ff in os.listdir('/n/projects/cda/rbsp/pngwalk_tmp/thumbs400'):
+                        shutil.move(os.path.join('/n/projects/cda/rbsp/pngwalk_tmp', 'thumbs400', ff), os.path.join(path, 'thumbs400', ff))
+
 
         return (self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))

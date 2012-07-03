@@ -1,13 +1,12 @@
 #!/usr/bin/env python2.6
 # -*- coding: utf-8 -*-
 
-import datetime
+import glob
 import hashlib
 import os
 import os.path
 
 import DBlogging
-import Version
 
 __version__ = '2.0.3'
 
@@ -20,6 +19,7 @@ class ReadError(Exception):
     `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
+        super(ReadError, self).__init__(*params)
         DBlogging.dblogger.error("ReadError raised")
 
 
@@ -30,6 +30,7 @@ class FilenameError(Exception):
     `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
+        super(FilenameError, self).__init__(*params)
         DBlogging.dblogger.error("FilenameError raised")
 
 
@@ -40,6 +41,7 @@ class WriteError(Exception):
     `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
+        super(WriteError, self).__init__(*params)
         DBlogging.dblogger.error("WriteError raised")
 
 class InputError(Exception):
@@ -49,6 +51,7 @@ class InputError(Exception):
     `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
+        super(InputError, self).__init__(*params)
         DBlogging.dblogger.error("InputError raised")
 
 
@@ -65,6 +68,7 @@ class DigestError(Exception):
 
     """
     def __init__(self, *params):
+        super(DigestError, self).__init__(*params)
         DBlogging.dblogger.error("DigestError raised")
 
 
@@ -142,22 +146,25 @@ class Diskfile(object):
 
     def __repr__(self):
         return "<Diskfile.Diskfile object: {0}>".format(self.infile)
-    
+
     __str__ = __repr__
 
     def checkAccess(self):
         """
         A few simple tests of the input file to be sure the script has the correct access
-
-        `Author:` Brian Larsen, LANL
         """
         # need both read and write access
         self.READ_ACCESS = os.access(self.infile, os.R_OK)
-        self.WRITE_ACCESS = os.access(self.infile, os.W_OK)
         if not self.READ_ACCESS:
-            raise(ReadError("file is not readable, does it exist?"))
+            # TODO this is a pngwalk hack
+            glb = glob.glob(self.infile + '*.png')
+            if len(glb) == 1:
+                self.infile = glb[0]
+            else:
+                raise(ReadError("file is not readable, does it exist? {0}".format(self.infile)))
+        self.WRITE_ACCESS = os.access(self.infile, os.W_OK)
         if not self.WRITE_ACCESS:
-            raise(WriteError("file is not writeable, wont be able to move it to proper location"))
+            raise(WriteError("file is not writeable, wont be able to move it to proper location {0}".format(self.infile)))
         DBlogging.dblogger.debug("Access Checked out OK")
 
 
@@ -169,7 +176,7 @@ def calcDigest( infile):
     `Author:` Jon Niehof, LANL
 
     .. _file:
-    
+
     Parameters
     ==========
     file : str

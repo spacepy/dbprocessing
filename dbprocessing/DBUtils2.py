@@ -1849,8 +1849,10 @@ class DBUtils2(object):
         Given a code_id list return the arguments to the code
         """
         DBlogging.dblogger.debug("Entered getCodeArgs: {0}".format(code_id))
-        sq1 =  self.session.query(self.Code.arguments).filter_by(code_id = code_id)  # should only have one value
-        return sq1[0][0]  # the [0][0] is ok (ish) since there can only be one
+        sq1 =  self.session.query(self.Code).get(code_id)  # should only have one value
+        if sq1 is None:
+            raise(DBNoData("No code: {0}".format(code_id)))
+        return sq1.arguments
 
     def _getMissionDirectory(self):
         """

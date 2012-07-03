@@ -2,6 +2,7 @@
 
 import imp
 import itertools
+import glob
 import os
 import os.path
 import shutil
@@ -461,10 +462,12 @@ class ProcessQueue(object):
             ## figure out how to put the arguments together
             args = self.dbu.getCodeArgs(code_id)
             if args is not None:
+                args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
                 args = args.split()
                 for arg in args:
                     if 'input' not in arg and 'output' not in arg:
                         cmdline.append(arg)
+
 
             for i_fid in input_files:
                 if args is not None:
@@ -493,7 +496,13 @@ class ProcessQueue(object):
             DBlogging.dblogger.info("command finished")
 
             # the code worked and the file should not go to incoming (it had better have an inspector)
-            self.moveToIncoming(os.path.join(self.tempdir, filename))
+            try:
+                self.moveToIncoming(os.path.join(self.tempdir, filename))
+            except IOError:
+                glb = glob.glob(os.path.join(self.tempdir, filename) + '*.png')
+                if len(glb) == 1:
+                    self.moveToIncoming(glb[0])
+
             self.rm_tempdir() # clean up
             ## TODO several additions have to be made here
             # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
