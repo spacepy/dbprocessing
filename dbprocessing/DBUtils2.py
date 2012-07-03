@@ -12,6 +12,7 @@ try: # new version changed this annoyingly
 except ImportError:
     from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import asc #, desc
+from sqlalchemy import and_, or_
 import DBlogging
 import socket # to get the local hostname
 import sys
@@ -1397,7 +1398,7 @@ class DBUtils2(object):
         except ValueError:
             f_id = self._getFileID(filename) # is a name
         product_id = self.session.query(self.File).get(f_id)
-        if sq is None:
+        if product_id is None:
             raise(DBNoData("No file: {0}".format(filename)))
         return product_id.product_id
 
@@ -1642,12 +1643,16 @@ class DBUtils2(object):
         retval = []
         try:
             for d in date:
-                sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
+                if isinstance(d, datetime.datetime):
+                    d = d.date()
+                sq = self.session.query(self.File).filter_by(product_id = product_id).filter(or_(self.File.utc_start_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1)), self.File.utc_stop_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1))))
+                #sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
                 sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
                 retval.extend(sq)
         except TypeError:
             d = date
-            sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
+            sq = self.session.query(self.File).filter_by(product_id = product_id).filter(or_(self.File.utc_start_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1)), self.File.utc_stop_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1))))
+            # sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
             sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
             retval.extend(sq)
         return retval
@@ -1693,10 +1698,8 @@ class DBUtils2(object):
         @return: list of input_product_ids
         @rtype: list
         """
-        sq = self.session.query(self).get(process_id)
-        if sq is None:
-            raise(DBNoData("No process: {0}".format(process_id)))
-        return sq.Productprocesslink
+        sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional).filter_by(process_id = process_id).all()
+        return sq
 
     def getFilesByProductDate(self, product_id, daterange):
         """

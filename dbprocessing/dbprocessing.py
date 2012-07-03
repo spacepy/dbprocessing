@@ -190,7 +190,8 @@ class ProcessQueue(object):
         dbf.move()
         # set files in the db of the same product and same utc_file_date to not be newest version
         files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
-        mx = max(zip(*files)[1])
+        if files:
+            mx = max(zip(*files)[1])
         for f in files:
             if f[1] != mx: # this is not the max, newest_version should be False
                 self.dbu.session.query(self.dbu.File).filter_by(file_id = f[0]).update({self.dbu.File.newest_version: False})
@@ -317,6 +318,8 @@ class ProcessQueue(object):
     #==============================================================================
             # get the products of the input files
             ## need to go through the input_product_id and make sure we have a file for each required product
+            if not files:
+                return None
             for prod, opt in input_product_id:
                 if not opt:
                     if not prod in zip(*files)[2]: # the product ID
