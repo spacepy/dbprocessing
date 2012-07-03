@@ -43,6 +43,12 @@ def toBool(value):
     else:
         return False
 
+def toNone(value):
+    if value == '':
+        return None
+    else:
+        return value
+
 def readconfig(config_filepath, section):
     # Create a ConfigParser object, to read the config file
     cfg=ConfigParser.SafeConfigParser()
@@ -84,7 +90,7 @@ def addStuff(filename):
     insp_id = dbu.addInspector(vals['filename'], vals['path'], vals['description'],
                      Version.Version(*vals['version'].split('.')), toBool(vals['active']),
                      dup.parse(vals['date_written']), int(vals['output_interface_version']),
-                     toBool(vals['newest']), prod_id, vals['arguments'])
+                     toBool(vals['newest']), prod_id, toNone(vals['arguments']))
     print("added Inspector {0}:{1}".format(insp_id, vals['filename']))
 
 
