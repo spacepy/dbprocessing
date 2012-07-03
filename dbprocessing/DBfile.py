@@ -66,7 +66,7 @@ class DBfile(object):
 
     def __repr__(self):
         return "<DBfile.DBfile object: {0}>".format(self.diskfile.infile)
-    
+
     __str__ = __repr__
 
     def checkVersion(self):
@@ -116,7 +116,7 @@ class DBfile(object):
                         met_start_time = self.diskfile.params['met_start_time'],
                         met_stop_time = self.diskfile.params['met_stop_time'],
                         newest_version = self.diskfile.params['newest_version'],
-                        md5sum = self.diskfile.params['md5sum'], 
+                        md5sum = self.diskfile.params['md5sum'],
                         process_keywords = self.diskfile.params['process_keywords'])
         return f_id
 
@@ -136,11 +136,11 @@ class DBfile(object):
         relative_path = self.dbu.session.query(self.dbu.Product.relative_path).filter_by(product_id  = self.diskfile.params['product_id'])
         if relative_path.count() > 1:
             raise(DBfileError('more than one rel path found'))
-        if relative_path.count() ==0:
+        if relative_path.count() == 0:
             raise(DBfileError('zero rel path found'))
         relative_path = relative_path.all()[0][0]
         basepath = self.dbu._getMissionDirectory()
-        path = str(basepath) + '/' + str(relative_path)
+        path = os.path.join(str(basepath), str(relative_path))
         return path
 
     def move(self):
