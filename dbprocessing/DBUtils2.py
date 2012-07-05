@@ -1802,6 +1802,17 @@ class DBUtils2(object):
             except IndexError: # no file_id found
                 raise(DBNoData("No product_name %s found in the DB" % (product_name)))
 
+    def getProductName(self,
+                     product_id):
+        """
+        Return the product Name for an input product id
+        """
+        sq = self.session.query(self.Product).get(product_id)
+        if sq is None:
+            raise(DBNoData("No product_id {0} found in the DB".format(product_id)))
+        else:
+            return sq.product_name
+
     def _getSatelliteID(self,
                         sat_name):
         """
