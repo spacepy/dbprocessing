@@ -251,6 +251,9 @@ class ProcessQueue(object):
                 continue
             if arg is not None:
                 kwargs = self._strargs_to_args(arg)
+                for key in kwargs:
+                    if kwargs[key] == '{PRODUCT}': # need to replace with the product name
+                        kwargs[key] = kwargs[key].replace('{PRODUCT}', self.dbu.getProductName(product))
                 df = inspect.Inspector(self.current_file, self.dbu, product, **kwargs)
             else:
                 df = inspect.Inspector(self.current_file, self.dbu, product, )
@@ -514,7 +517,7 @@ class ProcessQueue(object):
             df = self.figureProduct()
             if df is None:
                 DBlogging.dblogger.error("{0} did not have a product".format(self.current_file))
-                raise(ProcessException("The process output file did not have a product"))
+                raise(ProcessException("The process output file did not have a product: {0}".format(self.current_file)))
             df.params['verbose_provenance'] = ' '.join(cmdline)
             f_id = self.diskfileToDB(df)
             ## here the file is in the DB so we can add the filefilelink an filecodelinks
