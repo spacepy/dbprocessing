@@ -1712,8 +1712,13 @@ class DBUtils2(object):
         ans = sq1.intersection(sq2)
         return list(ans)
 
-#        sq1 = self.session.query(self.File).filter_by(product_id = product_id).filter_by(exists_on_disk = True).filter_by(utc_start_time <= daterange[0]).filter_by(newest_version = True).all()
-
+    def getFilesByProduct(self, prod_id):
+        """
+        given a product_id or name return all te file instances associated with it
+        """
+        prod_id = self._getProductID(prod_id)
+        sq = self.session.query(self.File).filter_by(product_id = prod_id)
+        return sq.all()
 
     def _getProductFormats(self, productID=None):
         """
@@ -1784,8 +1789,18 @@ class DBUtils2(object):
 
         @return: product_id -the product  ID for the input product name
         """
-        sq = self.session.query(self.Product.product_id).filter_by(product_name = product_name)
-        return sq.first()[0]
+        if isinstance(product_name, (int, long)):
+            sq = self.session.query(self.Product).get(product_name)
+            if sq is not None:
+                return sq.product_id
+            else:
+                raise(DBNoData("No product_id {0} found in the DB".format(product_name)))
+        else:
+            sq = self.session.query(self.Product).filter_by(product_name = product_name)
+            try:
+                return sq[0].product_id
+            except IndexError: # no file_id found
+                raise(DBNoData("No product_name %s found in the DB" % (product_name)))
 
     def _getSatelliteID(self,
                         sat_name):
@@ -2000,7 +2015,7 @@ class DBUtils2(object):
 
     def checkFiles(self):
         """
-        check files in the DB, return incinsistent files and why
+        check files in the DB, return inconsistent files and why
         """
         files = zip(*self.getAllFilenames())[0]
         ## check of existance and checksum
@@ -2008,17 +2023,53 @@ class DBUtils2(object):
         for f in files:
             try:
                 if not self.checkFileMD5(f):
-                    bad_list.append((f, 'bad checksum'))
+                    bad_list.append((f, '(100) bad checksum'))
             except IOError:
-                bad_list.append((f, 'file not found'))
+                bad_list.append((f, '(200) file not found'))
 
     def getProductTraceback(self, prod_id):
         """
         given a product id return instances of all the tables it takes to define it
         mission, satellite, instrument, product, inspector, Instrumentproductlink
         """
+        retval = {}
+        # get the product instance
+        retval['product'] = self.session.query(self.Product).get(prod_id)
+        if retval['product'] is None:
+            raise(DBNoData("No product {0} in the db".format(prod_id)))
+        # inspector
+        retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
+        # instrument
+        inst_id = self.getInstrumentFromProduct(prod_id)[0]
+        retval['instrument'] = self.session.query(self.Instrument).get(inst_id)
+        # Instrumentproductlink
+        retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((inst_id, prod_id))
+        # satellite
+        sat_id = self.getInstrumentSatellite(inst_id)[0]
+        retval['satellite'] = self.session.query(self.Satellite).get(sat_id)
+        # mission
+        mission_id = self.getSatelliteMission(88)[0]
+        retval['mission'] = self.session.query(self.Mission).get(mission_id)
+        return retval
 
+    def getProducts(self):
+        """
+        get all products for the given mission
+        """
+        outval = []
+        prods = self.getAllProducts()
+        mission_id = self._getMissionID()
+        for val in prods:
+            if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
+                outval.append(val)
+        return outval
 
+    def getAllProducts(self):
+        """
+        return a list of all products as instaces
+        """
+        prods = self.session.query(self.Product).all()
+        return prods
 
 
 
