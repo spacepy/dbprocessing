@@ -13,9 +13,14 @@ class MyMainWindow(QtGui.QMainWindow):
         # QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.RightFrame.setVisible(False)
+        self.ui.stackedWidget.setVisible(False)
 #        print self.ui.treeWidget.topLevelItem(0).isSelected()
 #        print self.ui.treeWidget.topLevelItem(0).emitDataChanged()
+        self.rightSide = {}
+        self.rightSide['product'] = []
+        self.rightSide['mission'] = []
+        self.rightSide['satellite'] = []
+        self.rightSide['instrument'] = []
         self._initialTree()
 
     def _initialTree(self):
@@ -32,22 +37,33 @@ class MyMainWindow(QtGui.QMainWindow):
         self.ui.treeWidget.connect(self.ui.treeWidget.selectionModel(),
                      QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"),
                      self._debugfn)
+        self.rightSide['product'].append(self.ui.treeWidget.topLevelItem(0).child(0).child(0).child(0))
+        self.rightSide['instrument'].append(self.ui.treeWidget.topLevelItem(0).child(0).child(0))
+        self.rightSide['satellite'].append(self.ui.treeWidget.topLevelItem(0).child(0))
+        self.rightSide['mission'].append(self.ui.treeWidget.topLevelItem(0))
 
     def _fillRightSide(self):
         """
         display the right side and get the values
         """
-        self.ui.RightFrame.setVisible(True)
-
+        self.ui.stackedWidget.setVisible(True)
+        if self.rightSide['mission'][0].isSelected():
+            self.ui.stackedWidget.setCurrentIndex(1)
+        if self.rightSide['product'][0].isSelected():
+            self.ui.stackedWidget.setCurrentIndex(0)
+        # is mission selected?
+#        if self.rightSide['mission'][0].isSelected():
+#            self.ui.MissionRight.setVisible(True)
 
 
     def _debugfn(self):
-        print self.ui.treeWidget.topLevelItem(0).isSelected()
-        print self.ui.treeWidget.topLevelItem(0).child(0).isSelected()
-        print self.ui.treeWidget.topLevelItem(0).child(0).child(0).isSelected()
-        print self.ui.treeWidget.topLevelItem(0).child(0).child(0).child(0).isSelected()
+        print self.rightSide['mission'][0].isSelected()
+        print self.rightSide['satellite'][0].isSelected()
+        print self.rightSide['instrument'][0].isSelected()
+        print self.rightSide['product'][0].isSelected()
         print()
 #        print self.ui.treeWidget.topLevelItem(0).isSelected()
+
         self._fillRightSide()
 
     def mouseClickEvent(self, event):
