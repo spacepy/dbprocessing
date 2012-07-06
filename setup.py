@@ -14,5 +14,6 @@ setup(name='dbprocessing',
       packages=['dbprocessing'],
       provides=['dbprocessing'],
       #package_data={'dbprocessing': ['rbsp_config.txt', 'xstartup']},
-      scripts=['scripts/ProcessQueue.py', 'scripts/addProducts.py'] ,
+      scripts=['scripts/ProcessQueue.py', 'scripts/addProducts.py',
+               'scripts/writeDBhtml.py', 'scripts/writeProductsConf.py'] ,
       )

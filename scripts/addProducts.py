@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python2.6
 
 
@@ -26,16 +25,6 @@ from dbprocessing import DBUtils2
 from dbprocessing import Version
 
 sections = ['base', 'product', 'inspector',]
-
-
-
-def usage():
-    """
-    print the usage messag out
-    """
-    print "Usage: {0} <filename>".format(sys.argv[0])
-    print "   -> config file to read"
-    return
 
 def toBool(value):
     if value in ['True', 'true', True, 1, 'Yes', 'yes']:
@@ -65,7 +54,7 @@ def addStuff(filename):
     vals = readconfig(filename, 'mission')
     if not vals:
         raise(ConfigParser.NoSectionError("No section [mission]"))
-    dbu = DBUtils2.DBUtils2(vals['name'])
+    dbu = DBUtils2.DBUtils2(vals['mission_name'])
     print("Connected to DB")
     dbu._openDB()
     dbu._createTableObjects()
@@ -73,13 +62,13 @@ def addStuff(filename):
     vals = readconfig(filename, 'instrument')
     if not vals:
         raise(ConfigParser.NoSectionError("No section [instrument]"))
-    inst_id = int(dbu._getInstruemntID(vals['name']))
+    inst_id = int(dbu._getInstruemntID(vals['instrument_name']))
     vals = readconfig(filename, 'product')
     if not vals:
         raise(ConfigParser.NoSectionError("No section [product]"))
     # add the product
-    prod_id = dbu.addProduct(vals['name'], inst_id, vals['path'], None, vals['format'], vals['level'])
-    print("added product {0}:{1}".format(prod_id, vals['name']))
+    prod_id = dbu.addProduct(vals['product_name'], inst_id, vals['relative_path'], None, vals['format'], vals['level'])
+    print("added product {0}:{1}".format(prod_id, vals['product_name']))
     # add the link
     dbu.addInstrumentproductlink(inst_id, prod_id)
     print("added Instrumentproductlink {0}:{1}".format(inst_id, prod_id))
@@ -87,11 +76,20 @@ def addStuff(filename):
     vals = readconfig(filename, 'inspector')
     if not vals:
         raise(ConfigParser.NoSectionError("No section [inspector]"))
-    insp_id = dbu.addInspector(vals['filename'], vals['path'], vals['description'],
+    insp_id = dbu.addInspector(vals['filename'], vals['relative_path'], vals['description'],
                      Version.Version(*vals['version'].split('.')), toBool(vals['active']),
                      dup.parse(vals['date_written']), int(vals['output_interface_version']),
                      toBool(vals['newest']), prod_id, toNone(vals['arguments']))
     print("added Inspector {0}:{1}".format(insp_id, vals['filename']))
+
+
+def usage():
+    """
+    print the usage messag out
+    """
+    print "Usage: {0} <filename>".format(sys.argv[0])
+    print "   -> config file to read"
+    return
 
 
 if __name__ == "__main__":

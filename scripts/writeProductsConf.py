@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python2.6
 
 
@@ -49,7 +48,7 @@ def writeconfig(my_cfg, config_filepath):
     fp=open(config_filepath, "wb")
     cfg.write(fp)
     fp.close()
-    print('wrote: config_filepath')
+    print('wrote: {0}'.format(config_filepath))
     return
 
 
