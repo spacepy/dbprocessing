@@ -25,11 +25,16 @@
     </property>
     <column>
      <property name="text">
-      <string notr="true">1</string>
+      <string>DBprocessing</string>
      </property>
     </column>
+    <item>
+     <property name="text">
+      <string>Mission</string>
+     </property>
+    </item>
    </widget>
-   <widget class="QFrame" name="frame">
+   <widget class="QFrame" name="RightFrame">
     <property name="geometry">
      <rect>
       <x>440</x>
@@ -44,7 +49,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -96,19 +101,26 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QLineEdit" name="lineEdit_2"/>
+         <widget class="QLineEdit" name="prod_name_box"/>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="prod_inst_box"/>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_3"/>
+         <widget class="QLineEdit" name="prod_relative_path"/>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_4"/>
+         <widget class="QLineEdit" name="prod_format_box"/>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+         <widget class="QDoubleSpinBox" name="prod_level_spin">
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <double>6.000000000000000</double>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -129,11 +141,11 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <tabstops>
-  <tabstop>lineEdit_2</tabstop>
-  <tabstop>lineEdit</tabstop>
-  <tabstop>lineEdit_3</tabstop>
-  <tabstop>lineEdit_4</tabstop>
-  <tabstop>doubleSpinBox</tabstop>
+  <tabstop>prod_name_box</tabstop>
+  <tabstop>prod_inst_box</tabstop>
+  <tabstop>prod_relative_path</tabstop>
+  <tabstop>prod_format_box</tabstop>
+  <tabstop>prod_level_spin</tabstop>
   <tabstop>treeWidget</tabstop>
  </tabstops>
  <resources/>
