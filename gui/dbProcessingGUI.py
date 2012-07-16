@@ -98,6 +98,8 @@ class MyMainWindow(QtGui.QMainWindow):
             print "event"
 
 if __name__ == "__main__":
+    import subprocess
+    subprocess.check_call(['pyside-uic', 'MainUI.ui', '-o', 'MainUI.py'])
     app = QtGui.QApplication(sys.argv)
     myapp = MyMainWindow()
     myapp.show()
