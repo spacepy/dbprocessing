@@ -44,7 +44,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="product">
      <widget class="QWidget" name="layoutWidget">
@@ -63,13 +63,6 @@
           <widget class="QLabel" name="label">
            <property name="text">
             <string>Product Name</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Instrument</string>
            </property>
           </widget>
          </item>
@@ -99,19 +92,16 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLineEdit" name="prod_name_box"/>
+          <widget class="QLineEdit" name="productNameEntry"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="prod_inst_box"/>
+          <widget class="QLineEdit" name="relativePathEntry"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="prod_relative_path"/>
+          <widget class="QLineEdit" name="formatEntry"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="prod_format_box"/>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="prod_level_spin">
+          <widget class="QDoubleSpinBox" name="levelEntry">
            <property name="decimals">
             <number>1</number>
            </property>
@@ -124,7 +114,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QPushButton" name="pushButton_5">
+     <widget class="QPushButton" name="newInspectorButton">
       <property name="geometry">
        <rect>
         <x>30</x>
@@ -453,22 +443,22 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_12">
          <item>
-          <widget class="QLineEdit" name="prod_name_box_6"/>
+          <widget class="QLineEdit" name="inspectorNameEntry"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="prod_inst_box_5"/>
+          <widget class="QLineEdit" name="inspectorRelativePathEntry"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="prod_relative_path_5"/>
+          <widget class="QLineEdit" name="inspectorDescriptionEntry"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="prod_format_box_6"/>
+          <widget class="QLineEdit" name="inspectorVersionEntry"/>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox"/>
+          <widget class="QSpinBox" name="inspectorOutputInterfaceEntry"/>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBox">
+          <widget class="QCheckBox" name="inspectorActiveCodeEntry">
            <property name="text">
             <string>True</string>
            </property>
@@ -478,7 +468,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDateEdit" name="dateEdit">
+          <widget class="QDateEdit" name="inspectorDateWrittenEntry">
            <property name="date">
             <date>
              <year>2012</year>
@@ -503,7 +493,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBox_2">
+          <widget class="QCheckBox" name="inspectorNewestVersionEntry">
            <property name="text">
             <string>True</string>
            </property>
@@ -513,7 +503,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="prod_format_box_9"/>
+          <widget class="QLineEdit" name="inspectorArgumentsEntry"/>
          </item>
         </layout>
        </item>
@@ -535,11 +525,10 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <tabstops>
-  <tabstop>prod_name_box</tabstop>
-  <tabstop>prod_inst_box</tabstop>
-  <tabstop>prod_relative_path</tabstop>
-  <tabstop>prod_format_box</tabstop>
-  <tabstop>prod_level_spin</tabstop>
+  <tabstop>productNameEntry</tabstop>
+  <tabstop>relativePathEntry</tabstop>
+  <tabstop>formatEntry</tabstop>
+  <tabstop>levelEntry</tabstop>
   <tabstop>treeWidget</tabstop>
  </tabstops>
  <resources/>

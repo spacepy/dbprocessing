@@ -1,6 +1,7 @@
 
 ## pyside-uic MainUI.ui -o MainUI.py
 
+import datetime
 import sys
 
 from PySide import QtCore, QtGui
@@ -31,8 +32,10 @@ class MyMainWindow(QtGui.QMainWindow):
         item.setText(0, QtGui.QApplication.translate("MainWindow", "Satellite", None, QtGui.QApplication.UnicodeUTF8))
         item = QtGui.QTreeWidgetItem(self.ui.treeWidget.topLevelItem(0).child(0)) # instrument
         item.setText(0, QtGui.QApplication.translate("MainWindow", "Instrument", None, QtGui.QApplication.UnicodeUTF8))
-        item = QtGui.QTreeWidgetItem(self.ui.treeWidget.topLevelItem(0).child(0).child(0)) # instrument
+        item = QtGui.QTreeWidgetItem(self.ui.treeWidget.topLevelItem(0).child(0).child(0)) # product
         item.setText(0, QtGui.QApplication.translate("MainWindow", "Product", None, QtGui.QApplication.UnicodeUTF8))
+        item = QtGui.QTreeWidgetItem(self.ui.treeWidget.topLevelItem(0).child(0).child(0).child(0)) # inspector
+        item.setText(0, QtGui.QApplication.translate("MainWindow", "Inspector", None, QtGui.QApplication.UnicodeUTF8))
         self.ui.treeWidget.connect(self.ui.treeWidget.selectionModel(),
                      QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"),
                      self._debugfn)
@@ -55,9 +58,7 @@ class MyMainWindow(QtGui.QMainWindow):
                 self.ui.stackedWidget.setCurrentIndex(v)
                 break
         # call the right method to deal with the v=boxes on the right
-        methodToCall = getattr(self, '_' + self.nameIndexMapping[v][1] + 'Right' )
-        methodToCall()
-
+        getattr(self, '_' + self.nameIndexMapping[v][1] + 'Right' )() # call the right method
 
     def _getSelected(self):
         """
@@ -116,6 +117,12 @@ class MyMainWindow(QtGui.QMainWindow):
         """
         print "_newCode"
 
+    def _newInspector(self):
+        """
+        add a inspector to the tree
+        """
+        print "_newInspector"
+
     def _missionRight(self):
         """
         handle things when the mission is on the right
@@ -143,6 +150,7 @@ class MyMainWindow(QtGui.QMainWindow):
         self.ui.newProductButton.connect(self.ui.newProductButton,
                                            QtCore.SIGNAL('clicked()'),
                                            self._newProduct)
+
     def _processRight(self):
         """
         handle things when the process is on the right
@@ -155,20 +163,31 @@ class MyMainWindow(QtGui.QMainWindow):
                                            QtCore.SIGNAL('clicked()'),
                                            self._newCode)
 
-
     def _productRight(self):
         """
         handle things when the product is on the right
         """
+        self.ui.productNameEntry.setText('productNameEntry')
+        self.ui.relativePathEntry.setText('relativePathEntry')
+        self.ui.formatEntry.setText('formatEntry')
+        self.ui.levelEntry.setValue(1.0)
+        self.ui.newInspectorButton.connect(self.ui.newInspectorButton,
+                                           QtCore.SIGNAL('clicked()'),
+                                           self._newInspector)
 
     def _inspectorRight(self):
         """
         handle things when the inspector is on the right
         """
-
-
-
-
+        self.ui.inspectorNameEntry.setText('inspectorNameEntry')
+        self.ui.inspectorRelativePathEntry.setText('inspectorRelativePathEntry')
+        self.ui.inspectorDescriptionEntry.setText('inspectorDescriptionEntry')
+        self.ui.inspectorVersionEntry.setText('inspectorVersionEntry')
+        self.ui.inspectorOutputInterfaceEntry.setValue(1)
+        self.ui.inspectorActiveCodeEntry.setChecked(True)
+        self.ui.inspectorDateWrittenEntry.setDate(datetime.date(2000, 1, 1))
+        self.ui.inspectorNewestVersionEntry.setChecked(True)
+        self.ui.inspectorArgumentsEntry.setText('inspectorArgumentsEntry')
 
     def mouseClickEvent(self, event):
             print "event"
