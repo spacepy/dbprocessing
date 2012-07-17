@@ -26,7 +26,20 @@ class MyMainWindow(QtGui.QMainWindow):
         self.rightSide['mission'] = []
         self.rightSide['satellite'] = []
         self.rightSide['instrument'] = []
-        self._initialTree()
+        self.ui.treeWidget.connect(self.ui.treeWidget.selectionModel(),
+                     QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"),
+                     self._debugfn)
+
+        self._updateInternals()
+#        self._populateExisting()
+
+    def keyPressEvent(self, event):
+        """
+        deal with key presses
+        """
+        print event.key(), '5'
+        if event.key() in (16777220, QtCore.Qt.Key_Enter): # figure this out!!
+            self._fillRightSide(self._getSelected(), self._getSelected())
 
     def _initialTree(self):
         """
@@ -51,7 +64,19 @@ class MyMainWindow(QtGui.QMainWindow):
             else:
                 break
 
-    def _fillRightSide(self, inItem):
+    def _updateInternals(self):
+        """
+        update some of the internal state, call thi often
+        """
+        self.nameIndexMapping = {}
+        for i in range(100): # never be this many
+            tmp = self.ui.stackedWidget.widget(i)
+            if tmp is not None:
+                self.nameIndexMapping[i] = (tmp, tmp.objectName())
+            else:
+                break
+
+    def _fillRightSide(self, inItem, extra=None):
         """
         display the right side and get the values
         """
@@ -62,7 +87,7 @@ class MyMainWindow(QtGui.QMainWindow):
                 self.ui.stackedWidget.setCurrentIndex(v)
                 break
         # call the right method to deal with the v=boxes on the right
-        getattr(self, '_' + self.nameIndexMapping[v][1] + 'Right' )() # call the right method
+        getattr(self, '_' + self.nameIndexMapping[v][1] + 'Right' )(extra) # call the right method
 
     def _getSelected(self):
         """
@@ -101,33 +126,45 @@ class MyMainWindow(QtGui.QMainWindow):
         """
         add a satellite to the tree
         """
-        print "_newSatellite"
+        item = QtGui.QTreeWidgetItem(self.ui.treeWidget.topLevelItem(self.ui.treeWidget.topLevelItemCount()-1)) # satellite
+        item.setText(self.ui.treeWidget.topLevelItemCount()-1, QtGui.QApplication.translate("MainWindow", "Satellite", None, QtGui.QApplication.UnicodeUTF8))
+        item.parent().setExpanded(True)
 
     def _newInstrument(self):
         """
         add a instrument to the tree
         """
-        print "_newInstrument"
+        item = QtGui.QTreeWidgetItem(self.ui.treeWidget.topLevelItem(0).child(0)) # instrument
+        item.setText(0, QtGui.QApplication.translate("MainWindow", "Instrument", None, QtGui.QApplication.UnicodeUTF8))
+        item.parent().setExpanded(True)
+        self._updateInternals()
 
     def _newProduct(self):
         """
         add a product to the tree
         """
-        print "_newProduct"
+        item = QtGui.QTreeWidgetItem(self.ui.treeWidget.topLevelItem(0).child(0).child(0)) # product
+        item.setText(0, QtGui.QApplication.translate("MainWindow", "Product", None, QtGui.QApplication.UnicodeUTF8))
+        item.parent().setExpanded(True)
+        self._updateInternals()
 
     def _newCode(self):
         """
         add a Code to the tree
         """
         print "_newCode"
+        self._updateInternals()
 
     def _newInspector(self):
         """
         add a inspector to the tree
         """
-        print "_newInspector"
+        item = QtGui.QTreeWidgetItem(self.ui.treeWidget.topLevelItem(0).child(0).child(0).child(0)) # inspector
+        item.setText(0, QtGui.QApplication.translate("MainWindow", "Inspector", None, QtGui.QApplication.UnicodeUTF8))
+        item.parent().setExpanded(True)
+        self._updateInternals()
 
-    def _missionRight(self):
+    def _missionRight(self, extra=None):
         """
         handle things when the mission is on the right
         """
@@ -138,16 +175,21 @@ class MyMainWindow(QtGui.QMainWindow):
                                            QtCore.SIGNAL('clicked()'),
                                            self._newSatellite)
 
-    def _satelliteRight(self):
+    def _satelliteRight(self, extra=None):
         """
         handle things when the satellite is on the right
         """
-        self.ui.satelliteNameEntry.setText('satellite')
-        self.ui.newInstrumentButton.connect(self.ui.newInstrumentButton,
-                                           QtCore.SIGNAL('clicked()'),
-                                           self._newInstrument)
+        if self.ui.satelliteNameEntry.text() == '':
+            self.ui.satelliteNameEntry.setText('satellite')
+        print "extra", extra
+        if extra is not None:
+            extra.setText(0, self.ui.satelliteNameEntry.text())
+        else:
+            self.ui.newInstrumentButton.connect(self.ui.newInstrumentButton,
+                                                QtCore.SIGNAL('clicked()'),
+                                                self._newInstrument)
 
-    def _instrumentRight(self):
+    def _instrumentRight(self, extra=None):
         """
         handle things when the instrument is on the right
         """
@@ -156,7 +198,7 @@ class MyMainWindow(QtGui.QMainWindow):
                                            QtCore.SIGNAL('clicked()'),
                                            self._newProduct)
 
-    def _processRight(self):
+    def _processRight(self, extra=None):
         """
         handle things when the process is on the right
         """
@@ -168,7 +210,7 @@ class MyMainWindow(QtGui.QMainWindow):
                                            QtCore.SIGNAL('clicked()'),
                                            self._newCode)
 
-    def _productRight(self):
+    def _productRight(self, extra=None):
         """
         handle things when the product is on the right
         """
@@ -180,7 +222,7 @@ class MyMainWindow(QtGui.QMainWindow):
                                            QtCore.SIGNAL('clicked()'),
                                            self._newInspector)
 
-    def _inspectorRight(self):
+    def _inspectorRight(self, extra=None):
         """
         handle things when the inspector is on the right
         """
@@ -196,6 +238,11 @@ class MyMainWindow(QtGui.QMainWindow):
 
     def mouseClickEvent(self, event):
             print "event"
+
+    def _populateExisting(self):
+        """
+        populate existing information into the tree
+        """
 
 
 def usage():

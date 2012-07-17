@@ -44,7 +44,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="product">
      <widget class="QWidget" name="layoutWidget">
@@ -510,6 +510,22 @@
       </layout>
      </widget>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="UpdateButton">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>830</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="mouseTracking">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string>Update</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
