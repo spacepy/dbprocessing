@@ -36,10 +36,6 @@ class MyMainWindow(QtGui.QMainWindow):
         self.ui.treeWidget.connect(self.ui.treeWidget.selectionModel(),
                      QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"),
                      self._debugfn)
-#        self.rightSide['product'].append(self.ui.treeWidget.topLevelItem(0).child(0).child(0).child(0))
-#        self.rightSide['instrument'].append(self.ui.treeWidget.topLevelItem(0).child(0).child(0))
-#        self.rightSide['satellite'].append(self.ui.treeWidget.topLevelItem(0).child(0))
-#        self.rightSide['mission'].append(self.ui.treeWidget.topLevelItem(0))
         self.nameIndexMapping = {}
         for i in range(100): # never be this many
             tmp = self.ui.stackedWidget.widget(i)
@@ -47,7 +43,6 @@ class MyMainWindow(QtGui.QMainWindow):
                 self.nameIndexMapping[i] = (tmp, tmp.objectName())
             else:
                 break
-
 
     def _fillRightSide(self, inItem):
         """
@@ -59,7 +54,11 @@ class MyMainWindow(QtGui.QMainWindow):
             if inItem.text(0).lower() == self.nameIndexMapping[v][1]:
                 self.ui.stackedWidget.setCurrentIndex(v)
                 break
-    
+        # call the right method to deal with the v=boxes on the right
+        methodToCall = getattr(self, '_' + self.nameIndexMapping[v][1] + 'Right' )
+        methodToCall()
+
+
     def _getSelected(self):
         """
         go through the left side tree and return the selected object
@@ -84,15 +83,92 @@ class MyMainWindow(QtGui.QMainWindow):
                                for ch_idx4 in range(tl_item.child(ch_idx0).child(ch_idx1).child(ch_idx2).child(ch_idx3).childCount()):
                                    if tl_item.child(ch_idx0).child(ch_idx1).child(ch_idx2).child(ch_idx3).child(ch_idx4).isSelected():
                                        return tl_item.child(ch_idx0).child(ch_idx1).child(ch_idx2).child(ch_idx3).child(ch_idx4)
-                               
-                               
-                               
-                               
+
+
+
+
     def _debugfn(self):
         # figure out which is selected
         print self._getSelected().text(0)
-                   
         self._fillRightSide(self._getSelected())
+
+    def _newSatellite(self):
+        """
+        add a satellite to the tree
+        """
+        print "_newSatellite"
+
+    def _newInstrument(self):
+        """
+        add a instrument to the tree
+        """
+        print "_newInstrument"
+
+    def _newProduct(self):
+        """
+        add a product to the tree
+        """
+        print "_newProduct"
+
+    def _newCode(self):
+        """
+        add a Code to the tree
+        """
+        print "_newCode"
+
+    def _missionRight(self):
+        """
+        handle things when the mission is on the right
+        """
+        self.ui.missionNameEntry.setText('mission')
+        self.ui.missionDirectoryEntry.setText('mission dir')
+        self.ui.newSatelliteButton.connect(self.ui.newSatelliteButton,
+                                           QtCore.SIGNAL('clicked()'),
+                                           self._newSatellite)
+
+    def _satelliteRight(self):
+        """
+        handle things when the satellite is on the right
+        """
+        self.ui.satelliteNameEntry.setText('satellite')
+        self.ui.newInstrumentButton.connect(self.ui.newInstrumentButton,
+                                           QtCore.SIGNAL('clicked()'),
+                                           self._newInstrument)
+
+    def _instrumentRight(self):
+        """
+        handle things when the instrument is on the right
+        """
+        self.ui.instrumentNameEntry.setText('instrument')
+        self.ui.newProductButton.connect(self.ui.newProductButton,
+                                           QtCore.SIGNAL('clicked()'),
+                                           self._newProduct)
+    def _processRight(self):
+        """
+        handle things when the process is on the right
+        """
+        self.ui.processNameEntry.setText('process')
+        self.ui.outputProductNameEntry.setText('output product')
+        self.ui.outputTimebaseEntry.setText('output timebase')
+        self.ui.extraParamsEntry.setText('extra params')
+        self.ui.newCodeButton.connect(self.ui.newCodeButton,
+                                           QtCore.SIGNAL('clicked()'),
+                                           self._newCode)
+
+
+    def _productRight(self):
+        """
+        handle things when the product is on the right
+        """
+
+    def _inspectorRight(self):
+        """
+        handle things when the inspector is on the right
+        """
+
+
+
+
 
     def mouseClickEvent(self, event):
             print "event"
