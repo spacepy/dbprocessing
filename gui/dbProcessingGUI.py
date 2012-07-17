@@ -8,15 +8,19 @@ from PySide import QtCore, QtGui
 
 from MainUI import Ui_MainWindow
 
+import dbprocessing.DBUtils2 as DBUtils2
+
+
 class MyMainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(MyMainWindow, self).__init__(parent)
-        # QtGui.QMainWindow.__init__(self, parent)
+
+        self.dbu = DBUtils2.DBUtils2(sys.argv[1])
+
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.stackedWidget.setVisible(False)
-#        print self.ui.treeWidget.topLevelItem(0).isSelected()
-#        print self.ui.treeWidget.topLevelItem(0).emitDataChanged()
+
         self.rightSide = {}
         self.rightSide['product'] = []
         self.rightSide['mission'] = []
@@ -127,7 +131,8 @@ class MyMainWindow(QtGui.QMainWindow):
         """
         handle things when the mission is on the right
         """
-        self.ui.missionNameEntry.setText('mission')
+        self.ui.treeWidget.topLevelItem(0).setText(0, self.dbu.mission)
+        self.ui.missionNameEntry.setText(self.dbu.mission)
         self.ui.missionDirectoryEntry.setText('mission dir')
         self.ui.newSatelliteButton.connect(self.ui.newSatelliteButton,
                                            QtCore.SIGNAL('clicked()'),
@@ -192,17 +197,27 @@ class MyMainWindow(QtGui.QMainWindow):
     def mouseClickEvent(self, event):
             print "event"
 
+
+def usage():
+    """
+    print out a usage message
+    """
+    print "usage: " + sys.argv[0] + " <mission name>"
+
 if __name__ == "__main__":
     import subprocess
     subprocess.check_call(['pyside-uic', 'MainUI.ui', '-o', 'MainUI.py'])
+    if len(sys.argv) != 2:
+        usage()
+        sys.exit()
     app = QtGui.QApplication(sys.argv)
     myapp = MyMainWindow()
     myapp.show()
     sys.exit(app.exec_())
 
 
-QtCore.Qt.Checked
-item_0 = QtGui.QTreeWidgetItem(self.treeWidget)
-item_1 = QtGui.QTreeWidgetItem(item_0)
-item_2 = QtGui.QTreeWidgetItem(item_1)
-item_1 = QtGui.QTreeWidgetItem(item_0)
+#QtCore.Qt.Checked
+#item_0 = QtGui.QTreeWidgetItem(self.treeWidget)
+#item_1 = QtGui.QTreeWidgetItem(item_0)
+#item_2 = QtGui.QTreeWidgetItem(item_1)
+#item_1 = QtGui.QTreeWidgetItem(item_0)
