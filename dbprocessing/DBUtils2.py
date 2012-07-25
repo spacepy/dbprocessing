@@ -185,7 +185,7 @@ class DBUtils2(object):
 ## when interacting using python use the class
         table_dict = {}
         for val in table_names:
-            table_dict[val[0].upper() + val[1:]] = val
+            table_dict[val.title()] = val
 
 ##  dynamically create all the classes (c1)
 ##  dynamically create all the tables in the db (c2)
