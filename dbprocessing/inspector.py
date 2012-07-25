@@ -74,7 +74,10 @@ class inspector(object):
         self.dirname = os.path.dirname(self.filename)
         self.product = product
         self.diskfile = Diskfile.Diskfile(self.filename, self.dbu)
-        if self.inspect(kwargs) is not None:  # mandates the diskfile is not full and not a match
+        insp = self.inspect(kwargs)
+        if insp is None:
+            self.diskfile = None
+        else:
             self._populate()
 
     @abstractmethod
@@ -103,6 +106,8 @@ class inspector(object):
         match = self.diskfile
         if match is not None:
             DBlogging.dblogger.debug("Checking the inspector has filled all the values: {0}".format(self.code_name))
+        else:
+            return None
 
         if self.diskfile.mission is None:
             match = None
@@ -149,17 +154,17 @@ class inspector(object):
         go through the filename and extract the first valid YYYYMMDD as a datetime
         """
         return extract_YYYYMMDD(self.filename)
-        
+
 
 def extract_YYYYMMDD(filename):
     """
     go through the filename and extract the first valid YYYYMMDD as a datetime
-    
+
     Parameters
     ==========
     filename : str
         filename to parse for a YYYYMMDD format
-    
+
     Returns
     =======
     out : (None, datetime.datetime)
@@ -191,7 +196,7 @@ def valid_YYYYMMDD(inval):
 
 def extract_Version(filename):
     """
-    go through the filename and pull out the fist valid vX.Y.Z and return as a 
+    go through the filename and pull out the fist valid vX.Y.Z and return as a
     Version object
     """
     res = re.search("[vV]\d+\.\d+\.\d+\.", filename)
