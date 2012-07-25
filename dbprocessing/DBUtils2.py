@@ -2063,6 +2063,36 @@ class DBUtils2(object):
         retval['mission'] = self.session.query(self.Mission).get(mission_id)
         return retval
 
+    def getProcessTraceback(self, proc_id):
+        """
+        given a process id return instances of all the tables it takes to define it
+        mission, satellite, instrument, product, process, code
+        """
+        retval = {}
+        # get the product instance
+        retval['process'] = self.session.query(self.Process).get(proc_id)
+        if retval['process'] is None:
+            raise(DBNoData("No process {0} in the db".format(proc_id)))
+        retval['output_product'] = self.session.query(self.Product).get(retval['process'].output_product)
+        # instrument
+        inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)[0]
+        retval['instrument'] = self.session.query(self.Instrument).get(inst_id)
+        # satellite
+        sat_id = self.getInstrumentSatellite(inst_id)[0]
+        retval['satellite'] = self.session.query(self.Satellite).get(sat_id)
+        # mission
+        mission_id = self.getSatelliteMission(88)[0]
+        retval['mission'] = self.session.query(self.Mission).get(mission_id)
+        # code
+        code_id = self.getCodeFromProcess(proc_id)
+        retval['code'] = self.session.query(self.Code).get(code_id)
+        # input products
+        retval['input_product'] = []
+        in_prod_id = self.getInputProductID(proc_id)
+        for val, opt in in_prod_id:
+            retval['input_product'].append((self.session.query(self.Product).get(val), opt) )
+        return retval
+
     def getProducts(self):
         """
         get all products for the given mission
@@ -2074,6 +2104,25 @@ class DBUtils2(object):
             if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
                 outval.append(val)
         return outval
+
+    def getProcesses(self):
+        """
+        get all processes for the given mission
+        """
+        outval = []
+        prods = self.getAllProducts()
+        mission_id = self._getMissionID()
+        for val in prods:
+            if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
+                outval.append(val)
+        return outval
+
+    def getAllProcesses(self):
+        """
+        return a list of all processes as instances
+        """
+        prods = self.session.query(self.Process).all()
+        return prods
 
     def getAllProducts(self):
         """
