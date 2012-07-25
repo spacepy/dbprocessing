@@ -57,6 +57,12 @@ def getStuff(prod_name, filename):
     dbu = DBUtils2.DBUtils2('rbsp') # TODO don't assume RBSP later
     dbu._openDB()
     dbu._createTableObjects()
+    # are we trying to write files for all the products?
+    if prod_name.lower() == 'all':
+        prods = dbu.getAllProducts()
+        for prod in prods:
+            getStuff(prod.product_name, prod.product_name + filename)
+        return
     try:
         prod_name = dbu._getProductID(int(prod_name))
     except ValueError:
