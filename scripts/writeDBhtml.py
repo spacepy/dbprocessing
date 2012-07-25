@@ -37,7 +37,8 @@ def makeHTML(mission, filename):
     <body>
 
     """
-    footer = """
+    footer = \
+    """
     <br>
     <br>
     </body></html>
@@ -53,71 +54,6 @@ def makeHTML(mission, filename):
     _writeProcesses(dbu, output)
     output.writelines(footer)
     output.close()
-
-
-#def _writeProducts(dbu, output):
-#    prods = dbu.getProducts()
-#    data = {}
-#    keys1 = ['level', 'product_name', 'product_description', 'relative_path', 'format']
-#    for key in keys1:
-#        data[key] = [v.__getattribute__(key) for v in prods]
-#
-#    keys2 = ['instrument_name']
-#    for key in keys2:
-#        data[key] = [dbu.getProductTraceback(v.product_id)['instrument'].__getattribute__(key) for v in prods]
-#
-#    keys3 = ['satellite_name']
-#    for key in keys3:
-#        data[key] = [dbu.getProductTraceback(v.product_id)['satellite'].__getattribute__(key) for v in prods]
-#
-#    keys4 = ['n_files']
-#    for key in keys4:
-#        data[key] = [len(dbu.getFilesByProduct(v.product_id)) for v in prods]
-#
-#    keys5 = ['latest']
-#    for key in keys5:
-#        data[key] = []
-#        for p in prods:
-#            tmp = dbu.getFilesByProduct(p.product_id)
-#            tmp = [t.utc_stop_time for t in tmp]
-#            tmp.sort()
-#            try:
-#                data[key].append(tmp[-1].isoformat())
-#            except IndexError:
-#                data[key].append(None)
-#
-#    keys = keys3 + keys2 + keys1[:-1] + keys4 + keys5 + [keys1[-1]]
-#
-#    # go through and sort the data by several keys
-#    ind = np.lexsort( (data['product_name'], data['level'], data['instrument_name'], data['satellite_name'],   ) )
-#
-#    output.write('<h1>{0}</h1>\n'.format(dbu.mission))
-#    output.write('<h2>{0}</h2>\n'.format(datetime.datetime.now().isoformat()))
-#
-#    output.write('<h2>{0}</h2>\n'.format('Products'))
-#
-#    output.write('<table style="border: medium none ; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">\n')
-#
-#    output.write('<tr>')
-#    for attr in keys:
-#        output.write('<th>{0}</th>'.format(attr))
-#    output.write('</tr>\n')
-#    for i, idx in enumerate(ind):
-#        if i % 2 == 0:
-#            output.write('<tr>')
-#        else:
-#            output.write('<tr class="alt">')
-#        output.write('<td>{0}</td>'.format(data['satellite_name'][idx]))
-#        output.write('<td>{0}</td>'.format(data['instrument_name'][idx]))
-#        output.write('<td>{0}</td>'.format(data['level'][idx]))
-#        output.write('<td>{0}</td>'.format(data['product_name'][idx]))
-#        output.write('<td>{0}</td>'.format(data['relative_path'][idx]))
-#        output.write('<td>{0}</td>'.format(data['n_files'][idx]))
-#        output.write('<td>{0}</td>'.format(data['latest'][idx]))
-#        output.write('<td>{0}</td>'.format(data['format'][idx]))
-#        output.write('</tr>\n')
-#
-#    output.write('</table>\n')
 
 def _writeProducts(dbu, output):
     prods = dbu.getAllProducts()
@@ -162,8 +98,10 @@ def _writeProducts(dbu, output):
     # go through and sort the data by several keys (right to left, ugg)
     ind = np.lexsort( (data['product_name'], data['level'], data['instrument_name'], data['satellite_name'],   ) )
 
+    output.write('<h1>{0}</h1>\n'.format(dbu.mission))
+    output.write('<h2>{0}</h2>\n'.format(datetime.datetime.now().isoformat()))
 
-    output.write('<h2>{0}</h2>\n'.format('Processes'))
+    output.write('<h2>{0}</h2>\n'.format('Products'))
 
     output.write('<table style="border: medium none ; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">\n')
     # write out the header
