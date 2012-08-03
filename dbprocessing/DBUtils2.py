@@ -25,6 +25,17 @@ from Diskfile import calcDigest
 __version__ = '2.0.3'
 
 
+
+#########################################################
+## NOTES, read these if new to this module
+#########################################################
+# - functions are in transition from returning the thing the name says e.g. _getFileID returens a number to
+#      instead returning the sqlalcheml object that meets the criteria so _getFileID would return a File instance
+#      and the user would then have to get the ID by using File.file_id.  This makes for fewer functions and is
+#      significantly cleaner in a few spots
+
+
+
 class DBError(Exception):
     pass
 class DBProcessingError(Exception):
