@@ -160,6 +160,12 @@ class DBfile(object):
         @TODO  add a check that the file is not already there before doing a move
         """
         path = self.getDirectory()
+        ## need to do path replacements
+        ftb = self.dbu.getFileTraceback(self.diskfile.params['filename'])
+        if '{INSTRUMENT}' in path : # need to replace with the instrument name
+            path = path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+        if '{SATELLITE}' in path : # need to replace with the instrument name
+            path = path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
         shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
         DBlogging.dblogger.info("file {0} moved to {1}".format(os.path.basename(self.diskfile.infile), os.path.dirname(os.path.join(path, self.diskfile.params['filename']))))
         DBlogging.dblogger.debug("self.diskfile.filename: {0}".format(self.diskfile.filename))

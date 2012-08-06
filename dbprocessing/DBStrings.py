@@ -55,6 +55,7 @@ class DBFormatter(string.Formatter):
         'MISSION': ('{MISSION}', None),
         'PRODUCT': ('{PRODUCT}', None),
         'SATELLITE': ('{SATELLITE}', None),
+        'INSTRUMENT': ('{INSTRUMENT}', None)
         }
 
     def format(self, format_string, *args, **kwargs):

@@ -1846,6 +1846,12 @@ class DBUtils2(object):
         sq = self.session.query(self.Satellite.satellite_id).filter_by(mission_id = self._getMissionID()).filter_by(satellite_name = sat_name)
         return sq.first()[0]  # there can be only one of each name
 
+    def getSatellite(self, sat_id):
+        """
+        given a sat id return tehsatellite instance
+        """
+        return self.session.query(self.Satellite).get(sat_id)
+
     def getCodePath(self, code_id):
         """
         Given a code_id list return the full name (path and all) of the code
@@ -2083,6 +2089,17 @@ class DBUtils2(object):
         # mission
         mission_id = self.getSatelliteMission(88)[0]
         retval['mission'] = self.session.query(self.Mission).get(mission_id)
+        return retval
+
+    def getFileTraceback(self, file_id):
+        """
+        given a product id return instances of all the tables it takes to define it
+        mission, satellite, instrument, product, inspector, Instrumentproductlink
+        """
+        file_id = self._getFileID(file_id)
+        prod_id = self.getFileProduct(file_id)
+        retval = self.getProductTraceback(prod_id)
+        retval['file'] = self.session.query(self.File).get(file_id)
         return retval
 
     def getProcessTraceback(self, proc_id):

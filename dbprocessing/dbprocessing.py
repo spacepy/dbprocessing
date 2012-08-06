@@ -254,6 +254,9 @@ class ProcessQueue(object):
                 for key in kwargs:
                     if kwargs[key] == '{PRODUCT}': # need to replace with the product name
                         kwargs[key] = kwargs[key].replace('{PRODUCT}', self.dbu.getProductName(product))
+                    if kwargs[key] == '{SATELLITE}': # need to replace with the product name
+                        kwargs[key] = kwargs[key].replace('{SATELLITE}', self.dbu.getProductTraceback(product)['satellite'].satellite_name)
+                #DBlogging.dblogger.debug("Calling inspector: {0} {1} {2}".format(self.current_file, product, kwargs ))
                 df = inspect.Inspector(self.current_file, self.dbu, product, **kwargs)
             else:
                 df = inspect.Inspector(self.current_file, self.dbu, product, )
@@ -371,7 +374,8 @@ class ProcessQueue(object):
                 filename = fmtr.expand_format(format_str, {'SATELLITE':satellite,
                                                              'PRODUCT':product,
                                                              'VERSION':str(output_file_version),
-                                                             'datetime':utc_file_date})
+                                                             'datetime':utc_file_date,
+                                                             'INSTRUMENT':instrument})
                 DBlogging.dblogger.debug("Filename: %s created" % (filename))
                 # if this filename is already in the DB we have to figure out which version number to increment
                 try:
