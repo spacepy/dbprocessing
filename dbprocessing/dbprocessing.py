@@ -459,8 +459,10 @@ class ProcessQueue(object):
 
             ## build the command line we are to run
             cmdline = [codepath]
-            ## build the command line we are to run
-            cmdline = [codepath]
+            ## get extra_params from the process
+            tmp = self.dbu.getProcess(process_id).extra_params
+            if tmp:
+                cmdline.append(tmp)
 
             ## figure out how to put the arguments together
             args = self.dbu.getCodeArgs(code_id)
@@ -470,7 +472,6 @@ class ProcessQueue(object):
                 for arg in args:
                     if 'input' not in arg and 'output' not in arg:
                         cmdline.append(arg)
-
 
             for i_fid in input_files:
                 if args is not None:

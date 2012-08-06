@@ -1378,6 +1378,14 @@ class DBUtils2(object):
             ans.append(v.process_id)
         return ans
 
+    def getProcess(self, process_id):
+        """
+        given a process_id return the product instance
+        """
+        p_id = self.getProcessID(process_id)
+        val = self.session.query(self.Process).get(p_id)
+        return val
+
     def getProcessTimebase(self, process):
         """
         given a product id or product name return the timebase
@@ -1397,8 +1405,11 @@ class DBUtils2(object):
         """
         given a process name return its id
         """
-        sq = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()
-        return sq[0][0]
+        try:
+           proc_id = long(proc_name)
+        except ValueError: # it is not a number
+            proc_id = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()[0][0]
+        return proc_id
 
     def getFileProduct(self, filename):
         """
