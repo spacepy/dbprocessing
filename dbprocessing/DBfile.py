@@ -167,13 +167,13 @@ class DBfile(object):
         try:
             tf = tarfile.open(os.path.join(path, self.diskfile.params['filename']), 'r:gz')
             if tf.getmembers(): # false if it does nat have any files inside i.e. is not a tarfile or empty, deal with empty later
-                tf.extractall(path=path)
-                was_tf = True
-            else:
-                was_tf = False
+                tf.extractall(path=os.path.join(path, '..')) # up one dir level
+#                was_tf = True
+#            else:
+#                was_tf = False
             tf.close()
-            if was_tf:
-                shutil.move(os.path.join(path, self.diskfile.params['filename']), os.path.join(os.path.join(path, 'tgz'), self.diskfile.params['filename']))
+#            if was_tf:
+#                shutil.move(os.path.join(path, self.diskfile.params['filename']), os.path.join(os.path.join(path, 'tgz'), self.diskfile.params['filename']))
         except tarfile.ReadError:
             pass
 

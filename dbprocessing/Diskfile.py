@@ -156,15 +156,15 @@ class Diskfile(object):
         # need both read and write access
         self.READ_ACCESS = os.access(self.infile, os.R_OK)
         if not self.READ_ACCESS:
-            # TODO this is a pngwalk hack
-            glb = glob.glob(self.infile + '*.png')
-            if len(glb) == 1:
-                self.infile = glb[0]
-            else:
-                raise(ReadError("file is not readable, does it exist? {0}".format(self.infile)))
+#            # TODO this is a pngwalk hack
+#            glb = glob.glob(self.infile + '*.png')
+#            if len(glb) == 1:
+#                self.infile = glb[0]
+#            else:
+            raise(ReadError("file is not readable, does it exist? {0}".format(self.infile)))
         self.WRITE_ACCESS = os.access(self.infile, os.W_OK)
         if not self.WRITE_ACCESS:
-            raise(WriteError("file is not writeable, wont be able to move it to proper location {0}".format(self.infile)))
+            raise(WriteError("file is not writeable, won't be able to move it to proper location: {0}".format(self.infile)))
         DBlogging.dblogger.debug("Access Checked out OK")
 
 
