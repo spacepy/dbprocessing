@@ -76,10 +76,14 @@ def addStuff(filename):
     vals = readconfig(filename, 'inspector')
     if not vals:
         raise(ConfigParser.NoSectionError("No section [inspector]"))
+    try:
+        version = vals['version'].split('.')
+    except KeyError:
+        version = (vals['interface_version'], vals['quality_version'], vals['revision_version'])
     insp_id = dbu.addInspector(vals['filename'], vals['relative_path'], vals['description'],
-                     Version.Version(*vals['version'].split('.')), toBool(vals['active']),
+                     Version.Version(*version), toBool(vals['active_code']),
                      dup.parse(vals['date_written']), int(vals['output_interface_version']),
-                     toBool(vals['newest']), prod_id, toNone(vals['arguments']))
+                     toBool(vals['newest_version']), prod_id, toNone(vals['arguments']))
     print("added Inspector {0}:{1}".format(insp_id, vals['filename']))
 
 
