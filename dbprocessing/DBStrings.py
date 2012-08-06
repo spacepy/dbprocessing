@@ -54,7 +54,7 @@ class DBFormatter(string.Formatter):
         'nnnn': ( '{nnnn}', '\d\d\d\d' ),
         'MISSION': ('{MISSION}', None),
         'PRODUCT': ('{PRODUCT}', None),
-        'SPACECRAFT': ('{SPACECRAFT}', None),
+        'SATELLITE': ('{SATELLITE}', None),
         }
 
     def format(self, format_string, *args, **kwargs):

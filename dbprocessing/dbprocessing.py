@@ -368,7 +368,7 @@ class ProcessQueue(object):
             incCode = True
             incFiles = True
             while True:
-                filename = fmtr.expand_format(format_str, {'SPACECRAFT':satellite,
+                filename = fmtr.expand_format(format_str, {'SATELLITE':satellite,
                                                              'PRODUCT':product,
                                                              'VERSION':str(output_file_version),
                                                              'datetime':utc_file_date})

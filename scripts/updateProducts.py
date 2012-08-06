@@ -74,10 +74,12 @@ def _updateSections(conf):
 
     sections = ['mission', 'satellite', 'instrument', 'product',
                 'instrumentproductlink', 'inspector']
+    succ = 0
     for section in sections:
         # get the object for the section
         try:
             obj = dbu.session.query(dbu.__getattribute__(section.title())).get(conf[section][section + '_id'])
+            succ += 1
         except KeyError: # happens for instrumentproductlink where there is not an id
             continue
         # get the attributes
@@ -92,6 +94,8 @@ def _updateSections(conf):
                     obj.__setattr__(attrs[i], conf[section][attrs[i]])
                     dbu.session.add(obj)
             dbu._commitDB()
+    if succ == 0:
+        raise(ValueError('using {0} on a product that is not in the DB'.format(sys.argv[0])))
 
 
 def usage():
