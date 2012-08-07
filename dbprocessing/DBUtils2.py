@@ -1402,7 +1402,7 @@ class DBUtils2(object):
         except IndexError:
             return None
         # need to do path replacement
-        ftb = self.getFileTraceback(product_id)
+        ftb = self.getProductTraceback(product_id)
         if '{INSTRUMENT}' in rel_path : # need to replace with the instrument name
             rel_path = rel_path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in rel_path : # need to replace with the instrument name
@@ -2161,7 +2161,7 @@ class DBUtils2(object):
     def getProcessTraceback(self, proc_id):
         """
         given a process id return instances of all the tables it takes to define it
-        mission, satellite, instrument, product, process, code
+        mission, satellite, instrument, product, process, code, productprocesslink
         """
         retval = {}
         # get the product instance
@@ -2186,6 +2186,10 @@ class DBUtils2(object):
         in_prod_id = self.getInputProductID(proc_id)
         for val, opt in in_prod_id:
             retval['input_product'].append((self.session.query(self.Product).get(val), opt) )
+        retval['productprocesslink'] = []
+        ppl = self.session.query(self.Productprocesslink).filter_by(process_id = proc_id)
+        for val in ppl:
+            retval['productprocesslink'].append(ppl)
         return retval
 
     def getProducts(self):
