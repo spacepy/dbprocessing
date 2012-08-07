@@ -829,6 +829,18 @@ class DBUtils2(object):
         self.session.add(p1)
         self._commitDB()
 
+    def updateProcessSubs(self, proc_id):
+        """
+        update an existing product performing the {} replacements
+        """
+        # need to do {} replacement, have to do it as a modification
+        p1 = self.session.query(self.Process).get(proc_id)
+        proc_id = p1.process_id
+        process_name = self._nameSubProcess(p1.process_name, process_id)
+        p1.process_name = process_name
+        self.session.add(p1)
+        self._commitDB()
+
     def addproductprocesslink(self,
                     input_product_id,
                     process_id,
@@ -1067,6 +1079,19 @@ class DBUtils2(object):
         in inStr replace the standard {} with the names
         """
         ftb = self.getProductTraceback(product_id)
+        if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+        if '{SATELLITE}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+        if '{MISSION}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+        return inStr
+
+    def _nameSubProcess(self, inStr, process_id):
+        """
+        in inStr replace the standard {} with the names
+        """
+        ftb = self.getProcessTraceback(process_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
