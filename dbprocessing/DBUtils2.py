@@ -805,7 +805,6 @@ class DBUtils2(object):
         @type super_product_id: str
         """
         p1 = self.Product()
-
         p1.instrument_id = instrument_id
         p1.product_name = product_name
         p1.relative_path = relative_path
@@ -815,6 +814,20 @@ class DBUtils2(object):
         self.session.add(p1)
         self._commitDB()
         return p1.product_id
+
+    def updateProductSubs(self, product_id):
+        """
+        update an existing product performing the {} replacements
+        """
+        # need to do {} replacement, have to do it as a modification
+        p1 = self.session.query(self.Product).get(product_id)
+        product_id = p1.product_id
+        product_name = self._nameSubProduct(p1.product_name, product_id)
+        p1.product_name = product_name
+        relative_path = self._nameSubProduct(p1.relative_path, product_id)
+        p1.relative_path = relative_path
+        self.session.add(p1)
+        self._commitDB()
 
     def addproductprocesslink(self,
                     input_product_id,
@@ -1032,6 +1045,8 @@ class DBUtils2(object):
         c1 = self.Inspector()
         c1.filename = filename
         c1.relative_path = relative_path
+        # need to do {} replacement
+        description = self._nameSubProduct(description, product)
         c1.description = description
         c1.product = product
         c1.interface_version = version.interface
@@ -1046,6 +1061,32 @@ class DBUtils2(object):
         self.session.add(c1)
         self._commitDB()
         return c1.inspector_id
+
+    def _nameSubProduct(self, inStr, product_id):
+        """
+        in inStr replace the standard {} with the names
+        """
+        ftb = self.getProductTraceback(product_id)
+        if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+        if '{SATELLITE}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+        if '{MISSION}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+        return inStr
+
+    def _nameSubFile(self, inStr, file_id):
+        """
+        in inStr replace the standard {} with the names
+        """
+        ftb = self.getFileTraceback(file_id)
+        if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+        if '{SATELLITE}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+        if '{MISSION}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+        return inStr
 
     def _commitDB(self):
         """
@@ -1360,6 +1401,14 @@ class DBUtils2(object):
             root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
         except IndexError:
             return None
+        # need to do path replacement
+        ftb = self.getFileTraceback(product_id)
+        if '{INSTRUMENT}' in rel_path : # need to replace with the instrument name
+            rel_path = rel_path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+        if '{SATELLITE}' in rel_path : # need to replace with the instrument name
+            rel_path = rel_path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+        if '{MISSION}' in rel_path : # need to replace with the instrument name
+            rel_path = rel_path.replace('{MISSION}', ftb['mision'].mission_name)
         return os.path.join(root_dir, rel_path, filename)
 
     def getProcessFromInputProduct(self, product):
@@ -1833,7 +1882,14 @@ class DBUtils2(object):
         if sq is None:
             raise(DBNoData("No product_id {0} found in the DB".format(product_id)))
         else:
-            return sq.product_name
+            ftb = self.getProductTraceback(product_id)
+            name = sq.product_name
+            ## perform name replacement {SATELLITE}, {INSTRUMENT}
+            if '{INSTRUMENT}' in name : # need to replace with the instrument name
+                name = name.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+            if '{SATELLITE}' in name : # need to replace with the instrument name
+                name = name.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+            return name
 
     def _getSatelliteID(self,
                         sat_name):

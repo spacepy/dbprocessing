@@ -85,6 +85,7 @@ def addStuff(filename):
                      dup.parse(vals['date_written']), int(vals['output_interface_version']),
                      toBool(vals['newest_version']), prod_id, toNone(vals['arguments']))
     print("added Inspector {0}:{1}".format(insp_id, vals['filename']))
+    dbu.updateProductSubs(prod_id)
 
 
 def usage():
