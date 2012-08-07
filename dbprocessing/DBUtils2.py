@@ -836,7 +836,7 @@ class DBUtils2(object):
         # need to do {} replacement, have to do it as a modification
         p1 = self.session.query(self.Process).get(proc_id)
         proc_id = p1.process_id
-        process_name = self._nameSubProcess(p1.process_name, process_id)
+        process_name = self._nameSubProcess(p1.process_name, proc_id)
         p1.process_name = process_name
         self.session.add(p1)
         self._commitDB()

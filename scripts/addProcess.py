@@ -32,7 +32,7 @@ def toBool(value):
         return False
 
 def toNone(value):
-    if value == '':
+    if value in ['', 'None']:
         return None
     else:
         return value
@@ -98,7 +98,7 @@ def addStuff(filename):
     proc_id = dbu.addProcess(cfg['process']['process_name'],
                              prod_id_dict[cfg['output_product']['product_name']],
                              cfg['process']['output_timebase'],
-                             cfg['process']['extra_params'],
+                             toNone(cfg['process']['extra_params']),
                              None)
     # add the productprocesslink (there are several)
     for sec in cfg:
@@ -135,10 +135,10 @@ def usage():
     print "   -> config file to read"
     return
 
-#
-#if __name__ == "__main__":
-#    if len(sys.argv) != 2:
-#        usage()
-#        sys.exit(2)
-#    addStuff(sys.argv[-1])
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        usage()
+        sys.exit(2)
+    addStuff(sys.argv[-1])
 
