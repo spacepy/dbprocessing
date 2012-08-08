@@ -251,7 +251,6 @@ class ProcessQueue(object):
                 continue
             if arg is not None:
                 kwargs = self._strargs_to_args(arg)
-                print 'kwargs', kwargs
                 df = inspect.Inspector(self.current_file, self.dbu, product, **kwargs)
             else:
                 df = inspect.Inspector(self.current_file, self.dbu, product, )
@@ -340,6 +339,8 @@ class ProcessQueue(object):
 
             # figure out the code path so that it can be called
             codepath = self.dbu.getCodePath(code_id)
+            if codepath is None:
+                continue
             DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(code_id, codepath))
 
             out_prod = self.dbu.getOutputProductFromProcess(process_id)

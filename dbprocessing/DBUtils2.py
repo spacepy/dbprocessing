@@ -2012,10 +2012,11 @@ class DBUtils2(object):
         Given a code_id list return the full name (path and all) of the code
         """
         DBlogging.dblogger.debug("Entered getCodePath: {0}".format(code_id))
-        sq1 =  self.session.query(self.Code.relative_path).filter_by(code_id = code_id)  # should only have one value
-        sq2 =  self._getMissionDirectory()
-        sq3 =  self.session.query(self.Code.filename).filter_by(code_id = code_id)  # should only have one value
-        return os.path.join(sq2, sq1[0][0], sq3[0][0])  # the [0][0] is ok (ish) since there can only be one
+        code = self.session.query(self.Code).get(code_id)
+        if not code.active_code: # not an active code
+            return None
+        mission_dir =  self._getMissionDirectory()
+        return os.path.join(mission_dir, code.relative_path, code.filename)
 
     def getCodeVersion(self, code_id):
         """
