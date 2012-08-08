@@ -60,7 +60,6 @@ def configCheck(conf, dbu):
     for exp in expected:
         if exp not in sections:
             raise(ValueError('Section {0} missing from file'.format(exp)))
-    print 'All sections present'
 
 
 def addStuff(filename):
@@ -72,7 +71,7 @@ def addStuff(filename):
 
     configCheck(cfg, dbu)
 
-    print 'Working on {0}'.format(filename)
+    print '{0}'.format(filename)
 
     # add the product
     satellite_id = dbu._getSatelliteID(cfg['satellite']['satellite_name'])
@@ -85,7 +84,7 @@ def addStuff(filename):
                             cfg['product']['format'],
                             float(cfg['product']['level']),
                             )
-    print 'added product {0}'.format(prod_id)
+    print '   added product {0}'.format(prod_id)
 
     # add instrumentproductlink
     dbu.addInstrumentproductlink(instrument_id, prod_id)
@@ -105,14 +104,14 @@ def addStuff(filename):
                                 prod_id,
                                 toNone(cfg['inspector']['arguments']),
                                 )
-    print 'added inspector {0}'.format(insp_id)
+    print '   added inspector {0}'.format(insp_id)
     dbu.updateProductSubs(prod_id)
 
 
 
 def usage():
     """
-    print the usage messag out
+    print the usage message out
     """
     print "Usage: {0} <filename>".format(sys.argv[0])
     print "   -> config file to read"

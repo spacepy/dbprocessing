@@ -59,7 +59,8 @@ def configCheck(conf, dbu):
     for exp in expected:
         if exp not in sections:
             raise(ValueError('Section {0} missing from file'.format(exp)))
-    print 'All sections present'
+    print(sys.argv[-1])
+    print '  All sections present'
     # check that the products already exist
     n_inputs = [0,0] #  (reg, opt)
     prods = [conf['output_product']['product_name']]
@@ -73,7 +74,7 @@ def configCheck(conf, dbu):
                 prods.append(conf[sec]['product_name'])
             except KeyError:
                 raise(ValueError('Malformed information in section {0} missing from file (optional missing)'.format(sec)))
-    print 'There are {0} required and {1} optional inputs'.format(*n_inputs)
+    print '  There are {0} required and {1} optional inputs'.format(*n_inputs)
     # do all the products exist in the db already?  (prods)
     prod_id_dict = {}
     for prod in prods:
@@ -81,7 +82,7 @@ def configCheck(conf, dbu):
             prod_id_dict[prod] = dbu._getProductID(prod)
         except DBUtils2.DBNoData:
             raise(DBUtils2.DBNoData('Product {0} was not already in the DB, check spelling or add'.format(prod)))
-    print 'All products are in the db.  Continuing with add'
+    print '  All products are in the db.  Continuing with add'
     return prod_id_dict
 
 

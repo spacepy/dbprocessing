@@ -1097,11 +1097,29 @@ class DBUtils2(object):
         c1.date_written = date_written
         c1.output_interface_version = output_interface_version
         c1.newest_version = newest_version
-        c1.arguments = arguments
+        c1.arguments = self._nameSubInspector(arguments, product)
 
         self.session.add(c1)
         self._commitDB()
         return c1.inspector_id
+
+    def _nameSubInspector(self, inStr, product_id):
+        """
+        in inStr replace the standard {} with the names
+        !!! NOTE product_id
+        """
+        ftb = self.getProductTraceback(product_id)
+        if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+        if '{SATELLITE}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+        if '{MISSION}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+        if '{PRODUCT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
+        if '{' in inStr: # call yourself again
+            inStr = self._nameSubInspector(inStr, product_id)
+        return inStr
 
     def _nameSubProduct(self, inStr, product_id):
         """
@@ -1114,6 +1132,8 @@ class DBUtils2(object):
             inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
         if '{MISSION}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+        if '{' in inStr: # call yourself again
+            inStr = self._nameSubProduct(inStr, product_id)
         return inStr
 
     def _nameSubProcess(self, inStr, process_id):
@@ -1127,6 +1147,8 @@ class DBUtils2(object):
             inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
         if '{MISSION}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+        if '{' in inStr: # call yourself again
+            inStr = self._nameSubProcess(inStr, process_id)
         return inStr
 
     def _nameSubFile(self, inStr, file_id):
