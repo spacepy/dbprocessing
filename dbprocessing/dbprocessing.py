@@ -251,12 +251,7 @@ class ProcessQueue(object):
                 continue
             if arg is not None:
                 kwargs = self._strargs_to_args(arg)
-                for key in kwargs:
-                    if kwargs[key] == '{PRODUCT}': # need to replace with the product name
-                        kwargs[key] = kwargs[key].replace('{PRODUCT}', self.dbu.getProductName(product))
-                    if kwargs[key] == '{SATELLITE}': # need to replace with the product name
-                        kwargs[key] = kwargs[key].replace('{SATELLITE}', self.dbu.getProductTraceback(product)['satellite'].satellite_name)
-                #DBlogging.dblogger.debug("Calling inspector: {0} {1} {2}".format(self.current_file, product, kwargs ))
+                print 'kwargs', kwargs
                 df = inspect.Inspector(self.current_file, self.dbu, product, **kwargs)
             else:
                 df = inspect.Inspector(self.current_file, self.dbu, product, )
