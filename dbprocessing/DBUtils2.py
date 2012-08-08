@@ -540,8 +540,8 @@ class DBUtils2(object):
         """
         remove everything from he process queue
         """
-        while self.processqueueLen() > 0:
-            self.processqueuePop()
+        self.session.query(self.Processqueue).delete()
+        self._commitDB()
         DBlogging.dblogger.info( "Processqueue was cleared")
 
     def processqueueRemoveItem(self, item):
@@ -697,6 +697,25 @@ class DBUtils2(object):
                 raise(DBNoData("No entry for ID={0} found".format(f)))
             else:
                 self._commitDB()
+
+    def deleteAllEntries(self):
+        """
+        delete all entries from the DB (leaves mission, satellite, instrument)
+        """
+        # clean everything out
+        self.session.query(self.Processqueue).delete()
+        self.session.query(self.Filefilelink).delete()
+        self.session.query(self.Filecodelink).delete()
+        self.session.query(self.File).delete()
+        self.session.query(self.Code).delete()
+        self.session.query(self.Inspector).delete()
+        self.session.query(self.Instrumentproductlink).delete()
+        self.session.query(self.Productprocesslink).delete()
+        self.session.query(self.Process).delete()
+        self.session.query(self.Product).delete()
+        self.session.query(self.Logging).delete()
+        self._commitDB()
+
 
     def getAllFilenames(self):
         """
@@ -878,6 +897,16 @@ class DBUtils2(object):
         self.session.add(fcl1)
         self._commitDB()
         return fcl1.resulting_file, fcl1.source_code
+
+    def delInspector(self, i):
+        """
+        removes an inspector form the db
+        """
+        insp = self.session.query(self.Inspector).get(i).delete()
+        if insp == 0:
+            raise(DBNoData("No entry for ID={0} found".format(i)))
+        else:
+            self._commitDB()
 
     def delFilefilelink(self, f):
         """
@@ -1895,6 +1924,10 @@ class DBUtils2(object):
 
         @return: product_id -the product  ID for the input product name
         """
+        try:
+            product_name = long(product_name)
+        except ValueError:
+            pass
         if isinstance(product_name, (int, long)):
             sq = self.session.query(self.Product).get(product_name)
             if sq is not None:
