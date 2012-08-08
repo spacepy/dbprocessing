@@ -12,7 +12,8 @@ scripts = ('scripts/ProcessQueue.py', 'scripts/addProducts.py',
                'scripts/updateProducts.py', 'scripts/addProcess.py',
                'scripts/writeProcessConf.py', 'scripts/deleteAllDBFiles.py',
                'scripts/README.txt', 'scripts/deleteDBFile.py',
-               'scripts/flushProcessQueue.py', 'scripts/printProcessQueue.py')
+               'scripts/flushProcessQueue.py', 'scripts/printProcessQueue.py',
+               'scripts/processQueueHTML.py')
 
 scripts_dir = os.path.expanduser('~/dbUtils')
 
