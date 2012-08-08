@@ -676,19 +676,19 @@ class DBUtils2(object):
             ## processqueue
             try:
                 self.processqueueRemoveItem(f)
-                print "Removed from Processqueue"
+                print "  Removed from Processqueue"
             except DBNoData:
                 pass
             ## filefilelink
             try:
                 self.delFilefilelink(f)
-                print "Removed from Filefilelink"
+                print "  Removed from Filefilelink"
             except DBNoData:
                 pass
             ## filecodelink
             try:
                 self.delFilecodelink(f)
-                print "Removed from Filecodelink"
+                print "  Removed from Filecodelink"
             except DBNoData:
                 pass
             ## file
@@ -1650,6 +1650,10 @@ class DBUtils2(object):
         @return: file_id: file_id of the input file
         @rtype: long
         """
+        try:
+            filename = long(filename)
+        except ValueError:
+            pass
         if isinstance(filename, (int, long)):
             sq = self.session.query(self.File).filter_by(file_id = filename)
             try:
