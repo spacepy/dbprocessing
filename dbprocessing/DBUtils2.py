@@ -845,6 +845,8 @@ class DBUtils2(object):
         p1.product_name = product_name
         relative_path = self._nameSubProduct(p1.relative_path, product_id)
         p1.relative_path = relative_path
+        fmt = self._nameSubProduct(p1.format, product_id)
+        p1.format = fmt
         self.session.add(p1)
         self._commitDB()
 
