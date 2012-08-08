@@ -1557,7 +1557,7 @@ class DBUtils2(object):
             try:
                 i_id.append(int(val))  # if a number
             except ValueError:
-                i_id.append(self._getInstruemntID(val)) # is a name
+                i_id.append(self._getInstrumentID(val)) # is a name
 
         sat_id = []
         for v in i_id:
@@ -1619,7 +1619,7 @@ class DBUtils2(object):
                 i_out.extend(tmp)
             return i_out
 
-    def _getInstruemntID(self, name):
+    def _getInstrumentID(self, name, satellite_id=None):
         """
         Return the instrument_id for a given instrument
 
@@ -1627,6 +1627,12 @@ class DBUtils2(object):
 
         """
         sq = self.session.query(self.Instrument).filter_by(instrument_name = name)
+        if sq.count() > 1:
+            if satellite_id == None:
+                raise(ValueError('Non unique instrument name and no satellite specified'))
+            for v in sq:
+                if v.satellite_id == satellite_id:
+                    return v.instrument_id
         return sq[0].instrument_id
 
     def _getMissions(self):

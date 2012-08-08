@@ -33,59 +33,81 @@ def toBool(value):
         return False
 
 def toNone(value):
-    if value == '':
+    if value in ['', 'None']:
         return None
     else:
         return value
 
-def readconfig(config_filepath, section):
+def readconfig(config_filepath):
     # Create a ConfigParser object, to read the config file
     cfg=ConfigParser.SafeConfigParser()
     cfg.read(config_filepath)
+    sections = cfg.sections()
     # Read each parameter in turn
-    global sections
-    try:
-        tmp = dict(cfg.items(section))
-    except ConfigParser.NoSectionError:
-        tmp = {}
-    return tmp
+    ans = {}
+    for section in sections:
+        ans[section] = dict(cfg.items(section))
+    return ans
+
+def configCheck(conf, dbu):
+    """
+    go through a file that has been read in and make sure that it is going to
+    work before we do anything
+    """
+    # check the sections
+    sections = conf.keys()
+    expected = ['satellite', 'mission', 'product', 'instrument', 'inspector' ]
+    for exp in expected:
+        if exp not in sections:
+            raise(ValueError('Section {0} missing from file'.format(exp)))
+    print 'All sections present'
+
 
 def addStuff(filename):
-    vals = readconfig(filename, 'mission')
-    if not vals:
-        raise(ConfigParser.NoSectionError("No section [mission]"))
-    dbu = DBUtils2.DBUtils2(vals['mission_name'])
-    print("Connected to DB")
+    cfg = readconfig(filename)
+    # setup the db
+    dbu = DBUtils2.DBUtils2('rbsp') # TODO no rbsp hardcode later
     dbu._openDB()
     dbu._createTableObjects()
-#    sat_id = int(dbu._getSatelliteID(vals['satellite']))
-    vals = readconfig(filename, 'instrument')
-    if not vals:
-        raise(ConfigParser.NoSectionError("No section [instrument]"))
-    inst_id = int(dbu._getInstruemntID(vals['instrument_name']))
-    vals = readconfig(filename, 'product')
-    if not vals:
-        raise(ConfigParser.NoSectionError("No section [product]"))
+
+    configCheck(cfg, dbu)
+
+    print 'Working on {0}'.format(filename)
+
     # add the product
-    prod_id = dbu.addProduct(vals['product_name'], inst_id, vals['relative_path'], None, vals['format'], vals['level'])
-    print("added product {0}:{1}".format(prod_id, vals['product_name']))
-    # add the link
-    dbu.addInstrumentproductlink(inst_id, prod_id)
-    print("added Instrumentproductlink {0}:{1}".format(inst_id, prod_id))
+    satellite_id = dbu._getSatelliteID(cfg['satellite']['satellite_name'])
+    instrument_id = dbu._getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)
+
+    prod_id = dbu.addProduct(cfg['product']['product_name'],
+                             instrument_id,
+                            cfg['product']['relative_path'],
+                            None,
+                            cfg['product']['format'],
+                            float(cfg['product']['level']),
+                            )
+    print 'added product {0}'.format(prod_id)
+
+    # add instrumentproductlink
+    dbu.addInstrumentproductlink(instrument_id, prod_id)
+
     # add inspector
-    vals = readconfig(filename, 'inspector')
-    if not vals:
-        raise(ConfigParser.NoSectionError("No section [inspector]"))
-    try:
-        version = vals['version'].split('.')
-    except KeyError:
-        version = (vals['interface_version'], vals['quality_version'], vals['revision_version'])
-    insp_id = dbu.addInspector(vals['filename'], vals['relative_path'], vals['description'],
-                     Version.Version(*version), toBool(vals['active_code']),
-                     dup.parse(vals['date_written']), int(vals['output_interface_version']),
-                     toBool(vals['newest_version']), prod_id, toNone(vals['arguments']))
-    print("added Inspector {0}:{1}".format(insp_id, vals['filename']))
+    version = Version.Version(*cfg['inspector']['version'].split('.'))
+    date_written = dup.parse(cfg['inspector']['date_written'])
+
+    insp_id = dbu.addInspector(cfg['inspector']['filename'],
+                               cfg['inspector']['relative_path'],
+                                cfg['inspector']['description'],
+                                version,
+                                toBool(cfg['inspector']['active_code']),
+                                date_written,
+                                int(cfg['inspector']['output_interface_version']),
+                                toBool(cfg['inspector']['newest_version']),
+                                prod_id,
+                                toNone(cfg['inspector']['arguments']),
+                                )
+    print 'added inspector {0}'.format(insp_id)
     dbu.updateProductSubs(prod_id)
+
 
 
 def usage():
@@ -102,4 +124,6 @@ if __name__ == "__main__":
         usage()
         sys.exit(2)
     addStuff(sys.argv[-1])
+
+
 
