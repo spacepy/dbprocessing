@@ -98,9 +98,9 @@ def makeHTML(mission, outfile, ingested, errorIngesting, commandsRun, startT, st
     output = open(outfile, 'w')
     output.writelines(header)
 
-    _writeHTML(ingested, output, mission, startT, stopT)
-    _writeHTML(errorIngesting, output, mission, startT, stopT)
-    _writeHTML(commandsRun, output, mission, startT, stopT)
+    _writeHTML(ingested, output, mission, startT, stopT, 'Ingested Files')
+    _writeHTML(errorIngesting, output, mission, startT, stopT, 'Error Ingesting Files')
+    _writeHTML(commandsRun, output, mission, startT, stopT, 'Commands Run')
 
     output.writelines(footer)
     output.close()
@@ -109,13 +109,13 @@ class dummy(object):
     def __init__(self, dt):
         self.dt = dt
 
-def _writeHTML(inlist, output, mission, startT, stopT):
+def _writeHTML(inlist, output, mission, startT, stopT, headerStr):
     """
     make the html for this
     """
     output.write('<h1>{0}</h1>\n'.format(mission))
     output.write('<h2>{0}--{1}</h2>\n'.format(startT.isoformat(), stopT.isoformat()))
-    output.write('<h2>{0}</h2>\n'.format('Ingested Files'))
+    output.write('<h2>{0}</h2>\n'.format(headerStr))
     output.write('<table style="border: medium none ; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">\n')
 
     # write out the header
@@ -127,6 +127,7 @@ def _writeHTML(inlist, output, mission, startT, stopT):
             output.write(idx.html(alt=False))
         else:
             output.write(idx.html(alt=True))
+        output.write('\n')
     output.write('</table>\n')
 
 def usage():
@@ -148,5 +149,8 @@ if __name__ == "__main__":
     if len(files) == 0:
         print "No log files in directory: {0}".format(sys.argv[1])
         sys.exit(2)
-    startT = sys.argv[2]
-    stopT = sys.argv[3]
+    startT = dup.parse(sys.argv[2])
+    stopT = dup.parse(sys.argv[3])
+    i, e, c = _getData(files, startT, stopT)
+    makeHTML('rbsp', sys.argv[-1], i, e, c, startT, stopT)
+

@@ -161,7 +161,7 @@ class ingested(object):
         try:
             tb = dbu.getFileTraceback(self.file_id)
             self.product_name = tb['product'].product_name
-            self.level = tb['file'].level
+            self.level = tb['file'].data_level
         except:
             self.product_name = 'unknown; file not in db'
             self.level = None

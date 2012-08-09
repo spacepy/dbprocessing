@@ -45,6 +45,16 @@ writeProductsConf.py - write out a config file for an existing product
 Usage: writeProductsConf.py <product name> <filename>
    -> product name (or number) to write to config file
 
+weeklyReport.py - write out an html suitable for a weekly report type use of what the chain has done
+ - somewhat limited not but a good start
+Usage: scripts/weeklyReport.py <input directory> <startTime> <stopTime> <filename>
+   -> directory with the dbprocessing_log.log files (automatically grabs all)
+   -> start date e.g. 2000-03-12
+   -> stop date e.g. 2000-03-17
+   -> filename to write out the report
+Example:
+~/dbUtils/weeklyReport.py ~/tmp 2012-08-08 2012-08-09 weeklyReport.html
+
 
 
 
