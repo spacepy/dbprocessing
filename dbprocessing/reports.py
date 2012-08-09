@@ -10,9 +10,13 @@ classes as backup to making reports
 """
 things included are:
     - number and list of files ingested
-    - number and list of files requested for injestion
+    - number and list of files requested for injestion that failed
     - number and list of other products created
-    - any errors or anomolies reported
+    - list of commands run
+
+TODO inclide later
+    - any errors or anomolies reported (TODO not done)
+
 """
 
 from functools import total_ordering
@@ -20,6 +24,7 @@ import os
 import re
 
 import dateutil.parser as dup
+import numpy as np
 
 from dbprocessing import DBUtils2
 
@@ -44,6 +49,7 @@ class logfile(object):
             self.setTimerange(timerange)
         self.ingested = self._ingested()
         self.errorIngesting = self._errorIngesting()
+        self.commandsRun = self._commandsRun()
 
     def setTimerange(self, timerange):
         if len(timerange) != 2:
@@ -78,23 +84,114 @@ class logfile(object):
                 lines.append(errorIngesting(line))
         return lines
 
+    def _commandsRun(self):
+        """
+        return a list of the unique commands run
+        """
+        lines = []
+        for line in self._logData:
+            m = re.match( r'^.*\s-\sdbprocessing\:\d*\s-\sINFO\s-\srunning\scommand\:.*$' , line)
+            if m:
+                lines.append(commandsRun(line))
+
+        names = [v.filename for v in lines]
+        uniq, ind = np.unique(names, return_index=True)
+        return [lines[v] for v in ind]
+
+
+@total_ordering
+class commandsRun(object):
+    def __init__(self, inStr):
+        """
+        pass in the line and parse it grabbing what we need
+        """
+        global dbu
+        self.dt = dup.parse(inStr.split(',')[0])
+        m = re.search( r'.*\s-\sdbprocessing\:\d*\s-\sINFO\s-\srunning\scommand\:\s(.*)\s' , inStr)
+        self.filename = m.group(1).split()[0]
+        # get the process name
+#        dbu.session.query(dbu.Code).filter_by(filename = os.path.basename(self.filename))
+
+    def htmlheader(self):
+        """
+        return a string html header
+        """
+        outStr = '<tr>'
+        for attr in ['filename', ]:
+            outStr += '<th>{0}</th>'.format(attr)
+        outStr += '</tr>\n'
+        return outStr
+
+    def html(self, alt=False):
+        """
+        return a html string for this
+        """
+        if alt:
+            outStr = '<tr class="alt">'
+        else:
+            outStr = '<tr>'
+        for v in ['filename', ]:
+            if v == 'dt':
+                val = self.dt.isoformat()
+            else:
+                val = self.__getattribute__(v)
+            outStr += '<td>{0}</td>'.format(val)
+        outStr += '</tr>'
+        return outStr
+
+    def __eq__(self, other):
+        return self.dt == other.dt
+
+    def __gt__(self, other):
+        return self.dt > other.dt
+
+
 @total_ordering
 class ingested(object):
     def __init__(self, inStr):
         """
         pass in the line and parse it grabbing what we need
         """
+        global dbu
         self.dt = dup.parse(inStr.split(',')[0])
         m = re.search( r'\s-\sINFO\s-\sFile\s(.*)\sentered' , inStr)
         self.filename = m.group(1)
         m = re.search( r'f\_id=(\d*)' , inStr)
         self.file_id = m.group(1)
-        global dbu
         try:
             tb = dbu.getFileTraceback(self.file_id)
             self.product_name = tb['product'].product_name
+            self.level = tb['file'].level
         except:
             self.product_name = 'unknown; file not in db'
+            self.level = None
+
+    def htmlheader(self):
+        """
+        return a string html header
+        """
+        outStr = '<tr>'
+        for attr in ['dt', 'file_id', 'filename', 'product_name', 'level']:
+            outStr += '<th>{0}</th>'.format(attr)
+        outStr += '</tr>\n'
+        return outStr
+
+    def html(self, alt=False):
+        """
+        return a html string for this
+        """
+        if alt:
+            outStr = '<tr class="alt">'
+        else:
+            outStr = '<tr>'
+        for v in ['dt', 'file_id', 'filename', 'product_name', 'level']:
+            if v == 'dt':
+                val = self.dt.isoformat()
+            else:
+                val = self.__getattribute__(v)
+            outStr += '<td>{0}</td>'.format(val)
+        outStr += '</tr>'
+        return outStr
 
     def __eq__(self, other):
         return self.dt == other.dt
@@ -112,6 +209,16 @@ class errorIngesting(object):
         self.dt = dup.parse(inStr.split(',')[0])
         self.filename = inStr.split()[-4] # this is hopefully always constant
         self.movedTo = inStr.split()[-1]
+
+    def htmlheader(self):
+        """
+        return a string html header
+        """
+        outStr = '<tr>'
+        for attr in ['dt', 'filename', 'movedTo']:
+            outStr += '<th>{0}</th>'.format(attr)
+        outStr += '</tr>\n'
+        return outStr
 
     def html(self, alt=False):
         """
