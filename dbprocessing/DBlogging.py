@@ -20,9 +20,10 @@ dblogger = logging.getLogger('DBLogger')
 dblogger.setLevel(logging.DEBUG)
 
 # Add the log message handler to the logger
-handler = logging.handlers.RotatingFileHandler(
-              LOG_FILENAME, maxBytes=20000000, backupCount=5)
-
+#handler = logging.handlers.TimedRotatingFileHandler(
+#              LOG_FILENAME, maxBytes=20000000, backupCount=0) # keep them all
+handler = logging.handlers.TimedRotatingFileHandler(
+              LOG_FILENAME, when='d', interval=1, backupCount=0) # keep them all
 
 LEVELS = {'debug': logging.DEBUG,
           'info': logging.INFO,
