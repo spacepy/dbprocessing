@@ -142,13 +142,13 @@ class DBUtils2DBTests(unittest.TestCase):
     def addInstrument(self):
         """addInstrument utility"""
         self.instrument = self.dbu.addInstrument('instname', 1)
-        
+
     def test_getInstrumentID(self):
         """test _getInstrumentID"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()
-        self.assertEqual(self.dbu._getInstruemntID('instname'), 1)        
+        self.assertEqual(self.dbu._getInstruemntID('instname'), 1)
 
     def test_addProduct(self):
         """test addProduct"""
@@ -185,7 +185,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addInstrument()
         self.addProduct()
         self.assertEqual(self.dbu.getProductLevel(1), 0)
-                
+
     def test_getProductNames(self):
         """test _getProductNames"""
         self.addMission()
@@ -346,7 +346,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProcess()
         self.addCode()
         self.assertEqual(self.dbu._getCodeID('code_filename'), 1)
-                
+
 
     def test_addFile(self):
         """test addFile"""
@@ -360,7 +360,7 @@ class DBUtils2DBTests(unittest.TestCase):
         file_id = self.dbu._addFile('file_filename',
                                     0,
                                     Version.Version(1,0,0),
-                                    file_create_date = datetime.datetime.now(),
+                                    file_create_date = datetime.datetime.utcnow(),
                                     exists_on_disk=False,
                                     utc_file_date=datetime.date.today(),
                                     utc_start_time=datetime.datetime(2012, 1, 1),
@@ -375,7 +375,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.file = self.dbu._addFile('file_filename',
                                     0,
                                     Version.Version(1,0,0),
-                                    file_create_date = datetime.datetime.now(),
+                                    file_create_date = datetime.datetime.utcnow(),
                                     exists_on_disk=False,
                                     utc_file_date=datetime.date(2012, 5, 4),
                                     utc_start_time=datetime.datetime(2012, 1, 1),
@@ -396,7 +396,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addCode()
         self.addFile()
         self.assertEqual(self.dbu.getFileProduct(1), 1)
-        self.assertEqual(self.dbu.getFileProduct('file_filename'), 1)        
+        self.assertEqual(self.dbu.getFileProduct('file_filename'), 1)
         self.assertEqual(self.dbu.getFileProduct(5), None) # there s no file 5
 
     def test_getFileUTCfileDate(self):
@@ -412,7 +412,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.assertEqual(self.dbu.getFileUTCfileDate(1), datetime.date(2012, 5, 4))
 
     def test_getFileProcess_keywords(self):
-        """test getFileProcess_keywords"""    
+        """test getFileProcess_keywords"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()
@@ -420,8 +420,8 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProductOutput()
         self.addProcess()
         self.addCode()
-        self.addFile()        
-        self.assertEqual(self.dbu.getFileProcess_keywords(1), 'process_keywords=foo')        
+        self.addFile()
+        self.assertEqual(self.dbu.getFileProcess_keywords(1), 'process_keywords=foo')
 
     def test_getFileFullPath(self):
         """_getFileFullPath tests"""
@@ -451,7 +451,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.assertEqual(self.dbu.getFileVersion('file_filename'), Version.Version(1,0,0))
 
     def test_getFileMission(self):
-        """test getFileMission"""       
+        """test getFileMission"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()

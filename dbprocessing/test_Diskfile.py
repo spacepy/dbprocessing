@@ -15,7 +15,7 @@ __version__ = '2.0.3'
 
 class DiskfileStaticTests(unittest.TestCase):
     """Tests for the static methods in Diskfile"""
-    
+
     def test_calcDigest(self):
         """ calcDigest  should behave correctly"""
         self.assertRaises(Diskfile.DigestError, Diskfile.calcDigest, 'idontexist.file')
@@ -34,7 +34,7 @@ class DiskfileStaticTests(unittest.TestCase):
 
 class DiskfileTests(unittest.TestCase):
     """Tests for Diskfile class"""
-    
+
     def setUp(self):
         super(DiskfileTests, self).setUp()
         dbo = DBUtils2.DBUtils2()
@@ -54,7 +54,7 @@ class DiskfileTests(unittest.TestCase):
     def test_repr(self):
         """repr retuens a known string"""
         self.assertEqual("DBProcessing class instance for mission Test, version: 2.0.3", self.dbo.__repr__())
-        
+
 
     def test_write_error(self):
         """given a file input that is not writeable WriteError"""
@@ -83,11 +83,11 @@ class DiskfileTests(unittest.TestCase):
         try:
             a = Diskfile.Diskfile('Test-Test_R0_evinst_20090117_v1.0.0.cdf',
                                   self.dbo)
-            now = datetime.datetime.now()
+            now = datetime.datetime.utcnow()
             expect = u'Test-Test_L1_evinst_{:04}{:02}{:02}_v1.0.0.cdf'.format(
                 now.year, now.month, now.day)
-            
-            self.assertEqual(a.makeProductFilename(17, datetime.datetime.now(),
+
+            self.assertEqual(a.makeProductFilename(17, datetime.datetime.utcnow(),
                                     Version.Version(1, 0, 0)),
                                     expect)
         finally:
@@ -101,11 +101,11 @@ class DiskfileTests(unittest.TestCase):
             a = Diskfile.Diskfile('Test-Test_R0_evinst_20090117_v1.0.0.cdf',
                                   self.dbo)
             self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
-                              datetime.datetime.now(), '1.0.0')
+                              datetime.datetime.utcnow(), '1.0.0')
             self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
                               'bad in', Version.Version(1, 0, 0))
             self.assertRaises(Diskfile.InputError, a.makeProductFilename, 17,
-                              datetime.datetime.now(), Version.Version(1,0,0),
+                              datetime.datetime.utcnow(), Version.Version(1,0,0),
                               'bad in')
         finally:
             os.remove('Test-Test_R0_evinst_20090117_v1.0.0.cdf')

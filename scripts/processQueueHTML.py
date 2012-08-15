@@ -93,7 +93,7 @@ def _writeQueue(dbu, output):
                 data[key].append(tb['product'].product_name)
 
     output.write('<h1>{0}</h1>\n'.format(dbu.mission))
-    output.write('<h2>{0}</h2>\n'.format(datetime.datetime.now().isoformat()))
+    output.write('<h2>{0}</h2>\n'.format(datetime.datetime.utcnow().isoformat()))
 
     output.write('<h2>{0}</h2>\n'.format('processQueue'))
 

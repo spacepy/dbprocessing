@@ -108,7 +108,7 @@ class CreateDBTests(unittest.TestCase):
             file.interface_version = 1
             file.quality_version = 1
             file.revision_version = 1
-            file.file_create_date = datetime.datetime.now()
+            file.file_create_date = datetime.datetime.utcnow()
             file.exists_on_disk = False
             file.quality_checked = False
             file.product_id = 1
@@ -408,7 +408,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -428,7 +428,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -448,7 +448,7 @@ class CreateDBTests(unittest.TestCase):
         # file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -468,7 +468,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 0
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -488,7 +488,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         # file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -508,7 +508,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         # file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -528,7 +528,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        # file.file_create_date = datetime.datetime.now()
+        # file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -548,7 +548,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         # file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -568,7 +568,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         # file.product_id = 1
@@ -588,7 +588,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -608,7 +608,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -628,7 +628,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -648,7 +648,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -668,7 +668,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1
@@ -690,7 +690,7 @@ class CreateDBTests(unittest.TestCase):
         file.interface_version = 1
         file.quality_version = 1
         file.revision_version = 1
-        file.file_create_date = datetime.datetime.now()
+        file.file_create_date = datetime.datetime.utcnow()
         file.exists_on_disk = False
         file.quality_checked = False
         file.product_id = 1

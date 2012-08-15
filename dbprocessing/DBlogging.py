@@ -1,6 +1,7 @@
 
 import logging
 import logging.handlers
+import time
 
 __version__ = '2.0.3'
 
@@ -36,6 +37,7 @@ LEVELS = {'debug': logging.DEBUG,
 formatter = \
     logging.Formatter("%(asctime)s - %(module)s:%(lineno)d - %(levelname)s" +
                       " - %(message)s")
+logging.Formatter.converter = time.gmtime
 
 # add formatter to ch
 handler.setFormatter(formatter)

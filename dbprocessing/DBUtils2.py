@@ -374,7 +374,7 @@ class DBUtils2(object):
         sq = self.session.query(self.Logging).filter_by(currently_processing = True)
         for val in sq:
             val.currently_processing = False
-            val.processing_end = datetime.datetime.now()
+            val.processing_end = datetime.datetime.utcnow()
             val.comment = 'Overridden:' + comment + ':' + __version__
             DBlogging.dblogger.error( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
             self.session.add(val)
@@ -395,7 +395,7 @@ class DBUtils2(object):
             raise(DBError('A Currently Processing flag is still set, cannot process now'))
         # save this class instance so that we can finish the logging later
         self.__p1 = self._addLogging(True,
-                              datetime.datetime.now(),
+                              datetime.datetime.utcnow(),
                               self._getMissionID(),
                               os.getlogin(),
                               socket.gethostname(),
@@ -403,7 +403,6 @@ class DBUtils2(object):
         DBlogging.dblogger.info( "Logging started: %d: %s, PID: %s, M_id: %s, user: %s, hostmane: %s" %
                                  (self.__p1.logging_id, self.__p1.processing_start_time, self.__p1.pid,
                                   self.__p1.mission_id, self.__p1.user, self.__p1.hostname) )
-
 
     def _addLogging(self,
                     currently_processing,
@@ -475,7 +474,7 @@ class DBUtils2(object):
             print("Must enter a comment for the log")
             return False
 
-        self.__p1.processing_end = datetime.datetime.now()
+        self.__p1.processing_end = datetime.datetime.utcnow()
         self.__p1.currently_processing = False
         self.__p1.comment = comment+':' + __version__
         self.session.add(self.__p1)
@@ -1409,7 +1408,7 @@ class DBUtils2(object):
         DF.ds_id = sq[0].ds_id
         DF.quality_version = quality_version
         DF.revision_version = revision_version
-        DF.file_create_date = datetime.now()
+        DF.file_create_date = datetime.utcnow()
         DF.dp_id = sq[0].dp_id
         DF.met_start_time = sq[0].met_start_time
         DF.met_stop_time = sq[0].met_stop_time
