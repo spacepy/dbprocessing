@@ -1109,16 +1109,18 @@ class DBUtils2(object):
         in inStr replace the standard {} with the names
         !!! NOTE product_id
         """
-        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}']
+        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}']
         ftb = self.getProductTraceback(product_id)
-        if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
+        if '{INSTRUMENT}' in inStr :
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
-        if '{SATELLITE}' in inStr : # need to replace with the instrument name
+        if '{SATELLITE}' in inStr :
             inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-        if '{MISSION}' in inStr : # need to replace with the instrument name
+        if '{MISSION}' in inStr :
             inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
-        if '{PRODUCT}' in inStr : # need to replace with the instrument name
+        if '{PRODUCT}' in inStr :
             inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
+        if '{LEVEL}' in inStr :
+            inStr = inStr.replace('{LEVEL}', ftb['product'].level)
         if any(val in inStr for val in repl): # call yourself again
             inStr = self._nameSubInspector(inStr, product_id)
         return inStr
@@ -1127,7 +1129,7 @@ class DBUtils2(object):
         """
         in inStr replace the standard {} with the names
         """
-        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}']
+        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}']
         ftb = self.getProductTraceback(product_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
@@ -1137,6 +1139,8 @@ class DBUtils2(object):
             inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
         if '{PRODUCT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
+        if '{LEVEL}' in inStr :
+            inStr = inStr.replace('{LEVEL}', ftb['product'].level)
         if any(val in inStr for val in repl): # call yourself again
             inStr = self._nameSubProduct(inStr, product_id)
         return inStr
@@ -1145,7 +1149,7 @@ class DBUtils2(object):
         """
         in inStr replace the standard {} with the names
         """
-        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}']
+        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}']
         ftb = self.getProcessTraceback(process_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
@@ -1155,6 +1159,8 @@ class DBUtils2(object):
             inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
         if '{PRODUCT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
+        if '{LEVEL}' in inStr :
+            inStr = inStr.replace('{LEVEL}', ftb['product'].level)
         if any(val in inStr for val in repl): # call yourself again
             inStr = self._nameSubProcess(inStr, process_id)
         return inStr
@@ -1170,6 +1176,8 @@ class DBUtils2(object):
             inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
         if '{MISSION}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+        if '{LEVEL}' in inStr :
+            inStr = inStr.replace('{LEVEL}', ftb['product'].level)
         return inStr
 
     def _commitDB(self):
