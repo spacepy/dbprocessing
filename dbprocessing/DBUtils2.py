@@ -1120,7 +1120,7 @@ class DBUtils2(object):
         if '{PRODUCT}' in inStr :
             inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
         if '{LEVEL}' in inStr :
-            inStr = inStr.replace('{LEVEL}', ftb['product'].level)
+            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
         if any(val in inStr for val in repl): # call yourself again
             inStr = self._nameSubInspector(inStr, product_id)
         return inStr
@@ -1140,7 +1140,7 @@ class DBUtils2(object):
         if '{PRODUCT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
         if '{LEVEL}' in inStr :
-            inStr = inStr.replace('{LEVEL}', ftb['product'].level)
+            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
         if any(val in inStr for val in repl): # call yourself again
             inStr = self._nameSubProduct(inStr, product_id)
         return inStr
@@ -1160,7 +1160,7 @@ class DBUtils2(object):
         if '{PRODUCT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
         if '{LEVEL}' in inStr :
-            inStr = inStr.replace('{LEVEL}', ftb['product'].level)
+            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
         if any(val in inStr for val in repl): # call yourself again
             inStr = self._nameSubProcess(inStr, process_id)
         return inStr
@@ -1177,7 +1177,7 @@ class DBUtils2(object):
         if '{MISSION}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
         if '{LEVEL}' in inStr :
-            inStr = inStr.replace('{LEVEL}', ftb['product'].level)
+            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
         return inStr
 
     def _commitDB(self):
