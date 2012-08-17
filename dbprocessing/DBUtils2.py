@@ -716,7 +716,6 @@ class DBUtils2(object):
         self.session.query(self.Logging).delete()
         self._commitDB()
 
-
     def getAllFilenames(self):
         """
         return all the filenames in the database
