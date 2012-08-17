@@ -166,8 +166,13 @@ class DBfile(object):
             path = path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in path : # need to replace with the instrument name
             path = path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-        DBlogging.dblogger.info("file {0} about to be moved to {1}".format(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename'])))
-        shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
+        try:
+            shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
+        except IOError:
+            dirname = os.path.split(os.path.join(path, self.diskfile.params['filename']))[0]
+            os.makedirs(dirname)
+            DBlogging.dblogger.warning("created a directory to put the date into: {1}".format(dirname))
+            shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
         DBlogging.dblogger.info("file {0} moved to {1}".format(os.path.basename(self.diskfile.infile), os.path.dirname(os.path.join(path, self.diskfile.params['filename']))))
         DBlogging.dblogger.debug("self.diskfile.filename: {0}".format(self.diskfile.filename))
         # if the file we are moving is a tgz file then we want to extract it in the place we moved it to and move the tgz file into a tgz directory
