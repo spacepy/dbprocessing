@@ -539,9 +539,11 @@ class DBUtils2(object):
         """
         remove everything from he process queue
         """
+        length = self.processqueueLen()
         self.session.query(self.Processqueue).delete()
         self._commitDB()
         DBlogging.dblogger.info( "Processqueue was cleared")
+        return length
 
     def processqueueRemoveItem(self, item):
         """
