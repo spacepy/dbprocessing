@@ -166,7 +166,7 @@ class DBfile(object):
             path = path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in path : # need to replace with the instrument name
             path = path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-        DBlogging.dblogger.info("file {0} about to be moved".format(self.diskfile.infile))
+        DBlogging.dblogger.info("file {0} about to be moved to {1}".format(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename'])))
         shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
         DBlogging.dblogger.info("file {0} moved to {1}".format(os.path.basename(self.diskfile.infile), os.path.dirname(os.path.join(path, self.diskfile.params['filename']))))
         DBlogging.dblogger.debug("self.diskfile.filename: {0}".format(self.diskfile.filename))
