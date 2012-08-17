@@ -96,7 +96,7 @@ class DBUtils2DBTests(unittest.TestCase):
         except DBUtils2.DBError:
             self.fail('Error is setting up table->class mapping')
         try:
-            self.dbu.Data_files
+            self.dbu.File
         except AttributeError:
             self.fail('Class not created')
 
@@ -148,7 +148,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addMission()
         self.addSatellite()
         self.addInstrument()
-        self.assertEqual(self.dbu._getInstruemntID('instname'), 1)
+        self.assertEqual(self.dbu._getInstrumentID('instname'), 1)
 
     def test_addProduct(self):
         """test addProduct"""
@@ -195,16 +195,6 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProductOutput()
         print self.dbu._getProductNames()
         self.assertEqual(self.dbu._getProductNames(), [(u'unittest', u'satname', u'instname', u'prod1', 1)])
-
-    def test_addInstrumentproductlink(self):
-        """test addInstrumentproductlink"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        i, p = self.dbu.addInstrumentproductlink(1, 1)
-        self.assertEqual(i, 1)
-        self.assertEqual(p, 1)
 
     def test_addProcess(self):
         """test addProcess"""
@@ -397,7 +387,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addFile()
         self.assertEqual(self.dbu.getFileProduct(1), 1)
         self.assertEqual(self.dbu.getFileProduct('file_filename'), 1)
-        self.assertEqual(self.dbu.getFileProduct(5), None) # there s no file 5
+        self.assertRaises(DBUtils2.DBNoData, self.dbu.getFileProduct, 5)
 
     def test_getFileUTCfileDate(self):
         """test getFileUTCfileDate"""
@@ -435,7 +425,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addFile()
         self.assertEqual(self.dbu._getFileFullPath(1), 'rootdir/prod1_path/file_filename')
         self.assertEqual(self.dbu._getFileFullPath('file_filename'), 'rootdir/prod1_path/file_filename')
-        self.assertRaises(IndexError, self.dbu._getFileFullPath, 3)
+        self.assertRaises(DBUtils2.DBNoData, self.dbu._getFileFullPath, 3)
 
     def test_getFileVersion(self):
         """test getFileVersion"""
