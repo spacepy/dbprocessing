@@ -859,6 +859,8 @@ class DBUtils2(object):
         proc_id = p1.process_id
         process_name = self._nameSubProcess(p1.process_name, proc_id)
         p1.process_name = process_name
+        extra_params = self._nameSubProcess(p1.extra_params, proc_id)
+        p1.extra_params = extra_params
         self.session.add(p1)
         self._commitDB()
 
@@ -1110,6 +1112,8 @@ class DBUtils2(object):
         in inStr replace the standard {} with the names
         !!! NOTE product_id
         """
+        if inStr is None:
+            return inStr
         repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         ftb = self.getProductTraceback(product_id)
         if '{INSTRUMENT}' in inStr :
@@ -1132,6 +1136,8 @@ class DBUtils2(object):
         """
         in inStr replace the standard {} with the names
         """
+        if inStr is None:
+            return inStr
         repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         ftb = self.getProductTraceback(product_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
@@ -1154,6 +1160,8 @@ class DBUtils2(object):
         """
         in inStr replace the standard {} with the names
         """
+        if inStr is None:
+            return inStr
         repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         ftb = self.getProcessTraceback(process_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
@@ -1176,6 +1184,8 @@ class DBUtils2(object):
         """
         in inStr replace the standard {} with the names
         """
+        if inStr is None:
+            return inStr
         ftb = self.getFileTraceback(file_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
@@ -2065,8 +2075,11 @@ class DBUtils2(object):
         given a process id return the code that makes performs that process
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess: {0}".format(proc_id))
-        sq1 =  self.session.query(self.Code.code_id).filter_by(process_id = proc_id)  # should only have one value
-        return sq1[0][0]
+        sq1 =  self.session.query(self.Code.code_id).filter_by(process_id = proc_id).all()  # should only have one value
+        try:
+            return sq1[0][0]
+        except IndexError:
+            return None
 
     def getCodeArgs(self, code_id):
         """
@@ -2294,7 +2307,8 @@ class DBUtils2(object):
         retval['mission'] = self.session.query(self.Mission).get(mission_id)
         # code
         code_id = self.getCodeFromProcess(proc_id)
-        retval['code'] = self.session.query(self.Code).get(code_id)
+        if code_id is not None:
+            retval['code'] = self.session.query(self.Code).get(code_id)
         # input products
         retval['input_product'] = []
         in_prod_id = self.getInputProductID(proc_id)
