@@ -800,6 +800,7 @@ class DBUtils2(object):
         p1.super_process_id = super_process_id
         self.session.add(p1)
         self._commitDB()
+        self.updateProcessSubs(p1.process_id)
         return p1.process_id
 
     def addProduct(self,
