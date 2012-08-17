@@ -560,11 +560,11 @@ class DBUtils2(object):
         """
         return the entire contents of the process queue
         """
-        pqdata = [self.processqueueGet(ii) for ii in range(self.processqueueLen())]
+        pqdata = zip(*self.session.query(self.Processqueue.file_id).all())[0]
         if len(pqdata) != self.processqueueLen():
             DBlogging.dblogger.error( "Entire Processqueue was read incorrectly")
             raise(DBError("Something went wrong with processqueue read all"))
-        DBlogging.dblogger.debug( "Entire Processqueue was read")
+        DBlogging.dblogger.debug( "Entire Processqueue was read: {0} elements returned".format(len(pqdata)))
         return pqdata
 
     def processqueuePush(self, fileid):
@@ -581,10 +581,12 @@ class DBUtils2(object):
         file_id : int
             the file_id that was passed in, but grabbed from the db
         """
-        try:
-            fileid = int(fileid)
-        except ValueError: # must have been a filename
-            fileid = self._getFileID(fileid)
+        if hasattr(fileid, '__iter__'):
+            ans = []
+            for v in fileid:
+                ans.extend(self.processqueuePush(v))
+            return ans
+        fileid = self._getFileID(fileid)
         pq1 = self.Processqueue()
         pq1.file_id = fileid
         self.session.add(pq1)
