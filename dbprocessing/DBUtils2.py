@@ -550,8 +550,7 @@ class DBUtils2(object):
         """
         remove a file from the queue by name or number
         """
-        if isinstance(item, str):
-            item = self._getFileID(item)
+        item = self._getFileID(item)
         contents = self.processqueueGetAll()
         try:
             ind = contents.index(item)
@@ -563,10 +562,10 @@ class DBUtils2(object):
         """
         return the entire contents of the process queue
         """
-        pqdata = zip(*self.session.query(self.Processqueue.file_id).all())[0]
-        if len(pqdata) != self.processqueueLen():
-            DBlogging.dblogger.error( "Entire Processqueue was read incorrectly")
-            raise(DBError("Something went wrong with processqueue read all"))
+        try:
+            pqdata = zip(*self.session.query(self.Processqueue.file_id).all())[0]
+        except IndexError:
+            pqdata = self.session.query(self.Processqueue.file_id).all()
         DBlogging.dblogger.debug( "Entire Processqueue was read: {0} elements returned".format(len(pqdata)))
         return pqdata
 
@@ -696,11 +695,8 @@ class DBUtils2(object):
             except DBNoData:
                 pass
             ## file
-            n1 = self.session.query(self.File).filter_by(file_id = f).delete()
-            if n1 == 0:
-                raise(DBNoData("No entry for ID={0} found".format(f)))
-            else:
-                self._commitDB()
+            self.session.query(self.File).filter_by(file_id = f).delete()
+            self._commitDB()
 
     def deleteAllEntries(self):
         """

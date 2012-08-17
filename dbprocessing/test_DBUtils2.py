@@ -375,6 +375,97 @@ class DBUtils2DBTests(unittest.TestCase):
                                     process_keywords='process_keywords=foo',
                                     )
 
+    def addFile2(self):
+        """utility to addFile to the db"""
+        self.file2 = self.dbu._addFile('file_filename2',
+                                    0,
+                                    Version.Version(1,0,0),
+                                    file_create_date = datetime.datetime.utcnow(),
+                                    exists_on_disk=False,
+                                    utc_file_date=datetime.date(2012, 5, 4),
+                                    utc_start_time=datetime.datetime(2012, 1, 2),
+                                    utc_stop_time=datetime.datetime(2012, 1, 2),
+                                    product_id = 1,
+                                    newest_version=True,
+                                    process_keywords='process_keywords=foo',
+                                    )
+
+    def test_deleteAllEntries(self):
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.dbu.deleteAllEntries()
+        self.assertEqual(0, self.dbu.session.query(self.dbu.File).count())
+        self.assertEqual(0, self.dbu.session.query(self.dbu.Code).count())
+        self.assertEqual(0, self.dbu.session.query(self.dbu.Process).count())
+        self.assertEqual(0, self.dbu.session.query(self.dbu.Product).count())
+
+    def test_purgeFileFromDB(self):
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.dbu._purgeFileFromDB(1)
+        self.assertEqual(0, self.dbu.session.query(self.dbu.File).count())
+
+    def test_getAllFilenames(self):
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.addFile2()
+        expected = [(u'file_filename', u'rootdir/prod1_path/file_filename'),
+                    (u'file_filename2', u'rootdir/prod1_path/file_filename2')]
+        self.assertEqual(expected, self.dbu.getAllFilenames())
+
+    def test_processqueue(self):
+        """Test all the process queue functions"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.dbu.processqueuePush(1)
+        self.assertEqual(1, self.dbu.processqueueLen())
+        self.assertEqual(1, self.dbu.processqueueFlush())
+        self.assertEqual(0, self.dbu.processqueueLen())
+        self.addFile2()
+        self.dbu.processqueuePush([1,2])
+        self.assertEqual(None, self.dbu.processqueuePop(100))
+        self.assertEqual((1,2), self.dbu.processqueueGetAll())
+        self.assertEqual(2, self.dbu.processqueueLen())
+        self.assertEqual(1, self.dbu.processqueueGet())
+        self.assertEqual(2, self.dbu.processqueueLen())
+        self.assertEqual(2, self.dbu.processqueueGet(1))
+        self.assertEqual(None, self.dbu.processqueueGet(100))
+        self.assertEqual(1, self.dbu.processqueuePop())
+        self.assertEqual(2, self.dbu.processqueuePop(0))
+        self.assertEqual(None, self.dbu.processqueuePop())
+        self.assertEqual(None, self.dbu.processqueueGet())
+        # test remove item
+        self.dbu.processqueuePush([1,2])
+        self.dbu.processqueueRemoveItem(1)
+        self.assertEqual(2, self.dbu.processqueueGet())
+        self.assertRaises(DBUtils2.DBNoData, self.dbu.processqueueRemoveItem, 1)
+        self.dbu.processqueueRemoveItem('file_filename2')
+        self.assertEqual(None, self.dbu.processqueueGet())
+
     def test_getFileProduct(self):
         """test getFileProduct"""
         self.addMission()
