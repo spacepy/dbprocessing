@@ -613,7 +613,7 @@ class DBUtils2(object):
             except DBNoData:
                 pass
             ## file
-            self.session.query(self.File).get(f).delete()
+            self.session.query(self.File).filter_by(file_id = f).delete()
             self._commitDB()
 
     def deleteAllEntries(self):
@@ -2122,7 +2122,7 @@ class DBUtils2(object):
         sat_id = self.getInstrumentSatellite(inst_id)[0]
         retval['satellite'] = self.session.query(self.Satellite).get(sat_id)
         # mission
-        mission_id = self.getSatelliteMission(88)[0]
+        mission_id = self.getSatelliteMission(sat_id)[0]
         retval['mission'] = self.session.query(self.Mission).get(mission_id)
         # code
         code_id = self.getCodeFromProcess(proc_id)
