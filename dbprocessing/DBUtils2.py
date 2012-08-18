@@ -438,7 +438,7 @@ class DBUtils2(object):
            this is **NOT** sure to be safe
         """
         file_id = self._getFileID(file_id)
-        sq = self.session.query(self.File).filter_by(file_id = file_id)[0] # there can only be one
+        sq = self.session.query(self.File).get(file_id) # there can only be one
         if sq.exists_on_disk:
             file_path = self._getFileFullPath(file_id)
             if not os.path.exists(file_path):
@@ -613,7 +613,7 @@ class DBUtils2(object):
             except DBNoData:
                 pass
             ## file
-            self.session.query(self.File).filter_by(file_id = f).delete()
+            self.session.query(self.File).get(f).delete()
             self._commitDB()
 
     def deleteAllEntries(self):
