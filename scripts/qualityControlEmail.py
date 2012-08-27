@@ -114,7 +114,7 @@ def main():
     a = DBUtils2.DBUtils2('rbsp')
     a._openDB()
     a._createTableObjects()
-    prod_id = a._getProductID(args[0])
+    prod_id = a.getProductID(args[0])
     prod_name = a.getProductName(prod_id)
 
     if not os.path.isfile(options.filename):

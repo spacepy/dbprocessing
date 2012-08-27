@@ -344,14 +344,14 @@ class ProcessQueue(object):
             DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(code_id, codepath))
 
             out_prod = self.dbu.getOutputProductFromProcess(process_id)
-            format_str = self.dbu._getProductFormats(out_prod)
+            format_str = self.dbu.getProductFormats(out_prod)
             # get the process_keywords from the file if there are any
             process_keywords = self._strargs_to_args([self.dbu.getFileProcess_keywords(fid) for fid in input_files])
             for key in process_keywords:
                 format_str = format_str.replace('{'+key+'}', process_keywords[key])
 
             # get the format string
-            tmp = self.dbu._getProductNames(out_prod)
+            tmp = self.dbu.getProductNames(out_prod)
             if not tmp:
                 DBlogging.dblogger.error("ERROR: DB inconsistency found")
                 raise(DBUtils2.DBError("DB inconsistency found"))
@@ -375,7 +375,7 @@ class ProcessQueue(object):
                 DBlogging.dblogger.debug("Filename: %s created" % (filename))
                 # if this filename is already in the DB we have to figure out which version number to increment
                 try:
-                    f_id_db = self.dbu._getFileID(filename)
+                    f_id_db = self.dbu.getFileID(filename)
                     DBlogging.dblogger.debug("Filename: {0} is in the DB, have to make different version".format(filename))
                     # the file is in the DB, has the code changed version?
                     ## we are planning to use code_id code was this used before?
@@ -449,7 +449,7 @@ class ProcessQueue(object):
                                 DBlogging.dblogger.debug("Filename: {0} found all the same files".format(filename))
                                 return None
 
-                except (DBUtils2.DBError, DBUtils2.DBNoData): # this is for self.dbu._getFileID(filename)
+                except (DBUtils2.DBError, DBUtils2.DBNoData): # this is for self.dbu.getFileID(filename)
                     DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(filename))
                     break # leave the while loop and do the processing
 

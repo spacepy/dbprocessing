@@ -64,9 +64,9 @@ def getStuff(prod_name, filename):
             getStuff(prod.product_name, prod.product_name + filename)
         return
     try:
-        prod_name = dbu._getProductID(int(prod_name))
+        prod_name = dbu.getProductID(int(prod_name))
     except ValueError:
-        prod_name = dbu._getProductID(prod_name)
+        prod_name = dbu.getProductID(prod_name)
     # get instances of all the tables in a product traceback
     sq = dbu.getProductTraceback(prod_name)
     for section in sq:

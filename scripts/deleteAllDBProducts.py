@@ -8,7 +8,7 @@ if __name__ == "__main__":
     a = DBUtils2.DBUtils2('rbsp')
     a._openDB()
     a._createTableObjects()
-    prod_ids = zip(*a._getProductNames())[4]
+    prod_ids = zip(*a.getProductNames())[4]
 
     for ff in f:
         a._purgeFileFromDB(ff[0])
