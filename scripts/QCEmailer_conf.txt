@@ -10,4 +10,14 @@ smtp = oppie-mail.lanl.gov:25
 username = ectsoc
 
 [REPT]
-rx = balarsen@lanl.gov
+rx = balarsen@lanl.gov, rfriedel@lanl.gov
+
+[MAGEIS]
+rx = balarsen@lanl.gov, rfriedel@lanl.gov
+
+[HOPE]
+rx = balarsen@lanl.gov, rfriedel@lanl.gov
+
+[SOC]
+rx = balarsen@lanl.gov, rfriedel@lanl.gov
+

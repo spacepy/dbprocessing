@@ -28,12 +28,15 @@ class QCEmailer(object):
             sys.stderr.write("Warning: there were no dates for QC for product: {0}, no output written\n".format(kwargs['PRODUCT']))
             sys.exit(0)
 
+        # get int he instrument for the email
+        ftb = a.getProductTraceback(self.prod_name)
+        inst = ftb['instrument'].instrument_name.upper()
 
         cfgFile = kwargs['configFile']
         self.config=None # configuration from file
         self.read_conf(cfgFile)
         self.email = self.email_account()
-        subject = 'Quality Assurance (QA) request for ECT Level 1 data plot  {PRODUCT}'.format(**kwargs)
+        subject = 'ECT QA request for {PRODUCT} data plot'.format(**kwargs)
         body = ['New Level 1 data has been processed at the ECT SOC and new plots for product {PRODUCT}'.format(**kwargs),
                      'are available for the following dates:',
                      '',
@@ -56,7 +59,7 @@ class QCEmailer(object):
 
         body = '\n'.join(body)
         if not kwargs['dryrun']:
-            self.email.send_simple(self.config['REPT']['rx'], subject, body)
+            self.email.send_simple(self.config[inst]['rx'], subject, body)
         else:
             print('EMAIL::\n')
             print('Subject:\n\n{0}'.format(subject))
@@ -66,7 +69,7 @@ class QCEmailer(object):
         """
         return the link for the email based on the product
         """
-        return 'http://www.rbsp-ect.lanl.gov/autoplot_launchers/rbspa_pre_ect-rept-hk-tvc-L1.jnlp'
+        return 'http://www.rbsp-ect.lanl.gov/autoplot_launchers/{PRODUCT}-QA.jnlp'.format(PRODUCT=self.prod_name)
 
     def read_conf(self, conf_file):
         cfg = ConfigParser.SafeConfigParser()
