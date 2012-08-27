@@ -55,8 +55,12 @@ Usage: scripts/weeklyReport.py <input directory> <startTime> <stopTime> <filenam
 Example:
 ~/dbUtils/weeklyReport.py ~/tmp 2012-08-08 2012-08-09 weeklyReport.html
 
-
-
+qualityControlFileDates.py - write out a text file with the dates of non QC checked files for a given product
+Usage: qualityControlFileDates.py [-f, --file= filename] product_name
+        -f output filename (default QC_dates.txt)
+        product name (or ID)
+Example:
+~/dbUtils/qualityControlFileDates.py rbspb_pre_ect-rept-sci-L2
 
 
 Other info
