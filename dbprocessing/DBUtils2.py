@@ -29,8 +29,8 @@ __version__ = '2.0.3'
 #########################################################
 ## NOTES, read these if new to this module
 #########################################################
-# - functions are in transition from returning the thing the name says e.g. _getFileID returens a number to
-#      instead returning the sqlalcheml object that meets the criteria so _getFileID would return a File instance
+# - functions are in transition from returning the thing the name says e.g. getFileID returens a number to
+#      instead returning the sqlalcheml object that meets the criteria so getFileID would return a File instance
 #      and the user would then have to get the ID by using File.file_id.  This makes for fewer functions and is
 #      significantly cleaner in a few spots
 
@@ -437,7 +437,7 @@ class DBUtils2(object):
         @keyword fix: (optional) set to have the DB fixed to match the filesystem
            this is **NOT** sure to be safe
         """
-        file_id = self._getFileID(file_id)
+        file_id = self.getFileID(file_id)
         sq = self.session.query(self.File).get(file_id) # there can only be one
         if sq.exists_on_disk:
             file_path = self._getFileFullPath(file_id)
@@ -468,7 +468,7 @@ class DBUtils2(object):
         """
         remove a file from the queue by name or number
         """
-        item = self._getFileID(item)
+        item = self.getFileID(item)
         contents = self.processqueueGetAll()
         try:
             ind = contents.index(item)
@@ -506,11 +506,11 @@ class DBUtils2(object):
             for v in fileid:
                 ans.extend(self.processqueuePush(v))
             return ans
-        fileid = self._getFileID(fileid)
+        fileid = self.getFileID(fileid)
         pq1 = self.Processqueue()
         pq1.file_id = fileid
         self.session.add(pq1)
-        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self._getFilename(fileid) ) )
+        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self.getFilename(fileid) ) )
         self._commitDB()
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
@@ -592,7 +592,7 @@ class DBUtils2(object):
         if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
             filename = [filename]
         for f in filename:
-            f = self._getFileID(f)
+            f = self.getFileID(f)
             # we need to look in each table that could have a reference to this file and delete that
             ## processqueue
             try:
@@ -688,7 +688,7 @@ class DBUtils2(object):
         s1.satellite_name = satellite_name
         self.session.add(s1)
         self._commitDB()
-        return self._getSatelliteID(satellite_name)
+        return self.getSatelliteID(satellite_name)
 
     def addProcess(self,
                     process_name,
@@ -834,7 +834,7 @@ class DBUtils2(object):
         """
         remove entries from Filefilelink, it will remove if the file is in either column
         """
-        f = self._getFileID(f) # change a name to a number
+        f = self.getFileID(f) # change a name to a number
         n1 = self.session.query(self.Filefilelink).filter_by(source_file = f).delete()
         n2 = self.session.query(self.Filefilelink).filter_by(resulting_file = f).delete()
         if n1+n2 == 0:
@@ -846,7 +846,7 @@ class DBUtils2(object):
         """
         remove entries from Filecodelink fore a given file
         """
-        f = self._getFileID(f) # change a name to a number
+        f = self.getFileID(f) # change a name to a number
         n2 = self.session.query(self.Filecodelink).filter_by(resulting_file = f).delete()
         if n2 == 0:
             raise(DBNoData("No entry for ID={0} found".format(f)))
@@ -1319,7 +1319,7 @@ class DBUtils2(object):
 
         """
         if isinstance(filename, (int, long)):
-            filename = self._getFilename(filename)
+            filename = self.getFilename(filename)
         # need to know file product and mission to get whole path
         try:
             product_id = self.session.query(self.File.product_id).filter_by(filename = filename)[0][0]
@@ -1346,7 +1346,7 @@ class DBUtils2(object):
         try:
             product = int(product)
         except ValueError: # it was a string
-            p_id = self._getProductID(product)
+            p_id = self.getProductID(product)
         else:
             p_id = product
         sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
@@ -1395,7 +1395,7 @@ class DBUtils2(object):
         try:
             f_id = int(filename)  # if a number
         except ValueError:
-            f_id = self._getFileID(filename) # is a name
+            f_id = self.getFileID(filename) # is a name
         product_id = self.session.query(self.File).get(f_id)
         if product_id is None:
             raise(DBNoData("No file: {0}".format(filename)))
@@ -1408,7 +1408,7 @@ class DBUtils2(object):
         try:
             f_id = int(filename)  # if a number
         except ValueError:
-            f_id = self._getFileID(filename) # is a name
+            f_id = self.getFileID(filename) # is a name
         sq = self.session.query(self.File).get(f_id)
         if sq is None:
             raise(DBNoData("No file: {0}".format(filename)))
@@ -1419,7 +1419,7 @@ class DBUtils2(object):
         given an a file name or a file ID return the mission(s) that file is
         associated with
         """
-        filename = self._getFileID(filename) # change a name to a number
+        filename = self.getFileID(filename) # change a name to a number
         product_id = self.getFileProduct(filename)
         # get all the instruments
         inst_id = self.getInstrumentFromProduct(product_id)
@@ -1440,7 +1440,7 @@ class DBUtils2(object):
             try:
                 i_id.append(int(val))  # if a number
             except ValueError:
-                i_id.append(self._getSatelliteID(val)) # is a name
+                i_id.append(self.getSatelliteID(val)) # is a name
 
         m_id = []
         for v in i_id:
@@ -1543,7 +1543,7 @@ class DBUtils2(object):
         sq = self.session.query(self.Mission.mission_name)
         return [val[0] for val in sq.all()]
 
-    def _getFileID(self, filename):
+    def getFileID(self, filename):
         """
         Return the fileID for the input filename
 
@@ -1570,7 +1570,7 @@ class DBUtils2(object):
             except IndexError: # no file_id found
                 raise(DBNoData("No filename %s found in the DB" % (filename)))
 
-    def _getCodeID(self, codename):
+    def getCodeID(self, codename):
         """
         Return the codeID for the input code
 
@@ -1583,7 +1583,7 @@ class DBUtils2(object):
         sq = self.session.query(self.Code.code_id).filter_by(filename = codename).all()
         return sq[0][0]
 
-    def _getFilename(self, file_id):
+    def getFilename(self, file_id):
         """
         Return the filename for the input file_id
 
@@ -1593,7 +1593,7 @@ class DBUtils2(object):
         @return: filename: filename associated with the file_id
         @rtype: str
         """
-        DBlogging.dblogger.debug( "Entered _getFilename():  file_id: {0}".format(file_id) )
+        DBlogging.dblogger.debug( "Entered getFilename():  file_id: {0}".format(file_id) )
         sq = self.session.query(self.File).get(file_id)
         if sq is None:
             raise(DBNoData("No file_id: {0}".format(file_id)))
@@ -1633,7 +1633,7 @@ class DBUtils2(object):
         try:
             file_id = int(file_id)
         except ValueError: # must have been a filename
-            file_id = self._getFileID(file_id)
+            file_id = self.getFileID(file_id)
         sq = self.session.query(self.File).get(file_id)
         if sq is None:
             raise(DBNoData("No file_id: {0}".format(file_id)))
@@ -1725,17 +1725,17 @@ class DBUtils2(object):
         """
         given a product_id or name return all te file instances associated with it
         """
-        prod_id = self._getProductID(prod_id)
+        prod_id = self.getProductID(prod_id)
         sq = self.session.query(self.File).filter_by(product_id = prod_id)
         return sq.all()
 
-    def _getProductFormats(self, productID=None):
+    def getProductFormats(self, productID=None):
         """
         Return the product formats for all the formats
 
         @return: list of all the product format strings and ids from the database
         """
-        DBlogging.dblogger.debug( "Entered _getProductFormats():  productID: {0}".format(productID) )
+        DBlogging.dblogger.debug( "Entered getProductFormats():  productID: {0}".format(productID) )
         if productID == None:
             sq = self.session.query(self.Product.format, self.Product.product_id)
             return sq.order_by(asc(self.Product.product_id)).all()
@@ -1743,13 +1743,13 @@ class DBUtils2(object):
             sq = self.session.query(self.Product.format).filter_by(product_id = productID)
             return sq[0][0]
 
-    def _getProductNames(self, productID=None):
+    def getProductNames(self, productID=None):
         """
         Return the mission, Satellite, Instrument,  product, product_id   names as a tuple
 
         @return: list of tuples of the mission, Satellite, Instrument,  product, product id  names
         """
-        DBlogging.dblogger.debug( "Entered _getProductNames():  productID: {0}".format(productID) )
+        DBlogging.dblogger.debug( "Entered getProductNames():  productID: {0}".format(productID) )
         if productID is None:
             sq = self.session.query(self.Mission.mission_name,
                                                     self.Satellite.satellite_name,
@@ -1773,7 +1773,7 @@ class DBUtils2(object):
         query the db and return a list of all the active inspector filenames [(filename, arguments, product), ...]
         """
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
-        basedir = self._getMissionDirectory()
+        basedir = self.getMissionDirectory()
         retval = [(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments, ans.product) for ans in sq]
         return retval
 
@@ -1788,7 +1788,7 @@ class DBUtils2(object):
         proc_ids = self.getProcessFromInputProduct(product_id)
         return proc_ids
 
-    def _getProductID(self,
+    def getProductID(self,
                      product_name):
         """
         Return the product ID for an input product name
@@ -1833,7 +1833,7 @@ class DBUtils2(object):
                 name = name.replace('{SATELLITE}', ftb['satellite'].satellite_name)
             return name
 
-    def _getSatelliteID(self,
+    def getSatelliteID(self,
                         sat_name):
         """
         @param sat_name: the satellite name to look up the id
@@ -1858,7 +1858,7 @@ class DBUtils2(object):
         code = self.session.query(self.Code).get(code_id)
         if not code.active_code: # not an active code
             return None
-        mission_dir =  self._getMissionDirectory()
+        mission_dir =  self.getMissionDirectory()
         return os.path.join(mission_dir, code.relative_path, code.filename)
 
     def getCodeVersion(self, code_id):
@@ -1910,14 +1910,14 @@ class DBUtils2(object):
             raise(DBNoData("No code: {0}".format(code_id)))
         return sq1.arguments
 
-    def _getMissionDirectory(self):
+    def getMissionDirectory(self):
         """
         return the base directory for the current mission
 
         @return: base directory for current mission
         @rtype: str
         """
-        DBlogging.dblogger.debug("Entered _getMissionDirectory: ")
+        DBlogging.dblogger.debug("Entered getMissionDirectory: ")
         sq = self.session.query(self.Mission.rootdir).filter_by(mission_name  = self.mission)
         return sq.first()[0]  # there can be only one of each name
 
@@ -1937,7 +1937,7 @@ class DBUtils2(object):
         """
         return the incoming path for the current mission
         """
-        basedir = self._getMissionDirectory()
+        basedir = self.getMissionDirectory()
         path = os.path.join(basedir, 'incoming/')
         return path
 
@@ -1945,7 +1945,7 @@ class DBUtils2(object):
         """
         return the error path for the current mission
         """
-        basedir = self._getMissionDirectory()
+        basedir = self.getMissionDirectory()
         path = os.path.join(basedir, 'errors/')
         return path
 
@@ -2013,7 +2013,7 @@ class DBUtils2(object):
         try:
             f_id = int(filename)  # if a number
         except ValueError:
-            f_id = self._getFileID(filename) # is a name
+            f_id = self.getFileID(filename) # is a name
         rel = self.Release()
         rel.file_id = f_id
         rel.release_num = release
@@ -2031,14 +2031,14 @@ class DBUtils2(object):
             if fullpath:
                 sq[i] = self._getFileFullPath(v)
             else:
-                sq[i] = self._getFilename(v)
+                sq[i] = self.getFilename(v)
         return sq
 
     def getFileMD5sum(self, file_id):
         """
         return the checksum for a file by id or name
         """
-        file_id = self._getFileID(file_id) # if a name convert to id
+        file_id = self.getFileID(file_id) # if a name convert to id
         sq = self.session.query(self.File.md5sum).filter_by(file_id = file_id).all()
         return sq[0] # there can only be one
 
@@ -2046,7 +2046,7 @@ class DBUtils2(object):
         """
         given a file id or name check the db checksum and the file checksum
         """
-        file_id = self._getFileID(file_id) # if a name convert to id
+        file_id = self.getFileID(file_id) # if a name convert to id
         disk_sha = calcDigest(self._getFileFullPath(file_id))
         db_sha = self.getFileMD5sum(file_id)[0]
         if str(disk_sha) == str(db_sha):
@@ -2073,7 +2073,7 @@ class DBUtils2(object):
         given a product id return instances of all the tables it takes to define it
         mission, satellite, instrument, product, inspector, Instrumentproductlink
         """
-        prod_id = self._getProductID(prod_id) # convert name to ID
+        prod_id = self.getProductID(prod_id) # convert name to ID
         retval = {}
         # get the product instance
         retval['product'] = self.session.query(self.Product).get(prod_id)
@@ -2099,7 +2099,7 @@ class DBUtils2(object):
         given a product id return instances of all the tables it takes to define it
         mission, satellite, instrument, product, inspector, Instrumentproductlink
         """
-        file_id = self._getFileID(file_id)
+        file_id = self.getFileID(file_id)
         prod_id = self.getFileProduct(file_id)
         retval = self.getProductTraceback(prod_id)
         retval['file'] = self.session.query(self.File).get(file_id)

@@ -79,7 +79,7 @@ def configCheck(conf, dbu):
     prod_id_dict = {}
     for prod in prods:
         try:
-            prod_id_dict[prod] = dbu._getProductID(prod)
+            prod_id_dict[prod] = dbu.getProductID(prod)
         except DBUtils2.DBNoData:
             raise(DBUtils2.DBNoData('Product {0} was not already in the DB, check spelling or add'.format(prod)))
     print '  All products are in the db.  Continuing with add'

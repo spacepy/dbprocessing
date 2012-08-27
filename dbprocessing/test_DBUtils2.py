@@ -105,7 +105,7 @@ class DBUtils2DBTests(unittest.TestCase):
         m = self.dbu.addMission('unittest', 'rootdir')
         self.assertEqual(m, 1)
         self.assertEqual(self.dbu._getMissionID(), m)
-        self.assertEqual(self.dbu._getMissionDirectory(), 'rootdir')
+        self.assertEqual(self.dbu.getMissionDirectory(), 'rootdir')
         self.assertEqual(self.dbu._getMissionName(), 'unittest')
         self.assertRaises(DBUtils2.DBError, self.addMission)
         self.assertEqual(self.dbu._getMissionName(id=1), ['unittest'])
@@ -168,15 +168,15 @@ class DBUtils2DBTests(unittest.TestCase):
         """addProductOutput utility"""
         self.productOutput = self.dbu.addProduct('prod2', 1, 'prod2_path', None, 'format', 0)
 
-    def test_getProductID(self):
-        """test _getProductID"""
+    def testgetProductID(self):
+        """test getProductID"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()
         self.addProduct()
-        self.assertEqual(self.dbu._getProductID('prod1'), 1)
+        self.assertEqual(self.dbu.getProductID('prod1'), 1)
         self.addProductOutput()
-        self.assertEqual(self.dbu._getProductID('prod2'), 2)
+        self.assertEqual(self.dbu.getProductID('prod2'), 2)
 
     def test_getProductLevel(self):
         """test getProductLevel"""
@@ -186,15 +186,15 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProduct()
         self.assertEqual(self.dbu.getProductLevel(1), 0)
 
-    def test_getProductNames(self):
-        """test _getProductNames"""
+    def testgetProductNames(self):
+        """test getProductNames"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()
         self.addProduct()
         self.addProductOutput()
-        print self.dbu._getProductNames()
-        self.assertEqual(self.dbu._getProductNames(), [(u'unittest', u'satname', u'instname', u'prod1', 1)])
+        print self.dbu.getProductNames()
+        self.assertEqual(self.dbu.getProductNames(), [(u'unittest', u'satname', u'instname', u'prod1', 1)])
 
     def test_addProcess(self):
         """test addProcess"""
@@ -326,8 +326,8 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addCode()
         self.assertEqual(self.dbu.getCodePath(1), 'rootdir/code_path/code_filename')
 
-    def test_getCodeID(self):
-        """test _getCodeID"""
+    def testgetCodeID(self):
+        """test getCodeID"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()
@@ -335,7 +335,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProductOutput()
         self.addProcess()
         self.addCode()
-        self.assertEqual(self.dbu._getCodeID('code_filename'), 1)
+        self.assertEqual(self.dbu.getCodeID('code_filename'), 1)
 
 
     def test_addFile(self):

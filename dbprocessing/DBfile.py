@@ -140,7 +140,7 @@ class DBfile(object):
         if relative_path.count() == 0:
             raise(DBfileError('zero rel path found'))
         relative_path = relative_path.all()[0][0]
-        basepath = self.dbu._getMissionDirectory()
+        basepath = self.dbu.getMissionDirectory()
         path = os.path.join(str(basepath), str(relative_path))
         return path
 
