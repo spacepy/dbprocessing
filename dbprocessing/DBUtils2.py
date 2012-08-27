@@ -2073,6 +2073,7 @@ class DBUtils2(object):
         given a product id return instances of all the tables it takes to define it
         mission, satellite, instrument, product, inspector, Instrumentproductlink
         """
+        prod_id = self._getProductID(prod_id) # convert name to ID
         retval = {}
         # get the product instance
         retval['product'] = self.session.query(self.Product).get(prod_id)
