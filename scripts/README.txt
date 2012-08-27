@@ -62,6 +62,15 @@ Usage: qualityControlFileDates.py [-f, --file= filename] product_name
 Example:
 ~/dbUtils/qualityControlFileDates.py rbspb_pre_ect-rept-sci-L2
 
+qualityControlEmail.py - send out a quality control email to the person in the config file
+Usage: qualityControlEmail.py [-d, --dryrun] product_name
+        -d dryrun mode just print the email to screen don't send
+        -f config filename (default ~/dbUtils/QCEmailer_conf.txt)
+        product name (or ID)
+Example:
+~/dbUtils/qualityControlEmail.py -d rbspa_rept-sw-L0
+
+
 
 Other info
 ==========
