@@ -223,32 +223,6 @@ class DBUtils2(object):
                 DBlogging.dblogger.debug("Class %s created" % (val))
 
 
-######################################
-### Gather files from DB #############
-######################################
-
-    def _gatherFiles(self, level, verbose=False):
-        """
-        gather all the files for a given mission into a list of sqlalchemy objects
-
-        @keyword verbose: (optional) print more out to the command line
-
-        @return: list of Data_files objects
-
-        >>>  pnl._gatherFiles()
-        123
-        """
-        try: self.Data_file
-        except AttributeError: self._createTableObjects()
-        try: self.Files_by_mission
-        except AttributeError: self._createViews()
-
-        files = self.session.query(self.Data_files).filter(self.Data_sources.ds_id == self.Data_files.ds_id).filter(self.Satellites.s_id == self.Data_sources.s_id).filter(self.Missions.m_id == self.Satellites.m_id).filter_by(data_level=level).all()
-        return {'files':files, 'process':[True]*len(files)}
-
-
-
-
 ###########################################
 ### Decide which files NOT to process #####
 ###########################################
@@ -278,62 +252,6 @@ class DBUtils2(object):
                 self.del_names.append(fname)
                 counter += 1
         return counter
-
-
-    def _newerFileVersion(self, id, bool=False, verbose=False):
-        """
-        given a data_file ID decide if there is a newer version
-        (maybe _delNewerVersion() can extend this but not yet)
-
-        @param id: the code or file id to check
-        @keyword bool: (optional) if set answers the question is there a newer version of the file?
-
-        @return: id of the newest version
-
-        >>>  pnl._newerFileVersion(101)
-        101
-        """
-        try: self.Data_files
-        except AttributeError: self._createTableObjects()
-
-        mul = []
-        vall = []
-        for sq_bf in self.session.query(self.Data_files).filter_by(base_filename = self._getBaseFilename(id)):
-            mul.append([sq_bf.filename,
-                        sq_bf.f_id])
-            vall.append(self.__get_V_num(sq_bf.interface_version,
-                                         sq_bf.quality_version,
-                                         sq_bf.revision_version))
-            if verbose:
-                print("\t\t%s %d %d %d %d" % (sq_bf.filename,
-                                              sq_bf.interface_version,
-                                              sq_bf.quality_version,
-                                              sq_bf.revision_version,
-                                              self.__get_V_num(sq_bf.interface_version,
-                                                               sq_bf.quality_version,
-                                                               sq_bf.revision_version)) )
-
-        if len(vall) == 0:
-            return None
-
-        self.mul = mul
-        self.vall = vall
-
-        ## make sure that there is just one of each v_num in vall
-        cnts = [vall.count(val) for val in vall]
-        if cnts.count(1) != len(cnts):
-            raise(DBProcessingError('More than one file with thwe same computed V_num'))
-
-        ## test to see if the newest is the id passed in
-        ind = np.argsort(vall)
-        if mul[ind[-1]][1] != id:
-            if bool: return True
-            else: return mul[ind[-1]][1]
-        else:
-            if bool: return False
-            else: return mul[ind[-1]][1]
-
-
 
 #####################################
 ####  Do processing and input to DB
@@ -520,7 +438,7 @@ class DBUtils2(object):
            this is **NOT** sure to be safe
         """
         file_id = self._getFileID(file_id)
-        sq = self.session.query(self.File).filter_by(file_id = file_id)[0] # there can only be one
+        sq = self.session.query(self.File).get(file_id) # there can only be one
         if sq.exists_on_disk:
             file_path = self._getFileFullPath(file_id)
             if not os.path.exists(file_path):
@@ -1394,107 +1312,6 @@ class DBUtils2(object):
             if bool: return False
             else: return mul[ind[-1]][1]
 
-    def _copyDataFile(self,
-                      f_id,
-                      interface_version,
-                      quality_version,
-                      revision_version):
-        """
-        Given an input file change its versions and insert it to DB
-
-        @param f_id: the file_id to copy
-        @param interface_version: new interface version
-        @param quality_version: new quality version
-        @param revision_version: new revision version
-        @return: True - Success, False - Failure
-
-        >>> dbp = DBProcessing()
-        >>> dbp._copyDataFile(18,999 , 1 ,1)
-        """
-        if self.__dbIsOpen == False:
-            self._openDB()
-        try: self.Base_filename
-        except AttributeError: self._createTableObjects()
-        try: self.Build_filenames
-        except AttributeError: self._createViews()
-        # should only do this once
-        sq = self.session.query(self.Data_files).filter_by(f_id = f_id)
-        DF = self.Data_files()
-        DF.utc_file_date = sq[0].utc_file_date
-        DF.utc_start_time = sq[0].utc_start_time
-        DF.utc_end_time = sq[0].utc_end_time
-        DF.data_level = sq[0].data_level
-        DF.consistency_check = sq[0].consistency_check
-        DF.interface_version = interface_version
-        DF.verbose_provenance = None
-        DF.quality_check = 0
-        DF.quality_comment = None
-        DF.caveats = None
-        DF.ds_id = sq[0].ds_id
-        DF.quality_version = quality_version
-        DF.revision_version = revision_version
-        DF.file_create_date = datetime.utcnow()
-        DF.dp_id = sq[0].dp_id
-        DF.met_start_time = sq[0].met_start_time
-        DF.met_stop_time = sq[0].met_stop_time
-        DF.exists_on_disk = True
-        DF.base_filename = self._getBaseFilename(f_id)
-        DF.filename = DF.base_filename + '_v' + \
-                      repr(interface_version) + '.' + \
-                      repr(quality_version) + '.' + \
-                      repr(revision_version) + '.cdf'
-               ## if not np.array([DF.interface_version != sq.interface_version,
-               ##       DF.quality_version != sq.quality_version,
-               ##       DF.revision_version != sq.revision_version]).any()
-        self.session.add(DF)
-        self._commitDB()
-
-
-    def _copyExecutableCode(self,
-                            ec_id,
-                            new_filename,
-                            interface_version,
-                            quality_version,
-                            revision_version,
-                            active_code = True):
-        """
-        Given an input executable code change its version and insert it to DB
-
-        @param ec_id: the file_id to copy
-        @param new_filename: the new name of the file
-        @param interface_version: new interface version
-        @param quality_version: new quality version
-        @param revision_version: new revision version
-        @param active_code: (optional) is the code active, default True
-
-        @return: True = Success / False = Failure
-
-        """
-        if self.__dbIsOpen == False:
-            self._openDB()
-        try: self.Base_filename
-        except AttributeError: self._createTableObjects()
-        try: self.Build_filenames
-        except AttributeError: self._createViews()
-        # should only do this once
-        sq = self.session.query(self.Executable_codes).filter_by(ec_id = ec_id)
-        EC = self.Executable_codes()
-        EC.relative_path = sq[0].relative_path
-        EC.code_start_date = sq[0].code_start_date
-        EC.code_stop_date = sq[0].code_stop_date
-        EC.code_id = sq[0].code_id
-        EC.p_id = sq[0].p_id
-        EC.ds_id = sq[0].ds_id
-        EC.interface_version = interface_version
-        EC.quality_version = quality_version
-        EC.revision_version = revision_version
-        EC.active_code = active_code
-        basefn = sq[0].filename.split('_v')[0]
-        EC.filename = new_filename
-
-        self.session.add(EC)
-        self._commitDB()
-
     def _getFileFullPath(self, filename):
         """
         return the full path to a file given the name or id
@@ -1518,6 +1335,8 @@ class DBUtils2(object):
             rel_path = rel_path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
         if '{MISSION}' in rel_path : # need to replace with the instrument name
             rel_path = rel_path.replace('{MISSION}', ftb['mision'].mission_name)
+        if '{ROOTDIR}' in rel_path : # need to replace with the instrument name
+            rel_path = rel_path.replace('{ROOTDIR}', ftb['mision'].rootdir)
         return os.path.join(root_dir, rel_path, filename)
 
     def getProcessFromInputProduct(self, product):
@@ -2303,7 +2122,7 @@ class DBUtils2(object):
         sat_id = self.getInstrumentSatellite(inst_id)[0]
         retval['satellite'] = self.session.query(self.Satellite).get(sat_id)
         # mission
-        mission_id = self.getSatelliteMission(88)[0]
+        mission_id = self.getSatelliteMission(sat_id)[0]
         retval['mission'] = self.session.query(self.Mission).get(mission_id)
         # code
         code_id = self.getCodeFromProcess(proc_id)
@@ -2358,6 +2177,15 @@ class DBUtils2(object):
         prods = self.session.query(self.Product).all()
         return prods
 
+    def getFilesQC(self):
+        """
+        return a list of tuples containing
+        (file_id, date, filename, product_name)
+        for files whos quality_checked flag is false
+        """
+        files = self.session.query(self.File).filter_by(quality_checked=False).filter_by(newest_version=True).all()
+        output = [ (f.file_id, f.utc_file_date, f.filename, self.getProductName(f.product_id) ) for f in files ]
+        return output
 
 
 
