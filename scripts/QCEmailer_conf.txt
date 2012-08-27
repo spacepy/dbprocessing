@@ -1,0 +1,13 @@
+
+
+[QCEmail]
+address = ectsoc@lanl.gov
+imap = oppie-mail.lanl.gov:993
+password = ye}ukaFt
+processed = Processed
+sent = QCSent
+smtp = oppie-mail.lanl.gov:25
+username = ectsoc
+
+[REPT]
+rx = balarsen@lanl.gov
