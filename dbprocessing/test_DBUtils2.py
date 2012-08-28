@@ -193,7 +193,6 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addInstrument()
         self.addProduct()
         self.addProductOutput()
-        print self.dbu.getProductNames()
         self.assertEqual(self.dbu.getProductNames(), [(u'unittest', u'satname', u'instname', u'prod1', 1)])
 
     def test_addProcess(self):
