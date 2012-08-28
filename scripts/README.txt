@@ -56,11 +56,12 @@ Example:
 ~/dbUtils/weeklyReport.py ~/tmp 2012-08-08 2012-08-09 weeklyReport.html
 
 qualityControlFileDates.py - write out a text file with the dates of non QC checked files for a given product
-Usage: qualityControlFileDates.py [-f, --file= filename] product_name
-        -f output filename (default QC_dates.txt)
+Usage: qualityControlFileDates.py [-f, --file= filename] [--html] product_name
+        -f output filename (default <product_name>.txt/<product_name>.html)
+        --html output in an html format
         product name (or ID)
 Example:
-~/dbUtils/qualityControlFileDates.py rbspb_pre_ect-rept-sci-L2
+~/dbUtils/qualityControlFileDates.py --html rbspb_pre_ect-rept-sci-L2
 
 qualityControlEmail.py - send out a quality control email to the person in the config file
 Usage: qualityControlEmail.py [-d, --dryrun] product_name
