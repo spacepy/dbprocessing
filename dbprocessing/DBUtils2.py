@@ -56,10 +56,10 @@ class DBUtils2(object):
         """
         @summary: Initialize the DBUtils class, default mission is 'Test'
         """
+        self.dbIsOpen = False
         if mission == None:
             raise(DBError("Must input mission name to create DBUtils2 instance"))
         self.mission = mission
-        self.dbIsOpen = False
         #Expose the format/regex routines of DBFormatter
         fmtr = DBStrings.DBFormatter()
         self.format = fmtr.format
