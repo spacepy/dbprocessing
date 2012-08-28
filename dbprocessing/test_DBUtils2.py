@@ -219,6 +219,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProcess()
         self.assertEqual(self.dbu.getProcessTimebase(1), 'DAILY')
         self.assertEqual(self.dbu.getProcessTimebase('process1'), 'DAILY')
+        self.assertRaises(DBUtils2.DBNoData, self.dbu.getProcessTimebase, 23)
 
     def test_getProcessID(self):
         """test getProcessID"""
@@ -389,6 +390,41 @@ class DBUtils2DBTests(unittest.TestCase):
                                     process_keywords='process_keywords=foo',
                                     )
 
+    def test_addFilefilelink(self):
+        """addFilefilelink should work"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        self.addFile2()
+        ans = self.dbu.addFilefilelink(self.file, self.file2)
+        self.assertEqual(ans, (2,1))
+        self.dbu.delFilefilelink(2)
+        self.assertEqual(2, self.dbu.session.query(self.dbu.File).count())
+        self.assertEqual(0, self.dbu.session.query(self.dbu.Filefilelink).count())
+        self.assertRaises(DBUtils2.DBNoData, self.dbu.delFilefilelink, 2)
+
+    def test_addFilecodelink(self):
+        """addFilecodelink should work"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.addProduct()
+        self.addProductOutput()
+        self.addProcess()
+        self.addCode()
+        self.addFile()
+        ans = self.dbu.addFilecodelink(self.file, self.code)
+        self.assertEqual(ans, (1,1))
+        self.dbu.delFilecodelink(1)
+        self.assertEqual(1, self.dbu.session.query(self.dbu.File).count())
+        self.assertEqual(0, self.dbu.session.query(self.dbu.Filecodelink).count())
+        self.assertRaises(DBUtils2.DBNoData, self.dbu.delFilecodelink, 2)
+
     def test_deleteAllEntries(self):
         self.addMission()
         self.addSatellite()
@@ -503,8 +539,8 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addFile()
         self.assertEqual(self.dbu.getFileProcess_keywords(1), 'process_keywords=foo')
 
-    def test_getFileFullPath(self):
-        """_getFileFullPath tests"""
+    def testgetFileFullPath(self):
+        """getFileFullPath tests"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()
@@ -513,9 +549,9 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProcess()
         self.addCode()
         self.addFile()
-        self.assertEqual(self.dbu._getFileFullPath(1), 'rootdir/prod1_path/file_filename')
-        self.assertEqual(self.dbu._getFileFullPath('file_filename'), 'rootdir/prod1_path/file_filename')
-        self.assertRaises(DBUtils2.DBNoData, self.dbu._getFileFullPath, 3)
+        self.assertEqual(self.dbu.getFileFullPath(1), 'rootdir/prod1_path/file_filename')
+        self.assertEqual(self.dbu.getFileFullPath('file_filename'), 'rootdir/prod1_path/file_filename')
+        self.assertRaises(DBUtils2.DBNoData, self.dbu.getFileFullPath, 3)
 
     def test_getFileVersion(self):
         """test getFileVersion"""
@@ -540,7 +576,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addProcess()
         self.addCode()
         self.addFile()
-        self.assertEqual(self.dbu.getFileMission(1), 1)
+        self.assertEqual(self.dbu.getFileMission(1).mission_id, 1)
 
     def test_getErrorPath(self):
         """test getErrorPath"""

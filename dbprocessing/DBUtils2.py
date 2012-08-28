@@ -440,7 +440,7 @@ class DBUtils2(object):
         file_id = self.getFileID(file_id)
         sq = self.session.query(self.File).get(file_id) # there can only be one
         if sq.exists_on_disk:
-            file_path = self._getFileFullPath(file_id)
+            file_path = self.getFileFullPath(file_id)
             if not os.path.exists(file_path):
                 if fix:
                     sq.exists_on_disk = False
@@ -641,7 +641,7 @@ class DBUtils2(object):
         ans = []
         sq = self.session.query(self.File.filename).all()
         for v in sq:
-            ans.append( (v[0], self._getFileFullPath(v[0])) )
+            ans.append( (v[0], self.getFileFullPath(v[0])) )
         return ans
 
     def addMission(self,
@@ -1255,88 +1255,19 @@ class DBUtils2(object):
                 return False
         return True
 
-    def _newerCodeVersion(self, ec_id, date=None, bool=False, verbose=False):
-        """
-        given a executable_code ID decide if there is a newer version
-        # TODO think on if this needs to check active dates etc
-
-        @param ec_id: the executable code id to check
-        @keyword date: (optional) the date to check for the newer version
-        @keyword bool: if set return Boolean True=there s a newer version
-        @return
-             - id of the newest version if bool is False
-             - True there is a newer version, False otherwise if bool is set
-
-        """
-        try: self.Executable_codes
-        except AttributeError: self._createTableObjects()
-
-        # if bool then we just want to know if this is the newest version
-        mul = []
-        vall = []
-        for sq_bf in self.session.query(self.Executable_codes).filter_by(p_id = self._getPID(ec_id)):
-            mul.append([sq_bf.filename,
-                        sq_bf.ec_id])
-            vall.append(self.__get_V_num(sq_bf.interface_version,
-                                         sq_bf.quality_version,
-                                         sq_bf.revision_version))
-
-            if verbose:
-                print("\t\t%s %d %d %d %d" % (sq_bf.filename,
-                                              sq_bf.interface_version,
-                                              sq_bf.quality_version,
-                                              sq_bf.revision_version,
-                                              self.__get_V_num(sq_bf.interface_version,
-                                                               sq_bf.quality_version,
-                                                               sq_bf.revision_version)) )
-
-
-        if len(mul) == 0:
-            if bool: return False
-            return None
-
-        self.mul = mul
-        self.vall = vall
-
-        ## make sure that there is just one of each v_num in vall
-        cnts = [vall.count(val) for val in vall]
-        if cnts.count(1) != len(cnts):
-            raise(DBProcessingError('More than one code with the same v_num'))
-
-        ## test to see if the newest is the id passed in
-        ind = np.argsort(vall)
-        if mul[ind[-1]][1] != id:
-            if bool: return True
-            else: return mul[ind[-1]][1]
-        else:
-            if bool: return False
-            else: return mul[ind[-1]][1]
-
-    def _getFileFullPath(self, filename):
+    def getFileFullPath(self, filename):
         """
         return the full path to a file given the name or id
         (name or id is based on type)
 
         """
-        if isinstance(filename, (int, long)):
-            filename = self.getFilename(filename)
+        filename = self.getFilename(filename)
+        file_id = self.getFileID(filename)
         # need to know file product and mission to get whole path
-        try:
-            product_id = self.session.query(self.File.product_id).filter_by(filename = filename)[0][0]
-            rel_path = self.session.query(self.Product).get(product_id).relative_path
-            root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
-        except IndexError:
-            return None
-        # need to do path replacement
-        ftb = self.getProductTraceback(product_id)
-        if '{INSTRUMENT}' in rel_path : # need to replace with the instrument name
-            rel_path = rel_path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
-        if '{SATELLITE}' in rel_path : # need to replace with the instrument name
-            rel_path = rel_path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-        if '{MISSION}' in rel_path : # need to replace with the instrument name
-            rel_path = rel_path.replace('{MISSION}', ftb['mision'].mission_name)
-        if '{ROOTDIR}' in rel_path : # need to replace with the instrument name
-            rel_path = rel_path.replace('{ROOTDIR}', ftb['mision'].rootdir)
+        ftb = self.getFileTraceback(file_id)
+        rel_path = ftb['product'].relative_path
+        root_dir = ftb['mission'].rootdir
+
         return os.path.join(root_dir, rel_path, filename)
 
     def getProcessFromInputProduct(self, product):
@@ -1367,13 +1298,8 @@ class DBUtils2(object):
         """
         given a product id or product name return the timebase
         """
-        try:
-            product = int(process)
-        except ValueError: # it was a string
-            p_id = self.getProcessID(process)
-        else:
-            p_id = product
-        sq = self.session.query(self.Process).get(p_id)
+        p_id = self.getProcessID(process)
+        sq = self.getProcess(p_id)
         if sq is None:
             raise(DBNoData("No process: {0}".format(process)))
         return sq.output_timebase
@@ -1384,6 +1310,7 @@ class DBUtils2(object):
         """
         try:
            proc_id = long(proc_name)
+           proc = self.session.query(self.Process).get(proc_id)
         except ValueError: # it is not a number
             proc_id = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()[0][0]
         return proc_id
@@ -1405,13 +1332,8 @@ class DBUtils2(object):
         """
         given a filename or fileid return a Version instance
         """
-        try:
-            f_id = int(filename)  # if a number
-        except ValueError:
-            f_id = self.getFileID(filename) # is a name
+        f_id = self.getFileID(filename)  # if a number
         sq = self.session.query(self.File).get(f_id)
-        if sq is None:
-            raise(DBNoData("No file: {0}".format(filename)))
         return Version.Version(sq.interface_version, sq.quality_version, sq.revision_version)
 
     def getFileMission(self, filename):
@@ -1426,28 +1348,16 @@ class DBUtils2(object):
         # get all the satellites
         sat_id = self.getInstrumentSatellite(inst_id)
         # get the missions
-        mission_id = self.getSatelliteMission(sat_id)
-        return mission_id[0]
+        mission = self.getSatelliteMission(sat_id)
+        return mission
 
     def getSatelliteMission(self, sat_name):
         """
         given a satellite or satellite id return the mission
         """
-        if not isinstance(sat_name, (tuple, list)):
-            sat_name = [sat_name]
-        i_id = []
-        for val in sat_name:
-            try:
-                i_id.append(int(val))  # if a number
-            except ValueError:
-                i_id.append(self.getSatelliteID(val)) # is a name
-
-        m_id = []
-        for v in i_id:
-            sq = self.session.query(self.Satellite.mission_id).filter_by(satellite_id = v).all()
-            tmp = [v[0] for v in sq]
-            m_id.extend(tmp)
-        return m_id
+        s_id = self.getSatelliteID(sat_name) # is a name
+        m_id = self.session.query(self.Satellite).get(s_id).mission_id
+        return self.session.query(self.Mission).get(m_id)
 
     def getInstrumentSatellite(self, instrument_name):
         """
@@ -1594,6 +1504,13 @@ class DBUtils2(object):
         @rtype: str
         """
         DBlogging.dblogger.debug( "Entered getFilename():  file_id: {0}".format(file_id) )
+        try:
+            file_id = long(file_id)
+        except ValueError:
+            sq = self.session.query(self.File).filter_by(filename = file_id).count()
+            if sq == 0:
+                raise(DBNoData("No filename: {0}".format(file_id)))
+            return file_id
         sq = self.session.query(self.File).get(file_id)
         if sq is None:
             raise(DBNoData("No file_id: {0}".format(file_id)))
@@ -1841,8 +1758,18 @@ class DBUtils2(object):
 
         @return: satellite_id - the requested satellite  ID
         """
-        sq = self.session.query(self.Satellite.satellite_id).filter_by(mission_id = self._getMissionID()).filter_by(satellite_name = sat_name)
-        return sq.first()[0]  # there can be only one of each name
+        if isinstance(sat_name, (list, tuple)):
+            s_id = []
+            for v in sat_name:
+                s_id.append(self.getSatelliteID(v))
+            return s_id
+        try:
+            sat_id = long(sat_name)
+            sq = self.session.query(self.Satellite).get(sat_id)
+            return sq.satellite_id
+        except ValueError: # it was a name
+            sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).all()
+        return sq[0].satellite_id  # there can be only one of each name
 
     def getSatellite(self, sat_id):
         """
@@ -2029,7 +1956,7 @@ class DBUtils2(object):
         sq = list(zip(*sq)[0])
         for i, v in enumerate(sq):
             if fullpath:
-                sq[i] = self._getFileFullPath(v)
+                sq[i] = self.getFileFullPath(v)
             else:
                 sq[i] = self.getFilename(v)
         return sq
@@ -2047,7 +1974,7 @@ class DBUtils2(object):
         given a file id or name check the db checksum and the file checksum
         """
         file_id = self.getFileID(file_id) # if a name convert to id
-        disk_sha = calcDigest(self._getFileFullPath(file_id))
+        disk_sha = calcDigest(self.getFileFullPath(file_id))
         db_sha = self.getFileMD5sum(file_id)[0]
         if str(disk_sha) == str(db_sha):
             return True
@@ -2090,8 +2017,8 @@ class DBUtils2(object):
         sat_id = self.getInstrumentSatellite(inst_id)[0]
         retval['satellite'] = self.session.query(self.Satellite).get(sat_id)
         # mission
-        mission_id = self.getSatelliteMission(sat_id)[0]
-        retval['mission'] = self.session.query(self.Mission).get(mission_id)
+        mission = self.getSatelliteMission(sat_id)
+        retval['mission'] = mission
         return retval
 
     def getFileTraceback(self, file_id):
@@ -2123,7 +2050,7 @@ class DBUtils2(object):
         sat_id = self.getInstrumentSatellite(inst_id)[0]
         retval['satellite'] = self.session.query(self.Satellite).get(sat_id)
         # mission
-        mission_id = self.getSatelliteMission(sat_id)[0]
+        mission_id = self.getSatelliteMission(sat_id).mission_id
         retval['mission'] = self.session.query(self.Mission).get(mission_id)
         # code
         code_id = self.getCodeFromProcess(proc_id)
