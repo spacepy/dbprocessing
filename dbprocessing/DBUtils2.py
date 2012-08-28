@@ -684,7 +684,7 @@ class DBUtils2(object):
             s1 = self.Satellite()
         except AttributeError:
             raise(DBError  ("Class Satellite not found was it created?"))
-        s1.mission_id = self.getMissionID()
+        s1.mission_id = self.getMissionID(self.mission)
         s1.satellite_name = satellite_name
         self.session.add(s1)
         self._commitDB()
@@ -1395,19 +1395,6 @@ class DBUtils2(object):
         sq = self.session.query(self.Product).get(p_id)
         return sq.level
 
-    def getMissionID(self):
-        """
-        Return the current mission ID
-
-        @return: mission_id - the current mission ID
-
-        >>> dbp = DBProcessing()
-        >>> dbp.getMissionID()
-        19
-        """
-        sq = self.session.query(self.Mission.mission_id).filter_by(mission_name = self.mission)
-        return sq[0][0]
-
     def getMissionName(self, id=None):
         """
         Return the current mission ID
@@ -1438,14 +1425,23 @@ class DBUtils2(object):
         @return: instrument_id - the instrument ID
 
         """
-        sq = self.session.query(self.Instrument).filter_by(instrument_name = name)
-        if sq.count() > 1:
-            if satellite_id == None:
-                raise(ValueError('Non unique instrument name and no satellite specified'))
-            for v in sq:
-                if v.satellite_id == satellite_id:
-                    return v.instrument_id
-        return sq[0].instrument_id
+        try:
+            i_id = long(name)
+            sq = self.session.query(self.Instrument).get(i_id)
+            if sq is None:
+                raise(DBNoData("No instrument_id {0} found in the DB".format(i_id)))
+            return sq.instrument_id
+        except ValueError:
+            sq = self.session.query(self.Instrument).filter_by(instrument_name = name).all()
+            if len(sq) == 0:
+                raise(DBNoData("No instrument_name {0} found in the DB".format(name)))
+            if len(sq) > 1:
+                if satellite_id == None:
+                    raise(ValueError('Non unique instrument name and no satellite specified'))
+                for v in sq:
+                    if v.satellite_id == satellite_id:
+                        return v.instrument_id
+            return sq[0].instrument_id
 
     def getMissions(self):
         """return a list of all the missions"""
@@ -1463,16 +1459,12 @@ class DBUtils2(object):
         @rtype: long
         """
         try:
-            filename = long(filename)
-        except ValueError:
-            pass
-        if isinstance(filename, (int, long)):
-            sq = self.session.query(self.File).filter_by(file_id = filename)
-            try:
-                return sq[0].file_id
-            except IndexError: # no file_id found
+            f_id = long(filename)
+            sq = self.session.query(self.File).get(f_id)
+            if sq is None:
                 raise(DBNoData("No file_id {0} found in the DB".format(filename)))
-        else:
+            return sq.file_id
+        except ValueError:
             sq = self.session.query(self.File).filter_by(filename = filename)
             try:
                 return sq[0].file_id
@@ -1502,27 +1494,25 @@ class DBUtils2(object):
         @return: filename: filename associated with the file_id
         @rtype: str
         """
-        DBlogging.dblogger.debug( "Entered getFilename():  file_id: {0}".format(file_id) )
         try:
             file_id = long(file_id)
+            sq = self.session.query(self.File).get(file_id)
+            if sq is None:
+                raise(DBNoData("No file_id: {0}".format(file_id)))
+            return sq.filename
         except ValueError:
-            sq = self.session.query(self.File).filter_by(filename = file_id).count()
-            if sq == 0:
+            sq = self.session.query(self.File).filter_by(filename = file_id).all()
+            if len(sq) == 0:
                 raise(DBNoData("No filename: {0}".format(file_id)))
             return file_id
-        sq = self.session.query(self.File).get(file_id)
-        if sq is None:
-            raise(DBNoData("No file_id: {0}".format(file_id)))
-        return sq.filename
 
     def getFileProcess_keywords(self, file_id):
         """
         given a file_id return the process keywords string
         """
-        DBlogging.dblogger.debug( "Entered getFileProcess_keywords():  file_id: {0}".format(file_id) )
-        sq = self.session.query(self.File).get(file_id)
-        if sq is None:
-            raise(DBNoData("No file_id: {0}".format(file_id)))
+        f_id = self.getFileID(file_id)
+        sq = self.session.query(self.File).get(f_id)
+        DBlogging.dblogger.debug( "Found getFileProcess_keywords():  file_id: {0}, kwargs: {1}".format(f_id, sq.process_keywords) )
         return sq.process_keywords
 
     def getFileUTCfileDate(self, file_id):
@@ -1535,28 +1525,23 @@ class DBUtils2(object):
         @return: utc_file_date: date of the file  associated with the file_id
         @rtype: datetime
         """
-        DBlogging.dblogger.debug( "Entered getFileUTCfileDate():  file_id: {0}".format(file_id) )
-        sq = self.session.query(self.File).get(file_id)
-        if sq is None:
-            raise(DBNoData("No file_id: {0}".format(file_id)))
+        f_id = self.getFileID(file_id)
+        sq = self.session.query(self.File).get(f_id)
+        DBlogging.dblogger.debug( "Found getFileUTCfileDate():  file_id: {0}, date: {1}".format(file_id, sq.utc_file_date) )
         return sq.utc_file_date
 
     def getFileDates(self, file_id):
         """
         given a file_id or name return the dates it spans
         """
-        DBlogging.dblogger.debug( "Entered getFileDates():  file_id: {0}".format(file_id) )
-        try:
-            file_id = int(file_id)
-        except ValueError: # must have been a filename
-            file_id = self.getFileID(file_id)
-        sq = self.session.query(self.File).get(file_id)
-        if sq is None:
-            raise(DBNoData("No file_id: {0}".format(file_id)))
+        f_id = self.getFileID(file_id)
+        sq = self.session.query(self.File).get(f_id)
         start_time = sq.utc_start_time.date()
         stop_time =  sq.utc_stop_time.date()
         retval = [start_time, stop_time]
-        return np.unique(retval).tolist()
+        ans = np.unique(retval).tolist()
+        DBlogging.dblogger.debug( "Found getFileDates():  file_id: {0}, dates: {1}".format(file_id, ans) )
+        return ans
 
     def getFiles_product_utc_file_date(self, product_id, date):
         """
@@ -1580,6 +1565,7 @@ class DBUtils2(object):
             # sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
             sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
             retval.extend(sq)
+        DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, retval) )
         return retval
 
 
