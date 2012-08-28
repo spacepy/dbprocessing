@@ -315,7 +315,7 @@ class DBUtils2(object):
         # save this class instance so that we can finish the logging later
         self.__p1 = self._addLogging(True,
                               datetime.datetime.utcnow(),
-                              self._getMissionID(),
+                              self.getMissionID(),
                               os.getlogin(),
                               socket.gethostname(),
                               pid = os.getpid() )
@@ -543,7 +543,7 @@ class DBUtils2(object):
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
-#                    if self.mission not in self._getMissionName(self.getFileMission(fid.file_id)): # file does not below to this mission
+#                    if self.mission not in self.getMissionName(self.getFileMission(fid.file_id)): # file does not below to this mission
 #                        fid_ret = self.processqueueGet(ii+1)
                     self.session.delete(fid)
                     fid_ret = fid.file_id
@@ -571,7 +571,7 @@ class DBUtils2(object):
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
                     fid_ret = fid.file_id
-#                    if self.mission not in self._getMissionName(self.getFileMission(fid_ret)): # file does not below to this mission
+#                    if self.mission not in self.getMissionName(self.getFileMission(fid_ret)): # file does not below to this mission
 #                        fid_ret = self.processqueueGet(ii+1)
                     break # there can be only one
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
@@ -684,7 +684,7 @@ class DBUtils2(object):
             s1 = self.Satellite()
         except AttributeError:
             raise(DBError  ("Class Satellite not found was it created?"))
-        s1.mission_id = self._getMissionID()
+        s1.mission_id = self.getMissionID()
         s1.satellite_name = satellite_name
         self.session.add(s1)
         self._commitDB()
@@ -1370,7 +1370,7 @@ class DBUtils2(object):
             try:
                 i_id.append(int(val))  # if a number
             except ValueError:
-                i_id.append(self._getInstrumentID(val)) # is a name
+                i_id.append(self.getInstrumentID(val)) # is a name
 
         sat_id = []
         for v in i_id:
@@ -1391,32 +1391,31 @@ class DBUtils2(object):
         """
         given a product ID return the level
         """
-        sq = self.session.query(self.Product).get(productID)
-        if sq is None:
-            raise(DBNoData("No product: {0}".format(productID)))
+        p_id = self.getProductID(productID)
+        sq = self.session.query(self.Product).get(p_id)
         return sq.level
 
-    def _getMissionID(self):
+    def getMissionID(self):
         """
         Return the current mission ID
 
         @return: mission_id - the current mission ID
 
         >>> dbp = DBProcessing()
-        >>> dbp._getMissionID()
+        >>> dbp.getMissionID()
         19
         """
         sq = self.session.query(self.Mission.mission_id).filter_by(mission_name = self.mission)
         return sq[0][0]
 
-    def _getMissionName(self, id=None):
+    def getMissionName(self, id=None):
         """
         Return the current mission ID
 
         @return: mission_id - the current mission ID
 
         >>> dbp = DBProcessing()
-        >>> dbp._getMissionID()
+        >>> dbp.getMissionID()
         19
         """
         if id is None:
@@ -1432,7 +1431,7 @@ class DBUtils2(object):
                 i_out.extend(tmp)
             return i_out
 
-    def _getInstrumentID(self, name, satellite_id=None):
+    def getInstrumentID(self, name, satellite_id=None):
         """
         Return the instrument_id for a given instrument
 
@@ -1448,7 +1447,7 @@ class DBUtils2(object):
                     return v.instrument_id
         return sq[0].instrument_id
 
-    def _getMissions(self):
+    def getMissions(self):
         """return a list of all the missions"""
         sq = self.session.query(self.Mission.mission_name)
         return [val[0] for val in sq.all()]
@@ -2073,7 +2072,7 @@ class DBUtils2(object):
         """
         outval = []
         prods = self.getAllProducts()
-        mission_id = self._getMissionID()
+        mission_id = self.getMissionID()
         for val in prods:
             if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
                 outval.append(val)
@@ -2085,7 +2084,7 @@ class DBUtils2(object):
         """
         outval = []
         prods = self.getAllProducts()
-        mission_id = self._getMissionID()
+        mission_id = self.getMissionID()
         for val in prods:
             if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
                 outval.append(val)

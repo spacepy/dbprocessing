@@ -104,21 +104,21 @@ class DBUtils2DBTests(unittest.TestCase):
         """add a mission to the DB"""
         m = self.dbu.addMission('unittest', 'rootdir')
         self.assertEqual(m, 1)
-        self.assertEqual(self.dbu._getMissionID(), m)
+        self.assertEqual(self.dbu.getMissionID(), m)
         self.assertEqual(self.dbu.getMissionDirectory(), 'rootdir')
-        self.assertEqual(self.dbu._getMissionName(), 'unittest')
+        self.assertEqual(self.dbu.getMissionName(), 'unittest')
         self.assertRaises(DBUtils2.DBError, self.addMission)
-        self.assertEqual(self.dbu._getMissionName(id=1), ['unittest'])
+        self.assertEqual(self.dbu.getMissionName(id=1), ['unittest'])
 
     def addMission(self):
         """utility to add a mission"""
         self.mission = self.dbu.addMission('unittest', 'rootdir')
 
-    def test_getMissions(self):
+    def testgetMissions(self):
         """test _getInputProductID"""
-        self.assertEqual([], self.dbu._getMissions())
+        self.assertEqual([], self.dbu.getMissions())
         self.addMission()
-        self.assertEqual(['unittest'], self.dbu._getMissions())
+        self.assertEqual(['unittest'], self.dbu.getMissions())
 
     def test_addSatellite(self):
         """add a satellite to the DB"""
@@ -143,12 +143,12 @@ class DBUtils2DBTests(unittest.TestCase):
         """addInstrument utility"""
         self.instrument = self.dbu.addInstrument('instname', 1)
 
-    def test_getInstrumentID(self):
-        """test _getInstrumentID"""
+    def testgetInstrumentID(self):
+        """test getInstrumentID"""
         self.addMission()
         self.addSatellite()
         self.addInstrument()
-        self.assertEqual(self.dbu._getInstrumentID('instname'), 1)
+        self.assertEqual(self.dbu.getInstrumentID('instname'), 1)
 
     def test_addProduct(self):
         """test addProduct"""
