@@ -1625,7 +1625,7 @@ class DBUtils2(object):
 
     def getFilesByProduct(self, prod_id):
         """
-        given a product_id or name return all te file instances associated with it
+        given a product_id or name return all the file instances associated with it
         """
         prod_id = self.getProductID(prod_id)
         sq = self.session.query(self.File).filter_by(product_id = prod_id)
@@ -1654,21 +1654,19 @@ class DBUtils2(object):
         DBlogging.dblogger.debug( "Entered getProductNames():  productID: {0}".format(productID) )
         if productID is None:
             sq = self.session.query(self.Mission.mission_name,
-                                                    self.Satellite.satellite_name,
-                                                    self.Instrument.instrument_name,
-                                                    self.Product.product_name,
-                                                    self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product)
+                                    self.Satellite.satellite_name,
+                                    self.Instrument.instrument_name,
+                                    self.Product.product_name,
+                                    self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product)
             return sq.order_by(asc(self.Product.product_id)).all()
         else:
+            p_id = self.getProductID(productID)
             sq = self.session.query(self.Mission.mission_name,
                                         self.Satellite.satellite_name,
                                         self.Instrument.instrument_name,
                                         self.Product.product_name,
-                                        self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == productID).all()
-        try:
+                                        self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == p_id).all()
             return tuple(sq[0])
-        except IndexError:
-            return None
 
     def getActiveInspectors(self):
         """
@@ -1702,15 +1700,12 @@ class DBUtils2(object):
         """
         try:
             product_name = long(product_name)
-        except ValueError:
-            pass
-        if isinstance(product_name, (int, long)):
             sq = self.session.query(self.Product).get(product_name)
             if sq is not None:
                 return sq.product_id
             else:
                 raise(DBNoData("No product_id {0} found in the DB".format(product_name)))
-        else:
+        except ValueError:
             sq = self.session.query(self.Product).filter_by(product_name = product_name)
             try:
                 return sq[0].product_id
@@ -1722,18 +1717,9 @@ class DBUtils2(object):
         """
         Return the product Name for an input product id
         """
-        sq = self.session.query(self.Product).get(product_id)
-        if sq is None:
-            raise(DBNoData("No product_id {0} found in the DB".format(product_id)))
-        else:
-            ftb = self.getProductTraceback(product_id)
-            name = sq.product_name
-            ## perform name replacement {SATELLITE}, {INSTRUMENT}
-            if '{INSTRUMENT}' in name : # need to replace with the instrument name
-                name = name.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
-            if '{SATELLITE}' in name : # need to replace with the instrument name
-                name = name.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-            return name
+        p_id = self.getProductID(product_id)
+        sq = self.session.query(self.Product).get(p_id)
+        return sq.product_name
 
     def getSatelliteID(self,
                         sat_name):
@@ -1756,12 +1742,6 @@ class DBUtils2(object):
             sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).all()
         return sq[0].satellite_id  # there can be only one of each name
 
-    def getSatellite(self, sat_id):
-        """
-        given a sat id return tehsatellite instance
-        """
-        return self.session.query(self.Satellite).get(sat_id)
-
     def getCodePath(self, code_id):
         """
         Given a code_id list return the full name (path and all) of the code
@@ -1782,24 +1762,25 @@ class DBUtils2(object):
         try:
             return Version.Version(*sq[0])
         except IndexError:
-            raise(ValueError("No code number {0} in the db".format(code_id)))
+            raise(DBNoData("No code number {0} in the db".format(code_id)))
 
     def getOutputProductFromProcess(self, process):
         """
         given an process id return the output product
         """
         DBlogging.dblogger.debug("Entered getOutputProductFromProcess: {0}".format(process))
-        sq2 = self.session.query(self.Process.output_product).filter_by(process_id = process)
-        # there can only be one
-        return sq2[0][0]
+        p_id = self.getProcessID(process)
+        sq2 = self.session.query(self.Process).get(p_id)
+        return sq2.output_product
 
     def getProcessFromOutputProduct(self, outProd):
         """
         Gets process from the db that have the output product
         """
         DBlogging.dblogger.debug("Entered getProcessFromOutputProduct: {0}".format(outProd))
-        sq1 =  self.session.query(self.Process.process_id).filter_by(output_product = outProd).all()  # should only have one value
-        return sq1[0][0]
+        p_id = self.getProductID(outProd)
+        sq1 =  self.session.query(self.Process).filter_by(output_product = p_id).all()  # should only have one value
+        return sq1[0].process_id
 
     def getCodeFromProcess(self, proc_id):
         """
@@ -1866,7 +1847,8 @@ class DBUtils2(object):
         given a file_id return all the other file_ids that went into making it
         """
         DBlogging.dblogger.debug("Entered getFilefilelink_byresult: file_id={0}".format(file_id))
-        sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = file_id).all()
+        f_id = self.getFileID(file_id)
+        sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = f_id).all()
         try:
             return zip(*sq)[0]
         except IndexError:
@@ -1877,12 +1859,14 @@ class DBUtils2(object):
         given a file_id return the code_id associated with it, or None
         """
         DBlogging.dblogger.debug("Entered getFilecodelink_byfile: file_id={0}".format(file_id))
-        sq = self.session.query(self.Filecodelink.source_code).filter_by(resulting_file = file_id).all() # can only be one
+        f_id = self.getFileID(file_id)
+        sq = self.session.query(self.Filecodelink.source_code).filter_by(resulting_file = f_id).all() # can only be one
         try:
             return sq[0][0]
         except IndexError:
             return None
 
+    @classmethod
     def daterange_to_dates(self, daterange):
         """
         given a daterange return the dat objects for all days in the range
@@ -1899,24 +1883,21 @@ class DBUtils2(object):
 
     def getNewestFiles(self):
         """
-        for the current mission get a list of all file ids that are marked newest version
+        for the current mission get a tuple of all file ids that are marked newest version
         """
         sq = self.session.query(self.File.file_id).filter_by(newest_version = True).all()
         sq = zip(*sq)[0]
-        mission_id = self.getMissionID(self.mission)
-        for i in range(len(sq)-1, -1, -1):
-            if self.getFileMission(sq[i]) != mission_id:
-                del sq[i]
         return sq
 
     def tag_release(self, rel_num):
         """
-        tag all thenewest versions of files to a release number (integer)
+        tag all the newest versions of files to a release number (integer)
         """
         newest_files = self.getNewestFiles()
         for f in newest_files:
             self.addRelease(f, rel_num, commit=False)
         self._commitDB()
+        return len(newest_files)
 
     def addRelease(self, filename, release, commit=False):
         """
