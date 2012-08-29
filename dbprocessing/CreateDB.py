@@ -209,7 +209,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('processqueue', metadata,
-            schema.Column('file_id', types.Integer,  
+            schema.Column('file_id', types.Integer,
                           schema.ForeignKey('file.file_id'), nullable=False, unique=True, ),
             schema.PrimaryKeyConstraint('file_id',)
         )
@@ -220,6 +220,12 @@ class dbprocessing_db(object):
             schema.Column('source_code', types.Integer,
                           schema.ForeignKey('code.code_id'), nullable=False),
             schema.PrimaryKeyConstraint('resulting_file', 'source_code' )
+        )
+
+        data_table = schema.Table('release', metadata,
+            schema.Column('file_id', types.Integer, nullable=False),
+            schema.Column('release_num', types.String(20),nullable=False),
+            schema.PrimaryKeyConstraint('file_id', 'release_num' )
         )
 
         data_table = schema.Table('logging', metadata,

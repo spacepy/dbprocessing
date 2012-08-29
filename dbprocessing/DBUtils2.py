@@ -19,7 +19,7 @@ import sys
 
 import DBStrings
 import Version
-from Diskfile import calcDigest
+from Diskfile import calcDigest, DigestError
 
 ## This goes in the processing comment field in the DB, do update it
 __version__ = '2.0.3'
@@ -1078,10 +1078,11 @@ class DBUtils2(object):
         """
         in inStr replace the standard {} with the names
         """
+        p_id = self.getProcessID(process_id)
         if inStr is None:
             return inStr
         repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
-        ftb = self.getProcessTraceback(process_id)
+        ftb = self.getProcessTraceback(p_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
@@ -1095,7 +1096,7 @@ class DBUtils2(object):
         if '{ROOTDIR}' in inStr :
             inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
         if any(val in inStr for val in repl): # call yourself again
-            inStr = self._nameSubProcess(inStr, process_id)
+            inStr = self._nameSubProcess(inStr, p_id)
         return inStr
 
     def _nameSubFile(self, inStr, file_id):
@@ -1144,7 +1145,7 @@ class DBUtils2(object):
             raise(DBError('could not close DB'))
 
 
-    def _addFile(self,
+    def addFile(self,
                 filename = None,
                 data_level = None,
                 version = None,
@@ -1266,7 +1267,10 @@ class DBUtils2(object):
         # need to know file product and mission to get whole path
         ftb = self.getFileTraceback(file_id)
         rel_path = ftb['product'].relative_path
-        root_dir = ftb['mission'].rootdir
+        try:
+            root_dir = ftb['mission'].rootdir
+        except KeyError:
+            root_dir = ''
 
         return os.path.join(root_dir, rel_path, filename)
 
@@ -1903,10 +1907,7 @@ class DBUtils2(object):
         """
         given a filename or file_id add an entry to the release table
         """
-        try:
-            f_id = int(filename)  # if a number
-        except ValueError:
-            f_id = self.getFileID(filename) # is a name
+        f_id = self.getFileID(filename)  # if a number
         rel = self.Release()
         rel.file_id = f_id
         rel.release_num = release
@@ -1927,21 +1928,13 @@ class DBUtils2(object):
                 sq[i] = self.getFilename(v)
         return sq
 
-    def getFileMD5sum(self, file_id):
-        """
-        return the checksum for a file by id or name
-        """
-        file_id = self.getFileID(file_id) # if a name convert to id
-        sq = self.session.query(self.File.md5sum).filter_by(file_id = file_id).all()
-        return sq[0] # there can only be one
-
     def checkFileMD5(self, file_id):
         """
         given a file id or name check the db checksum and the file checksum
         """
         file_id = self.getFileID(file_id) # if a name convert to id
         disk_sha = calcDigest(self.getFileFullPath(file_id))
-        db_sha = self.getFileMD5sum(file_id)[0]
+        db_sha = self.session.query(self.File).get(file_id).md5sum
         if str(disk_sha) == str(db_sha):
             return True
         else:
@@ -1958,8 +1951,9 @@ class DBUtils2(object):
             try:
                 if not self.checkFileMD5(f):
                     bad_list.append((f, '(100) bad checksum'))
-            except IOError:
+            except DigestError:
                 bad_list.append((f, '(200) file not found'))
+        return bad_list
 
     def getProductTraceback(self, prod_id):
         """
@@ -1970,8 +1964,6 @@ class DBUtils2(object):
         retval = {}
         # get the product instance
         retval['product'] = self.session.query(self.Product).get(prod_id)
-        if retval['product'] is None:
-            raise(DBNoData("No product {0} in the db".format(prod_id)))
         # inspector
         retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
         # instrument
@@ -2005,11 +1997,11 @@ class DBUtils2(object):
         """
         retval = {}
         # get the product instance
-        retval['process'] = self.session.query(self.Process).get(proc_id)
-        if retval['process'] is None:
-            raise(DBNoData("No process {0} in the db".format(proc_id)))
+        p_id = self.getProcessID(proc_id)
+        retval['process'] = self.session.query(self.Process).get(p_id)
         retval['output_product'] = self.session.query(self.Product).get(retval['process'].output_product)
         # instrument
+        print 'here1', retval['output_product'], retval['output_product'].product_id  # DELME
         inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)[0]
         retval['instrument'] = self.session.query(self.Instrument).get(inst_id)
         # satellite
@@ -2019,16 +2011,16 @@ class DBUtils2(object):
         mission_id = self.getSatelliteMission(sat_id).mission_id
         retval['mission'] = self.session.query(self.Mission).get(mission_id)
         # code
-        code_id = self.getCodeFromProcess(proc_id)
+        code_id = self.getCodeFromProcess(p_id)
         if code_id is not None:
             retval['code'] = self.session.query(self.Code).get(code_id)
         # input products
         retval['input_product'] = []
-        in_prod_id = self.getInputProductID(proc_id)
+        in_prod_id = self.getInputProductID(p_id)
         for val, opt in in_prod_id:
             retval['input_product'].append((self.session.query(self.Product).get(val), opt) )
         retval['productprocesslink'] = []
-        ppl = self.session.query(self.Productprocesslink).filter_by(process_id = proc_id)
+        ppl = self.session.query(self.Productprocesslink).filter_by(process_id = p_id)
         for val in ppl:
             retval['productprocesslink'].append(ppl)
         return retval
@@ -2039,19 +2031,7 @@ class DBUtils2(object):
         """
         outval = []
         prods = self.getAllProducts()
-        mission_id = self.getMissionID()
-        for val in prods:
-            if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
-                outval.append(val)
-        return outval
-
-    def getProcesses(self):
-        """
-        get all processes for the given mission
-        """
-        outval = []
-        prods = self.getAllProducts()
-        mission_id = self.getMissionID()
+        mission_id = self.getMissionID(self.mission)
         for val in prods:
             if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
                 outval.append(val)
@@ -2059,10 +2039,15 @@ class DBUtils2(object):
 
     def getAllProcesses(self):
         """
-        return a list of all processes as instances
+        get all processes for the given mission
         """
-        prods = self.session.query(self.Process).all()
-        return prods
+        outval = []
+        procs = self.session.query(self.Process).all()
+        mission_id = self.getMissionID(self.mission)
+        for val in procs:
+            if self.getProcessTraceback(val.process_id)['mission'].mission_id == mission_id:
+                outval.append(val)
+        return outval
 
     def getAllProducts(self):
         """
