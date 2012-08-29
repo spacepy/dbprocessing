@@ -27,52 +27,6 @@ class dbprocessing_db(object):
         if create:
             if os.path.isfile(filename) != True:
                 self.createDB()
-                self._createTableObjects()
-
-    def _createTableObjects(self, verbose = False):
-        """
-        cycle through the database and build classes for each of the tables
-
-        @keyword verbose: (optional) - print information out to the command line
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 14-Jun-2010 (BAL)
-        @version: V2: 25-Aug-2010 (BAL) - changed to throw exception not return False
-
-        >>>  pnl._createTableObjects()
-        """
-        table_names = self.engine.table_names()
-
-        ## create a dictionary of all the table names that will be used as class names.
-        ## this uses the db table name as the table name and a cap 1st letter as the class
-        ## when interacting using python use the class
-        table_dict = {}
-        for val in table_names:
-            table_dict[val[0].upper() + val[1:]] = val
-
-        ##  dynamically create all the classes (c1)
-        ##  dynamically create all the tables in the db (c2)
-        ##  dynamically create all the mapping between class and table (c3)
-        ## this just saves a lot of typing and is equivalent to:
-        ##     class Missions(object):
-        ##         pass
-        ##     missions = Table('missions', metadata, autoload=True)
-        ##     mapper(Missions, missions)
-        for val in table_dict:
-            if verbose: print val
-            if not hasattr(self, val):  # then make it
-                c1 = compile("""class %s(object):\n\tpass""" % (val), '', 'exec')
-                c2 = compile("%s = Table('%s', self.metadata, autoload=True)" % (str(table_dict[val]), table_dict[val]) , '', 'exec')
-                c3 = compile("orm.mapper(%s, %s)" % (val, str(table_dict[val])), '', 'exec')
-                c4 = compile("self.%s = %s" % (val, val), '', 'exec' )
-                exec(c1)
-                exec(c2)
-                exec(c3)
-                exec(c4)
-                if verbose: print("Class %s created" % (val))
 
     def createDB(self):
         """

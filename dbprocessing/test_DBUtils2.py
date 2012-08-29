@@ -953,6 +953,40 @@ class DBUtils2DBTests(unittest.TestCase):
         val = self.dbu.list_release('rel1', fullpath=False)
         self.assertEqual(val, [u'file_filename', u'file_filename2'])
 
+    def test_Logging(self):
+        """Logging methods"""
+        self.addMission()
+        self.assertFalse(self.dbu._currentlyProcessing())
+        cp = self.dbu.Logging()
+        cp.currently_processing = True
+        cp.mission_id = 1
+        cp.processing_start_time = datetime.datetime(2012, 3, 4)
+        cp.user = 'username'
+        cp.hostname = 'hostname'
+        cp.pid = 123
+        self.dbu.session.add(cp)
+        self.dbu._commitDB()
+        self.assertEqual(123, self.dbu._currentlyProcessing())
+        self.assertRaises(DBUtils2.DBError, self.dbu._startLogging)
+        cp = self.dbu.Logging()
+        cp.currently_processing = True
+        cp.mission_id = 1
+        cp.processing_start_time = datetime.datetime(2012, 3, 4)
+        cp.user = 'username'
+        cp.hostname = 'hostname'
+        cp.pid = 1234
+        self.dbu.session.add(cp)
+        self.dbu._commitDB()
+        self.assertRaises(DBUtils2.DBError, self.dbu._currentlyProcessing)
+        self.assertRaises(ValueError, self.dbu._resetProcessingFlag)
+        self.dbu._resetProcessingFlag('testing comment')
+        self.assertFalse(self.dbu._currentlyProcessing())
+        self.dbu._startLogging()
+        self.assertEqual(os.getpid(), self.dbu._currentlyProcessing())
+        self.dbu._stopLogging('stop comment')
+        self.assertFalse(self.dbu._currentlyProcessing())
+        self.assertRaises(DBUtils2.DBProcessingError, self.dbu._stopLogging, 'stop comment')
+
     def test_checkFileMD5(self):
         """checkFileMD5"""
         import Diskfile

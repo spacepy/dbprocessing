@@ -198,7 +198,6 @@ class DBUtils2(object):
         table_dict = {}
         for val in table_names:
             table_dict[val.title()] = val
-
 ##  dynamically create all the classes (c1)
 ##  dynamically create all the tables in the db (c2)
 ##  dynamically create all the mapping between class and table (c3)
@@ -223,36 +222,6 @@ class DBUtils2(object):
                 DBlogging.dblogger.debug("Class %s created" % (val))
 
 
-###########################################
-### Decide which files NOT to process #####
-###########################################
-
-    def _procCodeDates(self, verbose = False):
-        """
-        go through bf dict and if files have processing code in the right date range
-
-        @keyword verbose: (optional) - print out lots of info
-
-        @return: Counter - number of files added to the list from this check
-
-        >>>  pnl._procCodeDates()
-        """
-        # is there a processing code with the right dates?
-        # this is broken as there is more than one processing file that spans the data L0-L1 conversion
-        try: self.del_names
-        except AttributeError: self.initDelNames()
-        counter = 0
-        for fname in self.bf:
-            all_false = np.array([])
-            for sq in self.session.query(self.Processing_paths).filter_by(p_id = self.bf[fname]['out_p_id']):
-                if self.bf[fname]['utc_file_date'] < sq.code_start_date or self.bf[fname]['utc_file_date'] > sq.code_stop_date:
-                    all_false = np.append(all_false, True)
-            if ~all_false.any() and len(all_false) != 0:
-                print("\t<procCodeDates> %s didn't have valid, %s, %s, %s" % (fname, sq.code_start_date, sq.code_stop_date, all_false))
-                self.del_names.append(fname)
-                counter += 1
-        return counter
-
 #####################################
 ####  Do processing and input to DB
 #####################################
@@ -268,11 +237,11 @@ class DBUtils2(object):
         """
         DBlogging.dblogger.info("Checking currently_processing")
 
-        sq = self.session.query(self.Logging).filter_by(currently_processing = True)
-        if sq.count() == 1:
-            DBlogging.dblogger.warning("currently_processing is set.  PID: %d" % (sq[0].pid))
+        sq = self.session.query(self.Logging).filter_by(currently_processing = True).all()
+        if len(sq) == 1:
+            DBlogging.dblogger.warning("currently_processing is set.  PID: {0}".format(sq[0].pid))
             return sq[0].pid
-        elif sq.count() == 0:
+        elif len(sq) == 0:
             return False
         else:
             DBlogging.dblogger.error("More than one currently_processing flag set, fix the DB" )
@@ -288,8 +257,7 @@ class DBUtils2(object):
         >>>  pnl._resetProcessingFlag()
         """
         if comment == None:
-            print("Must enter a comment to override DB lock")
-            return False
+            raise(ValueError("Must enter a comment to override DB lock"))
         sq = self.session.query(self.Logging).filter_by(currently_processing = True)
         for val in sq:
             val.currently_processing = False
@@ -298,9 +266,6 @@ class DBUtils2(object):
             DBlogging.dblogger.error( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
             self.session.add(val)
         self._commitDB()
-        return True
-
-
 
     def _startLogging(self):
         """
@@ -315,7 +280,7 @@ class DBUtils2(object):
         # save this class instance so that we can finish the logging later
         self.__p1 = self._addLogging(True,
                               datetime.datetime.utcnow(),
-                              self.getMissionID(),
+                              self.getMissionID(self.mission),
                               os.getlogin(),
                               socket.gethostname(),
                               pid = os.getpid() )
@@ -357,11 +322,7 @@ class DBUtils2(object):
         @rtype: Logging
 
         """
-        try:
-            l1 = self.Logging()
-        except AttributeError:
-            raise(DBError("Class Logging not found was it created?"))
-
+        l1 = self.Logging()
         l1.currently_processing = currently_processing
         l1.processing_start_time = processing_start_time
         l1.mission_id = mission_id
@@ -389,9 +350,6 @@ class DBUtils2(object):
             raise(DBProcessingError("Logging was not started"))
         # clean up the logging, we are done processing and we can release the lock (currently_processing) and
         # put in the complete time
-        if comment == None:
-            print("Must enter a comment for the log")
-            return False
 
         self.__p1.processing_end = datetime.datetime.utcnow()
         self.__p1.currently_processing = False
@@ -399,34 +357,7 @@ class DBUtils2(object):
         self.session.add(self.__p1)
         self._commitDB()
         DBlogging.dblogger.info( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) )
-
-    def _addLoggingFile(self,
-                        logging_id,
-                        file_id,
-                        code_id,
-                        comment=None):
-        """
-        add a Logging_files entry to  DB
-
-        @param logging_id: the id of the logging session
-        @type logging_id: int
-        @param file_id: file id of the file being logged
-        @type file_id: int
-        @param code_id: the id of ete code being used
-        @type code_id: int
-        @keyword comment: comment on the logged file
-        @type comment: str
-        """
-        pf1 = self.Logging_files()
-        pf1.logging_id = logging_id
-        pf1.file_id = file_id
-        pf1.code_id = code_id
-        pf1.comment = comment
-        self.session.add(pf1)
-        DBlogging.dblogger.info( "File Logging added for file:%d code:%d with comment:%s"  % (pf1.file_id, pf1.code_id, pf1.comment) )
-        # TODO  think on if session should be left open or if a list should be passed in
-        self._commitDB()
-        return pf1.logging_file_id
+        del self.__p1
 
     def _checkDiskForFile(self, file_id, fix=False):
         """
