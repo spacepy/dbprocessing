@@ -183,6 +183,7 @@ class DBUtils2DBTests(unittest.TestCase):
     def addProductOutput(self):
         """addProductOutput utility"""
         self.productOutput = self.dbu.addProduct('prod2', 1, 'prod2_path', None, 'format', 0)
+        self.dbu.addInstrumentproductlink(1, 2)
 
     def test_getProductID(self):
         """test getProductID"""
@@ -223,7 +224,8 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addInstrument()
         self.addProduct()
         self.addProductOutput()
-        self.assertEqual(self.dbu.getProductNames(), [(u'unittest', u'satname', u'instname', u'prod1', 1)])
+        self.assertEqual(self.dbu.getProductNames(), [(u'unittest', u'satname', u'instname', u'prod1', 1),
+                         (u'unittest', u'satname', u'instname', u'prod2', 2)])
         self.assertEqual(self.dbu.getProductNames(1), (u'unittest', u'satname', u'instname', u'prod1', 1))
 
     def test_getProductFormats(self):
@@ -446,7 +448,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.assertEqual(Version.Version(1,0,0), val)
         self.assertRaises(DBUtils2.DBNoData, self.dbu.getCodeVersion, 342243)
 
-    def testgetCodeID(self):
+    def test_getCodeID(self):
         """test getCodeID"""
         self.addMission()
         self.addSatellite()
@@ -457,7 +459,7 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addCode()
         self.assertEqual(self.dbu.getCodeID('code_filename'), 1)
 
-    def testaddFile(self):
+    def test_addFile(self):
         """test addFile"""
         self.addMission()
         self.addSatellite()
@@ -964,10 +966,12 @@ class DBUtils2DBTests(unittest.TestCase):
         self.addSatellite()
         self.addInstrument()
         self.dbu.addProduct('prod1', self.instrument, os.path.join(tmpdir, 'incoming'), None, 'format', 0)
-        self.addProductOutput()
+        self.dbu.addProduct('prod2', self.instrument, os.path.join(tmpdir, 'incoming'), None, 'format', 1)
+        self.dbu.addInstrumentproductlink(1, 1)
+        self.dbu.addInstrumentproductlink(1, 2)
+
         self.addProcess()
         self.addproductprocesslink()
-        self.dbu.addInstrumentproductlink(1,1)
 
         self.file = self.dbu.addFile('file1',
                                     0,
