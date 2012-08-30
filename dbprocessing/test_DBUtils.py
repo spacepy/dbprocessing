@@ -158,8 +158,8 @@ class DBUtilsDBTests(unittest.TestCase):
         self.addMission()
         self.addSatellite()
         self.addInstrument()
-        self.assertEqual([1], self.dbu.getInstrumentSatellite(1))
-        self.assertEqual([1], self.dbu.getInstrumentSatellite('instname'))
+        self.assertEqual(1, self.dbu.getInstrumentSatellite(1))
+        self.assertEqual(1, self.dbu.getInstrumentSatellite('instname'))
 
     def test_getInstrumentID(self):
         """test getInstrumentID"""

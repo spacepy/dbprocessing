@@ -1,7 +1,6 @@
 #!/usr/bin/env python2.6
 
 from optparse import OptionParser
-import sys
 import traceback
 
 from dbprocessing import DBlogging, dbprocessing

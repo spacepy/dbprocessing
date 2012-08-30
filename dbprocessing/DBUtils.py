@@ -1280,21 +1280,7 @@ class DBUtils(object):
         """
         given an instrument name or ID return the satellite it is on
         """
-        if not isinstance(instrument_name, (tuple, list)):
-            instrument_name = [instrument_name]
-        i_id = []
-        for val in instrument_name:
-            try:
-                i_id.append(int(val))  # if a number
-            except ValueError:
-                i_id.append(self.getInstrumentID(val)) # is a name
-
-        sat_id = []
-        for v in i_id:
-            sq = self.session.query(self.Instrument.satellite_id).filter_by(instrument_id = v).all()
-            tmp = [v[0] for v in sq]
-            sat_id.extend(tmp)
-        return sat_id
+        return self.getEntry('Instrument', instrument_name).satellite_id
 
     def getInstrumentFromProduct(self, product_id):
         """
@@ -1302,7 +1288,10 @@ class DBUtils(object):
         """
         sq = self.session.query(self.Instrumentproductlink.instrument_id).filter_by(product_id = product_id).all()
         inst_id = [v[0] for v in sq]
-        return inst_id
+        if len(inst_id) == 1: # it should
+            return inst_id[0]
+        else:
+            return inst_id
 
     def getProductLevel(self, productID):
         """
@@ -1868,12 +1857,12 @@ class DBUtils(object):
         # inspector
         retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
         # instrument
-        inst_id = self.getInstrumentFromProduct(prod_id)[0]
+        inst_id = self.getInstrumentFromProduct(prod_id)
         retval['instrument'] = self.getEntry('Instrument', inst_id)
         # Instrumentproductlink
         retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((inst_id, prod_id))
         # satellite
-        sat_id = self.getInstrumentSatellite(inst_id)[0]
+        sat_id = self.getInstrumentSatellite(inst_id)
         retval['satellite'] = self.getEntry('Satellite', sat_id)
         # mission
         mission = self.getSatelliteMission(sat_id)
@@ -1901,10 +1890,10 @@ class DBUtils(object):
         retval['process'] = self.getEntry('Process', proc_id)
         retval['output_product'] = self.getEntry('Product', retval['process'].output_product)
         # instrument
-        inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)[0]
+        inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)
         retval['instrument'] = self.getEntry('Instrument', inst_id)
         # satellite
-        sat_id = self.getInstrumentSatellite(inst_id)[0]
+        sat_id = self.getInstrumentSatellite(inst_id)
         retval['satellite'] = self.getEntry('Satellite', sat_id)
         # mission
         mission_id = self.getSatelliteMission(sat_id).mission_id
