@@ -460,7 +460,7 @@ class ProcessQueue(object):
             ## build the command line we are to run
             cmdline = [codepath]
             ## get extra_params from the process # they are split by 2 spaces
-            args = self.dbu.getProcess(process_id).extra_params
+            args = self.dbu.getEntry('Process', process_id).extra_params
             if args is not None:
                 args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
                 args = args.split('  ')
