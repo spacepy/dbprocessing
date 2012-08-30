@@ -106,7 +106,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertEqual(m, 1)
         self.assertEqual(self.dbu.getMissionID('unittest'), m)
         self.assertEqual(self.dbu.getMissionDirectory(), 'rootdir')
-        self.assertEqual(self.dbu.getMissionName(), 'unittest')
         self.assertRaises(DBUtils.DBError, self.addMission)
 
     def test_getMissionID(self):
@@ -149,14 +148,6 @@ class DBUtilsDBTests(unittest.TestCase):
     def addInstrument(self):
         """addInstrument utility"""
         self.instrument = self.dbu.addInstrument('instname', 1)
-
-    def test_getInstrumentSatellite(self):
-        """getInstrumentSatellite"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.assertEqual(1, self.dbu.getInstrumentSatellite(1))
-        self.assertEqual(1, self.dbu.getInstrumentSatellite('instname'))
 
     def test_getInstrumentID(self):
         """test getInstrumentID"""
@@ -248,25 +239,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertRaises(DBUtils.DBNoData, self.dbu.getProductID, 23452)
         self.assertRaises(DBUtils.DBNoData, self.dbu.getProductID, 'nofile')
 
-    def test_getProductName(self):
-        """test getProductName"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.assertEqual(self.dbu.getProductName('prod1'), 'prod1')
-        self.assertEqual(self.dbu.getProductName(1), 'prod1')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProductName, 23452)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProductName, 'nofile')
-
-    def test_getProductLevel(self):
-        """test getProductLevel"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.assertEqual(self.dbu.getProductLevel(1), 0)
-
     def test_getProductNames(self):
         """test getProductNames"""
         self.addMission()
@@ -344,18 +316,6 @@ class DBUtilsDBTests(unittest.TestCase):
         val = self.dbu.getAllProcesses()
         self.assertEqual(val[0].process_id, 1)
         self.assertEqual(len(val), 1)
-
-    def test_getProcessTimebase(self):
-        """test getProcessTimebase"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProcess()
-        self.addproductprocesslink()
-        self.assertEqual(self.dbu.getProcessTimebase(1), 'DAILY')
-        self.assertEqual(self.dbu.getProcessTimebase('process1'), 'DAILY')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProcessTimebase, 23)
 
     def test_getProcessID(self):
         """test getProcessID"""
@@ -440,18 +400,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.dbu._commitDB()
         self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2001, 1, 1) ) )
 
-    def test_getCodeArgs(self):
-        """test getCodeArgs"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.assertEqual(self.dbu.getCodeArgs(1), 'arguments')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodeArgs, 342243)
-
     def test_getProcessFromOutputProduct(self):
         """getProcessFromOutputProduct"""
         self.addMission()
@@ -463,18 +411,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.addCode()
         val = self.dbu.getProcessFromOutputProduct(self.product)
         self.assertEqual(val, self.process)
-
-    def test_getOutputProductFromProcess(self):
-        """getOutputProductFromProcess"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        val = self.dbu.getOutputProductFromProcess(self.product)
-        self.assertEqual(val, self.product)
 
     def test_getCodePath(self):
         """test getCodePath"""
@@ -745,35 +681,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertEqual(1, self.dbu.Processqueue.len())
         self.assertEqual(2, self.dbu.Processqueue.get())
 
-    def test_getFileProduct(self):
-        """test getFileProduct"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.addFile()
-        self.assertEqual(self.dbu.getFileProduct(1), 1)
-        self.assertEqual(self.dbu.getFileProduct('file_filename'), 1)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileProduct, 5)
-
-    def test_getFilename(self):
-        """getFilename"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.addFile()
-        self.assertEqual(self.dbu.getFilename('file_filename'), 'file_filename')
-        self.assertEqual(self.dbu.getFilename(1), 'file_filename')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilename, 5)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilename, 'nofile')
-
     def test_getFileID(self):
         """ test getFileID"""
         self.addMission()
@@ -787,31 +694,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertEqual(self.dbu.getFileID(1), 1)
         self.assertEqual(self.dbu.getFileID('file_filename'), 1)
         self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, 34523)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, 'noexist')
-
-    def test_getFileUTCfileDate(self):
-        """test getFileUTCfileDate"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.addFile()
-        self.assertEqual(self.dbu.getFileUTCfileDate(1), datetime.date(2012, 5, 4))
-
-    def test_getFileProcess_keywords(self):
-        """test getFileProcess_keywords"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.addFile()
-        self.assertEqual(self.dbu.getFileProcess_keywords(1), 'process_keywords=foo')
         self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, 'noexist')
 
     def test_getFileDates(self):

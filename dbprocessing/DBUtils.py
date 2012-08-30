@@ -411,7 +411,7 @@ class DBUtils(object):
         pq1 = self.Processqueue()
         pq1.file_id = fileid
         self.session.add(pq1)
-        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self.getFilename(fileid) ) )
+        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self.getEntry('File', fileid).filename ) )
         self._commitDB()
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
@@ -444,8 +444,6 @@ class DBUtils(object):
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
-#                    if self.mission not in self.getMissionName(self.getFileMission(fid.file_id)): # file does not below to this mission
-#                        fid_ret = self.processqueueGet(ii+1)
                     self.session.delete(fid)
                     fid_ret = fid.file_id
                     break # there can be only one
@@ -472,8 +470,6 @@ class DBUtils(object):
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
                     fid_ret = fid.file_id
-#                    if self.mission not in self.getMissionName(self.getFileMission(fid_ret)): # file does not below to this mission
-#                        fid_ret = self.processqueueGet(ii+1)
                     break # there can be only one
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
@@ -1052,7 +1048,6 @@ class DBUtils(object):
             DBlogging.dblogger.error( "Database connection could not be closed" )
             raise(DBError('could not close DB'))
 
-
     def addFile(self,
                 filename = None,
                 data_level = None,
@@ -1170,7 +1165,7 @@ class DBUtils(object):
         (name or id is based on type)
 
         """
-        filename = self.getFilename(filename)
+        filename = self.getEntry('File', filename).filename
         file_id = self.getFileID(filename)
         # need to know file product and mission to get whole path
         ftb = self.getFileTraceback(file_id)
@@ -1192,12 +1187,6 @@ class DBUtils(object):
             ans.append(v.process_id)
         return ans
 
-    def getProcessTimebase(self, process):
-        """
-        given a product id or product name return the timebase
-        """
-        return self.getEntry('Process', process).output_timebase
-
     def getProcessID(self, proc_name):
         """
         given a process name return its id
@@ -1208,13 +1197,6 @@ class DBUtils(object):
         except ValueError: # it is not a number
             proc_id = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()[0][0]
         return proc_id
-
-    def getFileProduct(self, filename):
-        """
-        given a filename or file_id return the product id it belongs to
-        """
-        fle = self.getEntry('File', filename)
-        return fle.product_id
 
     def getFileVersion(self, filename):
         """
@@ -1229,11 +1211,11 @@ class DBUtils(object):
         associated with
         """
         filename = self.getFileID(filename) # change a name to a number
-        product_id = self.getFileProduct(filename)
+        product_id = self.getEntry('File', filename).product_id
         # get all the instruments
         inst_id = self.getInstrumentFromProduct(product_id)
         # get all the satellites
-        sat_id = self.getInstrumentSatellite(inst_id)
+        sat_id = self.getEntry('Instrument', inst_id).satellite_id
         # get the missions
         mission = self.getSatelliteMission(sat_id)
         return mission
@@ -1246,12 +1228,6 @@ class DBUtils(object):
         m_id = self.getEntry('Satellite', s_id).mission_id
         return self.getEntry('Mission', m_id)
 
-    def getInstrumentSatellite(self, instrument_name):
-        """
-        given an instrument name or ID return the satellite it is on
-        """
-        return self.getEntry('Instrument', instrument_name).satellite_id
-
     def getInstrumentFromProduct(self, product_id):
         """
         given a product ID get the instrument(s) id associated with it
@@ -1262,27 +1238,6 @@ class DBUtils(object):
             return inst_id[0]
         else:
             return inst_id
-
-    def getProductLevel(self, productID):
-        """
-        given a product ID return the level
-        """
-        return self.getEntry('Product', productID).level
-
-    def getMissionName(self, mid=None):
-        """
-        Return the current mission ID
-
-        @return: mission_id - the current mission ID
-
-        >>> dbp = DBProcessing()
-        >>> dbp.getMissionID()
-        19
-        """
-        if mid is None:
-            return self.getEntry('Mission', self.mission).mission_name
-        else:
-            return self.getEntry('Mission', mid).mission_name
 
     def getInstrumentID(self, name, satellite_id=None):
         """
@@ -1359,36 +1314,6 @@ class DBUtils(object):
             c_id = sq[0].code_id
         return c_id
 
-    def getFilename(self, file_id):
-        """
-        Return the filename for the input file_id
-
-        @param file_id: file_id to return the name from
-        @type filename: long
-
-        @return: filename: filename associated with the file_id
-        @rtype: str
-        """
-        return self.getEntry('File', file_id).filename
-
-    def getFileProcess_keywords(self, file_id):
-        """
-        given a file_id return the process keywords string
-        """
-        return self.getEntry('File', file_id).process_keywords
-
-    def getFileUTCfileDate(self, file_id):
-        """
-        Return the utc_file_date for the input file_id
-
-        @param file_id: file_id to return the date  from
-        @type filename: long
-
-        @return: utc_file_date: date of the file  associated with the file_id
-        @rtype: datetime
-        """
-        return self.getEntry('File', file_id).utc_file_date
-
     def getFileDates(self, file_id):
         """
         given a file_id or name return the dates it spans
@@ -1415,13 +1340,13 @@ class DBUtils(object):
                     d = d.date()
                 sq = self.session.query(self.File).filter_by(product_id = product_id).filter(or_(self.File.utc_start_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1)), self.File.utc_stop_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1))))
                 #sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
-                sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
+                sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getEntry('File', v.file_id).product_id, self.getEntry('File', v.file_id).utc_file_date ) for v in sq]
                 retval.extend(sq)
         except TypeError:
             d = date
             sq = self.session.query(self.File).filter_by(product_id = product_id).filter(or_(self.File.utc_start_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1)), self.File.utc_stop_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1))))
             # sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
-            sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
+            sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getEntry('File', v.file_id).product_id, self.getEntry('File', v.file_id).utc_file_date ) for v in sq]
             retval.extend(sq)
         DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, retval) )
         return retval
@@ -1540,7 +1465,7 @@ class DBUtils(object):
         given a file ID return all the processes that use this as input
         """
         DBlogging.dblogger.debug( "Entered findChildrenProducts():  file_id: {0}".format(file_id) )
-        product_id = self.getFileProduct(file_id)
+        product_id = self.getEntry('File', file_id).product_id
 
         # get all the process ids that have this product as an input
         proc_ids = self.getProcessFromInputProduct(product_id)
@@ -1569,13 +1494,6 @@ class DBUtils(object):
                 return sq[0].product_id
             except IndexError: # no file_id found
                 raise(DBNoData("No product_name %s found in the DB" % (product_name)))
-
-    def getProductName(self,
-                     product_id):
-        """
-        Return the product Name for an input product id
-        """
-        return self.getEntry('Product', product_id).product_name
 
     def getSatelliteID(self,
                         sat_name):
@@ -1619,12 +1537,6 @@ class DBUtils(object):
         except IndexError:
             raise(DBNoData("No code number {0} in the db".format(code_id)))
 
-    def getOutputProductFromProcess(self, process):
-        """
-        given an process id return the output product
-        """
-        return self.getEntry('Process', process).output_product
-
     def getProcessFromOutputProduct(self, outProd):
         """
         Gets process from the db that have the output product
@@ -1644,12 +1556,6 @@ class DBUtils(object):
             return sq1[0][0]
         except IndexError:
             return None
-
-    def getCodeArgs(self, code_id):
-        """
-        Given a code_id list return the arguments to the code
-        """
-        return self.getEntry('Code', code_id).arguments
 
     def getMissionDirectory(self):
         """
@@ -1778,7 +1684,7 @@ class DBUtils(object):
             if fullpath:
                 sq[i] = self.getFileFullPath(v)
             else:
-                sq[i] = self.getFilename(v)
+                sq[i] = self.getEntry('File', v).filename
         return sq
 
     def checkFileMD5(self, file_id):
@@ -1824,7 +1730,7 @@ class DBUtils(object):
         # Instrumentproductlink
         retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((inst_id, prod_id))
         # satellite
-        sat_id = self.getInstrumentSatellite(inst_id)
+        sat_id = self.getEntry('Instrument', inst_id).satellite_id
         retval['satellite'] = self.getEntry('Satellite', sat_id)
         # mission
         mission = self.getSatelliteMission(sat_id)
@@ -1837,7 +1743,7 @@ class DBUtils(object):
         mission, satellite, instrument, product, inspector, Instrumentproductlink
         """
         file_id = self.getFileID(file_id)
-        prod_id = self.getFileProduct(file_id)
+        prod_id = self.getEntry('File', file_id).product_id
         retval = self.getProductTraceback(prod_id)
         retval['file'] = self.getEntry('File', file_id)
         return retval
@@ -1855,7 +1761,7 @@ class DBUtils(object):
         inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)
         retval['instrument'] = self.getEntry('Instrument', inst_id)
         # satellite
-        sat_id = self.getInstrumentSatellite(inst_id)
+        sat_id = self.getEntry('Instrument', inst_id).satellite_id
         retval['satellite'] = self.getEntry('Satellite', sat_id)
         # mission
         mission_id = self.getSatelliteMission(sat_id).mission_id
