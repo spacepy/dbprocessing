@@ -528,19 +528,16 @@ class DBUtils2(object):
             ## processqueue
             try:
                 self.processqueueRemoveItem(f)
-                print "  Removed from Processqueue"
             except DBNoData:
                 pass
             ## filefilelink
             try:
                 self.delFilefilelink(f)
-                print "  Removed from Filefilelink"
             except DBNoData:
                 pass
             ## filecodelink
             try:
                 self.delFilecodelink(f)
-                print "  Removed from Filecodelink"
             except DBNoData:
                 pass
             ## file
@@ -756,11 +753,9 @@ class DBUtils2(object):
         """
         removes an inspector form the db
         """
-        insp = self.session.query(self.Inspector).get(i).delete()
-        if insp == 0:
-            raise(DBNoData("No entry for ID={0} found".format(i)))
-        else:
-            self._commitDB()
+        insp = self.getEntry('Inspector', i)
+        self.session.delete(insp)
+        self._commitDB()
 
     def delFilefilelink(self, f):
         """
@@ -943,7 +938,7 @@ class DBUtils2(object):
         # need to do {} replacement
         description = self._nameSubProduct(description, product)
         c1.description = description
-        c1.product = product
+        c1.product = self.getProductID(product)
         c1.interface_version = version.interface
         c1.quality_version = version.quality
         c1.revision_version = version.revision
@@ -951,36 +946,11 @@ class DBUtils2(object):
         c1.date_written = date_written
         c1.output_interface_version = output_interface_version
         c1.newest_version = newest_version
-        c1.arguments = self._nameSubInspector(arguments, product)
+        c1.arguments = self._nameSubProduct(arguments, product)
 
         self.session.add(c1)
         self._commitDB()
         return c1.inspector_id
-
-    def _nameSubInspector(self, inStr, product_id):
-        """
-        in inStr replace the standard {} with the names
-        !!! NOTE product_id
-        """
-        if inStr is None:
-            return inStr
-        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
-        ftb = self.getProductTraceback(product_id)
-        if '{INSTRUMENT}' in inStr :
-            inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
-        if '{SATELLITE}' in inStr :
-            inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-        if '{MISSION}' in inStr :
-            inStr = inStr.replace('{MISSION}', ftb['mission'].mission_name)
-        if '{PRODUCT}' in inStr :
-            inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
-        if '{LEVEL}' in inStr :
-            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
-        if '{ROOTDIR}' in inStr :
-            inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
-        if any(val in inStr for val in repl): # call yourself again
-            inStr = self._nameSubInspector(inStr, product_id)
-        return inStr
 
     def _nameSubProduct(self, inStr, product_id):
         """
@@ -1022,9 +992,9 @@ class DBUtils2(object):
         if '{MISSION}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{MISSION}', ftb['mission'].mission_name)
         if '{PRODUCT}' in inStr : # need to replace with the instrument name
-            inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
+            inStr = inStr.replace('{PRODUCT}', ftb['input_product'][0][0].product_name)
         if '{LEVEL}' in inStr :
-            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
+            inStr = inStr.replace('{LEVEL}', str(ftb['input_product'][0][0].level))
         if '{ROOTDIR}' in inStr :
             inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
         if any(val in inStr for val in repl): # call yourself again
@@ -1698,10 +1668,7 @@ class DBUtils2(object):
         """
         Given a code_id list return the arguments to the code
         """
-        sq1 = self.getEntry('Code', code_id)
-        if sq1 is None:
-            raise(DBNoData("No code: {0}".format(code_id)))
-        return sq1.arguments
+        return self.getEntry('Code', code_id).arguments
 
     def getMissionDirectory(self):
         """
@@ -1957,16 +1924,6 @@ class DBUtils2(object):
         """
         prods = self.session.query(self.Product).all()
         return prods
-
-    def getFilesQC(self):
-        """
-        return a list of tuples containing
-        (file_id, date, filename, product_name)
-        for files whos quality_checked flag is false
-        """
-        files = self.session.query(self.File).filter_by(quality_checked=False).filter_by(newest_version=True).all()
-        output = [ (f.file_id, f.utc_file_date, f.filename, self.getProductName(f.product_id) ) for f in files ]
-        return output
 
     def getEntry(self, table, *args):
         """
