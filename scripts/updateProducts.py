@@ -18,7 +18,7 @@ import ConfigParser
 import datetime
 import sys
 
-from dbprocessing import DBUtils2
+from dbprocessing import DBUtils
 
 sections = ['base', 'product', 'inspector',]
 
@@ -68,7 +68,7 @@ def _updateSections(conf):
     """
     go through each section and update the db is there is a change
     """
-    dbu = DBUtils2.DBUtils2('rbsp') # TODO don't assume RBSP later
+    dbu = DBUtils.DBUtils('rbsp') # TODO don't assume RBSP later
     dbu._openDB()
     dbu._createTableObjects()
 

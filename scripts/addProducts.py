@@ -21,7 +21,7 @@ import ConfigParser
 from dateutil import parser as dup
 import sys
 
-from dbprocessing import DBUtils2
+from dbprocessing import DBUtils
 from dbprocessing import Version
 
 sections = ['base', 'product', 'inspector',]
@@ -65,7 +65,7 @@ def configCheck(conf, dbu):
 def addStuff(filename):
     cfg = readconfig(filename)
     # setup the db
-    dbu = DBUtils2.DBUtils2('rbsp') # TODO no rbsp hardcode later
+    dbu = DBUtils.DBUtils('rbsp') # TODO no rbsp hardcode later
     dbu._openDB()
     dbu._createTableObjects()
 

@@ -68,7 +68,7 @@ class inspector(object):
 
     def __init__(self, filename, dbu, product, **kwargs):
         DBlogging.dblogger.info("Entered inspector {0} with kwargs: {1}".format(self.code_name, kwargs))
-        self.dbu = dbu # give us access to DBUtils2
+        self.dbu = dbu # give us access to DBUtils
         self.filename = filename
         self.basename = os.path.basename(self.filename)
         self.dirname = os.path.dirname(self.filename)

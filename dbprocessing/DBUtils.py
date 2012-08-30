@@ -46,7 +46,7 @@ class DBNoData(Exception):
     pass
 
 
-class DBUtils2(object):
+class DBUtils(object):
     """
     @summary: DBUtils - utility routines for the DBProcessing class, all of these may be user called but are meant to
     be internal routines for DBProcessing
@@ -58,7 +58,7 @@ class DBUtils2(object):
         """
         self.dbIsOpen = False
         if mission == None:
-            raise(DBError("Must input mission name to create DBUtils2 instance"))
+            raise(DBError("Must input mission name to create DBUtils instance"))
         self.mission = mission
         #Expose the format/regex routines of DBFormatter
         fmtr = DBStrings.DBFormatter()
@@ -507,6 +507,53 @@ class DBUtils2(object):
                     break # there can be only one
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
+
+    def queueClean(self):
+        """
+        go through the process queue and clear out lower versions of the same files
+        this is determined by product and utc_file_date
+        """
+        # TODO this might break with weekly input files
+        DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.dbu.processqueueLen()))
+        try:
+            pqdata = self.dbu.processqueueGetAll()
+        except DBUtils.DBError:
+            return None
+        # build up a list of tuples file_id, product_id, utc_file_date, version
+        data = []
+        for val in pqdata:
+            file_id = val
+            sq = self.dbu.session.query(self.dbu.File).filter_by(file_id = val)
+            try:
+                product_id = sq[0].product_id
+                utc_file_date = sq[0].utc_file_date
+                version = Version.Version(sq[0].interface_version, sq[0].quality_version, sq[0].revision_version)
+                data.append( (file_id, product_id, utc_file_date, version) )
+            except IndexError: # None return, maybe off the end
+                pass
+        ## think here on better, but a dict makes for easy del
+        data2 = {}
+        for ii, val in enumerate(data):
+            data2[ii] = val
+        for k1, k2 in itertools.product(range(len(data2)), range(len(data2))):
+            if k1 == k2:
+                continue
+            try:
+                if data2[k1][1] == data2[k2][1] and data2[k1][2] == data2[k2][2]: # same product an date
+                    # drop the one with the lower version
+                    if data2[k1][3] > data2[k2][3]:
+                        del data2[k2]
+                        DBlogging.dblogger.info("Removed {0} from the process queue".format(data2[k2]))
+                    else:
+                        del data2[k1]
+                        DBlogging.dblogger.info("Removed {0} from the process queue".format(data2[k1]))
+            except KeyError: # we deleted one of them
+                continue
+        ## now we have a dict of just the unique files
+        self.dbu.processqueueFlush()
+        for key in data2:
+            self.dbu.processqueuePush(data2[key][0]) # the file_id goes back on
+        DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.dbu.processqueueLen()))
 
     def _purgeFileFromDB(self, filename=None, recursive=False):
         """
@@ -1943,6 +1990,31 @@ class DBUtils2(object):
         if retval is None:
             raise(DBNoData('No entry {0} for table {1}'.format(args[0], table)))
         return retval
+
+    @classmethod
+    def processRunning(pid):
+        """
+        given a PID see if it is currently running
+
+        @param pid: a pid
+        @type pid: long
+
+        @return: True if pid is running, False otherwise
+        @rtype: bool
+
+        @author: Brandon Craig Rhodes
+        @organization: Stackoverflow
+        http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
+
+        @version: V1: 02-Dec-2010 (BAL)
+        """
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return False
+        else:
+            return True
+
 
 
 

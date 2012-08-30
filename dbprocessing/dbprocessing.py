@@ -1,7 +1,6 @@
 #!/usr/bin/env python2.6
 
 import imp
-import itertools
 import glob
 import os
 import os.path
@@ -13,7 +12,7 @@ import DBfile
 import DBlogging
 import DBStrings
 import DBqueue
-import DBUtils2
+import DBUtils
 import Version
 
 try: # new version changed this annoyingly
@@ -27,12 +26,6 @@ __version__ = '2.0.4'
 class ProcessException(Exception):
     """Class for errors in ProcessQueue"""
     pass
-
-
-class ForException(Exception):
-    """Cheezy but separate exception for breaking out of a nested loop"""
-    pass
-
 
 class ProcessQueue(object):
     """
@@ -49,7 +42,7 @@ class ProcessQueue(object):
                  mission):
 
         self.mission = mission
-        dbu = DBUtils2.DBUtils2(self.mission)
+        dbu = DBUtils.DBUtils(self.mission)
         dbu._openDB()
         dbu._createTableObjects()
         self.tempdir = None
@@ -73,25 +66,6 @@ class ProcessQueue(object):
             shutil.rmtree(self.tempdir)
             self.tempdir = None
             DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
-
-    def depDict(self, infile, file=None, code=None):
-        """
-        Dict to keep track of dependencies
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
-        """
-
-        DBlogging.dblogger.debug("Entered depDict:")
-
-        # maybe this should be a class
-        if not isinstance(file, (list, tuple)):
-            file = [file]
-        if not isinstance(code, (list, tuple)):
-            code = [code]
-        return {'infile':infile, 'code':code, 'file':file}
 
 
     def checkIncoming(self):
@@ -119,10 +93,6 @@ class ProcessQueue(object):
         DBlogging.dblogger.debug("Queue contains (%d): %s" % (len(self.queue),
                                                               self.queue))
 
-
-    ## def doProcess(self):
-    ##     DBlogging.dblogger.info("Entering doProcess()")
-    ##     self.process()
 
     def moveToError(self, fname):
         """
@@ -181,7 +151,7 @@ class ProcessQueue(object):
         try:
             f_id = dbf.addFileToDB()
             DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
-        except (ValueError, DBUtils2.DBError) as errmsg:
+        except (ValueError, DBUtils.DBError) as errmsg:
             DBlogging.dblogger.warning("Except adding file to db so" + \
                                        " moving to error: %s" % (errmsg))
             self.moveToError(os.path.join(df.path, df.filename))
@@ -201,7 +171,7 @@ class ProcessQueue(object):
             self.dbu.session.commit()
         except IntegrityError as IE:
             self.session.rollback()
-            raise(DBUtils2.DBError(IE))
+            raise(DBUtils.DBError(IE))
         # add to processqueue for later processing
         self.dbu.processqueuePush(f_id)
         return f_id
@@ -264,7 +234,7 @@ class ProcessQueue(object):
             return None
         if len(claimed) > 1:
             DBlogging.dblogger.error("File {0} matched more than one product, there is a DB error".format(self.current_file))
-            raise(DBUtils2.DBError("File {0} matched more than one product, there is a DB error".format(self.current_file)))
+            raise(DBUtils.DBError("File {0} matched more than one product, there is a DB error".format(self.current_file)))
 
         return claimed[0]  # return the diskfile
 
@@ -354,7 +324,7 @@ class ProcessQueue(object):
             tmp = self.dbu.getProductNames(out_prod)
             if not tmp:
                 DBlogging.dblogger.error("ERROR: DB inconsistency found")
-                raise(DBUtils2.DBError("DB inconsistency found"))
+                raise(DBUtils.DBError("DB inconsistency found"))
             mission, satellite, instrument, product, product_id = tmp
 
 
@@ -449,7 +419,7 @@ class ProcessQueue(object):
                                 DBlogging.dblogger.debug("Filename: {0} found all the same files".format(filename))
                                 return None
 
-                except (DBUtils2.DBError, DBUtils2.DBNoData): # this is for self.dbu.getFileID(filename)
+                except (DBUtils.DBError, DBUtils.DBNoData): # this is for self.dbu.getFileID(filename)
                     DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(filename))
                     break # leave the while loop and do the processing
 
@@ -531,74 +501,5 @@ class ProcessQueue(object):
             self.current_file = current_file # so we can put it back
 
 
-    def queueClean(self):
-        """
-        go through the process queue and clear out lower versions of the same files
-        this is determined by product and utc_file_date
-        """
-        # TODO this might break with weekly input files
-        DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.dbu.processqueueLen()))
-        try:
-            pqdata = self.dbu.processqueueGetAll()
-        except DBUtils2.DBError:
-            return None
-        # build up a list of tuples file_id, product_id, utc_file_date, version
-        data = []
-        for val in pqdata:
-            file_id = val
-            sq = self.dbu.session.query(self.dbu.File).filter_by(file_id = val)
-            try:
-                product_id = sq[0].product_id
-                utc_file_date = sq[0].utc_file_date
-                version = Version.Version(sq[0].interface_version, sq[0].quality_version, sq[0].revision_version)
-                data.append( (file_id, product_id, utc_file_date, version) )
-            except IndexError: # None return, maybe off the end
-                pass
-        ## think here on better, but a dict makes for easy del
-        data2 = {}
-        for ii, val in enumerate(data):
-            data2[ii] = val
-        for k1, k2 in itertools.product(range(len(data2)), range(len(data2))):
-            if k1 == k2:
-                continue
-            try:
-                if data2[k1][1] == data2[k2][1] and data2[k1][2] == data2[k2][2]: # same product an date
-                    # drop the one with the lower version
-                    if data2[k1][3] > data2[k2][3]:
-                        del data2[k2]
-                        DBlogging.dblogger.info("Removed {0} from the process queue".format(data2[k2]))
-                    else:
-                        del data2[k1]
-                        DBlogging.dblogger.info("Removed {0} from the process queue".format(data2[k1]))
-            except KeyError: # we deleted one of them
-                continue
-        ## now we have a dict of just the unique files
-        self.dbu.processqueueFlush()
-        for key in data2:
-            self.dbu.processqueuePush(data2[key][0]) # the file_id goes back on
-        DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.dbu.processqueueLen()))
 
-
-def processRunning(pid):
-    """
-    given a PID see if it is currently running
-
-    @param pid: a pid
-    @type pid: long
-
-    @return: True if pid is running, False otherwise
-    @rtype: bool
-
-    @author: Brandon Craig Rhodes
-    @organization: Stackoverflow
-    http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
-
-    @version: V1: 02-Dec-2010 (BAL)
-    """
-    try:
-        os.kill(pid, 0)
-    except OSError:
-        return False
-    else:
-        return True
 

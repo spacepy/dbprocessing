@@ -5,7 +5,7 @@ import os
 from optparse import OptionParser
 import sys
 
-from dbprocessing import DBUtils2
+from dbprocessing import DBUtils
 
 import SimpleEmail
 
@@ -13,7 +13,7 @@ import SimpleEmail
 class QCEmailer(object):
 
     def __init__(self, *args, **kwargs):
-        a = DBUtils2.DBUtils2('rbsp')
+        a = DBUtils.DBUtils('rbsp')
         a._openDB()
         a._createTableObjects()
 
@@ -111,7 +111,7 @@ def main():
     if len(args) != 1:
         parser.error("incorrect number of arguments")
 
-    a = DBUtils2.DBUtils2('rbsp')
+    a = DBUtils.DBUtils('rbsp')
     a._openDB()
     a._createTableObjects()
     prod_id = a.getProductID(args[0])

@@ -67,7 +67,7 @@ foreach in "find children": (queue)
 
 Important Files:
 -----------------
-DBUtils2.py - file contains most of the routines that directly interface to the db <<not all are still useful or functional>>
+DBUtils.py - file contains most of the routines that directly interface to the db <<not all are still useful or functional>>
 DBfile.py - class that represents a file in the db and what can be done with a file <<delete not yet supported>>
 DBlogging.py - class that logs message from program execution, I use tail -f dbprocessing_log.log
 dbprocessing_log.log - the log file for processing that is appended to as the program runs, is has a max size of 2000000 bytes

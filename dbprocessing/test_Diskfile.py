@@ -5,7 +5,7 @@ import os
 import stat
 import unittest
 
-import DBUtils2
+import DBUtils
 import Diskfile
 import Version
 
@@ -37,7 +37,7 @@ class DiskfileTests(unittest.TestCase):
 
     def setUp(self):
         super(DiskfileTests, self).setUp()
-        dbo = DBUtils2.DBUtils2()
+        dbo = DBUtils.DBUtils()
         dbo._openDB()
         dbo._createTableObjects()
         self.dbo = dbo
