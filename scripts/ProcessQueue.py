@@ -5,7 +5,7 @@ import traceback
 
 from dbprocessing import DBlogging, dbprocessing
 from dbprocessing.dbprocessing import ProcessException
-from DBUtils import processRunning
+from dbprocessing.DBUtils import processRunning
 
 __version__ = '2.0.3'
 
