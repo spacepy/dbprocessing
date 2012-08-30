@@ -5,7 +5,7 @@ import traceback
 
 from dbprocessing import DBlogging, dbprocessing
 from dbprocessing.dbprocessing import ProcessException
-from dbprocessing.DBUtils import processRunning
+from dbprocessing import DBUtils
 
 __version__ = '2.0.3'
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     curr_proc = pq.dbu._currentlyProcessing()
     if curr_proc:  # returns False or the PID
         # check if the PID is running
-        if processRunning(curr_proc):
+        if DBUtils.processRunning(curr_proc):
             # we still have an instance processing, don't start another
             pq.dbu._closeDB()
             DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
