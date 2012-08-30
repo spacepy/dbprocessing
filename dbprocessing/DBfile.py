@@ -43,8 +43,8 @@ class DBfile(object):
 
         @param diskfile: a diskfile instance to create a DBfile from
         @type infile: Diskfile
-        @param dbu: pass in the current DBUtils2 session so that a new connection is not made
-        @type dbu: DBUtils2
+        @param dbu: pass in the current DBUtils session so that a new connection is not made
+        @type dbu: DBUtils
 
         @author: Brian Larsen
         @organization: Los Alamos National Lab
@@ -58,7 +58,7 @@ class DBfile(object):
             raise(DBfileError('Wrong input, must input a Diskfile object'))
 
         # this keeps opening connecitons
-        #dbu = DBUtils2.DBUtils2(diskfile.mission)
+        #dbu = DBUtils.DBUtils(diskfile.mission)
         #dbu._openDB()
         #dbu._createTableObjects()
         self.dbu = dbu
@@ -90,7 +90,7 @@ class DBfile(object):
 
     def addFileToDB(self):
         """
-        wrapper around DButils2.addFile to take params dict to keywords
+        wrapper around DBUtils.addFile to take params dict to keywords
 
         @return: the file_id of the newly added file
         @rtype: long

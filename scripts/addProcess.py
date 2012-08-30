@@ -21,7 +21,7 @@ import ConfigParser
 from dateutil import parser as dup
 import sys
 
-from dbprocessing import DBUtils2
+from dbprocessing import DBUtils
 from dbprocessing import Version
 
 
@@ -80,8 +80,8 @@ def configCheck(conf, dbu):
     for prod in prods:
         try:
             prod_id_dict[prod] = dbu.getProductID(prod)
-        except DBUtils2.DBNoData:
-            raise(DBUtils2.DBNoData('Product {0} was not already in the DB, check spelling or add'.format(prod)))
+        except DBUtils.DBNoData:
+            raise(DBUtils.DBNoData('Product {0} was not already in the DB, check spelling or add'.format(prod)))
     print '  All products are in the db.  Continuing with add'
     return prod_id_dict
 
@@ -89,7 +89,7 @@ def configCheck(conf, dbu):
 def addStuff(filename):
     cfg = readconfig(filename)
     # setup the db
-    dbu = DBUtils2.DBUtils2('rbsp') # TODO no rbsp hardcode later
+    dbu = DBUtils.DBUtils('rbsp') # TODO no rbsp hardcode later
     dbu._openDB()
     dbu._createTableObjects()
 

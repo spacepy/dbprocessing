@@ -1,11 +1,12 @@
 #!/usr/bin/env python2.6
 
-import getopt
+from optparse import OptionParser
 import sys
 import traceback
 
 from dbprocessing import DBlogging, dbprocessing
-from dbprocessing.dbprocessing import processRunning, ProcessException
+from dbprocessing.dbprocessing import ProcessException
+from DBUtils import processRunning
 
 __version__ = '2.0.3'
 
@@ -20,31 +21,30 @@ def usage():
     return
 
 if __name__ == "__main__":
-    # TODO decide if we really want to run this way, works for now
-#    s = '--mission=Test --import --process'
-#    args = s.split()
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "pim:")
-    except getopt.GetoptError, err:
-        # print help information and exit:
-        print str(err) # will print something like "option -a not recognized"
-        usage()
-        sys.exit(2)
+    usage = \
+    """
+    Usage: {0} [-i] [-p] [-m Test]".format("ProcessQueue")
+        -i -> import
+        -p -> process
+        -m -> selects mission
+    """
+    parser = OptionParser(usage)
+    parser.add_option("-i", "", dest="i", action="store_true",
+                      help="ingest mode", default=False)
+    parser.add_option("-p", "", dest="p", action="store_true",
+                      help="process mode", default=False)
+    parser.add_option("-m", "--mission", dest="mission",
+                      help="selected mission", default=None)
+    (options, args) = parser.parse_args()
+    if len(args) != 0:
+        parser.error("incorrect number of arguments")
 
-    try:
-        if not '-i' in zip(*opts)[0] and not '-p' in zip(*opts)[0]:
-            usage()
-            sys.exit(2)
-    except IndexError:
-        usage()
-        sys.exit(2)
+    if options.i and options.p:
+        parser.error("options -i and -p are mutually exclusive")
+    if not options.i and not options.p:
+        parser.error("either -i or -p must be specified")
 
-    if '-m' in zip(*opts)[0]:
-        for o in opts:
-            if o[0] == '-m':
-                pq = dbprocessing.ProcessQueue(o[1])
-    else:
-        pq = dbprocessing.ProcessQueue('Test')
+    pq = dbprocessing.ProcessQueue(options.mission)
 
     # check currently processing
     curr_proc = pq.dbu._currentlyProcessing()
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # start logging as a lock
     pq.dbu._startLogging()
 
-    if '-i' in zip(*opts)[0]: # import selected
+    if options.i: # import selected
         try:
             start_len = pq.dbu.processqueueLen()
             pq.checkIncoming()
@@ -85,11 +85,11 @@ if __name__ == "__main__":
         pq.dbu._closeDB()
         print("Import finished: {0} files added".format(pq.dbu.processqueueLen()-start_len))
 
-    if '-p' in zip(*opts)[0]: # process selected
+    if options.p: # process selected
         try:
             DBlogging.dblogger.debug("pq.dbu.processqueueLen(): {0}".format(pq.dbu.processqueueLen()))
             while pq.dbu.processqueueLen() > 0:
-                pq.queueClean()  # get rid of duplicates
+                pq.dbu.processqueueClean()  # get rid of duplicates
                 file_id = pq.dbu.processqueueGet()
                 DBlogging.dblogger.debug("popped {0} from pq.dbu.processqueueGet()".format(file_id))
                 if file_id is None:

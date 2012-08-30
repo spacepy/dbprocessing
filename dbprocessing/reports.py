@@ -26,9 +26,9 @@ import re
 import dateutil.parser as dup
 import numpy as np
 
-from dbprocessing import DBUtils2
+from dbprocessing import DBUtils
 
-dbu = DBUtils2.DBUtils2('rbsp')
+dbu = DBUtils.DBUtils('rbsp')
 dbu._openDB()
 dbu._createTableObjects()
 

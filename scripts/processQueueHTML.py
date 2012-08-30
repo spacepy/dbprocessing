@@ -3,7 +3,7 @@
 import datetime
 import sys
 
-from dbprocessing import DBUtils2
+from dbprocessing import DBUtils
 
 
 def _unicodeListToStrList(lst):
@@ -57,7 +57,7 @@ def makeHTML(mission, filename):
     </body></html>
     """
 
-    dbu = DBUtils2.DBUtils2(mission) # TODO don't assume RBSP later
+    dbu = DBUtils.DBUtils(mission) # TODO don't assume RBSP later
     dbu._openDB()
     dbu._createTableObjects()
 

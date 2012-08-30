@@ -85,8 +85,8 @@ class Diskfile(object):
     ==========
     infile : str
         a file to create a diskfile around
-    dbu :  DBUtils2
-        pass in the current DBUtils2 session so that a new connection is not made
+    dbu :  DBUtils
+        pass in the current DBUtils session so that a new connection is not made
 
     Attributes
     ==========
@@ -137,7 +137,7 @@ class Diskfile(object):
         self.params['process_keywords'] = None
 
         # this keeps opening connecitons
-        #dbu = DBUtils2.DBUtils2('Test')
+        #dbu = DBUtils.DBUtils('Test')
         #dbu._openDB()
         #dbu._createTableObjects()
         self.dbu = dbu

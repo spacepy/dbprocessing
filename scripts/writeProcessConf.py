@@ -20,7 +20,7 @@
 import ConfigParser
 import sys
 
-from dbprocessing import DBUtils2
+from dbprocessing import DBUtils
 
 
 def toBool(value):
@@ -50,7 +50,7 @@ def writeconfig(my_cfg, config_filepath):
 
 def getStuff(proc_name, filename):
     cfg = {}
-    dbu = DBUtils2.DBUtils2('rbsp') # TODO don't assume RBSP later
+    dbu = DBUtils.DBUtils('rbsp') # TODO don't assume RBSP later
     dbu._openDB()
     dbu._createTableObjects()
     # are we trying to write files for all the products?

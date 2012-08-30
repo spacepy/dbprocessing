@@ -4,7 +4,7 @@ import unittest
 import os
 
 import DBfile
-import DBUtils2
+import DBUtils
 import Diskfile
 
 
@@ -19,7 +19,7 @@ class DBfileTests(unittest.TestCase):
         self.test_filename = 'Test-one_R0_evinst_20100112_v2.0.0.cdf'
         with open(self.test_filename, 'wb') as f:
             f.write('I am some text in a file')
-        self.dbu = DBUtils2.DBUtils2('Test')
+        self.dbu = DBUtils.DBUtils('Test')
         self.df = Diskfile.Diskfile(self.test_filename, self.dbu)
         #TODO: Diskfile appears to have never had this method
         #self.df.parseAll()

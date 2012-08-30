@@ -46,7 +46,7 @@ class DBNoData(Exception):
     pass
 
 
-class DBUtils2(object):
+class DBUtils(object):
     """
     @summary: DBUtils - utility routines for the DBProcessing class, all of these may be user called but are meant to
     be internal routines for DBProcessing
@@ -58,7 +58,7 @@ class DBUtils2(object):
         """
         self.dbIsOpen = False
         if mission == None:
-            raise(DBError("Must input mission name to create DBUtils2 instance"))
+            raise(DBError("Must input mission name to create DBUtils instance"))
         self.mission = mission
         #Expose the format/regex routines of DBFormatter
         fmtr = DBStrings.DBFormatter()
@@ -507,6 +507,42 @@ class DBUtils2(object):
                     break # there can be only one
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
+
+    def processqueueClean(self):
+        """
+        go through the process queue and clear out lower versions of the same files
+        this is determined by product and utc_file_date
+        """
+        # TODO this might break with weekly input files
+        DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.processqueueLen()))
+        pqdata = self.processqueueGetAll()
+        if len(pqdata) <= 1: # can't clean just one (or zero) entries
+            return
+        # build up a list of tuples file_id, product_id, utc_file_date, version
+        data = {}
+        for ii, file_id in enumerate(pqdata):
+            sq = self.getEntry('File', file_id)
+            product_id = sq.product_id
+            utc_file_date = sq.utc_file_date
+            version = self.getFileVersion(sq.file_id)
+            data[ii] = (file_id, product_id, utc_file_date, version)
+        for k1, k2 in itertools.combinations(range(len(data)), 2): # order does not matter
+            if data[k1][1] == data[k2][1] and data[k1][2] == data[k2][2]: # same product an date
+                # drop the one with the lower version
+                if data[k1][3] > data[k2][3]:
+                    DBlogging.dblogger.info("Removed {0} from the process queue".format(data[k2]))
+                    del data[k2]
+                elif data[k1][3] < data[k2][3]:
+                    DBlogging.dblogger.info("Removed {0} from the process queue".format(data[k1]))
+                    del data[k1]
+                else:
+                    DBlogging.dblogger.error('Same product ({0}), same date ({1}), same version ({2}) this should not have been allowed'.format(data[k1][1], data[k1][2], data[k1][3]))
+                    raise(DBError('Same product ({0}), same date ({1}), same version ({2}) this should not have been allowed'.format(data[k1][1], data[k1][2], data[k1][3])))
+        ## now we have a dict of just the unique files
+        self.processqueueFlush()
+        for key in data:
+            self.processqueuePush(data[key][0]) # the file_id goes back on
+        DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.processqueueLen()))
 
     def _purgeFileFromDB(self, filename=None, recursive=False):
         """
@@ -1172,20 +1208,14 @@ class DBUtils2(object):
         try:
             root_dir = ftb['mission'].rootdir
         except KeyError:
-            root_dir = ''
-
+            raise(DBError("Mission root directory not set, fix the DB"))
         return os.path.join(root_dir, rel_path, filename)
 
     def getProcessFromInputProduct(self, product):
         """
         given an product name or id return all the processes that use that as an input
         """
-        try:
-            product = int(product)
-        except ValueError: # it was a string
-            p_id = self.getProductID(product)
-        else:
-            p_id = product
+        p_id = self.getProductID(product)
         sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
         ans = []
         for v in sq:
@@ -1943,6 +1973,31 @@ class DBUtils2(object):
         if retval is None:
             raise(DBNoData('No entry {0} for table {1}'.format(args[0], table)))
         return retval
+
+    @classmethod
+    def processRunning(self, pid):
+        """
+        given a PID see if it is currently running
+
+        @param pid: a pid
+        @type pid: long
+
+        @return: True if pid is running, False otherwise
+        @rtype: bool
+
+        @author: Brandon Craig Rhodes
+        @organization: Stackoverflow
+        http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
+
+        @version: V1: 02-Dec-2010 (BAL)
+        """
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return False
+        else:
+            return True
+
 
 
 
