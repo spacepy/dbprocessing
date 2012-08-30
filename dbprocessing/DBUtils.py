@@ -508,52 +508,41 @@ class DBUtils(object):
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
 
-    def queueClean(self):
+    def processqueueClean(self):
         """
         go through the process queue and clear out lower versions of the same files
         this is determined by product and utc_file_date
         """
         # TODO this might break with weekly input files
-        DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.dbu.processqueueLen()))
-        try:
-            pqdata = self.dbu.processqueueGetAll()
-        except DBUtils.DBError:
-            return None
+        DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.processqueueLen()))
+        pqdata = self.processqueueGetAll()
+        if len(pqdata) <= 1: # can't clean just one (or zero) entries
+            return
         # build up a list of tuples file_id, product_id, utc_file_date, version
-        data = []
-        for val in pqdata:
-            file_id = val
-            sq = self.dbu.session.query(self.dbu.File).filter_by(file_id = val)
-            try:
-                product_id = sq[0].product_id
-                utc_file_date = sq[0].utc_file_date
-                version = Version.Version(sq[0].interface_version, sq[0].quality_version, sq[0].revision_version)
-                data.append( (file_id, product_id, utc_file_date, version) )
-            except IndexError: # None return, maybe off the end
-                pass
-        ## think here on better, but a dict makes for easy del
-        data2 = {}
-        for ii, val in enumerate(data):
-            data2[ii] = val
-        for k1, k2 in itertools.product(range(len(data2)), range(len(data2))):
-            if k1 == k2:
-                continue
-            try:
-                if data2[k1][1] == data2[k2][1] and data2[k1][2] == data2[k2][2]: # same product an date
-                    # drop the one with the lower version
-                    if data2[k1][3] > data2[k2][3]:
-                        del data2[k2]
-                        DBlogging.dblogger.info("Removed {0} from the process queue".format(data2[k2]))
-                    else:
-                        del data2[k1]
-                        DBlogging.dblogger.info("Removed {0} from the process queue".format(data2[k1]))
-            except KeyError: # we deleted one of them
-                continue
+        data = {}
+        for ii, file_id in enumerate(pqdata):
+            sq = self.getEntry('File', file_id)
+            product_id = sq.product_id
+            utc_file_date = sq.utc_file_date
+            version = self.getFileVersion(sq.file_id)
+            data[ii] = (file_id, product_id, utc_file_date, version)
+        for k1, k2 in itertools.combinations(range(len(data)), 2): # order does not matter
+            if data[k1][1] == data[k2][1] and data[k1][2] == data[k2][2]: # same product an date
+                # drop the one with the lower version
+                if data[k1][3] > data[k2][3]:
+                    DBlogging.dblogger.info("Removed {0} from the process queue".format(data[k2]))
+                    del data[k2]
+                elif data[k1][3] < data[k2][3]:
+                    DBlogging.dblogger.info("Removed {0} from the process queue".format(data[k1]))
+                    del data[k1]
+                else:
+                    DBlogging.dblogger.error('Same product ({0}), same date ({1}), same version ({2}) this should not have been allowed'.format(data[k1][1], data[k1][2], data[k1][3]))
+                    raise(DBError('Same product ({0}), same date ({1}), same version ({2}) this should not have been allowed'.format(data[k1][1], data[k1][2], data[k1][3])))
         ## now we have a dict of just the unique files
-        self.dbu.processqueueFlush()
-        for key in data2:
-            self.dbu.processqueuePush(data2[key][0]) # the file_id goes back on
-        DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.dbu.processqueueLen()))
+        self.processqueueFlush()
+        for key in data:
+            self.processqueuePush(data[key][0]) # the file_id goes back on
+        DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.processqueueLen()))
 
     def _purgeFileFromDB(self, filename=None, recursive=False):
         """
@@ -1219,20 +1208,14 @@ class DBUtils(object):
         try:
             root_dir = ftb['mission'].rootdir
         except KeyError:
-            root_dir = ''
-
+            raise(DBError("Mission root directory not set, fix the DB"))
         return os.path.join(root_dir, rel_path, filename)
 
     def getProcessFromInputProduct(self, product):
         """
         given an product name or id return all the processes that use that as an input
         """
-        try:
-            product = int(product)
-        except ValueError: # it was a string
-            p_id = self.getProductID(product)
-        else:
-            p_id = product
+        p_id = self.getProductID(product)
         sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
         ans = []
         for v in sq:
@@ -1992,7 +1975,7 @@ class DBUtils(object):
         return retval
 
     @classmethod
-    def processRunning(pid):
+    def processRunning(self, pid):
         """
         given a PID see if it is currently running
 

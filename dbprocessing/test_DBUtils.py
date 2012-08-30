@@ -153,6 +153,14 @@ class DBUtilsDBTests(unittest.TestCase):
         """addInstrument utility"""
         self.instrument = self.dbu.addInstrument('instname', 1)
 
+    def test_getInstrumentSatellite(self):
+        """getInstrumentSatellite"""
+        self.addMission()
+        self.addSatellite()
+        self.addInstrument()
+        self.assertEqual([1], self.dbu.getInstrumentSatellite(1))
+        self.assertEqual([1], self.dbu.getInstrumentSatellite('instname'))
+
     def test_getInstrumentID(self):
         """test getInstrumentID"""
         self.addMission()
@@ -518,6 +526,7 @@ class DBUtilsDBTests(unittest.TestCase):
         self.addProcess()
         self.addCode()
         self.assertEqual(self.dbu.getCodeID('code_filename'), 1)
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodeID, 'badname')
 
     def test_addFile(self):
         """test addFile"""
@@ -564,7 +573,7 @@ class DBUtilsDBTests(unittest.TestCase):
         """utility to addFile to the db"""
         self.file2 = self.dbu.addFile('file_filename2',
                                     0,
-                                    Version.Version(1,0,0),
+                                    Version.Version(1,1,0),
                                     file_create_date = datetime.datetime.utcnow(),
                                     exists_on_disk=False,
                                     utc_file_date=datetime.date(2012, 5, 4),
@@ -727,6 +736,17 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertRaises(DBUtils.DBNoData, self.dbu.processqueueRemoveItem, 1)
         self.dbu.processqueueRemoveItem('file_filename2')
         self.assertEqual(None, self.dbu.processqueueGet())
+        # test clean
+        self.assertEqual(None, self.dbu.processqueueClean())
+        self.dbu.processqueuePush([1,2])
+        self.dbu.processqueueClean()
+        self.assertEqual(1, self.dbu.processqueueLen())
+        self.assertEqual(2, self.dbu.processqueueGet())
+        self.dbu.processqueueFlush()
+        self.dbu.processqueuePush([2,1])
+        self.dbu.processqueueClean()
+        self.assertEqual(1, self.dbu.processqueueLen())
+        self.assertEqual(2, self.dbu.processqueueGet())
 
     def test_getFileProduct(self):
         """test getFileProduct"""
@@ -1250,6 +1270,12 @@ class DBUtilsClassMethodTests(unittest.TestCase):
         daterange = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5, 23)]
         expected = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5)]
         self.assertEqual(expected, DBUtils.DBUtils.daterange_to_dates(daterange))
+
+    def test_processRunning(self):
+        """processRunning"""
+        self.assertTrue(DBUtils.DBUtils.processRunning(os.getpid()))
+        self.assertFalse(DBUtils.DBUtils.processRunning(32768)) # one more than allowed on ect-soc-s1 (/proc/sys/kernel/pid_max)
+
 
 class DBUtilsDBUseTests(unittest.TestCase):
     """Tests for DBUtils"""

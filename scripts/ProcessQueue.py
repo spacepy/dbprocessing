@@ -90,7 +90,7 @@ if __name__ == "__main__":
         try:
             DBlogging.dblogger.debug("pq.dbu.processqueueLen(): {0}".format(pq.dbu.processqueueLen()))
             while pq.dbu.processqueueLen() > 0:
-                pq.queueClean()  # get rid of duplicates
+                pq.dbu.processqueueClean()  # get rid of duplicates
                 file_id = pq.dbu.processqueueGet()
                 DBlogging.dblogger.debug("popped {0} from pq.dbu.processqueueGet()".format(file_id))
                 if file_id is None:
