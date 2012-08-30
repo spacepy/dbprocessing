@@ -68,8 +68,8 @@ def makeHTML(mission, filename):
     output.close()
 
 def _writeQueue(dbu, output):
-    n_items = dbu.processqueueLen()
-    items = dbu.processqueueGetAll()
+    n_items = dbu.Processqueue.len()
+    items = dbu.Processqueue.getAll()
 
     traceback = []
     for v in items:

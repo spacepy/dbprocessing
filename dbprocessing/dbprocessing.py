@@ -43,8 +43,6 @@ class ProcessQueue(object):
 
         self.mission = mission
         dbu = DBUtils.DBUtils(self.mission)
-        dbu._openDB()
-        dbu._createTableObjects()
         self.tempdir = None
         self.current_file = None
         self.dbu = dbu
@@ -173,7 +171,7 @@ class ProcessQueue(object):
             self.session.rollback()
             raise(DBUtils.DBError(IE))
         # add to processqueue for later processing
-        self.dbu.processqueuePush(f_id)
+        self.dbu.Processqueue.push(f_id)
         return f_id
 
     def importFromIncoming(self):

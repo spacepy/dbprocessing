@@ -12,7 +12,7 @@ try: # new version changed this annoyingly
 except ImportError:
     from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import asc #, desc
-from sqlalchemy import and_, or_
+from sqlalchemy import or_
 import DBlogging
 import socket # to get the local hostname
 import sys
@@ -52,7 +52,7 @@ class DBUtils(object):
     be internal routines for DBProcessing
     """
 
-    def __init__(self, mission='Test'):
+    def __init__(self, mission='Test', db_var=None):
         """
         @summary: Initialize the DBUtils class, default mission is 'Test'
         """
@@ -64,6 +64,9 @@ class DBUtils(object):
         fmtr = DBStrings.DBFormatter()
         self.format = fmtr.format
         self.re = fmtr.re
+        self._openDB(db_var)
+        self._createTableObjects()
+        self._patchProcessQueue()
 
     def __del__(self):
         """
@@ -89,6 +92,16 @@ class DBUtils(object):
                 (version, expected))
         return True
 
+    def _patchProcessQueue(self):
+        self.Processqueue.flush = self._processqueueFlush
+        self.Processqueue.remove = self._processqueueRemoveItem
+        self.Processqueue.getAll = self. _processqueueGetAll
+        self.Processqueue.push = self._processqueuePush
+        self.Processqueue.len = self._processqueueLen
+        self.Processqueue.pop = self._processqueuePop
+        self.Processqueue.get = self._processqueueGet
+        self.Processqueue.clean = self._processqueueClean
+
 ####################################
 ###### DB and Tables ###############
 ####################################
@@ -108,10 +121,6 @@ class DBUtils(object):
         try:
 
             if self.mission in  ['Test', 'rbsp']:
-                engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
-
-                # this holds the metadata, tables names, attributes, etc
-            elif self.mission == 'Polar':
                 engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
 
             elif self.mission == 'unittest':
@@ -346,29 +355,29 @@ class DBUtils(object):
         else:
             return True
 
-    def processqueueFlush(self):
+    def _processqueueFlush(self):
         """
         remove everything from he process queue
         """
-        length = self.processqueueLen()
+        length = self.Processqueue.len()
         self.session.query(self.Processqueue).delete()
         self._commitDB()
         DBlogging.dblogger.info( "Processqueue was cleared")
         return length
 
-    def processqueueRemoveItem(self, item):
+    def _processqueueRemoveItem(self, item):
         """
         remove a file from the queue by name or number
         """
         item = self.getFileID(item)
-        contents = self.processqueueGetAll()
+        contents = self.Processqueue.getAll()
         try:
             ind = contents.index(item)
-            self.processqueuePop(ind)
+            self.Processqueue.pop(ind)
         except ValueError:
             raise(DBNoData("No Item ID={0} found".format(item)))
 
-    def processqueueGetAll(self):
+    def _processqueueGetAll(self):
         """
         return the entire contents of the process queue
         """
@@ -379,7 +388,7 @@ class DBUtils(object):
         DBlogging.dblogger.debug( "Entire Processqueue was read: {0} elements returned".format(len(pqdata)))
         return pqdata
 
-    def processqueuePush(self, fileid):
+    def _processqueuePush(self, fileid):
         """
         push a file onto the process queue (onto the right)
 
@@ -396,7 +405,7 @@ class DBUtils(object):
         if hasattr(fileid, '__iter__'):
             ans = []
             for v in fileid:
-                ans.extend(self.processqueuePush(v))
+                ans.extend(self.Processqueue.push(v))
             return ans
         fileid = self.getFileID(fileid)
         pq1 = self.Processqueue()
@@ -407,13 +416,13 @@ class DBUtils(object):
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
 
-    def processqueueLen(self):
+    def _processqueueLen(self):
         """
         return the number of files in the process queue
         """
         return self.session.query(self.Processqueue).count()
 
-    def processqueuePop(self, index=0):
+    def _processqueuePop(self, index=0):
         """
         pop a file off the process queue (from the left)
 
@@ -427,7 +436,7 @@ class DBUtils(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        num = self.processqueueLen()
+        num = self.Processqueue.len()
         if num == 0:
             return None
         elif index >= num:
@@ -443,7 +452,7 @@ class DBUtils(object):
             self._commitDB()
             return fid_ret
 
-    def processqueueGet(self, index=0):
+    def _processqueueGet(self, index=0):
         """
         get the file at the head of the queue (from the left)
 
@@ -452,7 +461,7 @@ class DBUtils(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        num = self.processqueueLen()
+        num = self.Processqueue.len()
         if num == 0:
             DBlogging.dblogger.info( "processqueueGet() returned: None (empty queue)")
             return None
@@ -469,14 +478,14 @@ class DBUtils(object):
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
 
-    def processqueueClean(self):
+    def _processqueueClean(self):
         """
         go through the process queue and clear out lower versions of the same files
         this is determined by product and utc_file_date
         """
         # TODO this might break with weekly input files
-        DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.processqueueLen()))
-        pqdata = self.processqueueGetAll()
+        DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.Processqueue.len()))
+        pqdata = self.Processqueue.getAll()
         if len(pqdata) <= 1: # can't clean just one (or zero) entries
             return
         # build up a list of tuples file_id, product_id, utc_file_date, version
@@ -500,10 +509,10 @@ class DBUtils(object):
                     DBlogging.dblogger.error('Same product ({0}), same date ({1}), same version ({2}) this should not have been allowed'.format(data[k1][1], data[k1][2], data[k1][3]))
                     raise(DBError('Same product ({0}), same date ({1}), same version ({2}) this should not have been allowed'.format(data[k1][1], data[k1][2], data[k1][3])))
         ## now we have a dict of just the unique files
-        self.processqueueFlush()
+        self.Processqueue.flush()
         for key in data:
-            self.processqueuePush(data[key][0]) # the file_id goes back on
-        DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.processqueueLen()))
+            self.Processqueue.push(data[key][0]) # the file_id goes back on
+        DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
     def _purgeFileFromDB(self, filename=None, recursive=False):
         """
@@ -524,7 +533,7 @@ class DBUtils(object):
             # we need to look in each table that could have a reference to this file and delete that
             ## processqueue
             try:
-                self.processqueueRemoveItem(f)
+                self.Processqueue.remove(f)
             except DBNoData:
                 pass
             ## filefilelink
@@ -538,7 +547,7 @@ class DBUtils(object):
             except DBNoData:
                 pass
             ## file
-            self.session.query(self.File).filter_by(file_id = f).delete()
+            self.session.delete(self.getEntry('File', f))
             self._commitDB()
 
     def deleteAllEntries(self):
@@ -1260,7 +1269,7 @@ class DBUtils(object):
         """
         return self.getEntry('Product', productID).level
 
-    def getMissionName(self, id=None):
+    def getMissionName(self, mid=None):
         """
         Return the current mission ID
 
@@ -1270,18 +1279,10 @@ class DBUtils(object):
         >>> dbp.getMissionID()
         19
         """
-        if id is None:
-            sq = self.session.query(self.Mission).filter_by(mission_name = self.mission)
-            return sq[0].mission_name
+        if mid is None:
+            return self.getEntry('Mission', self.mission).mission_name
         else:
-            if not isinstance(id, (tuple, list)):
-                id = [id]
-            i_out = []
-            for i in id:
-                sq = self.session.query(self.Mission.mission_name).filter_by(mission_id = i)
-                tmp = [v[0] for v in sq]
-                i_out.extend(tmp)
-            return i_out
+            return self.getEntry('Mission', mid).mission_name
 
     def getInstrumentID(self, name, satellite_id=None):
         """
@@ -1730,7 +1731,7 @@ class DBUtils(object):
             ms = self.session.query(self.Mission).get(m_id)
             if ms is None:
                 raise(DBNoData('Invalid mission id {0}'.format(m_id)))
-        except ValueError:
+        except (ValueError, TypeError):
             sq = self.session.query(self.Mission.mission_id).filter_by(mission_name = mission_name).all()
             if len(sq) == 0:
                 raise(DBNoData('Invalid mission name {0}'.format(mission_name)))
@@ -1947,7 +1948,6 @@ class DBUtils(object):
             return False
         else:
             return True
-
 
 
 
