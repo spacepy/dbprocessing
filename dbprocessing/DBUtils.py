@@ -1193,7 +1193,7 @@ class DBUtils(object):
         """
         try:
            proc_id = long(proc_name)
-           proc = self.session.query(self.Process).get(proc_id)
+           self.session.query(self.Process).get(proc_id)
         except ValueError: # it is not a number
             proc_id = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()[0][0]
         return proc_id
