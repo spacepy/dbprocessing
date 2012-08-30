@@ -23,9 +23,7 @@ class DBUtilsDBTests(unittest.TestCase):
     def setUp(self):
         super(DBUtilsDBTests, self).setUp()
         db = CreateDB.dbprocessing_db(filename = ':memory:', create=True)
-        self.dbu = DBUtils.DBUtils(mission='unittest')
-        self.dbu._openDB(db_var=db)
-        self.dbu._createTableObjects()
+        self.dbu = DBUtils.DBUtils(mission='unittest', db_var=db)
 
     def tearDown(self):
         super(DBUtilsDBTests, self).tearDown()
@@ -108,9 +106,7 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertEqual(m, 1)
         self.assertEqual(self.dbu.getMissionID('unittest'), m)
         self.assertEqual(self.dbu.getMissionDirectory(), 'rootdir')
-        self.assertEqual(self.dbu.getMissionName(), 'unittest')
         self.assertRaises(DBUtils.DBError, self.addMission)
-        self.assertEqual(self.dbu.getMissionName(id=1), ['unittest'])
 
     def test_getMissionID(self):
         """getMissionID"""
@@ -152,14 +148,6 @@ class DBUtilsDBTests(unittest.TestCase):
     def addInstrument(self):
         """addInstrument utility"""
         self.instrument = self.dbu.addInstrument('instname', 1)
-
-    def test_getInstrumentSatellite(self):
-        """getInstrumentSatellite"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.assertEqual([1], self.dbu.getInstrumentSatellite(1))
-        self.assertEqual([1], self.dbu.getInstrumentSatellite('instname'))
 
     def test_getInstrumentID(self):
         """test getInstrumentID"""
@@ -251,25 +239,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertRaises(DBUtils.DBNoData, self.dbu.getProductID, 23452)
         self.assertRaises(DBUtils.DBNoData, self.dbu.getProductID, 'nofile')
 
-    def test_getProductName(self):
-        """test getProductName"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.assertEqual(self.dbu.getProductName('prod1'), 'prod1')
-        self.assertEqual(self.dbu.getProductName(1), 'prod1')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProductName, 23452)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProductName, 'nofile')
-
-    def test_getProductLevel(self):
-        """test getProductLevel"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.assertEqual(self.dbu.getProductLevel(1), 0)
-
     def test_getProductNames(self):
         """test getProductNames"""
         self.addMission()
@@ -347,18 +316,6 @@ class DBUtilsDBTests(unittest.TestCase):
         val = self.dbu.getAllProcesses()
         self.assertEqual(val[0].process_id, 1)
         self.assertEqual(len(val), 1)
-
-    def test_getProcessTimebase(self):
-        """test getProcessTimebase"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProcess()
-        self.addproductprocesslink()
-        self.assertEqual(self.dbu.getProcessTimebase(1), 'DAILY')
-        self.assertEqual(self.dbu.getProcessTimebase('process1'), 'DAILY')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProcessTimebase, 23)
 
     def test_getProcessID(self):
         """test getProcessID"""
@@ -443,18 +400,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.dbu._commitDB()
         self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2001, 1, 1) ) )
 
-    def test_getCodeArgs(self):
-        """test getCodeArgs"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.assertEqual(self.dbu.getCodeArgs(1), 'arguments')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodeArgs, 342243)
-
     def test_getProcessFromOutputProduct(self):
         """getProcessFromOutputProduct"""
         self.addMission()
@@ -466,18 +411,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.addCode()
         val = self.dbu.getProcessFromOutputProduct(self.product)
         self.assertEqual(val, self.process)
-
-    def test_getOutputProductFromProcess(self):
-        """getOutputProductFromProcess"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        val = self.dbu.getOutputProductFromProcess(self.product)
-        self.assertEqual(val, self.product)
 
     def test_getCodePath(self):
         """test getCodePath"""
@@ -683,7 +616,7 @@ class DBUtilsDBTests(unittest.TestCase):
         self.addFile()
         self.addFile2()
         self.dbu.addFilefilelink(1, 2)
-        self.dbu.processqueuePush(1)
+        self.dbu.Processqueue.push(1)
         self.dbu.addFilecodelink(1, 1)
         self.dbu._purgeFileFromDB(1)
         self.assertEqual(1, self.dbu.session.query(self.dbu.File).count())
@@ -712,70 +645,41 @@ class DBUtilsDBTests(unittest.TestCase):
         self.addProcess()
         self.addCode()
         self.addFile()
-        self.dbu.processqueuePush(1)
-        self.assertEqual(1, self.dbu.processqueueLen())
-        self.assertEqual(1, self.dbu.processqueueFlush())
-        self.assertEqual(0, self.dbu.processqueueLen())
+        self.dbu.Processqueue.push(1)
+        self.assertEqual(1, self.dbu.Processqueue.len())
+        self.assertEqual(1, self.dbu.Processqueue.flush())
+        self.assertEqual(0, self.dbu.Processqueue.len())
         self.addFile2()
-        self.dbu.processqueuePush([1,2])
-        self.assertEqual(None, self.dbu.processqueuePop(100))
-        self.assertEqual((1,2), self.dbu.processqueueGetAll())
-        self.assertEqual(2, self.dbu.processqueueLen())
-        self.assertEqual(1, self.dbu.processqueueGet())
-        self.assertEqual(2, self.dbu.processqueueLen())
-        self.assertEqual(2, self.dbu.processqueueGet(1))
-        self.assertEqual(None, self.dbu.processqueueGet(100))
-        self.assertEqual(1, self.dbu.processqueuePop())
-        self.assertEqual(2, self.dbu.processqueuePop(0))
-        self.assertEqual(None, self.dbu.processqueuePop())
-        self.assertEqual(None, self.dbu.processqueueGet())
+        self.dbu.Processqueue.push([1,2])
+        self.assertEqual(None, self.dbu.Processqueue.pop(100))
+        self.assertEqual((1,2), self.dbu.Processqueue.getAll())
+        self.assertEqual(2, self.dbu.Processqueue.len())
+        self.assertEqual(1, self.dbu.Processqueue.get())
+        self.assertEqual(2, self.dbu.Processqueue.len())
+        self.assertEqual(2, self.dbu.Processqueue.get(1))
+        self.assertEqual(None, self.dbu.Processqueue.get(100))
+        self.assertEqual(1, self.dbu.Processqueue.pop())
+        self.assertEqual(2, self.dbu.Processqueue.pop(0))
+        self.assertEqual(None, self.dbu.Processqueue.pop())
+        self.assertEqual(None, self.dbu.Processqueue.get())
         # test remove item
-        self.dbu.processqueuePush([1,2])
-        self.dbu.processqueueRemoveItem(1)
-        self.assertEqual(2, self.dbu.processqueueGet())
-        self.assertRaises(DBUtils.DBNoData, self.dbu.processqueueRemoveItem, 1)
-        self.dbu.processqueueRemoveItem('file_filename2')
-        self.assertEqual(None, self.dbu.processqueueGet())
+        self.dbu.Processqueue.push([1,2])
+        self.dbu.Processqueue.remove(1)
+        self.assertEqual(2, self.dbu.Processqueue.get())
+        self.assertRaises(DBUtils.DBNoData, self.dbu.Processqueue.remove, 1)
+        self.dbu.Processqueue.remove('file_filename2')
+        self.assertEqual(None, self.dbu.Processqueue.get())
         # test clean
-        self.assertEqual(None, self.dbu.processqueueClean())
-        self.dbu.processqueuePush([1,2])
-        self.dbu.processqueueClean()
-        self.assertEqual(1, self.dbu.processqueueLen())
-        self.assertEqual(2, self.dbu.processqueueGet())
-        self.dbu.processqueueFlush()
-        self.dbu.processqueuePush([2,1])
-        self.dbu.processqueueClean()
-        self.assertEqual(1, self.dbu.processqueueLen())
-        self.assertEqual(2, self.dbu.processqueueGet())
-
-    def test_getFileProduct(self):
-        """test getFileProduct"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.addFile()
-        self.assertEqual(self.dbu.getFileProduct(1), 1)
-        self.assertEqual(self.dbu.getFileProduct('file_filename'), 1)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileProduct, 5)
-
-    def test_getFilename(self):
-        """getFilename"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.addFile()
-        self.assertEqual(self.dbu.getFilename('file_filename'), 'file_filename')
-        self.assertEqual(self.dbu.getFilename(1), 'file_filename')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilename, 5)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilename, 'nofile')
+        self.assertEqual(None, self.dbu.Processqueue.clean())
+        self.dbu.Processqueue.push([1,2])
+        self.dbu.Processqueue.clean()
+        self.assertEqual(1, self.dbu.Processqueue.len())
+        self.assertEqual(2, self.dbu.Processqueue.get())
+        self.dbu.Processqueue.flush()
+        self.dbu.Processqueue.push([2,1])
+        self.dbu.Processqueue.clean()
+        self.assertEqual(1, self.dbu.Processqueue.len())
+        self.assertEqual(2, self.dbu.Processqueue.get())
 
     def test_getFileID(self):
         """ test getFileID"""
@@ -790,31 +694,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertEqual(self.dbu.getFileID(1), 1)
         self.assertEqual(self.dbu.getFileID('file_filename'), 1)
         self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, 34523)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, 'noexist')
-
-    def test_getFileUTCfileDate(self):
-        """test getFileUTCfileDate"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.addFile()
-        self.assertEqual(self.dbu.getFileUTCfileDate(1), datetime.date(2012, 5, 4))
-
-    def test_getFileProcess_keywords(self):
-        """test getFileProcess_keywords"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.addProductOutput()
-        self.addProcess()
-        self.addCode()
-        self.addFile()
-        self.assertEqual(self.dbu.getFileProcess_keywords(1), 'process_keywords=foo')
         self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, 'noexist')
 
     def test_getFileDates(self):
@@ -1206,12 +1085,10 @@ class DBUtilsDBTests(unittest.TestCase):
 
 class DBUtilsAddTests(unittest.TestCase):
     """Tests for add methods (?) of DBUtils"""
-
     def setUp(self):
         super(DBUtilsAddTests, self).setUp()
-        self.dbu = DBUtils.DBUtils(mission='unittest')
-        self.dbu._openDB()
-        self.dbu._createTableObjects()
+        db = CreateDB.dbprocessing_db(filename = ':memory:', create=True)
+        self.dbu = DBUtils.DBUtils(mission='unittest', db_var=db)
 
     def tearDown(self):
         super(DBUtilsAddTests, self).tearDown()
@@ -1224,30 +1101,17 @@ class DBUtilsAddTests(unittest.TestCase):
         self.assertRaises(ValueError, self.dbu.addMission, 1234, 'path')
         self.assertRaises(ValueError, self. dbu.addMission, 'filename', 12345)
 
-    def test_addMissionOrder(self):
-        """_addMission wont work until the Mission class is created from the DB"""
-        self.assertRaises(DBUtils.DBError, self.dbu.addMission, 'filename', 'path')
-
     def test_addSatelliteInput(self):
         """_addSatellite should only accept string input"""
         self.assertRaises(ValueError, self.dbu.addSatellite, 1234)
 
     def test_addSatelliteOrder(self):
         """_addSatellite wont work until the Mission class is created from the DB"""
-        self.assertRaises(DBUtils.DBError, self.dbu.addSatellite, 'satname', )
+        self.assertRaises(DBUtils.DBNoData, self.dbu.addSatellite, 'satname', )
 
 
 class DBUtilsClassMethodTests(unittest.TestCase):
     """Tests for class methods of DBUtils"""
-
-    def test_build_fname(self):
-        """_build_fname should give known outout for known input"""
-        dat_in =( ('/root/file/', 'relative/', 'Test', 'test1', 'Prod1', '20100614', 1, 1, 1),
-                  ('/root/file/', 'relative/', 'Test', 'test1', 'Prod1', '20100614', 1, 1, 1, '.txt') )
-        real_ans = ( '/root/file/relative/Test-test1_Prod1_20100614_v1.1.1.cdf',
-                     '/root/file/relative/Test-test1_Prod1_20100614_v1.1.1.txt' )
-        for i, val in enumerate(dat_in):
-            self.assertEqual(real_ans[i], DBUtils.DBUtils._build_fname(*val))
 
     def test_test_SQLAlchemy_version(self):
         """The testing of the SQLAlchemy version should work"""

@@ -43,8 +43,6 @@ class ProcessQueue(object):
 
         self.mission = mission
         dbu = DBUtils.DBUtils(self.mission)
-        dbu._openDB()
-        dbu._createTableObjects()
         self.tempdir = None
         self.current_file = None
         self.dbu = dbu
@@ -173,7 +171,7 @@ class ProcessQueue(object):
             self.session.rollback()
             raise(DBUtils.DBError(IE))
         # add to processqueue for later processing
-        self.dbu.processqueuePush(f_id)
+        self.dbu.Processqueue.push(f_id)
         return f_id
 
     def importFromIncoming(self):
@@ -254,7 +252,7 @@ class ProcessQueue(object):
             DBlogging.dblogger.debug("Finding input files for {0}".format(utc_file_date))
 
             ## here decide how we build output and do it.
-            timebase = self.dbu.getProcessTimebase(process_id)
+            timebase = self.dbu.getEntry('Process', process_id).output_timebase
             if timebase == 'FILE': # taking one file to the next file
                 DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
                 files = []
@@ -313,10 +311,10 @@ class ProcessQueue(object):
                 continue
             DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(code_id, codepath))
 
-            out_prod = self.dbu.getOutputProductFromProcess(process_id)
+            out_prod = self.dbu.getEntry('Process', process_id).output_product
             format_str = self.dbu.getProductFormats(out_prod)
             # get the process_keywords from the file if there are any
-            process_keywords = self._strargs_to_args([self.dbu.getFileProcess_keywords(fid) for fid in input_files])
+            process_keywords = self._strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
             for key in process_keywords:
                 format_str = format_str.replace('{'+key+'}', process_keywords[key])
 
@@ -437,7 +435,7 @@ class ProcessQueue(object):
                 cmdline.extend(args)
 
             ## figure out how to put the arguments together
-            args = self.dbu.getCodeArgs(code_id)
+            args = self.dbu.getEntry('Code', code_id).arguments
             if args is not None:
                 args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
                 args = args.split()

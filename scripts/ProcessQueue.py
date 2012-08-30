@@ -1,7 +1,6 @@
 #!/usr/bin/env python2.6
 
 from optparse import OptionParser
-import sys
 import traceback
 
 from dbprocessing import DBlogging, dbprocessing
@@ -65,7 +64,7 @@ if __name__ == "__main__":
 
     if options.i: # import selected
         try:
-            start_len = pq.dbu.processqueueLen()
+            start_len = pq.dbu.Processqueue.len()
             pq.checkIncoming()
             while len(pq.queue) != 0:
                 pq.importFromIncoming()
@@ -83,28 +82,28 @@ if __name__ == "__main__":
         else:
             pq.dbu._stopLogging('Nominal Exit')
         pq.dbu._closeDB()
-        print("Import finished: {0} files added".format(pq.dbu.processqueueLen()-start_len))
+        print("Import finished: {0} files added".format(pq.dbu.Processqueue.len()-start_len))
 
     if options.p: # process selected
         try:
-            DBlogging.dblogger.debug("pq.dbu.processqueueLen(): {0}".format(pq.dbu.processqueueLen()))
-            while pq.dbu.processqueueLen() > 0:
-                pq.dbu.processqueueClean()  # get rid of duplicates
-                file_id = pq.dbu.processqueueGet()
-                DBlogging.dblogger.debug("popped {0} from pq.dbu.processqueueGet()".format(file_id))
+            DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
+            while pq.dbu.Processqueue.len() > 0:
+                pq.dbu.Processqueue.clean()  # get rid of duplicates
+                file_id = pq.dbu.Processqueue.get()
+                DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
                 if file_id is None:
                     break
                 children = pq.dbu.getChildrenProducts(file_id) # returns process
                 if not children:
                     DBlogging.dblogger.debug("No children found for {0}".format(file_id))
-                    pq.dbu.processqueuePop() # done in two steps for crashes
+                    pq.dbu.Processqueue.pop() # done in two steps for crashes
                     continue
                 ## right here we have a list of processes that should run
                 # loop through the children and see which to build
                 for child_process in children:
                     ## are all the required inputs available? For the dates we are doing
                     pq.buildChildren(child_process, file_id)
-                    pq.dbu.processqueuePop()
+                    pq.dbu.Processqueue.pop()
 
         except:
             #Generic top-level error handler, because otherwise people freak if
