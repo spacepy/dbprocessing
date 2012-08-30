@@ -1240,15 +1240,6 @@ class DBUtilsAddTests(unittest.TestCase):
 class DBUtilsClassMethodTests(unittest.TestCase):
     """Tests for class methods of DBUtils"""
 
-    def test_build_fname(self):
-        """_build_fname should give known outout for known input"""
-        dat_in =( ('/root/file/', 'relative/', 'Test', 'test1', 'Prod1', '20100614', 1, 1, 1),
-                  ('/root/file/', 'relative/', 'Test', 'test1', 'Prod1', '20100614', 1, 1, 1, '.txt') )
-        real_ans = ( '/root/file/relative/Test-test1_Prod1_20100614_v1.1.1.cdf',
-                     '/root/file/relative/Test-test1_Prod1_20100614_v1.1.1.txt' )
-        for i, val in enumerate(dat_in):
-            self.assertEqual(real_ans[i], DBUtils.DBUtils._build_fname(*val))
-
     def test_test_SQLAlchemy_version(self):
         """The testing of the SQLAlchemy version should work"""
         self.assertTrue(DBUtils.DBUtils._test_SQLAlchemy_version())

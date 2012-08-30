@@ -79,7 +79,6 @@ class DBUtils(object):
         """
         return 'DBProcessing class instance for mission ' + self.mission + ', version: ' + __version__
 
-
     @classmethod
     def _test_SQLAlchemy_version(self, version= sqlalchemy.__version__):
         """This tests the version to be sure that it is compatible"""
@@ -89,44 +88,6 @@ class DBUtils(object):
                 "SQLAlchemy version %s was not expected, expected %s.x" %
                 (version, expected))
         return True
-
-
-    @classmethod
-    def _build_fname(self,
-                     rootdir = '',
-                     relative_path = '',
-                     mission_name = '',
-                     satellite_name = '',
-                     product_name = '',
-                     date = '',
-                     release = '',
-                     quality = '',
-                     revision = '',
-                     extension = '.cdf'):
-        """This builds a filename from the pieces contained in the filename
-
-        @keyword rootdir: root directory of the filename to create (default '')
-        @keyword relative_path: relative path for filename (default '')
-        @keyword mission_name: mission name (default '')
-        @keyword satellite_name: satellite name  (default '')
-        @keyword product_name: data product name (default '')
-        @keyword date: file date (default '')
-        @keyword quality: quality version number (default '')
-        @keyword revision: revision version number  (default '')
-
-        @return: A full filename that can be used by OS calls
-
-        >>> nl._ProcessNext__build_fname('/root/file/', 'relative/', 'Test', 'test1', 'Prod1', '20100614', 1, 1, 1)
-            Out[9]: '/root/file/relative/Test-test1_Prod1_20100614_v1.1.1.cdf'
-
-        """
-        dir = rootdir + relative_path
-        fname = mission_name + '-' + satellite_name + '_' + product_name
-        ver = 'v' + str(release) + '.' + str(quality) + '.' + str(revision)
-        fname = fname + '_' + date + '_' + ver + extension
-        return dir + fname
-
-
 
 ####################################
 ###### DB and Tables ###############
