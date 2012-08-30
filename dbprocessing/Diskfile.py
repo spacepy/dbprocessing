@@ -185,7 +185,7 @@ def calcDigest( infile):
     Returns
     =======
     out : str
-        hex digits of the file_, SHA1 (40 bytes)
+        hex digits of the file, SHA1 (40 bytes)
 
     """
     m = hashlib.sha1()
@@ -193,7 +193,7 @@ def calcDigest( infile):
         with open(infile, 'rb') as f:
             m.update(f.read())
     except IOError:
-        raise(DigestError("File not found"))
+        raise(DigestError("File not found: {0}".format(infile)))
 
     DBlogging.dblogger.debug("digest calculated: %s, file: %s " % (m.hexdigest(), infile))
 

@@ -75,7 +75,7 @@ def addStuff(filename):
 
     # add the product
     satellite_id = dbu.getSatelliteID(cfg['satellite']['satellite_name'])
-    instrument_id = dbu._getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)
+    instrument_id = dbu.getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)
 
     prod_id = dbu.addProduct(cfg['product']['product_name'],
                              instrument_id,

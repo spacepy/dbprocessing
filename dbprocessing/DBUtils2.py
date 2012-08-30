@@ -19,7 +19,7 @@ import sys
 
 import DBStrings
 import Version
-from Diskfile import calcDigest
+from Diskfile import calcDigest, DigestError
 
 ## This goes in the processing comment field in the DB, do update it
 __version__ = '2.0.3'
@@ -198,7 +198,6 @@ class DBUtils2(object):
         table_dict = {}
         for val in table_names:
             table_dict[val.title()] = val
-
 ##  dynamically create all the classes (c1)
 ##  dynamically create all the tables in the db (c2)
 ##  dynamically create all the mapping between class and table (c3)
@@ -223,36 +222,6 @@ class DBUtils2(object):
                 DBlogging.dblogger.debug("Class %s created" % (val))
 
 
-###########################################
-### Decide which files NOT to process #####
-###########################################
-
-    def _procCodeDates(self, verbose = False):
-        """
-        go through bf dict and if files have processing code in the right date range
-
-        @keyword verbose: (optional) - print out lots of info
-
-        @return: Counter - number of files added to the list from this check
-
-        >>>  pnl._procCodeDates()
-        """
-        # is there a processing code with the right dates?
-        # this is broken as there is more than one processing file that spans the data L0-L1 conversion
-        try: self.del_names
-        except AttributeError: self.initDelNames()
-        counter = 0
-        for fname in self.bf:
-            all_false = np.array([])
-            for sq in self.session.query(self.Processing_paths).filter_by(p_id = self.bf[fname]['out_p_id']):
-                if self.bf[fname]['utc_file_date'] < sq.code_start_date or self.bf[fname]['utc_file_date'] > sq.code_stop_date:
-                    all_false = np.append(all_false, True)
-            if ~all_false.any() and len(all_false) != 0:
-                print("\t<procCodeDates> %s didn't have valid, %s, %s, %s" % (fname, sq.code_start_date, sq.code_stop_date, all_false))
-                self.del_names.append(fname)
-                counter += 1
-        return counter
-
 #####################################
 ####  Do processing and input to DB
 #####################################
@@ -268,11 +237,11 @@ class DBUtils2(object):
         """
         DBlogging.dblogger.info("Checking currently_processing")
 
-        sq = self.session.query(self.Logging).filter_by(currently_processing = True)
-        if sq.count() == 1:
-            DBlogging.dblogger.warning("currently_processing is set.  PID: %d" % (sq[0].pid))
+        sq = self.session.query(self.Logging).filter_by(currently_processing = True).all()
+        if len(sq) == 1:
+            DBlogging.dblogger.warning("currently_processing is set.  PID: {0}".format(sq[0].pid))
             return sq[0].pid
-        elif sq.count() == 0:
+        elif len(sq) == 0:
             return False
         else:
             DBlogging.dblogger.error("More than one currently_processing flag set, fix the DB" )
@@ -288,8 +257,7 @@ class DBUtils2(object):
         >>>  pnl._resetProcessingFlag()
         """
         if comment == None:
-            print("Must enter a comment to override DB lock")
-            return False
+            raise(ValueError("Must enter a comment to override DB lock"))
         sq = self.session.query(self.Logging).filter_by(currently_processing = True)
         for val in sq:
             val.currently_processing = False
@@ -298,9 +266,6 @@ class DBUtils2(object):
             DBlogging.dblogger.error( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
             self.session.add(val)
         self._commitDB()
-        return True
-
-
 
     def _startLogging(self):
         """
@@ -315,7 +280,7 @@ class DBUtils2(object):
         # save this class instance so that we can finish the logging later
         self.__p1 = self._addLogging(True,
                               datetime.datetime.utcnow(),
-                              self._getMissionID(),
+                              self.getMissionID(self.mission),
                               os.getlogin(),
                               socket.gethostname(),
                               pid = os.getpid() )
@@ -357,11 +322,7 @@ class DBUtils2(object):
         @rtype: Logging
 
         """
-        try:
-            l1 = self.Logging()
-        except AttributeError:
-            raise(DBError("Class Logging not found was it created?"))
-
+        l1 = self.Logging()
         l1.currently_processing = currently_processing
         l1.processing_start_time = processing_start_time
         l1.mission_id = mission_id
@@ -389,9 +350,6 @@ class DBUtils2(object):
             raise(DBProcessingError("Logging was not started"))
         # clean up the logging, we are done processing and we can release the lock (currently_processing) and
         # put in the complete time
-        if comment == None:
-            print("Must enter a comment for the log")
-            return False
 
         self.__p1.processing_end = datetime.datetime.utcnow()
         self.__p1.currently_processing = False
@@ -399,34 +357,7 @@ class DBUtils2(object):
         self.session.add(self.__p1)
         self._commitDB()
         DBlogging.dblogger.info( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) )
-
-    def _addLoggingFile(self,
-                        logging_id,
-                        file_id,
-                        code_id,
-                        comment=None):
-        """
-        add a Logging_files entry to  DB
-
-        @param logging_id: the id of the logging session
-        @type logging_id: int
-        @param file_id: file id of the file being logged
-        @type file_id: int
-        @param code_id: the id of ete code being used
-        @type code_id: int
-        @keyword comment: comment on the logged file
-        @type comment: str
-        """
-        pf1 = self.Logging_files()
-        pf1.logging_id = logging_id
-        pf1.file_id = file_id
-        pf1.code_id = code_id
-        pf1.comment = comment
-        self.session.add(pf1)
-        DBlogging.dblogger.info( "File Logging added for file:%d code:%d with comment:%s"  % (pf1.file_id, pf1.code_id, pf1.comment) )
-        # TODO  think on if session should be left open or if a list should be passed in
-        self._commitDB()
-        return pf1.logging_file_id
+        del self.__p1
 
     def _checkDiskForFile(self, file_id, fix=False):
         """
@@ -438,9 +369,9 @@ class DBUtils2(object):
            this is **NOT** sure to be safe
         """
         file_id = self.getFileID(file_id)
-        sq = self.session.query(self.File).get(file_id) # there can only be one
+        sq = self.getEntry('File', file_id)
         if sq.exists_on_disk:
-            file_path = self._getFileFullPath(file_id)
+            file_path = self.getFileFullPath(file_id)
             if not os.path.exists(file_path):
                 if fix:
                     sq.exists_on_disk = False
@@ -543,7 +474,7 @@ class DBUtils2(object):
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
-#                    if self.mission not in self._getMissionName(self.getFileMission(fid.file_id)): # file does not below to this mission
+#                    if self.mission not in self.getMissionName(self.getFileMission(fid.file_id)): # file does not below to this mission
 #                        fid_ret = self.processqueueGet(ii+1)
                     self.session.delete(fid)
                     fid_ret = fid.file_id
@@ -571,7 +502,7 @@ class DBUtils2(object):
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
                     fid_ret = fid.file_id
-#                    if self.mission not in self._getMissionName(self.getFileMission(fid_ret)): # file does not below to this mission
+#                    if self.mission not in self.getMissionName(self.getFileMission(fid_ret)): # file does not below to this mission
 #                        fid_ret = self.processqueueGet(ii+1)
                     break # there can be only one
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
@@ -597,19 +528,16 @@ class DBUtils2(object):
             ## processqueue
             try:
                 self.processqueueRemoveItem(f)
-                print "  Removed from Processqueue"
             except DBNoData:
                 pass
             ## filefilelink
             try:
                 self.delFilefilelink(f)
-                print "  Removed from Filefilelink"
             except DBNoData:
                 pass
             ## filecodelink
             try:
                 self.delFilecodelink(f)
-                print "  Removed from Filecodelink"
             except DBNoData:
                 pass
             ## file
@@ -641,7 +569,7 @@ class DBUtils2(object):
         ans = []
         sq = self.session.query(self.File.filename).all()
         for v in sq:
-            ans.append( (v[0], self._getFileFullPath(v[0])) )
+            ans.append( (v[0], self.getFileFullPath(v[0])) )
         return ans
 
     def addMission(self,
@@ -684,7 +612,7 @@ class DBUtils2(object):
             s1 = self.Satellite()
         except AttributeError:
             raise(DBError  ("Class Satellite not found was it created?"))
-        s1.mission_id = self._getMissionID()
+        s1.mission_id = self.getMissionID(self.mission)
         s1.satellite_name = satellite_name
         self.session.add(s1)
         self._commitDB()
@@ -757,7 +685,8 @@ class DBUtils2(object):
         update an existing product performing the {} replacements
         """
         # need to do {} replacement, have to do it as a modification
-        p1 = self.session.query(self.Product).get(product_id)
+        p1 = self.getEntry('Product', product_id)
+
         product_id = p1.product_id
         product_name = self._nameSubProduct(p1.product_name, product_id)
         p1.product_name = product_name
@@ -773,7 +702,7 @@ class DBUtils2(object):
         update an existing product performing the {} replacements
         """
         # need to do {} replacement, have to do it as a modification
-        p1 = self.session.query(self.Process).get(proc_id)
+        p1 = self.getEntry('Process', proc_id)
         proc_id = p1.process_id
         process_name = self._nameSubProcess(p1.process_name, proc_id)
         p1.process_name = process_name
@@ -824,11 +753,9 @@ class DBUtils2(object):
         """
         removes an inspector form the db
         """
-        insp = self.session.query(self.Inspector).get(i).delete()
-        if insp == 0:
-            raise(DBNoData("No entry for ID={0} found".format(i)))
-        else:
-            self._commitDB()
+        insp = self.getEntry('Inspector', i)
+        self.session.delete(insp)
+        self._commitDB()
 
     def delFilefilelink(self, f):
         """
@@ -1011,7 +938,7 @@ class DBUtils2(object):
         # need to do {} replacement
         description = self._nameSubProduct(description, product)
         c1.description = description
-        c1.product = product
+        c1.product = self.getProductID(product)
         c1.interface_version = version.interface
         c1.quality_version = version.quality
         c1.revision_version = version.revision
@@ -1019,36 +946,11 @@ class DBUtils2(object):
         c1.date_written = date_written
         c1.output_interface_version = output_interface_version
         c1.newest_version = newest_version
-        c1.arguments = self._nameSubInspector(arguments, product)
+        c1.arguments = self._nameSubProduct(arguments, product)
 
         self.session.add(c1)
         self._commitDB()
         return c1.inspector_id
-
-    def _nameSubInspector(self, inStr, product_id):
-        """
-        in inStr replace the standard {} with the names
-        !!! NOTE product_id
-        """
-        if inStr is None:
-            return inStr
-        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
-        ftb = self.getProductTraceback(product_id)
-        if '{INSTRUMENT}' in inStr :
-            inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
-        if '{SATELLITE}' in inStr :
-            inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-        if '{MISSION}' in inStr :
-            inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
-        if '{PRODUCT}' in inStr :
-            inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
-        if '{LEVEL}' in inStr :
-            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
-        if '{ROOTDIR}' in inStr :
-            inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
-        if any(val in inStr for val in repl): # call yourself again
-            inStr = self._nameSubInspector(inStr, product_id)
-        return inStr
 
     def _nameSubProduct(self, inStr, product_id):
         """
@@ -1063,7 +965,7 @@ class DBUtils2(object):
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
         if '{MISSION}' in inStr : # need to replace with the instrument name
-            inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+            inStr = inStr.replace('{MISSION}', ftb['mission'].mission_name)
         if '{PRODUCT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
         if '{LEVEL}' in inStr :
@@ -1078,24 +980,25 @@ class DBUtils2(object):
         """
         in inStr replace the standard {} with the names
         """
+        p_id = self.getProcessID(process_id)
         if inStr is None:
             return inStr
         repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
-        ftb = self.getProcessTraceback(process_id)
+        ftb = self.getProcessTraceback(p_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
         if '{MISSION}' in inStr : # need to replace with the instrument name
-            inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+            inStr = inStr.replace('{MISSION}', ftb['mission'].mission_name)
         if '{PRODUCT}' in inStr : # need to replace with the instrument name
-            inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
+            inStr = inStr.replace('{PRODUCT}', ftb['input_product'][0][0].product_name)
         if '{LEVEL}' in inStr :
-            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
+            inStr = inStr.replace('{LEVEL}', str(ftb['input_product'][0][0].level))
         if '{ROOTDIR}' in inStr :
             inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
         if any(val in inStr for val in repl): # call yourself again
-            inStr = self._nameSubProcess(inStr, process_id)
+            inStr = self._nameSubProcess(inStr, p_id)
         return inStr
 
     def _nameSubFile(self, inStr, file_id):
@@ -1110,7 +1013,7 @@ class DBUtils2(object):
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
         if '{MISSION}' in inStr : # need to replace with the instrument name
-            inStr = inStr.replace('{MISSION}', ftb['mision'].mission_name)
+            inStr = inStr.replace('{MISSION}', ftb['mission'].mission_name)
         if '{LEVEL}' in inStr :
             inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
         return inStr
@@ -1144,7 +1047,7 @@ class DBUtils2(object):
             raise(DBError('could not close DB'))
 
 
-    def _addFile(self,
+    def addFile(self,
                 filename = None,
                 data_level = None,
                 version = None,
@@ -1240,7 +1143,7 @@ class DBUtils2(object):
 
         """
         # can only be one here (sq)
-        code = self.session.query(self.Code).get(ec_id)
+        code = self.getEntry('Code', ec_id)
         if code.active_code == False:
             return False
         try:
@@ -1255,88 +1158,22 @@ class DBUtils2(object):
                 return False
         return True
 
-    def _newerCodeVersion(self, ec_id, date=None, bool=False, verbose=False):
-        """
-        given a executable_code ID decide if there is a newer version
-        # TODO think on if this needs to check active dates etc
-
-        @param ec_id: the executable code id to check
-        @keyword date: (optional) the date to check for the newer version
-        @keyword bool: if set return Boolean True=there s a newer version
-        @return
-             - id of the newest version if bool is False
-             - True there is a newer version, False otherwise if bool is set
-
-        """
-        try: self.Executable_codes
-        except AttributeError: self._createTableObjects()
-
-        # if bool then we just want to know if this is the newest version
-        mul = []
-        vall = []
-        for sq_bf in self.session.query(self.Executable_codes).filter_by(p_id = self._getPID(ec_id)):
-            mul.append([sq_bf.filename,
-                        sq_bf.ec_id])
-            vall.append(self.__get_V_num(sq_bf.interface_version,
-                                         sq_bf.quality_version,
-                                         sq_bf.revision_version))
-
-            if verbose:
-                print("\t\t%s %d %d %d %d" % (sq_bf.filename,
-                                              sq_bf.interface_version,
-                                              sq_bf.quality_version,
-                                              sq_bf.revision_version,
-                                              self.__get_V_num(sq_bf.interface_version,
-                                                               sq_bf.quality_version,
-                                                               sq_bf.revision_version)) )
-
-
-        if len(mul) == 0:
-            if bool: return False
-            return None
-
-        self.mul = mul
-        self.vall = vall
-
-        ## make sure that there is just one of each v_num in vall
-        cnts = [vall.count(val) for val in vall]
-        if cnts.count(1) != len(cnts):
-            raise(DBProcessingError('More than one code with the same v_num'))
-
-        ## test to see if the newest is the id passed in
-        ind = np.argsort(vall)
-        if mul[ind[-1]][1] != id:
-            if bool: return True
-            else: return mul[ind[-1]][1]
-        else:
-            if bool: return False
-            else: return mul[ind[-1]][1]
-
-    def _getFileFullPath(self, filename):
+    def getFileFullPath(self, filename):
         """
         return the full path to a file given the name or id
         (name or id is based on type)
 
         """
-        if isinstance(filename, (int, long)):
-            filename = self.getFilename(filename)
+        filename = self.getFilename(filename)
+        file_id = self.getFileID(filename)
         # need to know file product and mission to get whole path
+        ftb = self.getFileTraceback(file_id)
+        rel_path = ftb['product'].relative_path
         try:
-            product_id = self.session.query(self.File.product_id).filter_by(filename = filename)[0][0]
-            rel_path = self.session.query(self.Product).get(product_id).relative_path
-            root_dir = self.session.query(self.Product, self.Mission.rootdir).filter(self.Product.product_id == product_id).join((self.Instrument, self.Product.instrument_id == self.Instrument.instrument_id)).join(self.Satellite).join(self.Mission)[0][1]
-        except IndexError:
-            return None
-        # need to do path replacement
-        ftb = self.getProductTraceback(product_id)
-        if '{INSTRUMENT}' in rel_path : # need to replace with the instrument name
-            rel_path = rel_path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
-        if '{SATELLITE}' in rel_path : # need to replace with the instrument name
-            rel_path = rel_path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-        if '{MISSION}' in rel_path : # need to replace with the instrument name
-            rel_path = rel_path.replace('{MISSION}', ftb['mision'].mission_name)
-        if '{ROOTDIR}' in rel_path : # need to replace with the instrument name
-            rel_path = rel_path.replace('{ROOTDIR}', ftb['mision'].rootdir)
+            root_dir = ftb['mission'].rootdir
+        except KeyError:
+            root_dir = ''
+
         return os.path.join(root_dir, rel_path, filename)
 
     def getProcessFromInputProduct(self, product):
@@ -1355,28 +1192,11 @@ class DBUtils2(object):
             ans.append(v.process_id)
         return ans
 
-    def getProcess(self, process_id):
-        """
-        given a process_id return the product instance
-        """
-        p_id = self.getProcessID(process_id)
-        val = self.session.query(self.Process).get(p_id)
-        return val
-
     def getProcessTimebase(self, process):
         """
         given a product id or product name return the timebase
         """
-        try:
-            product = int(process)
-        except ValueError: # it was a string
-            p_id = self.getProcessID(process)
-        else:
-            p_id = product
-        sq = self.session.query(self.Process).get(p_id)
-        if sq is None:
-            raise(DBNoData("No process: {0}".format(process)))
-        return sq.output_timebase
+        return self.getEntry('Process', process).output_timebase
 
     def getProcessID(self, proc_name):
         """
@@ -1384,6 +1204,7 @@ class DBUtils2(object):
         """
         try:
            proc_id = long(proc_name)
+           proc = self.session.query(self.Process).get(proc_id)
         except ValueError: # it is not a number
             proc_id = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()[0][0]
         return proc_id
@@ -1392,27 +1213,15 @@ class DBUtils2(object):
         """
         given a filename or file_id return the product id it belongs to
         """
-        try:
-            f_id = int(filename)  # if a number
-        except ValueError:
-            f_id = self.getFileID(filename) # is a name
-        product_id = self.session.query(self.File).get(f_id)
-        if product_id is None:
-            raise(DBNoData("No file: {0}".format(filename)))
-        return product_id.product_id
+        fle = self.getEntry('File', filename)
+        return fle.product_id
 
     def getFileVersion(self, filename):
         """
         given a filename or fileid return a Version instance
         """
-        try:
-            f_id = int(filename)  # if a number
-        except ValueError:
-            f_id = self.getFileID(filename) # is a name
-        sq = self.session.query(self.File).get(f_id)
-        if sq is None:
-            raise(DBNoData("No file: {0}".format(filename)))
-        return Version.Version(sq.interface_version, sq.quality_version, sq.revision_version)
+        fle = self.getEntry('File', filename)
+        return Version.Version(fle.interface_version, fle.quality_version, fle.revision_version)
 
     def getFileMission(self, filename):
         """
@@ -1426,28 +1235,16 @@ class DBUtils2(object):
         # get all the satellites
         sat_id = self.getInstrumentSatellite(inst_id)
         # get the missions
-        mission_id = self.getSatelliteMission(sat_id)
-        return mission_id[0]
+        mission = self.getSatelliteMission(sat_id)
+        return mission
 
     def getSatelliteMission(self, sat_name):
         """
         given a satellite or satellite id return the mission
         """
-        if not isinstance(sat_name, (tuple, list)):
-            sat_name = [sat_name]
-        i_id = []
-        for val in sat_name:
-            try:
-                i_id.append(int(val))  # if a number
-            except ValueError:
-                i_id.append(self.getSatelliteID(val)) # is a name
-
-        m_id = []
-        for v in i_id:
-            sq = self.session.query(self.Satellite.mission_id).filter_by(satellite_id = v).all()
-            tmp = [v[0] for v in sq]
-            m_id.extend(tmp)
-        return m_id
+        s_id = self.getSatelliteID(sat_name) # is a name
+        m_id = self.getEntry('Satellite', s_id).mission_id
+        return self.getEntry('Mission', m_id)
 
     def getInstrumentSatellite(self, instrument_name):
         """
@@ -1460,7 +1257,7 @@ class DBUtils2(object):
             try:
                 i_id.append(int(val))  # if a number
             except ValueError:
-                i_id.append(self._getInstrumentID(val)) # is a name
+                i_id.append(self.getInstrumentID(val)) # is a name
 
         sat_id = []
         for v in i_id:
@@ -1481,32 +1278,16 @@ class DBUtils2(object):
         """
         given a product ID return the level
         """
-        sq = self.session.query(self.Product).get(productID)
-        if sq is None:
-            raise(DBNoData("No product: {0}".format(productID)))
-        return sq.level
+        return self.getEntry('Product', productID).level
 
-    def _getMissionID(self):
+    def getMissionName(self, id=None):
         """
         Return the current mission ID
 
         @return: mission_id - the current mission ID
 
         >>> dbp = DBProcessing()
-        >>> dbp._getMissionID()
-        19
-        """
-        sq = self.session.query(self.Mission.mission_id).filter_by(mission_name = self.mission)
-        return sq[0][0]
-
-    def _getMissionName(self, id=None):
-        """
-        Return the current mission ID
-
-        @return: mission_id - the current mission ID
-
-        >>> dbp = DBProcessing()
-        >>> dbp._getMissionID()
+        >>> dbp.getMissionID()
         19
         """
         if id is None:
@@ -1522,23 +1303,32 @@ class DBUtils2(object):
                 i_out.extend(tmp)
             return i_out
 
-    def _getInstrumentID(self, name, satellite_id=None):
+    def getInstrumentID(self, name, satellite_id=None):
         """
         Return the instrument_id for a given instrument
 
         @return: instrument_id - the instrument ID
 
         """
-        sq = self.session.query(self.Instrument).filter_by(instrument_name = name)
-        if sq.count() > 1:
-            if satellite_id == None:
-                raise(ValueError('Non unique instrument name and no satellite specified'))
-            for v in sq:
-                if v.satellite_id == satellite_id:
-                    return v.instrument_id
-        return sq[0].instrument_id
+        try:
+            i_id = long(name)
+            sq = self.session.query(self.Instrument).get(i_id)
+            if sq is None:
+                raise(DBNoData("No instrument_id {0} found in the DB".format(i_id)))
+            return sq.instrument_id
+        except ValueError:
+            sq = self.session.query(self.Instrument).filter_by(instrument_name = name).all()
+            if len(sq) == 0:
+                raise(DBNoData("No instrument_name {0} found in the DB".format(name)))
+            if len(sq) > 1:
+                if satellite_id == None:
+                    raise(ValueError('Non unique instrument name and no satellite specified'))
+                for v in sq:
+                    if v.satellite_id == satellite_id:
+                        return v.instrument_id
+            return sq[0].instrument_id
 
-    def _getMissions(self):
+    def getMissions(self):
         """return a list of all the missions"""
         sq = self.session.query(self.Mission.mission_name)
         return [val[0] for val in sq.all()]
@@ -1554,16 +1344,12 @@ class DBUtils2(object):
         @rtype: long
         """
         try:
-            filename = long(filename)
-        except ValueError:
-            pass
-        if isinstance(filename, (int, long)):
-            sq = self.session.query(self.File).filter_by(file_id = filename)
-            try:
-                return sq[0].file_id
-            except IndexError: # no file_id found
+            f_id = long(filename)
+            sq = self.session.query(self.File).get(f_id)
+            if sq is None:
                 raise(DBNoData("No file_id {0} found in the DB".format(filename)))
-        else:
+            return sq.file_id
+        except ValueError:
             sq = self.session.query(self.File).filter_by(filename = filename)
             try:
                 return sq[0].file_id
@@ -1580,8 +1366,17 @@ class DBUtils2(object):
         @return: code_id: code_id of the input file
         @rtype: long
         """
-        sq = self.session.query(self.Code.code_id).filter_by(filename = codename).all()
-        return sq[0][0]
+        try:
+            c_id = long(codename)
+            code = self.session.query(self.Code).get(c_id)
+            if code is None:
+                raise(DBNoData("No code id {0} found in the DB".format(c_id)))
+        except ValueError:
+            sq = self.session.query(self.Code.code_id).filter_by(filename = codename).all()
+            if len(sq) == 0:
+                raise(DBNoData("No code name {0} found in the DB".format(codename)))
+            c_id = sq[0].code_id
+        return c_id
 
     def getFilename(self, file_id):
         """
@@ -1593,21 +1388,13 @@ class DBUtils2(object):
         @return: filename: filename associated with the file_id
         @rtype: str
         """
-        DBlogging.dblogger.debug( "Entered getFilename():  file_id: {0}".format(file_id) )
-        sq = self.session.query(self.File).get(file_id)
-        if sq is None:
-            raise(DBNoData("No file_id: {0}".format(file_id)))
-        return sq.filename
+        return self.getEntry('File', file_id).filename
 
     def getFileProcess_keywords(self, file_id):
         """
         given a file_id return the process keywords string
         """
-        DBlogging.dblogger.debug( "Entered getFileProcess_keywords():  file_id: {0}".format(file_id) )
-        sq = self.session.query(self.File).get(file_id)
-        if sq is None:
-            raise(DBNoData("No file_id: {0}".format(file_id)))
-        return sq.process_keywords
+        return self.getEntry('File', file_id).process_keywords
 
     def getFileUTCfileDate(self, file_id):
         """
@@ -1619,28 +1406,19 @@ class DBUtils2(object):
         @return: utc_file_date: date of the file  associated with the file_id
         @rtype: datetime
         """
-        DBlogging.dblogger.debug( "Entered getFileUTCfileDate():  file_id: {0}".format(file_id) )
-        sq = self.session.query(self.File).get(file_id)
-        if sq is None:
-            raise(DBNoData("No file_id: {0}".format(file_id)))
-        return sq.utc_file_date
+        return self.getEntry('File', file_id).utc_file_date
 
     def getFileDates(self, file_id):
         """
         given a file_id or name return the dates it spans
         """
-        DBlogging.dblogger.debug( "Entered getFileDates():  file_id: {0}".format(file_id) )
-        try:
-            file_id = int(file_id)
-        except ValueError: # must have been a filename
-            file_id = self.getFileID(file_id)
-        sq = self.session.query(self.File).get(file_id)
-        if sq is None:
-            raise(DBNoData("No file_id: {0}".format(file_id)))
+        sq = self.getEntry('File', file_id)
         start_time = sq.utc_start_time.date()
         stop_time =  sq.utc_stop_time.date()
         retval = [start_time, stop_time]
-        return np.unique(retval).tolist()
+        ans = np.unique(retval).tolist()
+        DBlogging.dblogger.debug( "Found getFileDates():  file_id: {0}, dates: {1}".format(file_id, ans) )
+        return ans
 
     def getFiles_product_utc_file_date(self, product_id, date):
         """
@@ -1664,6 +1442,7 @@ class DBUtils2(object):
             # sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
             sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getFileProduct(v.file_id), self.getFileUTCfileDate(v.file_id) ) for v in sq]
             retval.extend(sq)
+        DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, retval) )
         return retval
 
 
@@ -1723,7 +1502,7 @@ class DBUtils2(object):
 
     def getFilesByProduct(self, prod_id):
         """
-        given a product_id or name return all te file instances associated with it
+        given a product_id or name return all the file instances associated with it
         """
         prod_id = self.getProductID(prod_id)
         sq = self.session.query(self.File).filter_by(product_id = prod_id)
@@ -1752,21 +1531,19 @@ class DBUtils2(object):
         DBlogging.dblogger.debug( "Entered getProductNames():  productID: {0}".format(productID) )
         if productID is None:
             sq = self.session.query(self.Mission.mission_name,
-                                                    self.Satellite.satellite_name,
-                                                    self.Instrument.instrument_name,
-                                                    self.Product.product_name,
-                                                    self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product)
+                                    self.Satellite.satellite_name,
+                                    self.Instrument.instrument_name,
+                                    self.Product.product_name,
+                                    self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product)
             return sq.order_by(asc(self.Product.product_id)).all()
         else:
+            p_id = self.getProductID(productID)
             sq = self.session.query(self.Mission.mission_name,
                                         self.Satellite.satellite_name,
                                         self.Instrument.instrument_name,
                                         self.Product.product_name,
-                                        self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == productID).all()
-        try:
+                                        self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == p_id).all()
             return tuple(sq[0])
-        except IndexError:
-            return None
 
     def getActiveInspectors(self):
         """
@@ -1800,15 +1577,12 @@ class DBUtils2(object):
         """
         try:
             product_name = long(product_name)
-        except ValueError:
-            pass
-        if isinstance(product_name, (int, long)):
             sq = self.session.query(self.Product).get(product_name)
             if sq is not None:
                 return sq.product_id
             else:
                 raise(DBNoData("No product_id {0} found in the DB".format(product_name)))
-        else:
+        except ValueError:
             sq = self.session.query(self.Product).filter_by(product_name = product_name)
             try:
                 return sq[0].product_id
@@ -1820,18 +1594,7 @@ class DBUtils2(object):
         """
         Return the product Name for an input product id
         """
-        sq = self.session.query(self.Product).get(product_id)
-        if sq is None:
-            raise(DBNoData("No product_id {0} found in the DB".format(product_id)))
-        else:
-            ftb = self.getProductTraceback(product_id)
-            name = sq.product_name
-            ## perform name replacement {SATELLITE}, {INSTRUMENT}
-            if '{INSTRUMENT}' in name : # need to replace with the instrument name
-                name = name.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
-            if '{SATELLITE}' in name : # need to replace with the instrument name
-                name = name.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-            return name
+        return self.getEntry('Product', product_id).product_name
 
     def getSatelliteID(self,
                         sat_name):
@@ -1841,21 +1604,24 @@ class DBUtils2(object):
 
         @return: satellite_id - the requested satellite  ID
         """
-        sq = self.session.query(self.Satellite.satellite_id).filter_by(mission_id = self._getMissionID()).filter_by(satellite_name = sat_name)
-        return sq.first()[0]  # there can be only one of each name
-
-    def getSatellite(self, sat_id):
-        """
-        given a sat id return tehsatellite instance
-        """
-        return self.session.query(self.Satellite).get(sat_id)
+        if isinstance(sat_name, (list, tuple)):
+            s_id = []
+            for v in sat_name:
+                s_id.append(self.getSatelliteID(v))
+            return s_id
+        try:
+            sat_id = long(sat_name)
+            sq = self.session.query(self.Satellite).get(sat_id)
+            return sq.satellite_id
+        except ValueError: # it was a name
+            sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).all()
+        return sq[0].satellite_id  # there can be only one of each name
 
     def getCodePath(self, code_id):
         """
         Given a code_id list return the full name (path and all) of the code
         """
-        DBlogging.dblogger.debug("Entered getCodePath: {0}".format(code_id))
-        code = self.session.query(self.Code).get(code_id)
+        code = self.getEntry('Code', code_id)
         if not code.active_code: # not an active code
             return None
         mission_dir =  self.getMissionDirectory()
@@ -1870,24 +1636,22 @@ class DBUtils2(object):
         try:
             return Version.Version(*sq[0])
         except IndexError:
-            raise(ValueError("No code number {0} in the db".format(code_id)))
+            raise(DBNoData("No code number {0} in the db".format(code_id)))
 
     def getOutputProductFromProcess(self, process):
         """
         given an process id return the output product
         """
-        DBlogging.dblogger.debug("Entered getOutputProductFromProcess: {0}".format(process))
-        sq2 = self.session.query(self.Process.output_product).filter_by(process_id = process)
-        # there can only be one
-        return sq2[0][0]
+        return self.getEntry('Process', process).output_product
 
     def getProcessFromOutputProduct(self, outProd):
         """
         Gets process from the db that have the output product
         """
         DBlogging.dblogger.debug("Entered getProcessFromOutputProduct: {0}".format(outProd))
-        sq1 =  self.session.query(self.Process.process_id).filter_by(output_product = outProd).all()  # should only have one value
-        return sq1[0][0]
+        p_id = self.getProductID(outProd)
+        sq1 =  self.session.query(self.Process).filter_by(output_product = p_id).all()  # should only have one value
+        return sq1[0].process_id
 
     def getCodeFromProcess(self, proc_id):
         """
@@ -1904,11 +1668,7 @@ class DBUtils2(object):
         """
         Given a code_id list return the arguments to the code
         """
-        DBlogging.dblogger.debug("Entered getCodeArgs: {0}".format(code_id))
-        sq1 =  self.session.query(self.Code).get(code_id)  # should only have one value
-        if sq1 is None:
-            raise(DBNoData("No code: {0}".format(code_id)))
-        return sq1.arguments
+        return self.getEntry('Code', code_id).arguments
 
     def getMissionDirectory(self):
         """
@@ -1954,7 +1714,8 @@ class DBUtils2(object):
         given a file_id return all the other file_ids that went into making it
         """
         DBlogging.dblogger.debug("Entered getFilefilelink_byresult: file_id={0}".format(file_id))
-        sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = file_id).all()
+        f_id = self.getFileID(file_id)
+        sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = f_id).all()
         try:
             return zip(*sq)[0]
         except IndexError:
@@ -1965,12 +1726,14 @@ class DBUtils2(object):
         given a file_id return the code_id associated with it, or None
         """
         DBlogging.dblogger.debug("Entered getFilecodelink_byfile: file_id={0}".format(file_id))
-        sq = self.session.query(self.Filecodelink.source_code).filter_by(resulting_file = file_id).all() # can only be one
+        f_id = self.getFileID(file_id)
+        sq = self.session.query(self.Filecodelink.source_code).filter_by(resulting_file = f_id).all() # can only be one
         try:
             return sq[0][0]
         except IndexError:
             return None
 
+    @classmethod
     def daterange_to_dates(self, daterange):
         """
         given a daterange return the dat objects for all days in the range
@@ -1982,38 +1745,41 @@ class DBUtils2(object):
         """
         given a misio name return its ID
         """
-        sq = self.session.query(self.Mission.mission_id).filter_by(mission_name = mission_name)
-        return sq[0][0]
+        try:
+            m_id = long(mission_name)
+            ms = self.session.query(self.Mission).get(m_id)
+            if ms is None:
+                raise(DBNoData('Invalid mission id {0}'.format(m_id)))
+        except ValueError:
+            sq = self.session.query(self.Mission.mission_id).filter_by(mission_name = mission_name).all()
+            if len(sq) == 0:
+                raise(DBNoData('Invalid mission name {0}'.format(mission_name)))
+            m_id = sq[0].mission_id
+        return m_id
 
     def getNewestFiles(self):
         """
-        for the current mission get a list of all file ids that are marked newest version
+        for the current mission get a tuple of all file ids that are marked newest version
         """
         sq = self.session.query(self.File.file_id).filter_by(newest_version = True).all()
         sq = zip(*sq)[0]
-        mission_id = self.getMissionID(self.mission)
-        for i in range(len(sq)-1, -1, -1):
-            if self.getFileMission(sq[i]) != mission_id:
-                del sq[i]
         return sq
 
     def tag_release(self, rel_num):
         """
-        tag all thenewest versions of files to a release number (integer)
+        tag all the newest versions of files to a release number (integer)
         """
         newest_files = self.getNewestFiles()
         for f in newest_files:
             self.addRelease(f, rel_num, commit=False)
         self._commitDB()
+        return len(newest_files)
 
     def addRelease(self, filename, release, commit=False):
         """
         given a filename or file_id add an entry to the release table
         """
-        try:
-            f_id = int(filename)  # if a number
-        except ValueError:
-            f_id = self.getFileID(filename) # is a name
+        f_id = self.getFileID(filename)  # if a number
         rel = self.Release()
         rel.file_id = f_id
         rel.release_num = release
@@ -2029,26 +1795,17 @@ class DBUtils2(object):
         sq = list(zip(*sq)[0])
         for i, v in enumerate(sq):
             if fullpath:
-                sq[i] = self._getFileFullPath(v)
+                sq[i] = self.getFileFullPath(v)
             else:
                 sq[i] = self.getFilename(v)
         return sq
-
-    def getFileMD5sum(self, file_id):
-        """
-        return the checksum for a file by id or name
-        """
-        file_id = self.getFileID(file_id) # if a name convert to id
-        sq = self.session.query(self.File.md5sum).filter_by(file_id = file_id).all()
-        return sq[0] # there can only be one
 
     def checkFileMD5(self, file_id):
         """
         given a file id or name check the db checksum and the file checksum
         """
-        file_id = self.getFileID(file_id) # if a name convert to id
-        disk_sha = calcDigest(self._getFileFullPath(file_id))
-        db_sha = self.getFileMD5sum(file_id)[0]
+        db_sha = self.getEntry('File', file_id).md5sum
+        disk_sha = calcDigest(self.getFileFullPath(file_id))
         if str(disk_sha) == str(db_sha):
             return True
         else:
@@ -2065,8 +1822,9 @@ class DBUtils2(object):
             try:
                 if not self.checkFileMD5(f):
                     bad_list.append((f, '(100) bad checksum'))
-            except IOError:
+            except DigestError:
                 bad_list.append((f, '(200) file not found'))
+        return bad_list
 
     def getProductTraceback(self, prod_id):
         """
@@ -2076,22 +1834,20 @@ class DBUtils2(object):
         prod_id = self.getProductID(prod_id) # convert name to ID
         retval = {}
         # get the product instance
-        retval['product'] = self.session.query(self.Product).get(prod_id)
-        if retval['product'] is None:
-            raise(DBNoData("No product {0} in the db".format(prod_id)))
+        retval['product'] = self.getEntry('Product', prod_id)
         # inspector
         retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
         # instrument
         inst_id = self.getInstrumentFromProduct(prod_id)[0]
-        retval['instrument'] = self.session.query(self.Instrument).get(inst_id)
+        retval['instrument'] = self.getEntry('Instrument', inst_id)
         # Instrumentproductlink
         retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((inst_id, prod_id))
         # satellite
         sat_id = self.getInstrumentSatellite(inst_id)[0]
-        retval['satellite'] = self.session.query(self.Satellite).get(sat_id)
+        retval['satellite'] = self.getEntry('Satellite', sat_id)
         # mission
-        mission_id = self.getSatelliteMission(sat_id)[0]
-        retval['mission'] = self.session.query(self.Mission).get(mission_id)
+        mission = self.getSatelliteMission(sat_id)
+        retval['mission'] = mission
         return retval
 
     def getFileTraceback(self, file_id):
@@ -2102,7 +1858,7 @@ class DBUtils2(object):
         file_id = self.getFileID(file_id)
         prod_id = self.getFileProduct(file_id)
         retval = self.getProductTraceback(prod_id)
-        retval['file'] = self.session.query(self.File).get(file_id)
+        retval['file'] = self.getEntry('File', file_id)
         return retval
 
     def getProcessTraceback(self, proc_id):
@@ -2112,30 +1868,28 @@ class DBUtils2(object):
         """
         retval = {}
         # get the product instance
-        retval['process'] = self.session.query(self.Process).get(proc_id)
-        if retval['process'] is None:
-            raise(DBNoData("No process {0} in the db".format(proc_id)))
-        retval['output_product'] = self.session.query(self.Product).get(retval['process'].output_product)
+        retval['process'] = self.getEntry('Process', proc_id)
+        retval['output_product'] = self.getEntry('Product', retval['process'].output_product)
         # instrument
         inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)[0]
-        retval['instrument'] = self.session.query(self.Instrument).get(inst_id)
+        retval['instrument'] = self.getEntry('Instrument', inst_id)
         # satellite
         sat_id = self.getInstrumentSatellite(inst_id)[0]
-        retval['satellite'] = self.session.query(self.Satellite).get(sat_id)
+        retval['satellite'] = self.getEntry('Satellite', sat_id)
         # mission
-        mission_id = self.getSatelliteMission(sat_id)[0]
-        retval['mission'] = self.session.query(self.Mission).get(mission_id)
+        mission_id = self.getSatelliteMission(sat_id).mission_id
+        retval['mission'] = self.getEntry('Mission', mission_id)
         # code
-        code_id = self.getCodeFromProcess(proc_id)
+        code_id = self.getCodeFromProcess(retval['process'].process_id)
         if code_id is not None:
-            retval['code'] = self.session.query(self.Code).get(code_id)
+            retval['code'] = self.getEntry('Code', code_id)
         # input products
         retval['input_product'] = []
-        in_prod_id = self.getInputProductID(proc_id)
+        in_prod_id = self.getInputProductID(retval['process'].process_id)
         for val, opt in in_prod_id:
-            retval['input_product'].append((self.session.query(self.Product).get(val), opt) )
+            retval['input_product'].append((self.getEntry('Product', val), opt) )
         retval['productprocesslink'] = []
-        ppl = self.session.query(self.Productprocesslink).filter_by(process_id = proc_id)
+        ppl = self.session.query(self.Productprocesslink).filter_by(process_id = retval['process'].process_id)
         for val in ppl:
             retval['productprocesslink'].append(ppl)
         return retval
@@ -2146,19 +1900,7 @@ class DBUtils2(object):
         """
         outval = []
         prods = self.getAllProducts()
-        mission_id = self._getMissionID()
-        for val in prods:
-            if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
-                outval.append(val)
-        return outval
-
-    def getProcesses(self):
-        """
-        get all processes for the given mission
-        """
-        outval = []
-        prods = self.getAllProducts()
-        mission_id = self._getMissionID()
+        mission_id = self.getMissionID(self.mission)
         for val in prods:
             if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
                 outval.append(val)
@@ -2166,10 +1908,15 @@ class DBUtils2(object):
 
     def getAllProcesses(self):
         """
-        return a list of all processes as instances
+        get all processes for the given mission
         """
-        prods = self.session.query(self.Process).all()
-        return prods
+        outval = []
+        procs = self.session.query(self.Process).all()
+        mission_id = self.getMissionID(self.mission)
+        for val in procs:
+            if self.getProcessTraceback(val.process_id)['mission'].mission_id == mission_id:
+                outval.append(val)
+        return outval
 
     def getAllProducts(self):
         """
@@ -2178,16 +1925,24 @@ class DBUtils2(object):
         prods = self.session.query(self.Product).all()
         return prods
 
-    def getFilesQC(self):
+    def getEntry(self, table, *args):
         """
-        return a list of tuples containing
-        (file_id, date, filename, product_name)
-        for files whos quality_checked flag is false
+        master method to return a entry instance from any table in the db
         """
-        files = self.session.query(self.File).filter_by(quality_checked=False).filter_by(newest_version=True).all()
-        output = [ (f.file_id, f.utc_file_date, f.filename, self.getProductName(f.product_id) ) for f in files ]
-        return output
-
+        if table not in dir(self):
+            raise(ValueError('Invalid table specification: {0}'.format(table)))
+        if ('get' + table + 'ID') in dir(self):
+            cmd = 'get' + table + 'ID'
+            pk = getattr(self, cmd)(args[0])
+        else:
+            try:
+                pk = long(args[0])
+            except ValueError:
+                raise(ValueError('Invalid primary key, {1}, specified for table {0}'.format(table, args[0])))
+        retval = self.session.query(getattr(self, table)).get(pk)
+        if retval is None:
+            raise(DBNoData('No entry {0} for table {1}'.format(args[0], table)))
+        return retval
 
 
 

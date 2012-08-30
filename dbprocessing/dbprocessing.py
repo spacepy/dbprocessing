@@ -480,7 +480,7 @@ class ProcessQueue(object):
                    for arg in args:
                        if 'input' in arg:
                            cmdline.append(arg.split('=')[1])
-                cmdline.append(self.dbu._getFileFullPath(i_fid))
+                cmdline.append(self.dbu.getFileFullPath(i_fid))
             if args is not None:
                 for arg in args:
                    if 'output' in arg:

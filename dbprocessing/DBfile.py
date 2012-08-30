@@ -90,7 +90,7 @@ class DBfile(object):
 
     def addFileToDB(self):
         """
-        wrapper around DButils2._addFile to take params dict to keywords
+        wrapper around DButils2.addFile to take params dict to keywords
 
         @return: the file_id of the newly added file
         @rtype: long
@@ -101,7 +101,7 @@ class DBfile(object):
 
         @version: V1: 05-Oct-2010 (BAL)
         """
-        f_id = self.dbu._addFile(filename = self.diskfile.params['filename'],
+        f_id = self.dbu.addFile(filename = self.diskfile.params['filename'],
                         data_level = self.diskfile.params['data_level'],
                         version = self.diskfile.params['version'],
                         file_create_date = self.diskfile.params['file_create_date'],
