@@ -92,7 +92,8 @@ class inspector(object):
         """
         populate the rest of the information to the diskfile
         """
-        self.diskfile.mission = self.dbu.getProductNames(productID=self.diskfile.params['product_id'])[0] # mission name is 0
+        ptb = self.dbu.getProductTraceback(self.diskfile.params['product_id'])
+        self.diskfile.mission = ptb['mission'].mission_name
         self.diskfile.params['file_create_date'] = datetime.datetime.fromtimestamp(os.path.getmtime(self.diskfile.infile))
         self.diskfile.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
         self.diskfile.params['md5sum'] = Diskfile.calcDigest(self.diskfile.infile)
