@@ -59,12 +59,20 @@ class ProcessQueue(object):
         """
 
     def rm_tempdir(self):
+        """
+        remove the temp directory
+        """
         if self.tempdir != None:
             name = self.tempdir
             shutil.rmtree(self.tempdir)
             self.tempdir = None
             DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
 
+    def mk_tempdir(self, suffix='_dbprocessing'):
+        """
+        create a secure temp directory
+        """
+        self.tempdir = tempfile.mkdtemp('_dbprocessing')
 
     def checkIncoming(self):
         """
@@ -114,9 +122,9 @@ class ProcessQueue(object):
         try:
             shutil.move(fname, path)
         except IOError:
-            DBlogging.dblogger.warning("file {0} was not successfully moved to error".format(os.path.join(path, os.path.basename(fname) )))
+            DBlogging.dblogger.error("file {0} was not successfully moved to error".format(os.path.join(path, os.path.basename(fname) )))
         else:
-            DBlogging.dblogger.warning("**ERROR** {0} moved to {1}".format(fname, path))
+            DBlogging.dblogger.error("moveToError {0} moved to {1}".format(fname, path))
 
     def moveToIncoming(self, fname):
         """
@@ -129,11 +137,11 @@ class ProcessQueue(object):
         @version: V1: 18-Apr-2012 (BAL)
         """
         inc_path = self.dbu.getIncomingPath()
-        DBlogging.dblogger.debug("Entered moveToIncoming: {0} {1}".format(fname, inc_path))
         if os.path.isfile(os.path.join(inc_path, os.path.basename(fname))):
         #TODO do I really want to remove old version:?
             os.remove( os.path.join(inc_path, os.path.basename(fname)) )
         shutil.move(fname, inc_path + os.sep)
+        DBlogging.dblogger.debug("moveToIncoming: {0} {1}".format(fname, inc_path))
 
     def diskfileToDB(self, df):
         """
@@ -144,7 +152,7 @@ class ProcessQueue(object):
             self.moveToError(self.current_file)
             return None
 
-        # if the file is the wrong mission skip it
+        # creae the DBfile
         dbf = DBfile.DBfile(df, self.dbu)
         try:
             f_id = dbf.addFileToDB()
@@ -160,11 +168,13 @@ class ProcessQueue(object):
         # set files in the db of the same product and same utc_file_date to not be newest version
         files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
         if files:
-            mx = max(zip(*files)[1])
+            mx = max(zip(*files)[1]) # max on version
         for f in files:
             if f[1] != mx: # this is not the max, newest_version should be False
-                self.dbu.session.query(self.dbu.File).filter_by(file_id = f[0]).update({self.dbu.File.newest_version: False})
-                DBlogging.dblogger.debug("set {0}.newest_version=False".format(f[0]))
+                fle = self.dbu.getEntry('File', f[0])
+                fle.update({self.dbu.File.newest_version: False})
+                # this seems good, TODO mak sure .add() isnt needed as well
+                DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f[0]))
         try:
             self.dbu.session.commit()
         except IntegrityError as IE:
@@ -188,7 +198,7 @@ class ProcessQueue(object):
 
     def _strargs_to_args(self, strargs):
         """
-        read in the arguments string forn the db and change to a dict
+        read in the arguments string from the db and change to a dict
         """
         kwargs = {}
         if isinstance(strargs, (list, tuple)): # we have multiple to deal with
@@ -249,7 +259,7 @@ class ProcessQueue(object):
             ## get all the input products for that process, and if they are optional
             input_product_id = self.dbu.getInputProductID(process_id) # this is a list
 
-            DBlogging.dblogger.debug("Finding input files for {0}".format(utc_file_date))
+            DBlogging.dblogger.debug("Finding input files for file_id:{0} process_id:{1} date:{2}".format(file_id, process_id, utc_file_date))
 
             ## here decide how we build output and do it.
             timebase = self.dbu.getEntry('Process', process_id).output_timebase
@@ -295,7 +305,7 @@ class ProcessQueue(object):
                         DBlogging.dblogger.info("Required products not found, continuing.  Process:{0}, product{1}".format(process_id, prod))
                         return None
 
-            input_files = zip(*files)[0]
+            input_files = zip(*files)[0] # this is the file_id
             DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
     #==============================================================================
@@ -312,19 +322,14 @@ class ProcessQueue(object):
             DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(code_id, codepath))
 
             out_prod = self.dbu.getEntry('Process', process_id).output_product
-            format_str = self.dbu.getProductFormats(out_prod)
+            # grab the format
+            format_str = self.dbu.getEntry('Product', out_prod).format
             # get the process_keywords from the file if there are any
             process_keywords = self._strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
             for key in process_keywords:
                 format_str = format_str.replace('{'+key+'}', process_keywords[key])
 
-            # get the format string
-            tmp = self.dbu.getProductNames(out_prod)
-            if not tmp:
-                DBlogging.dblogger.error("ERROR: DB inconsistency found")
-                raise(DBUtils.DBError("DB inconsistency found"))
-            mission, satellite, instrument, product, product_id = tmp
-
+            ptb = self.dbu.getProductTraceback(out_prod)
 
             ## need to build a version string for the output file
             version = self.dbu.getCodeVersion(code_id)
@@ -335,11 +340,11 @@ class ProcessQueue(object):
             incCode = True
             incFiles = True
             while True:
-                filename = fmtr.expand_format(format_str, {'SATELLITE':satellite,
-                                                             'PRODUCT':product,
+                filename = fmtr.expand_format(format_str, {'SATELLITE':ptb['satellite'].satellite_name,
+                                                             'PRODUCT':ptb['product'].product_name,
                                                              'VERSION':str(output_file_version),
                                                              'datetime':utc_file_date,
-                                                             'INSTRUMENT':instrument})
+                                                             'INSTRUMENT':ptb['instrument'].instrument_name})
                 DBlogging.dblogger.debug("Filename: %s created" % (filename))
                 # if this filename is already in the DB we have to figure out which version number to increment
                 try:
@@ -422,7 +427,7 @@ class ProcessQueue(object):
                     break # leave the while loop and do the processing
 
             # make a directory to run the code
-            self.tempdir = tempfile.mkdtemp('_dbprocessing')
+            self.mk_tempdir()
             DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
 
             ## build the command line we are to run
@@ -431,7 +436,7 @@ class ProcessQueue(object):
             args = self.dbu.getEntry('Process', process_id).extra_params
             if args is not None:
                 args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
-                args = args.split('  ')
+                args = args.split('|')
                 cmdline.extend(args)
 
             ## figure out how to put the arguments together

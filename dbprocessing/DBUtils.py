@@ -1414,43 +1414,6 @@ class DBUtils(object):
         sq = self.session.query(self.File).filter_by(product_id = prod_id)
         return sq.all()
 
-    def getProductFormats(self, productID=None):
-        """
-        Return the product formats for all the formats
-
-        @return: list of all the product format strings and ids from the database
-        """
-        DBlogging.dblogger.debug( "Entered getProductFormats():  productID: {0}".format(productID) )
-        if productID == None:
-            sq = self.session.query(self.Product.format, self.Product.product_id)
-            return sq.order_by(asc(self.Product.product_id)).all()
-        else:
-            sq = self.session.query(self.Product.format).filter_by(product_id = productID)
-            return sq[0][0]
-
-    def getProductNames(self, productID=None):
-        """
-        Return the mission, Satellite, Instrument,  product, product_id   names as a tuple
-
-        @return: list of tuples of the mission, Satellite, Instrument,  product, product id  names
-        """
-        DBlogging.dblogger.debug( "Entered getProductNames():  productID: {0}".format(productID) )
-        if productID is None:
-            sq = self.session.query(self.Mission.mission_name,
-                                    self.Satellite.satellite_name,
-                                    self.Instrument.instrument_name,
-                                    self.Product.product_name,
-                                    self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product)
-            return sq.order_by(asc(self.Product.product_id)).all()
-        else:
-            p_id = self.getProductID(productID)
-            sq = self.session.query(self.Mission.mission_name,
-                                        self.Satellite.satellite_name,
-                                        self.Instrument.instrument_name,
-                                        self.Product.product_name,
-                                        self.Product.product_id).join(self.Satellite).join(self.Instrument).join(self.Instrumentproductlink).join(self.Product).filter(self.Product.product_id == p_id).all()
-            return tuple(sq[0])
-
     def getActiveInspectors(self):
         """
         query the db and return a list of all the active inspector filenames [(filename, arguments, product), ...]
