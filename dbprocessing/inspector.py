@@ -92,7 +92,7 @@ class inspector(object):
         """
         populate the rest of the information to the diskfile
         """
-        ptb = self.dbu.getProductTraceback(self.diskfile.params['product_id'])
+        ptb = self.dbu.getProductTraceback(self.product)
         self.diskfile.mission = ptb['mission'].mission_name
         self.diskfile.params['file_create_date'] = datetime.datetime.fromtimestamp(os.path.getmtime(self.diskfile.infile))
         self.diskfile.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
