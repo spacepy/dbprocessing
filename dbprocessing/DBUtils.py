@@ -494,11 +494,11 @@ class DBUtils(object):
         uniq_dat = list(set(dat))
         # step through the uniq ones and if there is more than one drop
         for uval in uniq_dat:
-            if dat.count(uval) > 1: # we did find more than one
-                # create a new list of just those
-                tmp = [val for val in file_entries if val.product_id == uval[0] and val.utc_file_date == uval[1]]
-                mx = max(tmp, key=lambda x: Version.Version(x.interface_version, x.quality_version, x.revision_version))
-                ans.append(mx.file_id)
+            # should be albe t do a bailout here, TODO
+            # create a new list of just those
+            tmp = [val for val in file_entries if val.product_id == uval[0] and val.utc_file_date == uval[1]]
+            mx = max(tmp, key=lambda x: Version.Version(x.interface_version, x.quality_version, x.revision_version))
+            ans.append(mx.file_id)
 
         ## now we have a list of just the unique file_id's
         self.Processqueue.flush()
