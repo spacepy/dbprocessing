@@ -497,7 +497,7 @@ class DBUtils(object):
             if dat.count(uval) > 1: # we did find more than one
                 # create a new list of just those
                 tmp = [val for val in file_entries if val.product_id == uval[0] and val.utc_file_date == uval[1]]
-                mx = max(tmp, key=lambda x: x.version)
+                mx = max(tmp, key=lambda x: Version.Version(x.interface_version, x.quality_version, x.revision_version))
                 ans.append(mx.file_id)
 
         ## now we have a list of just the unique file_id's
