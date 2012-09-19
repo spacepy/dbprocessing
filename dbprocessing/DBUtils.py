@@ -484,30 +484,25 @@ class DBUtils(object):
         pqdata = self.Processqueue.getAll()
         if len(pqdata) <= 1: # can't clean just one (or zero) entries
             return
-        # build up a list of tuples file_id, product_id, utc_file_date, version
-        data = {}
-        for ii, file_id in enumerate(pqdata):
-            sq = self.getEntry('File', file_id)
-            product_id = sq.product_id
-            utc_file_date = sq.utc_file_date
-            version = self.getFileVersion(sq.file_id)
-            data[ii] = (file_id, product_id, utc_file_date, version)
-        for k1, k2 in itertools.combinations(range(len(data)), 2): # order does not matter
-            if data[k1][1] == data[k2][1] and data[k1][2] == data[k2][2]: # same product an date
-                # drop the one with the lower version
-                if data[k1][3] > data[k2][3]:
-                    DBlogging.dblogger.info("Removed {0} from the process queue".format(data[k2]))
-                    del data[k2]
-                elif data[k1][3] < data[k2][3]:
-                    DBlogging.dblogger.info("Removed {0} from the process queue".format(data[k1]))
-                    del data[k1]
-                else:
-                    DBlogging.dblogger.error('Same product ({0}), same date ({1}), same version ({2}) this should not have been allowed'.format(data[k1][1], data[k1][2], data[k1][3]))
-                    raise(DBError('Same product ({0}), same date ({1}), same version ({2}) this should not have been allowed'.format(data[k1][1], data[k1][2], data[k1][3])))
-        ## now we have a dict of just the unique files
+
+        ans = [] # this will hold the unique file_id's to put back on the queue
+
+        file_entries = [self.getEntry('File', val) for val in pqdata]
+        # setup a tuple of (product_id, utc_file_date)
+        dat = [(val.product_id, val.utc_file_date) for val in file_entries]
+        # now we want just the unique enetries
+        uniq_dat = list(set(dat))
+        # step through the uniq ones and if there is more than one drop
+        for uval in uniq_dat:
+            if dat.count(uval) > 1: # we did find more than one
+                # create a new list of just those
+                tmp = [val for val in file_entries if val.product_id == uval[0] and val.utc_file_date == uval[1]]
+                mx = max(tmp, key=lambda x: x.version)
+                ans.append(mx.file_id)
+
+        ## now we have a list of just the unique file_id's
         self.Processqueue.flush()
-        for key in data:
-            self.Processqueue.push(data[key][0]) # the file_id goes back on
+        self.Processqueue.push(ans)
         DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
     def _purgeFileFromDB(self, filename=None, recursive=False):
