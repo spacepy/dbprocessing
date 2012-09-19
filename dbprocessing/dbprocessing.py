@@ -172,7 +172,8 @@ class ProcessQueue(object):
         for f in files:
             if f[1] != mx: # this is not the max, newest_version should be False
                 fle = self.dbu.getEntry('File', f[0])
-                fle.update({self.dbu.File.newest_version: False})
+                fle.newest_version = False
+                self.dbu.session.add(fle)
                 # this seems good, TODO mak sure .add() isnt needed as well
                 DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f[0]))
         try:
