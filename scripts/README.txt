@@ -79,8 +79,6 @@ Totally clean out the DB:  (leaves mission, instrument, satellite)
 run these commands (done this way so it is hard to do)
 from dbprocessing import DBUtils
 a = DBUtils.DBUtils('rbsp')
-a._openDB()
-a._createTableObjects()
 a.deleteAllEntries()
 
 
