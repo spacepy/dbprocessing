@@ -103,9 +103,6 @@ class Diskfile(object):
 
         Author: Brian Larsen, LANL
         """
-
-        DBlogging.dblogger.info("Entered Diskfile")
-
         self.infile = infile
         self.checkAccess()
 
@@ -165,7 +162,7 @@ class Diskfile(object):
         self.WRITE_ACCESS = os.access(self.infile, os.W_OK)
         if not self.WRITE_ACCESS:
             raise(WriteError("file is not writeable, won't be able to move it to proper location: {0}".format(self.infile)))
-        DBlogging.dblogger.debug("Access Checked out OK")
+        DBlogging.dblogger.debug("{0} Access Checked out OK".format(self.infile))
 
 
 
