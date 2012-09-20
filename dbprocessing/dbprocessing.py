@@ -212,7 +212,7 @@ class ProcessQueue(object):
             for val in strargs.split():
                 tmp = val.split('=')
                 kwargs[tmp[0]] = tmp[1]
-        except AttributeError: # it was None
+        except (AttributeError, KeyError): # it was None
             pass
         return kwargs
 
