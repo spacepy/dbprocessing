@@ -632,7 +632,7 @@ class DBUtils(object):
         @keyword super_process_id: the process id of the superprocess for this process
         @type super_process_id: int
         """
-        if output_timebase not in ['ORBIT', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'FILE']:
+        if output_timebase not in ['RUN', 'ORBIT', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'FILE']:
             raise(ValueError("output_timebase invalid choice"))
 
         p1 = self.Process()
@@ -1181,6 +1181,13 @@ class DBUtils(object):
         for v in sq:
             ans.append(v.process_id)
         return ans
+
+    def getRunProcess(self):
+        """
+        return a list of the processes whos output_timebase is "RUN"
+        """
+        proc = self.session.query(self.Process).filter_by(output_timebase = 'RUN').all()
+        return proc
 
     def getProcessID(self, proc_name):
         """

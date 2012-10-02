@@ -504,6 +504,11 @@ class ProcessQueue(object):
                     self.dbu.addFilefilelink(f_id, val)
             self.current_file = current_file # so we can put it back
 
+    def onRun(self):
+        """
+        Processes can be defined as outpout timebase "RUN" whcih means to run
+        them each time to processing chain is run
+        """
 
 
 
