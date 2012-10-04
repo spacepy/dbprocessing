@@ -201,8 +201,14 @@ class ProcessQueue(object):
         """
         read in the arguments string from the db and change to a dict
         """
+        if strargs is None:
+            return None
         kwargs = {}
         if isinstance(strargs, (list, tuple)): # we have multiple to deal with
+            # TODO why was this needed?
+            if len(strargs) == 1:
+                kwargs = self._strargs_to_args(strargs[0])
+                return kwargs
             for val in strargs:
                 tmp = self._strargs_to_args(val)
                 for key in tmp:
@@ -326,9 +332,13 @@ class ProcessQueue(object):
             # grab the format
             format_str = self.dbu.getEntry('Product', out_prod).format
             # get the process_keywords from the file if there are any
-            process_keywords = self._strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
-            for key in process_keywords:
-                format_str = format_str.replace('{'+key+'}', process_keywords[key])
+            print '%%%%', input_files
+            try:
+                process_keywords = self._strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
+                for key in process_keywords:
+                    format_str = format_str.replace('{'+key+'}', process_keywords[key])
+            except TypeError:
+                pass
 
             ptb = self.dbu.getProductTraceback(out_prod)
 
