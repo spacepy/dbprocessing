@@ -6,12 +6,14 @@ import tempfile
 import shutil
 import subprocess
 
-
 import dbprocessing.DBUtils as DBUtils
 import dbprocessing.DBlogging as DBlogging
 
-dbu = DBUtils.DBUtils('rbsp')
+# Code users rsync to build an incremental list of files not already
+# processed (i.e. not in /n/space_data/cda/rbsp) and saves that list to a file
+# then the file is opened and each file is copied using shutils.copy
 
+dbu = DBUtils.DBUtils('rbsp')
 
 mission_path = dbu.getMissionDirectory()
 inc_path = dbu.getIncomingPath()
