@@ -21,6 +21,8 @@ mission_path = dbu.getMissionDirectory()
 inc_path = dbu.getIncomingPath()
 data_path = os.path.expanduser(os.path.join('~ectsoc', 'data', 'level_0'))
 error_path = dbu.getErrorPath()
+dbu._closeDB()
+
 
 def sync_data(sc, inst):
     global mission_path
