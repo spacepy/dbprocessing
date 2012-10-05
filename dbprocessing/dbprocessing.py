@@ -475,7 +475,7 @@ class ProcessQueue(object):
 
             # TODO, think here on how to grab the output
             try:
-                subprocess.check_call(cmdline, stderr=subprocess.STDOUT)
+                subprocess.check_call(cmdline, shell=True, stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError:
                 # TODO figure out how to print what the return code was
                 DBlogging.dblogger.error("Command returned a non-zero return code")
