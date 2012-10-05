@@ -332,7 +332,6 @@ class ProcessQueue(object):
             # grab the format
             format_str = self.dbu.getEntry('Product', out_prod).format
             # get the process_keywords from the file if there are any
-            print '%%%%', input_files
             try:
                 process_keywords = self._strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
                 for key in process_keywords:
