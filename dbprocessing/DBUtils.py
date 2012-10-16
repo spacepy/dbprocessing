@@ -1723,7 +1723,10 @@ class DBUtils(object):
         retval['output_product'] = self.getEntry('Product', retval['process'].output_product)
         # instrument
         inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)
-        retval['instrument'] = self.getEntry('Instrument', inst_id)
+        try:
+            retval['instrument'] = self.getEntry('Instrument', inst_id)
+        except (TypeError):
+            raise(ValueError('Bad instrument id specified'))
         # satellite
         sat_id = self.getEntry('Instrument', inst_id).satellite_id
         retval['satellite'] = self.getEntry('Satellite', sat_id)
@@ -1757,16 +1760,22 @@ class DBUtils(object):
                 outval.append(val)
         return outval
 
-    def getAllProcesses(self):
+    def getAllProcesses(self, timebase='all'):
         """
         get all processes for the given mission
         """
         outval = []
-        procs = self.session.query(self.Process).all()
+        if timebase == 'all':
+            procs = self.session.query(self.Process).all()
+        else:
+            procs = self.session.query(self.Process).filter_by(output_timebase = timebase.upper()).all()
         mission_id = self.getMissionID(self.mission)
         for val in procs:
-            if self.getProcessTraceback(val.process_id)['mission'].mission_id == mission_id:
-                outval.append(val)
+            try:
+                if self.getProcessTraceback(val.process_id)['mission'].mission_id == mission_id:
+                    outval.append(val)
+            except ValueError: # happens when a getProcessTraceback fails
+                continue
         return outval
 
     def getAllProducts(self):
@@ -1788,7 +1797,7 @@ class DBUtils(object):
         else:
             try:
                 pk = long(args[0])
-            except ValueError:
+            except (ValueError, TypeError):
                 raise(ValueError('Invalid primary key, {1}, specified for table {0}'.format(table, args[0])))
         retval = self.session.query(getattr(self, table)).get(pk)
         if retval is None:
