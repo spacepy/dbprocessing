@@ -1529,7 +1529,6 @@ class DBUtils(object):
         @return: base directory for current mission
         @rtype: str
         """
-        DBlogging.dblogger.debug("Entered getMissionDirectory: ")
         sq = self.session.query(self.Mission.rootdir).filter_by(mission_name  = self.mission)
         return sq.first()[0]  # there can be only one of each name
 
