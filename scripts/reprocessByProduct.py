@@ -23,6 +23,8 @@ if __name__ == "__main__":
                       help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
     parser.add_option("-e", "--endDate", dest="endDate", type="string",
                       help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
+    parser.add_option("", "--force", dest="force", action="store_true",
+                      help="Force the reprocessing", default=False)
     (options, args) = parser.parse_args()
     if len(args) != 1:
         parser.error("incorrect number of arguments")
@@ -37,7 +39,7 @@ if __name__ == "__main__":
         endDate = None
 
     db = dbprocessing.ProcessQueue('rbsp')
-    num = db.reprocessByProduct(args[0], startDate=startDate, endDate=endDate)
+    num = db.reprocessByProduct(args[0], startDate=startDate, endDate=endDate, force=options.force)
     print('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
     DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
 
