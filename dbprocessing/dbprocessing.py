@@ -437,7 +437,7 @@ class ProcessQueue(object):
                         DBlogging.dblogger.debug("input_files: {0}  ".format(input_files))
                         # go through and see if all the same files are present,
                         ## if not quality is incremented
-                        file_vers = [1,0,0] # versions start at 1.0.0
+                        file_vers = [0,0,0] # versions start at 1.0.0
                         for in_file in input_files:
                             # the file is there is it the same version
                             input_file_version = self.dbu.getFileVersion(in_file)
