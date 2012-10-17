@@ -542,6 +542,7 @@ class DBUtils(object):
             ## file
             self.session.delete(self.getEntry('File', f))
             self._commitDB()
+            DBlogging.dblogger.info( "File removed from db {0}".format(f) )
 
     def deleteAllEntries(self):
         """

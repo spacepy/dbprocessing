@@ -142,7 +142,7 @@ class ProcessQueue(object):
         #TODO do I really want to remove old version:?
             os.remove( os.path.join(inc_path, os.path.basename(fname)) )
         shutil.move(fname, inc_path + os.sep)
-        DBlogging.dblogger.debug("moveToIncoming: {0} {1}".format(fname, inc_path))
+        DBlogging.dblogger.info("moveToIncoming: {0} {1}".format(fname, inc_path))
 
     def diskfileToDB(self, df):
         """
@@ -583,11 +583,12 @@ class ProcessQueue(object):
         # things made here will also have to have inspectors
         raise(NotImplementedError('Not yet implemented'))
 
-    def reprocessByCode(self, code_id, startDate=None, endDate=None):
+    def reprocessByCode(self, code_id, startDate=None, endDate=None, force=False):
         """
         given a code_id (or name) add all files that this code touched to processqueue
             so that next -p run they will be reprocessed
         If one adds a new code run this on the code that this is replacing
+        Force moves the file back to incoming and then removes it from the db
         ** this ends up being a little more aggressive as the input files are put
            on the processqueue so all products associated with them are remade
            ** If we want to change this then several steps need to occur:
@@ -609,9 +610,14 @@ class ProcessQueue(object):
         parents = [self.dbu.getFileParents(val, id_only=True) for val in f_ids]
         filesToReprocess = set(Utils.flatten(parents))
         self.dbu.Processqueue.push(filesToReprocess)
+        if force:
+            # move the file to incoming then remove it from the db
+            #####!!!! version numners are not bumped
+            for f in filesToReprocess:
+                self._fileBackToIncoming(f)
         return len(filesToReprocess)
 
-    def reprocessByProduct(self, prod_id, startDate=None, endDate=None):
+    def reprocessByProduct(self, prod_id, startDate=None, endDate=None, force=False):
         prod_id = self.dbu.getProductID(prod_id)
         files = self.dbu.getFilesByProduct(prod_id)
         # files before this date are removed from the list
@@ -622,7 +628,21 @@ class ProcessQueue(object):
             files = [val for val in files if val.utc_file_date <= endDate]
         f_ids = [val.file_id for val in files]
         self.dbu.Processqueue.push(f_ids)
+        if force:
+            # move the file to incoming then remove it from the db
+            #####!!!! version numners are not bumped
+            for f in f_ids:
+                self._fileBackToIncoming(f)
         return len(f_ids)
 
+    def _fileBackToIncoming(self, file_id):
+        """
+        take a file and move it form the db back to incoming and remove it from the db
+        """
+        DBlogging.dblogger.info("Moving {0} back to incoming".format(file_id) )
+        file_id = self.dbu.getFileID(file_id)
+        fp = self.dbu.getFileFullPath(file_id)
+        self.moveToIncoming(fp)
+        self.dbu._purgeFileFromDB(fp)
 
 
