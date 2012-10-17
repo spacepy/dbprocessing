@@ -610,3 +610,19 @@ class ProcessQueue(object):
         filesToReprocess = set(Utils.flatten(parents))
         self.dbu.Processqueue.push(filesToReprocess)
         return len(filesToReprocess)
+
+    def reprocessByProduct(self, prod_id, startDate=None, endDate=None):
+        prod_id = self.dbu.getProductID(prod_id)
+        files = self.dbu.getFilesByProduct(prod_id)
+        # files before this date are removed from the list
+        if startDate is not None:
+            files = [val for val in files if val.utc_file_date >= startDate]
+        # files after this date are removed from the list
+        if endDate is not None:
+            files = [val for val in files if val.utc_file_date <= endDate]
+        f_ids = [val.file_id for val in files]
+        self.dbu.Processqueue.push(f_ids)
+        return len(f_ids)
+
+
+
