@@ -27,6 +27,7 @@ class ProcessException(Exception):
     """Class for errors in ProcessQueue"""
     pass
 
+
 class ProcessQueue(object):
     """
     Main code used to process the Queue, looks in incoming and builds all
@@ -472,66 +473,11 @@ class ProcessQueue(object):
                     break # leave the while loop and do the processing
 
 #==============================================================================
-#             # TODO can this be pulled ut to be a runner
+#             # TODO can this be pulled out to be a runner function
 #==============================================================================
 
-            # make a directory to run the code
-            self.mk_tempdir()
-            DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
+            cmdline = self._runner(self, process_id, code_id, utc_file_date, input_files, filename)
 
-            ## build the command line we are to run
-            cmdline = [codepath]
-            ## get extra_params from the process # they are split by 2 spaces
-            args = self.dbu.getEntry('Process', process_id).extra_params
-            if args is not None:
-                args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
-                args = args.split('|')
-                cmdline.extend(args)
-
-            ## figure out how to put the arguments together
-            args = self.dbu.getEntry('Code', code_id).arguments
-            if args is not None:
-                args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
-                args = args.split()
-                for arg in args:
-                    if 'input' not in arg and 'output' not in arg:
-                        cmdline.append(arg)
-
-            for i_fid in input_files:
-                if args is not None:
-                   for arg in args:
-                       if 'input' in arg:
-                           cmdline.append(arg.split('=')[1])
-                cmdline.append(self.dbu.getFileFullPath(i_fid))
-            if args is not None:
-                for arg in args:
-                   if 'output' in arg:
-                       cmdline.append(arg.split('=')[1])
-            cmdline.append(os.path.join(self.tempdir, filename))
-
-            DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))
-
-            # TODO, think here on how to grab the output
-            try:
-                subprocess.check_call(' '.join(cmdline), shell=True, stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError:
-                # TODO figure out how to print what the return code was
-                DBlogging.dblogger.error("Command returned a non-zero return code")
-                # assume the file is bad and move it to error
-                self.moveToError(filename)
-                self.rm_tempdir() # clean up
-                continue
-            DBlogging.dblogger.debug("command finished")
-
-            # the code worked and the file should not go to incoming (it had better have an inspector)
-            try:
-                self.moveToIncoming(os.path.join(self.tempdir, filename))
-            except IOError:
-                glb = glob.glob(os.path.join(self.tempdir, filename) + '*.png')
-                if len(glb) == 1:
-                    self.moveToIncoming(glb[0])
-
-            self.rm_tempdir() # clean up
             ## TODO several additions have to be made here
             # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
             #    -- maybe instead of moving this to incoming we add it to the db now with the links
@@ -539,7 +485,7 @@ class ProcessQueue(object):
             # need to add the current file to the DB so that we have the filefilelink and filecodelink info
             current_file = self.current_file # so we can put it back
             self.current_file = os.path.join(self.dbu.getIncomingPath(), filename)
-            df = self.figureProduct()
+            df = self.figureProduct() # uses all the inspectors to see what product a file is
             if df is None:
                 DBlogging.dblogger.error("{0} did not have a product".format(self.current_file))
                 raise(ProcessException("The process output file did not have a product: {0}".format(self.current_file)))
@@ -551,6 +497,69 @@ class ProcessQueue(object):
                 for val in input_files: # add a link for each input file
                     self.dbu.addFilefilelink(f_id, val)
             self.current_file = current_file # so we can put it back
+
+    def _runner(self, process_id, code_id, utc_file_date, input_files, filename):
+        """
+        decide what code and then run it
+        """
+        codepath = self.dbu.getCodePath(code_id)
+
+        # make a directory to run the code
+        self.mk_tempdir()
+        DBlogging.dblogger.debug("Created temp directory: {0}".format(self.tempdir))
+
+        ## build the command line we are to run
+        cmdline = [codepath]
+        ## get extra_params from the process # they are split by 2 spaces
+        args = self.dbu.getEntry('Process', process_id).extra_params
+        if args is not None:
+            args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+            args = args.split('|')
+            cmdline.extend(args)
+
+        ## figure out how to put the arguments together
+        args = self.dbu.getEntry('Code', code_id).arguments
+        if args is not None:
+            args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+            args = args.split()
+            for arg in args:
+                if 'input' not in arg and 'output' not in arg:
+                    cmdline.append(arg)
+
+        for i_fid in input_files:
+            if args is not None:
+               for arg in args:
+                   if 'input' in arg:
+                       cmdline.append(arg.split('=')[1])
+            cmdline.append(self.dbu.getFileFullPath(i_fid))
+        if args is not None:
+            for arg in args:
+               if 'output' in arg:
+                   cmdline.append(arg.split('=')[1])
+        cmdline.append(os.path.join(self.tempdir, filename))
+
+        DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))
+
+        # TODO, think here on how to grab the output
+        try:
+            subprocess.check_call(' '.join(cmdline), shell=True, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError:
+            # TODO figure out how to print what the return code was
+            DBlogging.dblogger.error("Command returned a non-zero return code")
+            # assume the file is bad and move it to error
+            self.moveToError(filename)
+            self.rm_tempdir() # clean up
+            continue
+        DBlogging.dblogger.debug("command finished")
+
+        try:
+            self.moveToIncoming(os.path.join(self.tempdir, filename))
+        except IOError:
+            glb = glob.glob(os.path.join(self.tempdir, filename) + '*.png')
+            if len(glb) == 1:
+                self.moveToIncoming(glb[0])
+        self.rm_tempdir() # clean up
+        return cmdline
 
     def onRun(self):
         """
