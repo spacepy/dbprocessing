@@ -23,19 +23,8 @@ import sys
 
 from dbprocessing import DBUtils
 from dbprocessing import Version
+from dbprocessing.Utils import toBool, toNone
 
-
-def toBool(value):
-    if value in ['True', 'true', True, 1, 'Yes', 'yes']:
-        return True
-    else:
-        return False
-
-def toNone(value):
-    if value in ['', 'None']:
-        return None
-    else:
-        return value
 
 def readconfig(config_filepath):
     # Create a ConfigParser object, to read the config file

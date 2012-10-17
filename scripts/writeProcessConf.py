@@ -21,19 +21,8 @@ import ConfigParser
 import sys
 
 from dbprocessing import DBUtils
+from dbprocessing.Utils import toBool, toNone
 
-
-def toBool(value):
-    if value in ['True', 'true', True, 1, 'Yes', 'yes']:
-        return True
-    else:
-        return False
-
-def toNone(value):
-    if value == '':
-        return None
-    else:
-        return value
 
 def writeconfig(my_cfg, config_filepath):
     cfg=ConfigParser.ConfigParser()

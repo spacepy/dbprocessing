@@ -19,20 +19,10 @@ import datetime
 import sys
 
 from dbprocessing import DBUtils
+from dbprocessing.Utils import toBool, toNone
 
 sections = ['base', 'product', 'inspector',]
 
-def toBool(value):
-    if value in ['True', 'true', True, 1, 'Yes', 'yes']:
-        return True
-    else:
-        return False
-
-def toNone(value):
-    if value == '':
-        return None
-    else:
-        return value
 
 def readconfig(config_filepath):
     """
