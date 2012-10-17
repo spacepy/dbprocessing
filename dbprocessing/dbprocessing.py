@@ -476,7 +476,7 @@ class ProcessQueue(object):
 #             # TODO can this be pulled out to be a runner function
 #==============================================================================
 
-            cmdline = self._runner(process_id, code_id, utc_file_date, input_files, filename)
+            cmdline = self._runner(process_id, utc_file_date, input_files, filename)
             if cmdline is None:
                 continue
 
@@ -505,10 +505,11 @@ class ProcessQueue(object):
                 self.dbu.addFilefilelink(f_id, val)
         self.current_file = current_file # so we can put it back
 
-    def _runner(self, process_id, code_id, utc_file_date, input_files, filename):
+    def _runner(self, process_id, utc_file_date, input_files, filename):
         """
         decide what code and then run it
         """
+        code_id = self.dbu.getCodeFromProcess(process_id)
         codepath = self.dbu.getCodePath(code_id)
 
         # make a directory to run the code
@@ -575,6 +576,11 @@ class ProcessQueue(object):
         """
         proc = self.dbu.getAllProcesses(timebase='RUN')
         # need to call a "runner" with these processes
+        ######
+        ##
+        # not sure how to deal with having to specify a filename and handle that in the DB
+        # things made here will also have to have inspectors
+        raise(NotImplementedError('Not yet implemented'))
 
 
 
