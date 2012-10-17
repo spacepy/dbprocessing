@@ -643,6 +643,6 @@ class ProcessQueue(object):
         file_id = self.dbu.getFileID(file_id)
         fp = self.dbu.getFileFullPath(file_id)
         self.moveToIncoming(fp)
-        self.dbu._purgeFileFromDB(fp)
+        self.dbu._purgeFileFromDB(os.path.basename(fp))
 
 
