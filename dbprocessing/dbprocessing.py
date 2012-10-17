@@ -631,18 +631,21 @@ class ProcessQueue(object):
         if force:
             # move the file to incoming then remove it from the db
             #####!!!! version numners are not bumped
-            for f in f_ids:
+            for f in files:
                 self._fileBackToIncoming(f)
         return len(f_ids)
 
-    def _fileBackToIncoming(self, file_id):
+    def _fileBackToIncoming(self, f):
         """
         take a file and move it form the db back to incoming and remove it from the db
         """
-        DBlogging.dblogger.info("Moving {0} back to incoming".format(file_id) )
-        file_id = self.dbu.getFileID(file_id)
-        fp = self.dbu.getFileFullPath(file_id)
-        self.moveToIncoming(fp)
+        DBlogging.dblogger.info("Moving {0} back to incoming".format(f.file_id) )
+        fp = self.dbu.getFileFullPath(f.file_id)
+        if f.exists_on_disk:
+            try:
+                self.moveToIncoming(fp)
+            except IOError: # move failed, file didn't exist afterall
+                DBlogging.dblogger.error("Error Moving {0} back to incoming, continued".format(f.filename) )
         self.dbu._purgeFileFromDB(os.path.basename(fp))
 
 
