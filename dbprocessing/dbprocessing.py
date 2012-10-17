@@ -481,22 +481,27 @@ class ProcessQueue(object):
             ## TODO several additions have to be made here
             # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
             #    -- maybe instead of moving this to incoming we add it to the db now with the links
+            self._add_links(filename, cmdline, code_id, input_files)
 
-            # need to add the current file to the DB so that we have the filefilelink and filecodelink info
-            current_file = self.current_file # so we can put it back
-            self.current_file = os.path.join(self.dbu.getIncomingPath(), filename)
-            df = self.figureProduct() # uses all the inspectors to see what product a file is
-            if df is None:
-                DBlogging.dblogger.error("{0} did not have a product".format(self.current_file))
-                raise(ProcessException("The process output file did not have a product: {0}".format(self.current_file)))
-            df.params['verbose_provenance'] = ' '.join(cmdline)
-            f_id = self.diskfileToDB(df)
-            ## here the file is in the DB so we can add the filefilelink an filecodelinks
-            if f_id is not None: # None comes back if the file goes to error
-                self.dbu.addFilecodelink(f_id, code_id)
-                for val in input_files: # add a link for each input file
-                    self.dbu.addFilefilelink(f_id, val)
-            self.current_file = current_file # so we can put it back
+    def _add_links(self, filename, cmdline, code_id, input_files):
+        """
+        add the filefilelink and filecodelink and verbose provenance
+        """
+        # need to add the current file to the DB so that we have the filefilelink and filecodelink info
+        current_file = self.current_file # so we can put it back
+        self.current_file = os.path.join(self.dbu.getIncomingPath(), filename)
+        df = self.figureProduct() # uses all the inspectors to see what product a file is
+        if df is None:
+            DBlogging.dblogger.error("{0} did not have a product".format(self.current_file))
+            raise(ProcessException("The process output file did not have a product: {0}".format(self.current_file)))
+        df.params['verbose_provenance'] = ' '.join(cmdline)
+        f_id = self.diskfileToDB(df)
+        ## here the file is in the DB so we can add the filefilelink an filecodelinks
+        if f_id is not None: # None comes back if the file goes to error
+            self.dbu.addFilecodelink(f_id, code_id)
+            for val in input_files: # add a link for each input file
+                self.dbu.addFilefilelink(f_id, val)
+        self.current_file = current_file # so we can put it back
 
     def _runner(self, process_id, code_id, utc_file_date, input_files, filename):
         """
