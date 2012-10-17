@@ -1,26 +1,27 @@
-import itertools
-import sqlalchemy
-import glob
-import pwd
-from sqlalchemy.orm import sessionmaker
-import os.path
 import datetime
+import glob
+import itertools
+import os.path
+import pwd
+import socket # to get the local hostname
+import sys
+
 import numpy as np
-from sqlalchemy import Table #Column, Integer, String, DateTime, BigInteger, Boolean, Date, Float, Table
-from sqlalchemy.orm import mapper # sessionmaker
+import sqlalchemy
+from sqlalchemy import Table
+from sqlalchemy.orm import mapper
+from sqlalchemy.orm import sessionmaker
 try: # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
 except ImportError:
     from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql.expression import asc #, desc
+from sqlalchemy.sql.expression import asc
 from sqlalchemy import or_
-import DBlogging
-import socket # to get the local hostname
-import sys
 
+from Diskfile import calcDigest, DigestError
+import DBlogging
 import DBStrings
 import Version
-from Diskfile import calcDigest, DigestError
 
 ## This goes in the processing comment field in the DB, do update it
 __version__ = '2.0.3'
