@@ -476,7 +476,7 @@ class ProcessQueue(object):
 #             # TODO can this be pulled out to be a runner function
 #==============================================================================
 
-            cmdline = self._runner(self, process_id, code_id, utc_file_date, input_files, filename)
+            cmdline = self._runner(process_id, code_id, utc_file_date, input_files, filename)
             if cmdline is None:
                 continue
 
