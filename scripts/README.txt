@@ -71,6 +71,20 @@ Usage: qualityControlEmail.py [-d, --dryrun] product_name
 Example:
 ~/dbUtils/qualityControlEmail.py -d rbspa_rept-sw-L0
 
+reprocessByCode.py - add files back to he process queue for a given process
+Usage: reprocessByCode.py [options]
+Options:
+  -h, --help            show this help message and exit
+  -s STARTDATE, --startDate=STARTDATE
+                        Date to start reprocessing (e.g. 2012-10-02)
+  -e ENDDATE, --endDate=ENDDATE
+                        Date to end reprocessing (e.g. 2012-10-25)
+Example:
+~/dbUtils/reprocessByCode.py 993
+~/dbUtils/reprocessByCode.py l05_to_l1.py
+
+
+
 
 
 Other info
