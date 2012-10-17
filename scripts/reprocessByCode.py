@@ -27,20 +27,25 @@ import dbprocessing.dbprocessing as dbprocessing
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-s", "--startDate", dest="startDate", type="string",
-                      help="Date to start reprocessing", default=None)
+                      help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
     parser.add_option("-e", "--endDate", dest="endDate", type="string",
-                      help="Date to end reprocessing", default=None)
+                      help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
     (options, args) = parser.parse_args()
     if len(args) != 1:
         parser.error("incorrect number of arguments")
 
     if options.startDate is not None:
         startDate = dup.parse(options.startDate)
+    else:
+        startDate = None
     if options.endDate is not None:
         endDate = dup.parse(options.endDate)
+    else:
+        endDate = None
 
     db = dbprocessing.ProcessQueue('rbsp')
     num = db.reprocessByCode(args[0], startDate=startDate, endDate=endDate)
     print('Added {0} files to be reprocessed for code {1}'.format(num, args[0]))
     DBlogging.dblogger.info('Added {0} files to be reprocessed for code {1}'.format(num, args[0]))
+
 
