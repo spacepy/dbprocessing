@@ -1,3 +1,4 @@
+import pwd
 import itertools
 import sqlalchemy
 import glob
@@ -251,7 +252,7 @@ class DBUtils(object):
         self.__p1 = self._addLogging(True,
                               datetime.datetime.utcnow(),
                               self.getMissionID(self.mission),
-                              os.getlogin(),
+                              pwd.getpwuid(os.getuid())[0],
                               socket.gethostname(),
                               pid = os.getpid() )
         DBlogging.dblogger.info( "Logging started: %d: %s, PID: %s, M_id: %s, user: %s, hostmane: %s" %
