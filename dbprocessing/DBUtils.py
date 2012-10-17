@@ -1806,6 +1806,32 @@ class DBUtils(object):
             raise(DBNoData('No entry {0} for table {1}'.format(args[0], table)))
         return retval
 
+    def getFilesByCode(self, code_id, id_only=False):
+        """
+        given a code_id (or name) return the files that were created using it
+        """
+        code_id = self.getCodeID(code_id)
+        f_ids = self.session.query(self.Filecodelink.resulting_file).filter_by(source_code=code_id).all()
+        f_ids = zip(*f_ids)[0]
+        files = [self.getEntry('File', val) for val in f_ids]
+        if not id_only:
+            return files
+        else:
+            return [val.file_id for val in files]
+
+    def getFileParents(self, file_id, id_only=False):
+        """
+        given a file_id (or filename) return the files that went into making it
+        """
+        file_id = self.getFileID(file_id)
+        f_ids = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file=file_id).all()
+        f_ids = zip(*f_ids)[0]
+        files = [self.getEntry('File', val) for val in f_ids]
+        if not id_only:
+            return files
+        else:
+            return [val.file_id for val in files]
+
     @classmethod
     def processRunning(self, pid):
         """
@@ -1829,6 +1855,8 @@ class DBUtils(object):
             return False
         else:
             return True
+
+
 
 
 
