@@ -13,6 +13,7 @@ import DBlogging
 import DBStrings
 import DBqueue
 import DBUtils
+import Utils
 import Version
 
 try: # new version changed this annoyingly
@@ -582,5 +583,30 @@ class ProcessQueue(object):
         # things made here will also have to have inspectors
         raise(NotImplementedError('Not yet implemented'))
 
-
-
+    def reprocessByCode(self, code_id, startDate=None, endDate=None):
+        """
+        given a code_id (or name) add all files that this code touched to processqueue
+            so that next -p run they will be reprocessed
+        If one adds a new code run this on the code that this is replacing
+        ** this ends up being a little more aggressive as the input files are put
+           on the processqueue so all products associated with them are remade
+           ** If we want to change this then several steps need to occur:
+               1) need to have a way to tell buildchildren or _runner to only use
+                   certain codes
+        """
+        # 1) get all the files made by this code
+        # 2) get all the parents of the 1) files
+        # 3) add all these back to the processqueue (use set as duplicates breaks things)
+        code_id = self.dbu.getCodeID(code_id) # allows name or id
+        files = self.dbu.getFilesByCode(code_id)
+        # files before this date are removed from the list
+        if startDate is not None:
+            files = [val for val in files if val.utc_file_date >= startDate]
+        # files after this date are removed from the list
+        if endDate is not None:
+            files = [val for val in files if val.utc_file_date <= endDate]
+        f_ids = [val.file_id for val in files]
+        parents = [self.dbu.getFileParents(val, id_only=True) for val in f_ids]
+        filesToReprocess = set(Utils.flatten(parents))
+        self.dbu.Processqueue.push(filesToReprocess)
+        return len(filesToReprocess)
