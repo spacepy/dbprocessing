@@ -477,6 +477,8 @@ class ProcessQueue(object):
 #==============================================================================
 
             cmdline = self._runner(self, process_id, code_id, utc_file_date, input_files, filename)
+            if cmdline is None:
+                continue
 
             ## TODO several additions have to be made here
             # -- after the process is run we have to somehow keep track of the filefilelink and the foldcodelink so they can be added
@@ -554,7 +556,7 @@ class ProcessQueue(object):
             # assume the file is bad and move it to error
             self.moveToError(filename)
             self.rm_tempdir() # clean up
-            continue
+            return None
         DBlogging.dblogger.debug("command finished")
 
         try:
