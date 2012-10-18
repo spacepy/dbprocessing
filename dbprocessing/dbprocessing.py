@@ -341,12 +341,12 @@ class ProcessQueue(object):
         """
         DBlogging.dblogger.debug("Entered buildChildren: process_id={0}".format(process_id))
 
-        daterange = self.dbu.getFileDates(file_id)
+        daterange = self.dbu.getFileDates(file_id[0])
 
         # whole fucntion is in this loop
         for utc_file_date in daterange:
 
-            files, input_product_id = self._getRequiredProducts(process_id, file_id, utc_file_date, daterange)
+            files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date, daterange)
 
             #==============================================================================
             # do we have the required files to do the build?
@@ -403,6 +403,7 @@ class ProcessQueue(object):
                                                              'datetime':utc_file_date,
                                                              'INSTRUMENT':ptb['instrument'].instrument_name})
                 DBlogging.dblogger.debug("Filename: %s created" % (filename))
+
                 # if this filename is already in the DB we have to figure out which version number to increment
                 try:
                     f_id_db = self.dbu.getFileID(filename)
@@ -439,6 +440,17 @@ class ProcessQueue(object):
                         ## if not quality is incremented
                         file_vers = [0,0,0] # versions start at 1.0.0
                         for in_file in input_files:
+
+                            ## if we have done a force then we need to inc the version number manually
+                            if file_id[1] is not None:
+                                DBlogging.dblogger.debug("Filename: version incremented based on version_bump {0}" % (file_id[1]))
+                                if file_id[1] == 0:
+                                    file_vers[0] += 1
+                                elif file_id[1] == 1:
+                                    file_vers[1] += 1
+                                elif file_id[1] == 2:
+                                    file_vers[2] += 1
+
                             # the file is there is it the same version
                             input_file_version = self.dbu.getFileVersion(in_file)
                             DBlogging.dblogger.debug("self.dbu.getFileVersion(in_file): {0}".format(self.dbu.getFileVersion(in_file)))
@@ -583,12 +595,13 @@ class ProcessQueue(object):
         # things made here will also have to have inspectors
         raise(NotImplementedError('Not yet implemented'))
 
-    def reprocessByCode(self, code_id, startDate=None, endDate=None, force=False):
+    def reprocessByCode(self, code_id, startDate=None, endDate=None, force=False, incVersion=2):
         """
         given a code_id (or name) add all files that this code touched to processqueue
             so that next -p run they will be reprocessed
         If one adds a new code run this on the code that this is replacing
         Force moves the file back to incoming and then removes it from the db
+        incVersion sets which of the version numbers to increment {0}.{1}.{2}
         ** this ends up being a little more aggressive as the input files are put
            on the processqueue so all products associated with them are remade
            ** If we want to change this then several steps need to occur:
@@ -617,7 +630,7 @@ class ProcessQueue(object):
                 self._fileBackToIncoming(f)
         return len(filesToReprocess)
 
-    def reprocessByProduct(self, prod_id, startDate=None, endDate=None, force=False):
+    def reprocessByProduct(self, prod_id, startDate=None, endDate=None, force=False, incVersion=2):
         prod_id = self.dbu.getProductID(prod_id)
         files = self.dbu.getFilesByProduct(prod_id)
         # files before this date are removed from the list

@@ -89,11 +89,11 @@ if __name__ == "__main__":
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
             while pq.dbu.Processqueue.len() > 0:
                 pq.dbu.Processqueue.clean()  # get rid of duplicates
-                file_id = pq.dbu.Processqueue.get()
+                file_id = pq.dbu.Processqueue.get(version_bump=True)
                 DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
                 if file_id is None:
                     break
-                children = pq.dbu.getChildrenProducts(file_id) # returns process
+                children = pq.dbu.getChildrenProducts(file_id[0]) # returns process
                 if not children:
                     DBlogging.dblogger.debug("No children found for {0}".format(file_id))
                     pq.dbu.Processqueue.pop() # done in two steps for crashes

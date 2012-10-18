@@ -390,7 +390,7 @@ class DBUtils(object):
         DBlogging.dblogger.debug( "Entire Processqueue was read: {0} elements returned".format(len(pqdata)))
         return pqdata
 
-    def _processqueuePush(self, fileid):
+    def _processqueuePush(self, fileid, version_bump=None):
         """
         push a file onto the process queue (onto the right)
 
@@ -407,11 +407,12 @@ class DBUtils(object):
         if hasattr(fileid, '__iter__'):
             ans = []
             for v in fileid:
-                ans.extend(self.Processqueue.push(v))
+                ans.extend(self.Processqueue.push(v, version_bump))
             return ans
         fileid = self.getFileID(fileid)
         pq1 = self.Processqueue()
         pq1.file_id = fileid
+        pq1.version_bump = version_bump
         self.session.add(pq1)
         DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self.getEntry('File', fileid).filename ) )
         self._commitDB()
@@ -424,7 +425,7 @@ class DBUtils(object):
         """
         return self.session.query(self.Processqueue).count()
 
-    def _processqueuePop(self, index=0):
+    def _processqueuePop(self, index=0, version_bump=None):
         """
         pop a file off the process queue (from the left)
 
@@ -446,13 +447,16 @@ class DBUtils(object):
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
+                    if version_bump is not None:
+                        fid_ret = (fid.file_id, fid.version_bump)
+                    else:
+                        fid_ret = fid.file_id
                     self.session.delete(fid)
-                    fid_ret = fid.file_id
                     break # there can be only one
             self._commitDB()
             return fid_ret
 
-    def _processqueueGet(self, index=0):
+    def _processqueueGet(self, index=0, version_bump=None):
         """
         get the file at the head of the queue (from the left)
 
@@ -471,7 +475,10 @@ class DBUtils(object):
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
                 if ii == index:
-                    fid_ret = fid.file_id
+                    if version_bump is not None:
+                        fid_ret = (fid.file_id, fid.version_bump)
+                    else:
+                        fid_ret = fid.file_id
                     break # there can be only one
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
