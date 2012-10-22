@@ -47,7 +47,8 @@ handler.setFormatter(formatter)
 dblogger.addHandler(handler)
 
 # test and do the rollover if needed:
-dblogger.handlers[0].shouldRollover(dblogger.info('test rollover'))
+if dblogger.handlers[0].shouldRollover(dblogger.info('test rollover')):
+    dblogger.handlers[0].doRollover()
 
 
 dblogger.info("DBLogger initialized")
