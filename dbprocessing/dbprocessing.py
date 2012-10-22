@@ -424,12 +424,15 @@ class ProcessQueue(object):
                     db_files = self.dbu.getFilefilelink_byresult(f_id_db)
                     did_inc = False
                     for in_file in input_files:
-                        DBlogging.dblogger.debug("in_file: {0}, db_files: {1}  in_file in db_files or len(db_files) != len(input_files):{2}".format(in_file, db_files, in_file not in db_files or len(db_files) != len(input_files)))
-                        if in_file not in db_files or len(db_files) != len(input_files):
-                            output_file_version.incQuality()
-                            DBlogging.dblogger.debug("Filename: {0} found a file that was not in the original version".format(filename))
-                            did_inc = True
-                            break # out of the for loop to try again
+                        DBlogging.dblogger.debug("in_file: {0}, db_files: {1} ".format(in_file, db_files))
+                        if db_files is not None:
+                            if in_file not in db_files or len(db_files) != len(input_files):
+                                output_file_version.incQuality()
+                                DBlogging.dblogger.debug("Filename: {0} found a file that was not in the original version".format(filename))
+                                did_inc = True
+                                break # out of the for loop to try again
+                        else:
+                            raise(DBUtils.DBError())
                     if did_inc:
                         continue # another loop of the while
 
