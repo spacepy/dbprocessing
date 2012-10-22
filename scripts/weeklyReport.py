@@ -119,7 +119,10 @@ def _writeHTML(inlist, output, mission, startT, stopT, headerStr):
     output.write('<table style="border: medium none ; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">\n')
 
     # write out the header
-    output.write(inlist[0].htmlheader())
+    try:
+        output.write(inlist[0].htmlheader())
+    except IndexError:  # only one input file
+        output.write(inlist.htmlheader())
 
     # and write all the data
     for i, idx in enumerate(inlist):
