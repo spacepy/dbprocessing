@@ -44,7 +44,7 @@ if __name__ == "__main__":
     if options.force is not None:
         if options.force not in [0,1,2]:
             parser.error("invalid force option [0,1,2]")
-        num = db.reprocessByProduct(args[0], startDate=startDate, endDate=endDate, force=True, incVersion=options.force)
+        num = db.reprocessByProduct(args[0], startDate=startDate, endDate=endDate, incVersion=options.force)
     else:
         num = db.reprocessByProduct(args[0], startDate=startDate, endDate=endDate)
 

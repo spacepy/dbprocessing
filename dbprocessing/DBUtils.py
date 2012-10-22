@@ -1833,6 +1833,8 @@ class DBUtils(object):
         """
         file_id = self.getFileID(file_id)
         f_ids = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file=file_id).all()
+        if not f_ids:
+            return []
         f_ids = zip(*f_ids)[0]
         files = [self.getEntry('File', val) for val in f_ids]
         if not id_only:

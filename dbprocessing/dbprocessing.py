@@ -598,7 +598,7 @@ class ProcessQueue(object):
         # things made here will also have to have inspectors
         raise(NotImplementedError('Not yet implemented'))
 
-    def reprocessByCode(self, code_id, startDate=None, endDate=None, force=False, incVersion=2):
+    def _reprocessBy(self, id_in, code=False, prod=False, startDate=None, endDate=None, incVersion=2):
         """
         given a code_id (or name) add all files that this code touched to processqueue
             so that next -p run they will be reprocessed
@@ -614,8 +614,12 @@ class ProcessQueue(object):
         # 1) get all the files made by this code
         # 2) get all the parents of the 1) files
         # 3) add all these back to the processqueue (use set as duplicates breaks things)
-        code_id = self.dbu.getCodeID(code_id) # allows name or id
-        files = self.dbu.getFilesByCode(code_id)
+        if code:
+            code_id = self.dbu.getCodeID(id_in) # allows name or id
+            files = self.dbu.getFilesByCode(code_id)
+        elif prod:
+            prod_id = self.dbu.getProductID(id_in)
+            files = self.dbu.getFilesByProduct(prod_id)
         # files before this date are removed from the list
         if startDate is not None:
             files = [val for val in files if val.utc_file_date >= startDate]
@@ -625,43 +629,18 @@ class ProcessQueue(object):
         f_ids = [val.file_id for val in files]
         parents = [self.dbu.getFileParents(val, id_only=True) for val in f_ids]
         filesToReprocess = set(Utils.flatten(parents))
-        self.dbu.Processqueue.push(filesToReprocess)
-        if force:
-            # move the file to incoming then remove it from the db
-            #####!!!! version numners are not bumped
-            for f in filesToReprocess:
-                self._fileBackToIncoming(f)
+        self.dbu.Processqueue.push(filesToReprocess, incVersion)
         return len(filesToReprocess)
 
-    def reprocessByProduct(self, prod_id, startDate=None, endDate=None, force=False, incVersion=2):
-        prod_id = self.dbu.getProductID(prod_id)
-        files = self.dbu.getFilesByProduct(prod_id)
-        # files before this date are removed from the list
-        if startDate is not None:
-            files = [val for val in files if val.utc_file_date >= startDate]
-        # files after this date are removed from the list
-        if endDate is not None:
-            files = [val for val in files if val.utc_file_date <= endDate]
-        f_ids = [val.file_id for val in files]
-        self.dbu.Processqueue.push(f_ids)
-        if force:
-            # move the file to incoming then remove it from the db
-            #####!!!! version numners are not bumped
-            for f in files:
-                self._fileBackToIncoming(f)
-        return len(f_ids)
+    # TODO can functools.partial help here?
+    def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=2):
+        return(self._reprocessBy(id_in, code=True, prod=False, startDate=startDate, endDate=endDate, incVersion=incVersion))
 
-    def _fileBackToIncoming(self, f):
-        """
-        take a file and move it form the db back to incoming and remove it from the db
-        """
-        DBlogging.dblogger.info("Moving {0} back to incoming".format(f.file_id) )
-        fp = self.dbu.getFileFullPath(f.file_id)
-        if f.exists_on_disk:
-            try:
-                self.moveToIncoming(fp)
-            except IOError: # move failed, file didn't exist afterall
-                DBlogging.dblogger.error("Error Moving {0} back to incoming, continued".format(f.filename) )
-        self.dbu._purgeFileFromDB(os.path.basename(fp))
+    def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=2):
+        return(self._reprocessBy(id_in, code=False, prod=True, startDate=startDate, endDate=endDate, incVersion=incVersion))
+
+
+
+
 
 
