@@ -19,7 +19,6 @@ TODO inclide later
 
 """
 
-from functools import total_ordering
 import os
 import re
 
@@ -99,7 +98,6 @@ class logfile(object):
         return [lines[v] for v in ind]
 
 
-@total_ordering
 class commandsRun(object):
     def __init__(self, inStr):
         """
@@ -142,11 +140,22 @@ class commandsRun(object):
     def __eq__(self, other):
         return self.dt == other.dt
 
+    def __ne__(self, other):
+        return self.dt != other.dt
+
     def __gt__(self, other):
         return self.dt > other.dt
 
+    def __ge__(self, other):
+        return self.dt >= other.dt
 
-@total_ordering
+    def __lt__(self, other):
+        return self.dt < other.dt
+
+    def __le__(self, other):
+        return self.dt <= other.dt
+
+
 class ingested(object):
     def __init__(self, inStr):
         """
@@ -196,11 +205,22 @@ class ingested(object):
     def __eq__(self, other):
         return self.dt == other.dt
 
+    def __ne__(self, other):
+        return self.dt != other.dt
+
     def __gt__(self, other):
         return self.dt > other.dt
 
+    def __ge__(self, other):
+        return self.dt >= other.dt
 
-@total_ordering
+    def __lt__(self, other):
+        return self.dt < other.dt
+
+    def __le__(self, other):
+        return self.dt <= other.dt
+
+
 class errorIngesting(object):
     def __init__(self, inStr):
         """
@@ -240,6 +260,18 @@ class errorIngesting(object):
     def __eq__(self, other):
         return self.dt == other.dt
 
+    def __ne__(self, other):
+        return self.dt != other.dt
+
     def __gt__(self, other):
         return self.dt > other.dt
+
+    def __ge__(self, other):
+        return self.dt >= other.dt
+
+    def __lt__(self, other):
+        return self.dt < other.dt
+
+    def __le__(self, other):
+        return self.dt <= other.dt
 

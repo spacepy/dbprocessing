@@ -118,6 +118,7 @@ def _writeHTML(inlist, output, mission, startT, stopT, headerStr):
     output.write('<h2>{0}</h2>\n'.format(headerStr))
     output.write('<table style="border: medium none ; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">\n')
 
+<<<<<<< HEAD
     if inlist:
         # write out the header
         output.write(inlist[0].htmlheader())
@@ -129,6 +130,21 @@ def _writeHTML(inlist, output, mission, startT, stopT, headerStr):
             else:
                 output.write(idx.html(alt=True))
             output.write('\n')
+=======
+    # write out the header
+    try:
+        output.write(inlist[0].htmlheader())
+    except IndexError:  # only one input file
+        output.write(inlist.htmlheader())
+
+    # and write all the data
+    for i, idx in enumerate(inlist):
+        if i % 2 == 0:
+            output.write(idx.html(alt=False))
+        else:
+            output.write(idx.html(alt=True))
+        output.write('\n')
+>>>>>>> 03994d8f3f6bc25a06745517ab83e0833d8399d2
     output.write('</table>\n')
 
 def usage():
