@@ -57,7 +57,7 @@ class ProcessQueue(object):
 
     def __del__(self):
         """
-        attempt a bit of cleanup
+        attempt a bit of up
         """
 
     def rm_tempdir(self):
@@ -446,7 +446,7 @@ class ProcessQueue(object):
 
                             ## if we have done a force then we need to inc the version number manually
                             if file_id[1] is not None:
-                                DBlogging.dblogger.debug("Filename: version incremented based on version_bump {0}" % (file_id[1]))
+                                DBlogging.dblogger.debug("Filename: version incremented based on version_bump {0}".format(file_id[1]))
                                 if file_id[1] == 0:
                                     file_vers[0] += 1
                                 elif file_id[1] == 1:
