@@ -444,16 +444,6 @@ class ProcessQueue(object):
                         file_vers = [0,0,0] # versions start at 1.0.0
                         for in_file in input_files:
 
-                            ## if we have done a force then we need to inc the version number manually
-                            if file_id[1] is not None:
-                                DBlogging.dblogger.debug("Filename: version incremented based on version_bump {0}".format(file_id[1]))
-                                if file_id[1] == 0:
-                                    file_vers[0] += 1
-                                elif file_id[1] == 1:
-                                    file_vers[1] += 1
-                                elif file_id[1] == 2:
-                                    file_vers[2] += 1
-
                             # the file is there is it the same version
                             input_file_version = self.dbu.getFileVersion(in_file)
                             DBlogging.dblogger.debug("self.dbu.getFileVersion(in_file): {0}".format(self.dbu.getFileVersion(in_file)))
@@ -462,6 +452,17 @@ class ProcessQueue(object):
                             ver_diff =  input_file_version - db_file_version
                             DBlogging.dblogger.debug("ver_diff: {0}".format(ver_diff))
                             ## did the revision change?
+
+                            ## if we have done a force then we need to inc the version number manually
+                            if file_id[1] is not None:
+                                DBlogging.dblogger.debug("Filename: version incremented based on version_bump {0}".format(file_id[1]))
+                                if file_id[1] == 0:
+                                    ver_diff[0] += 1
+                                elif file_id[1] == 1:
+                                    ver_diff[1] += 1
+                                elif file_id[1] == 2:
+                                    ver_diff[2] += 1
+
                             if ver_diff[2] > 0:
                                 file_vers[2] += 1
                             ## did the quality change?
