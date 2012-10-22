@@ -478,7 +478,7 @@ class ProcessQueue(object):
                             elif file_vers[1] > 0:
                                 output_file_version.incQuality()
                                 break # out of the for loop
-                            elif file_vers[0] > 0:
+                            elif file_vers[2] > 0:
                                 output_file_version.incRevision()
                                 break # out of the for loop
                             else: # this file would be the same as what we already have, don't process it
