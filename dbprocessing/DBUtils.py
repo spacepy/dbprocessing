@@ -1585,18 +1585,6 @@ class DBUtils(object):
         path = os.path.join(basedir, 'errors/')
         return path
 
-    def getFilefilelink_byresult(self, file_id):
-        """
-        given a file_id return all the other file_ids that went into making it
-        """
-        DBlogging.dblogger.debug("Entered getFilefilelink_byresult: file_id={0}".format(file_id))
-        f_id = self.getFileID(file_id)
-        sq = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file = f_id).all()
-        try:
-            return zip(*sq)[0]
-        except IndexError:
-            return None
-
     def getFilecodelink_byfile(self, file_id):
         """
         given a file_id return the code_id associated with it, or None
