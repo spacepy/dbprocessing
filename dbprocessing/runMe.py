@@ -254,7 +254,7 @@ class runMe(object):
         revision_diff = False
         for parent in parents:
             if not parent.newest_version: # if a parent is no longer newest we need to inc
-                fls = self.dbu.getFiles_product_utc_file_date(parent.product, parent.utc_file_date)
+                fls = self.dbu.getFiles_product_utc_file_date(parent.product_id, parent.utc_file_date)
                 ind = zip(*fls)[0].index(parent.file_id) # get the index of the file id in the output
                 vers = zip(*fls)[1]
                 mx_v = max(vers)
