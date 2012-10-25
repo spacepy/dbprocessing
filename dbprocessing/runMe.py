@@ -14,7 +14,7 @@ import tempfile
 import DBlogging
 import DBStrings
 import DBUtils
-import ProcessQueue
+import dbprocessing
 import Version
 
 from Utils import strargs_to_args
@@ -321,7 +321,7 @@ class runMe(object):
         add the filefilelink and filecodelink and verbose provenance
         """
         # need to add the current file to the DB so that we have the filefilelink and filecodelink info
-        pq = ProcessQueue('rbsp')  # TODO make this general later
+        pq = dbprocessing.ProcessQueue('rbsp')  # TODO make this general later
         self.current_file = os.path.join(self.dbu.getIncomingPath(), self.filename)
         df = pq.figureProduct() # uses all the inspectors to see what product a file is
         if df is None:
