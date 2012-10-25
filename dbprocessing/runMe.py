@@ -14,7 +14,7 @@ import tempfile
 import DBlogging
 import DBStrings
 import DBUtils
-import ProcessQueue
+from dbprocessing import ProcessQueue
 import Version
 
 from Utils import strargs_to_args
@@ -322,11 +322,11 @@ class runMe(object):
         """
         # need to add the current file to the DB so that we have the filefilelink and filecodelink info
         pq = ProcessQueue('rbsp')  # TODO make this general later
-        self.current_file = os.path.join(self.dbu.getIncomingPath(), self.filename)
-        df = pq.figureProduct() # uses all the inspectors to see what product a file is
+        current_file = os.path.join(self.dbu.getIncomingPath(), self.filename)
+        df = pq.figureProduct(current_file) # uses all the inspectors to see what product a file is
         if df is None:
-            DBlogging.dblogger.error("{0} did not have a product".format(self.current_file))
-            raise(ProcessException("The process output file did not have a product: {0}".format(self.current_file)))
+            DBlogging.dblogger.error("{0} did not have a product".format(current_file))
+            raise(ProcessException("The process output file did not have a product: {0}".format(current_file)))
         df.params['verbose_provenance'] = ' '.join(cmdline)
         f_id = self.diskfileToDB(df)
         ## here the file is in the DB so we can add the filefilelink an filecodelinks
