@@ -321,12 +321,18 @@ class runMe(object):
         add the filefilelink and filecodelink and verbose provenance
         """
         # need to add the current file to the DB so that we have the filefilelink and filecodelink info
+<<<<<<< HEAD
         pq = dbprocessing.ProcessQueue('rbsp')  # TODO make this general later
         self.current_file = os.path.join(self.dbu.getIncomingPath(), self.filename)
         df = pq.figureProduct() # uses all the inspectors to see what product a file is
+=======
+        pq = ProcessQueue('rbsp')  # TODO make this general later
+        current_file = os.path.join(self.dbu.getIncomingPath(), self.filename)
+        df = pq.figureProduct(current_file) # uses all the inspectors to see what product a file is
+>>>>>>> 8bf20c94ee9cba748a9aa8e61dbadf85c9023a9e
         if df is None:
-            DBlogging.dblogger.error("{0} did not have a product".format(self.current_file))
-            raise(ProcessException("The process output file did not have a product: {0}".format(self.current_file)))
+            DBlogging.dblogger.error("{0} did not have a product".format(current_file))
+            raise(ProcessException("The process output file did not have a product: {0}".format(current_file)))
         df.params['verbose_provenance'] = ' '.join(cmdline)
         f_id = self.diskfileToDB(df)
         ## here the file is in the DB so we can add the filefilelink an filecodelinks

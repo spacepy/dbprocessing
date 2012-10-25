@@ -43,7 +43,7 @@ class ProcessQueue(object):
         self.mission = mission
         dbu = DBUtils.DBUtils(self.mission)
         self.tempdir = None
-        self.current_file = None
+#        self.current_file = None
         self.runme_list = []
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()
@@ -130,8 +130,8 @@ class ProcessQueue(object):
         given a diskfile go through and do all the steps to add it into the db
         """
         if df is None:
-            DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.current_file))
-            self.moveToError(self.current_file)
+            DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.filename))
+            self.moveToError(self.filename)
             return None
 
         # creae the DBfile
@@ -174,15 +174,17 @@ class ProcessQueue(object):
         DBlogging.dblogger.debug("Entering importFromIncoming, {0} to import".format(len(self.queue)))
 
         for val in self.queue.popleftiter() :
-            self.current_file = val
-            DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.current_file, len(self.queue)))
+            self.filename = val
+            DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.filename, len(self.queue)))
             df = self.figureProduct()
             self.diskfileToDB(df)
 
-    def figureProduct(self):
+    def figureProduct(self, filename=None):
         """
         This function imports the inspectors and figures out which inspectors claim the file
         """
+        if filename is None:
+            filename = self.filename
         act_insp = self.dbu.getActiveInspectors()
         claimed = []
         for code, arg, product in act_insp:
@@ -193,20 +195,20 @@ class ProcessQueue(object):
                 continue
             if arg is not None:
                 kwargs = strargs_to_args(arg)
-                df = inspect.Inspector(self.current_file, self.dbu, product, **kwargs)
+                df = inspect.Inspector(filename, self.dbu, product, **kwargs)
             else:
-                df = inspect.Inspector(self.current_file, self.dbu, product, )
+                df = inspect.Inspector(filename, self.dbu, product, )
             if df is not None:
                 claimed.append(df)
-                DBlogging.dblogger.debug("Match found: {0}: {1}".format(self.current_file, code, ))
+                DBlogging.dblogger.debug("Match found: {0}: {1}".format(filename, code, ))
                 break # lets call it done after we find one
 
         if len(claimed) == 0: # no match
-            DBlogging.dblogger.info("File {0} found no inspector match".format(self.current_file))
+            DBlogging.dblogger.info("File {0} found no inspector match".format(filename))
             return None
         if len(claimed) > 1:
-            DBlogging.dblogger.error("File {0} matched more than one product, there is a DB error".format(self.current_file))
-            raise(DBUtils.DBError("File {0} matched more than one product, there is a DB error".format(self.current_file)))
+            DBlogging.dblogger.error("File {0} matched more than one product, there is a DB error".format(filename))
+            raise(DBUtils.DBError("File {0} matched more than one product, there is a DB error".format(filename)))
 
         return claimed[0]  # return the diskfile
 
