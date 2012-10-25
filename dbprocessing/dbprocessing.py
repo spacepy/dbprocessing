@@ -15,6 +15,7 @@ import DBqueue
 import DBUtils
 import runMe
 import Utils
+from Utils import strargs_to_args
 import Version
 
 try: # new version changed this annoyingly
@@ -191,7 +192,7 @@ class ProcessQueue(object):
                 DBlogging.dblogger.error("Inspector: {0} not found: {1}".format(code, msg))
                 continue
             if arg is not None:
-                kwargs = self._strargs_to_args(arg)
+                kwargs = strargs_to_args(arg)
                 df = inspect.Inspector(self.current_file, self.dbu, product, **kwargs)
             else:
                 df = inspect.Inspector(self.current_file, self.dbu, product, )
