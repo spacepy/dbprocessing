@@ -198,7 +198,8 @@ class ProcessQueue(object):
             df = self.figureProduct()
             self.diskfileToDB(df)
 
-    def _strargs_to_args(self, strargs):
+    @classmethod
+    def _strargs_to_args(cls, strargs):
         """
         read in the arguments string from the db and change to a dict
         """
@@ -208,10 +209,10 @@ class ProcessQueue(object):
         if isinstance(strargs, (list, tuple)): # we have multiple to deal with
             # TODO why was this needed?
             if len(strargs) == 1:
-                kwargs = self._strargs_to_args(strargs[0])
+                kwargs = cls._strargs_to_args(strargs[0])
                 return kwargs
             for val in strargs:
-                tmp = self._strargs_to_args(val)
+                tmp = cls._strargs_to_args(val)
                 for key in tmp:
                     kwargs[key] = tmp[key]
             return kwargs
@@ -309,31 +310,31 @@ class ProcessQueue(object):
                     return False
         return True
 
-    def _increment_code_id(self, code_id, db_code_id, output_file_version, filename):
-        """
-        function increments the output_file_version based on code version
-        ripped out to here for easier debugging
-        """
-        if db_code_id != code_id: # did the code change
-            DBlogging.dblogger.debug("code_id: {0}   db_code_id: {1}".format(code_id, db_code_id))
-            ver_diff = (self.dbu.getCodeVersion(code_id) - self.dbu.getCodeVersion(db_code_id))
-            # order matters here by the way these reset each other
-            ## did the revision change?
-            if ver_diff[2] > 0:
-                output_file_version.incRevision()
-                DBlogging.dblogger.debug("Filename: {0} incRevision()".format(filename))
-            ## did the quality change?
-            if ver_diff[1] > 0:
-                output_file_version.incQuality()
-                DBlogging.dblogger.debug("Filename: {0} incQuality()".format(filename))
-            ## did the interface change?
-            if ver_diff[0] > 0:
-                output_file_version.incInterface()
-                DBlogging.dblogger.debug("Filename: {0} incInterface()".format(filename))
-            incCode = False
-        else:
-            incCode = True
-        return incCode, output_file_version
+#    def _increment_code_id(self, code_id, db_code_id, output_file_version, filename):
+#        """
+#        function increments the output_file_version based on code version
+#        ripped out to here for easier debugging
+#        """
+#        if db_code_id != code_id: # did the code change
+#            DBlogging.dblogger.debug("code_id: {0}   db_code_id: {1}".format(code_id, db_code_id))
+#            ver_diff = (self.dbu.getCodeVersion(code_id) - self.dbu.getCodeVersion(db_code_id))
+#            # order matters here by the way these reset each other
+#            ## did the revision change?
+#            if ver_diff[2] > 0:
+#                output_file_version.incRevision()
+#                DBlogging.dblogger.debug("Filename: {0} incRevision()".format(filename))
+#            ## did the quality change?
+#            if ver_diff[1] > 0:
+#                output_file_version.incQuality()
+#                DBlogging.dblogger.debug("Filename: {0} incQuality()".format(filename))
+#            ## did the interface change?
+#            if ver_diff[0] > 0:
+#                output_file_version.incInterface()
+#                DBlogging.dblogger.debug("Filename: {0} incInterface()".format(filename))
+#            incCode = False
+#        else:
+#            incCode = True
+#        return incCode, output_file_version
 
     def buildChildren(self, process_id, file_id):
         """
@@ -357,37 +358,38 @@ class ProcessQueue(object):
             input_files = zip(*files)[0] # this is the file_id
             DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
+### MOVE TO RUNME!!
             #==============================================================================
             # setup and do the processing
             #==============================================================================
 
-            # since we have a process do we have a code that does it?
-            code_id = self.dbu.getCodeFromProcess(process_id)
+#            # since we have a process do we have a code that does it?
+#            code_id = self.dbu.getCodeFromProcess(process_id)
 
-            # figure out the code path so that it can be called
-            codepath = self.dbu.getCodePath(code_id)
-            if codepath is None:
-                continue
-            DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(code_id, codepath))
+#            # figure out the code path so that it can be called
+#            codepath = self.dbu.getCodePath(code_id)
+#            if codepath is None:
+#                continue
+#            DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(code_id, codepath))
 
-            out_prod = self.dbu.getEntry('Process', process_id).output_product
-            # grab the format
-            format_str = self.dbu.getEntry('Product', out_prod).format
-            # get the process_keywords from the file if there are any
-            try:
-                process_keywords = self._strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
-                for key in process_keywords:
-                    format_str = format_str.replace('{'+key+'}', process_keywords[key])
-            except TypeError:
-                pass
+#            out_prod = self.dbu.getEntry('Process', process_id).output_product
+#            # grab the format
+#            format_str = self.dbu.getEntry('Product', out_prod).format
+#            # get the process_keywords from the file if there are any
+#            try:
+#                process_keywords = self._strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
+#                for key in process_keywords:
+#                    format_str = format_str.replace('{'+key+'}', process_keywords[key])
+#            except TypeError:
+#                pass
 
-            ptb = self.dbu.getProductTraceback(out_prod)
-
-            ## need to build a version string for the output file
-            version = self.dbu.getCodeVersion(code_id)
-
-            fmtr = DBStrings.DBFormatter()
-            output_file_version = Version.Version(version.interface, 0, 0)
+#            ptb = self.dbu.getProductTraceback(out_prod)
+#
+#            ## need to build a version string for the output file
+#            version = self.dbu.getCodeVersion(code_id)
+#
+#            fmtr = DBStrings.DBFormatter()
+#            output_file_version = Version.Version(version.interface, 0, 0)
 
             incCode = True
             incFiles = True
@@ -397,31 +399,31 @@ class ProcessQueue(object):
                 # 1) make an output filename
                 # 2) if this does not exist in db we can make it
                 # 3) if it does exist in the db them we have to bump a version number
-                filename = fmtr.expand_format(format_str, {'SATELLITE':ptb['satellite'].satellite_name,
-                                                             'PRODUCT':ptb['product'].product_name,
-                                                             'VERSION':str(output_file_version),
-                                                             'datetime':utc_file_date,
-                                                             'INSTRUMENT':ptb['instrument'].instrument_name})
-                DBlogging.dblogger.debug("Filename: %s created" % (filename))
+#                filename = fmtr.expand_format(format_str, {'SATELLITE':ptb['satellite'].satellite_name,
+#                                                             'PRODUCT':ptb['product'].product_name,
+#                                                             'VERSION':str(output_file_version),
+#                                                             'datetime':utc_file_date,
+#                                                             'INSTRUMENT':ptb['instrument'].instrument_name})
+#                DBlogging.dblogger.debug("Filename: %s created" % (filename))
 
                 # if this filename is already in the DB we have to figure out which version number to increment
                 try:
-                    f_id_db = self.dbu.getFileID(filename)
-                    DBlogging.dblogger.debug("Filename: {0} is in the DB, have to make different version".format(filename))
+#                    f_id_db = self.dbu.getFileID(filename)
+#                    DBlogging.dblogger.debug("Filename: {0} is in the DB, have to make different version".format(filename))
                     # the file is in the DB, has the code changed version?
                     ## we are planning to use code_id code was this used before?
-                    db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
-                    DBlogging.dblogger.debug("f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
-                    if db_code_id is None:
-                        # I think things will also crash here
-                        DBlogging.dblogger.error("Database inconsistency found!! A generated file {0} does not have a filecodelink".format(filename))
+#                    db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
+#                    DBlogging.dblogger.debug("f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
+#                    if db_code_id is None:
+#                        # I think things will also crash here
+#                        DBlogging.dblogger.error("Database inconsistency found!! A generated file {0} does not have a filecodelink".format(filename))
 
-                    # Go through an look to see if the code version changed
-                    if incCode:
-                        incCode, output_file_version = self._increment_code_id(code_id, db_code_id, output_file_version, filename)
+#                    # Go through an look to see if the code version changed
+#                    if incCode:
+#                        incCode, output_file_version = self._increment_code_id(code_id, db_code_id, output_file_version, filename)
 
                     # check all the input files to see if any of them are not in the already processed
-                    db_files = self.dbu.getFilefilelink_byresult(f_id_db)
+#                    db_files = self.dbu.getFilefilelink_byresult(f_id_db)
                     did_inc = False
                     for in_file in input_files:
                         DBlogging.dblogger.debug("in_file: {0}, db_files: {1} ".format(in_file, db_files))
@@ -437,57 +439,57 @@ class ProcessQueue(object):
                         continue # another loop of the while
 
                     if incFiles:
-                        DBlogging.dblogger.debug("db_files: {0}  f_id_db: {1}".format(db_files, f_id_db))
-                        DBlogging.dblogger.debug("input_files: {0}  ".format(input_files))
-                        # go through and see if all the same files are present,
-                        ## if not quality is incremented
-                        file_vers = [0,0,0] # versions start at 1.0.0
-                        for in_file in input_files:
+#                        DBlogging.dblogger.debug("db_files: {0}  f_id_db: {1}".format(db_files, f_id_db))
+#                        DBlogging.dblogger.debug("input_files: {0}  ".format(input_files))
+#                        # go through and see if all the same files are present,
+#                        ## if not quality is incremented
+#                        file_vers = [0,0,0] # versions start at 1.0.0
+#                        for in_file in input_files:
+#
+#                            # the file is there is it the same version
+#                            input_file_version = self.dbu.getFileVersion(in_file)
+#                            DBlogging.dblogger.debug("self.dbu.getFileVersion(in_file): {0}".format(self.dbu.getFileVersion(in_file)))
+#                            db_file_version = self.dbu.getFileVersion(db_files[db_files.index(in_file)])
+#                            DBlogging.dblogger.debug("self.dbu.getFileVersion(input_files[input_files.index(in_file)]): {0}".format(self.dbu.getFileVersion(input_files[input_files.index(in_file)])))
+#                            ver_diff =  input_file_version - db_file_version
+#                            DBlogging.dblogger.debug("ver_diff: {0}".format(ver_diff))
+#                            ## did the revision change?
+#
+#                            ## if we have done a force then we need to inc the version number manually
+#                            if file_id[1] is not None:
+#                                DBlogging.dblogger.debug("Filename: version incremented based on version_bump {0}".format(file_id[1]))
+#                                if file_id[1] == 0:
+#                                    ver_diff[0] += 1
+#                                elif file_id[1] == 1:
+#                                    ver_diff[1] += 1
+#                                elif file_id[1] == 2:
+#                                    ver_diff[2] += 1
+#
+#                            if ver_diff[2] > 0:
+#                                file_vers[2] += 1
+#                            ## did the quality change?
+#                            if ver_diff[1] > 0:
+#                                file_vers[1] += 1
+#                            ## did the interface change?
+#                            if ver_diff[0] > 0:
+#                                file_vers[0] += 1
+#                            DBlogging.dblogger.debug("file_vers: {0}".format(file_vers))
+#                            if file_vers[0] > 0:
+#                                output_file_version.incInterface()
+#                                break # out of the for loop
+#                            elif file_vers[1] > 0:
+#                                output_file_version.incQuality()
+#                                break # out of the for loop
+#                            elif file_vers[2] > 0:
+#                                output_file_version.incRevision()
+#                                break # out of the for loop
+#                            else: # this file would be the same as what we already have, don't process it
+#                                DBlogging.dblogger.debug("Filename: {0} found all the same files".format(filename))
+#                                return None
 
-                            # the file is there is it the same version
-                            input_file_version = self.dbu.getFileVersion(in_file)
-                            DBlogging.dblogger.debug("self.dbu.getFileVersion(in_file): {0}".format(self.dbu.getFileVersion(in_file)))
-                            db_file_version = self.dbu.getFileVersion(db_files[db_files.index(in_file)])
-                            DBlogging.dblogger.debug("self.dbu.getFileVersion(input_files[input_files.index(in_file)]): {0}".format(self.dbu.getFileVersion(input_files[input_files.index(in_file)])))
-                            ver_diff =  input_file_version - db_file_version
-                            DBlogging.dblogger.debug("ver_diff: {0}".format(ver_diff))
-                            ## did the revision change?
-
-                            ## if we have done a force then we need to inc the version number manually
-                            if file_id[1] is not None:
-                                DBlogging.dblogger.debug("Filename: version incremented based on version_bump {0}".format(file_id[1]))
-                                if file_id[1] == 0:
-                                    ver_diff[0] += 1
-                                elif file_id[1] == 1:
-                                    ver_diff[1] += 1
-                                elif file_id[1] == 2:
-                                    ver_diff[2] += 1
-
-                            if ver_diff[2] > 0:
-                                file_vers[2] += 1
-                            ## did the quality change?
-                            if ver_diff[1] > 0:
-                                file_vers[1] += 1
-                            ## did the interface change?
-                            if ver_diff[0] > 0:
-                                file_vers[0] += 1
-                            DBlogging.dblogger.debug("file_vers: {0}".format(file_vers))
-                            if file_vers[0] > 0:
-                                output_file_version.incInterface()
-                                break # out of the for loop
-                            elif file_vers[1] > 0:
-                                output_file_version.incQuality()
-                                break # out of the for loop
-                            elif file_vers[2] > 0:
-                                output_file_version.incRevision()
-                                break # out of the for loop
-                            else: # this file would be the same as what we already have, don't process it
-                                DBlogging.dblogger.debug("Filename: {0} found all the same files".format(filename))
-                                return None
-
-                except (DBUtils.DBError, DBUtils.DBNoData): # this is for self.dbu.getFileID(filename)
-                    DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(filename))
-                    break # leave the while loop and do the processing
+#                except (DBUtils.DBError, DBUtils.DBNoData): # this is for self.dbu.getFileID(filename)
+#                    DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(filename))
+#                    break # leave the while loop and do the processing
 
 #==============================================================================
 #             # TODO can this be pulled out to be a runner function
