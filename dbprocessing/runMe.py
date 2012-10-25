@@ -320,7 +320,6 @@ class runMe(object):
         add the filefilelink and filecodelink and verbose provenance
         """
         # need to add the current file to the DB so that we have the filefilelink and filecodelink info
-        current_file = self.current_file # so we can put it back
         self.current_file = os.path.join(self.dbu.getIncomingPath(), self.filename)
         df = self.figureProduct() # uses all the inspectors to see what product a file is
         if df is None:
@@ -333,7 +332,6 @@ class runMe(object):
             self.dbu.addFilecodelink(f_id, self.code_id)
             for val in self.input_files: # add a link for each input file
                 self.dbu.addFilefilelink(f_id, val)
-        self.current_file = current_file # so we can put it back
 
 
 
