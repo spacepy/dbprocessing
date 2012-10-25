@@ -1355,7 +1355,8 @@ class DBUtils(object):
 
     def getFiles_product_utc_file_date(self, product_id, date):
         """
-        given a product id and a utc_file_date return all the files that match [(file_id, Version, product_id, product_id, utc_file_date), ]
+        given a product id and a utc_file_date return all the files that match
+        [(file_id, Version, product_id, utc_file_date), ]
         """
         DBlogging.dblogger.debug( "Entered getFiles_product_utc_file_date():  product_id: {0} date: {1}".format(product_id, date) )
         if isinstance(date, datetime.datetime):
@@ -1621,11 +1622,14 @@ class DBUtils(object):
             m_id = sq[0].mission_id
         return m_id
 
-    def getNewestFiles(self):
+    def getNewestFiles(self, product=None):
         """
         for the current mission get a tuple of all file ids that are marked newest version
         """
-        sq = self.session.query(self.File.file_id).filter_by(newest_version = True).all()
+        if product is None:
+            sq = self.session.query(self.File.file_id).filter_by(newest_version = True).all()
+        else:
+            sq = self.session.query(self.File.file_id).filter_by(newest_version = True).filter_by(product = product).all()
         sq = zip(*sq)[0]
         return sq
 
