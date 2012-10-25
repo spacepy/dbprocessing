@@ -4,8 +4,8 @@ from optparse import OptionParser
 import traceback
 
 from dbprocessing import DBlogging, dbprocessing
-from dbprocessing.dbprocessing import ProcessException
-from dbprocessing import DBUtils
+from dbprocessing.runMe import ProcessException
+from dbprocessing import runMe
 
 __version__ = '2.0.3'
 
@@ -104,6 +104,13 @@ if __name__ == "__main__":
                     ## are all the required inputs available? For the dates we are doing
                     pq.buildChildren(child_process, file_id)
                     pq.dbu.Processqueue.pop()
+            # now do all the running
+            # sort them so that we run the oldest date first, cuts down on reprocess
+            pq.runme_list = sorted(pq.runme_list, key=lambda val: val.utc_file_date)
+            print pq.runme_list
+            for v in pq.runme_list:
+                ## TODO if one wanted to add smarts do it here
+                runMe.runner(v)
 
         except:
             #Generic top-level error handler, because otherwise people freak if
