@@ -57,7 +57,7 @@ class DBfile(object):
         if not isinstance(diskfile, Diskfile.Diskfile):
             raise(DBfileError('Wrong input, must input a Diskfile object'))
 
-        # this keeps opening connecitons
+        # this keeps opening connections
         #dbu = DBUtils.DBUtils(diskfile.mission)
         #dbu._openDB()
         #dbu._createTableObjects()

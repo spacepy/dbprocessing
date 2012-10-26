@@ -21,7 +21,7 @@ from Utils import strargs_to_args
 
 
 class ProcessException(Exception):
-    """Class for errors in runing processes"""
+    """Class for errors in running processes"""
     pass
 
 
@@ -96,7 +96,7 @@ def runner(runme):
 
 class runMe(object):
     """
-    class holds all teh info it takes to run a process
+    class holds all the info it takes to run a process
     TODO find a better name
     """
     def __init__(self, dbu, utc_file_date, process_id, input_files,):
@@ -138,7 +138,7 @@ class runMe(object):
         # set the default version for the output file
         self.output_version = Version.Version(code_version.interface, 0, 0)
 
-        ## we have a filename, now we need to incement versions as needed/appropiate to
+        ## we have a filename, now we need to increment versions as needed/appropriate to
         ## come up with a unique one
 
         # in this loop see if the file can be created i.e. ges not already exist in the db
@@ -189,8 +189,8 @@ class runMe(object):
 
     def _fileInDB(self):
         """
-        check the filenae we created and see if it is in the, if it is we will
-        not process wih that name
+        check the filename we created and see if it is in the, if it is we will
+        not process with that name
         """
         try:
             f_id_db = self.dbu.getFileID(self.filename)
@@ -245,7 +245,7 @@ class runMe(object):
         """
         go through a files parents and see if any of the parents have new versions
         not used in this processing, if so increment the correct version number
-        ** this is decided by the parents only have revision then revisin inc
+        ** this is decided by the parents only have revision then revision inc
             if a parent has a quality inc then inc quality
         """
         parents = self.dbu.getFileParents(f_id_db)

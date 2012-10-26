@@ -31,8 +31,8 @@ __version__ = '2.0.3'
 #########################################################
 ## NOTES, read these if new to this module
 #########################################################
-# - functions are in transition from returning the thing the name says e.g. getFileID returens a number to
-#      instead returning the sqlalcheml object that meets the criteria so getFileID would return a File instance
+# - functions are in transition from returning the thing the name says e.g. getFileID returns a number to
+#      instead returning the sqlalchemy object that meets the criteria so getFileID would return a File instance
 #      and the user would then have to get the ID by using File.file_id.  This makes for fewer functions and is
 #      significantly cleaner in a few spots
 
@@ -509,7 +509,7 @@ class DBUtils(object):
         file_entries = [self.getEntry('File', val[0]) for val in pqdata]
         # setup a tuple of (product_id, utc_file_date)
         dat = [(val.product_id, val.utc_file_date) for val in file_entries]
-        # now we want just the unique enetries
+        # now we want just the unique entries
         uniq_dat = list(set(dat))
         # step through the uniq ones and if there is more than one drop
         for uval in uniq_dat:
@@ -586,7 +586,7 @@ class DBUtils(object):
 
     def getAllFilenames(self):
         """
-        return all the filenames in the database
+        return all the file names in the database
         """
         ans = []
         sq = self.session.query(self.File.filename).all()
@@ -1209,7 +1209,7 @@ class DBUtils(object):
 
     def getRunProcess(self):
         """
-        return a list of the processes whos output_timebase is "RUN"
+        return a list of the processes who's output_timebase is "RUN"
         """
         proc = self.session.query(self.Process).filter_by(output_timebase = 'RUN').all()
         return proc
@@ -1444,7 +1444,7 @@ class DBUtils(object):
 
     def getActiveInspectors(self):
         """
-        query the db and return a list of all the active inspector filenames [(filename, arguments, product), ...]
+        query the db and return a list of all the active inspector file names [(filename, arguments, product), ...]
         """
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
         basedir = self.getMissionDirectory()
@@ -1608,7 +1608,7 @@ class DBUtils(object):
 
     def getMissionID(self, mission_name):
         """
-        given a misio name return its ID
+        given a mission name return its ID
         """
         try:
             m_id = long(mission_name)
@@ -1684,7 +1684,7 @@ class DBUtils(object):
         check files in the DB, return inconsistent files and why
         """
         files = zip(*self.getAllFilenames())[0]
-        ## check of existance and checksum
+        ## check of existence and checksum
         bad_list = []
         for f in files:
             try:
@@ -1797,7 +1797,7 @@ class DBUtils(object):
 
     def getAllProducts(self):
         """
-        return a list of all products as instaces
+        return a list of all products as instances
         """
         prods = self.session.query(self.Product).all()
         return prods

@@ -7,7 +7,7 @@ import collections
 
 def flatten(l):
     """
-    flatten an irregualrly nested list of lists
+    flatten an irregularly nested list of lists
     thanks SO: http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
     """
     for el in l:

@@ -11,10 +11,10 @@ import DBlogging
 __version__ = '2.0.3'
 
 
-# TODO look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isnt called
+# TODO look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isn't called
 class ReadError(Exception):
     """
-    Exception that a file is not readable by the script, probably doesnt exist
+    Exception that a file is not readable by the script, probably doesn't exist
 
     `Author:` Brian Larsen, LANL
     """
@@ -36,7 +36,7 @@ class FilenameError(Exception):
 
 class WriteError(Exception):
     """
-    Exception that a file is not writeable by the script, probably doesnt exist or in a ro directory
+    Exception that a file is not write able by the script, probably doesn't exist or in a ro directory
 
     `Author:` Brian Larsen, LANL
     """
@@ -75,7 +75,7 @@ class DigestError(Exception):
 class Diskfile(object):
     """
     Diskfile class contains methods for dealing with files on disk,
-    all parsing for what mission files belog to is contined in here
+    all parsing for what mission files belong to is continued in here
     to add a new mission code must be added here.
 
     `Author:` Brian Larsen, LANL
@@ -133,7 +133,7 @@ class Diskfile(object):
         self.params['newest_version'] = None
         self.params['process_keywords'] = None
 
-        # this keeps opening connecitons
+        # this keeps opening connections
         #dbu = DBUtils.DBUtils('Test')
         #dbu._openDB()
         #dbu._createTableObjects()

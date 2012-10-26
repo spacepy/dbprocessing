@@ -100,7 +100,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('file', metadata,
-                # this was a bigint, sqlalchemy doesnt seem to like this... think here
+                # this was a bigint, sqlalchemy doesn't seem to like this... think here
             schema.Column('file_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('filename', types.String(50), nullable=False, unique=True),  # hmm long enough?
             schema.Column('utc_file_date', types.Date, nullable=True),

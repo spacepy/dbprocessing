@@ -49,7 +49,7 @@ class module(object):
     @classmethod
     def get_env(self, *args):
         """
-        return a complete envrionment suitable for passing through to
+        return a complete environment suitable for passing through to
         subprocess.call()
 
         Parameters

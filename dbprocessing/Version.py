@@ -2,7 +2,7 @@ from __future__ import division
 """
 Module to handle version information of files and codes.
 
-Handles boolean operators (>, <, =, !=) and database interface for version is also implemented in another module
+Handles Boolean operators (>, <, =, !=) and database interface for version is also implemented in another module
 
 The version scheme is X,Y,Z where:
 * X is the interface version, incremented only when the interface to a file or code changes
@@ -54,13 +54,13 @@ class Version(object):
     >>> print(v)
     1.1.1
 
-    Version objects can perform boolean operations
+    Version objects can perform Boolean operations
 
     >>> v2 = Version.Version(1,2,1)
     >>> print(v2 > v)
     True
 
-    Incrementing the version
+    Increment the version
 
     >>> v.incQuality()
     >>> print(v)

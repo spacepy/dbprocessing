@@ -48,7 +48,7 @@ class CreateDBTests(unittest.TestCase):
         del self.db, self.session
 
     def addMission(self):
-        """add a mission, convienience routine"""
+        """add a mission, convenience routine"""
         mission = self.db.Mission()
         mission.rootdir = 'rootdir'
         mission.mission_name = 'Test me'
@@ -56,7 +56,7 @@ class CreateDBTests(unittest.TestCase):
         self.session.commit()
 
     def addSatellite(self):
-        """add a satellite, convienience routine"""
+        """add a satellite, convenience routine"""
         if self.session.query(self.db.Mission).count() == 0:
             self.addMission()
         if self.session.query(self.db.Satellite).count() == 0:
@@ -171,7 +171,7 @@ class CreateDBTests(unittest.TestCase):
         self.assertRaises(IntegrityError, self.session.commit)
 
     def test_mission_nameunique(self):
-        """Mission table mission_name is unque (regression)"""
+        """Mission table mission_name is unique (regression)"""
         self.addMission()
         # there should be one entry
         self.assertEqual(self.session.query(self.db.Mission).count(), 1)
@@ -183,7 +183,7 @@ class CreateDBTests(unittest.TestCase):
         self.assertRaises(IntegrityError, self.session.commit)
 
     def test_satellite_name(self):
-        """Satelite table satellite_name not nullable (regression)"""
+        """Satellite table satellite_name not nullable (regression)"""
         # have to have a mission to have a sat
         self.addMission()
         sat = self.db.Satellite()
@@ -192,17 +192,17 @@ class CreateDBTests(unittest.TestCase):
         self.assertRaises(IntegrityError, self.session.commit)
 
     def test_satellite_mission_id(self):
-        """Satelite table mission_id is not nullable (regression)"""
+        """Satellite table mission_id is not nullable (regression)"""
         sat = self.db.Satellite()
         sat.satellite_name = 'sat name'
         self.session.add(sat)
         self.assertRaises(IntegrityError, self.session.commit)
 
     def test_satellite_unique(self):
-        """Satelite table pairs are unique (regression)"""
+        """Satellite table pairs are unique (regression)"""
         self.addSatellite()
         self.assertEqual(self.session.query(self.db.Satellite).count(), 1)
-        # try and readd the same sat
+        # try and read the same sat
         sat = self.db.Satellite()
         sat.mission_id = 1
         sat.satellite_name = 'sat name'
@@ -599,7 +599,7 @@ class CreateDBTests(unittest.TestCase):
         self.assertRaises(IntegrityError, self.session.commit)
 
     def test_file_utc_met_start(self):
-        """file table either utc or met spcified start"""
+        """file table either utc or met specified start"""
         # add a product
         self.addProduct()
         file = self.db.File()
@@ -619,7 +619,7 @@ class CreateDBTests(unittest.TestCase):
         self.assertRaises(IntegrityError, self.session.commit)
 
     def test_file_utc_met_stop(self):
-        """file table either utc or met spcified start"""
+        """file table either utc or met specified start"""
         # add a product
         self.addProduct()
         file = self.db.File()

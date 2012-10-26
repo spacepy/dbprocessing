@@ -10,12 +10,12 @@ classes as backup to making reports
 """
 things included are:
     - number and list of files ingested
-    - number and list of files requested for injestion that failed
+    - number and list of files requested for ingestion that failed
     - number and list of other products created
     - list of commands run
 
-TODO inclide later
-    - any errors or anomolies reported (TODO not done)
+TODO include later
+    - any errors or anomalies reported (TODO not done)
 
 """
 
@@ -224,7 +224,7 @@ class ingested(object):
 class errorIngesting(object):
     def __init__(self, inStr):
         """
-        pass in the lig line and parse it savinf what we want
+        pass in the lig line and parse it saving what we want
         """
         self.dt = dup.parse(inStr.split(',')[0])
         self.filename = inStr.split()[-4] # this is hopefully always constant

@@ -89,7 +89,7 @@ class ProcessQueue(object):
         self.queue.extendleft(self.dbu._checkIncoming())
         # step through and remove duplicates
         # if python 2.7 deque has a .count() otherwise have to use
-        #  this workaropund
+        #  this workaround
         for i in range(len(self.queue )):
             try:
                 if list(self.queue).count(self.queue[i]) != 1:
@@ -156,7 +156,7 @@ class ProcessQueue(object):
                 fle = self.dbu.getEntry('File', f[0])
                 fle.newest_version = False
                 self.dbu.session.add(fle)
-                # this seems good, TODO mak sure .add() isnt needed as well
+                # this seems good, TODO make sure .add() isn't needed as well
                 DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f[0]))
         try:
             self.dbu.session.commit()
@@ -248,7 +248,7 @@ class ProcessQueue(object):
 
         else:
             DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
-            raise(NotImplementedError('Not implented yet: {0} based processing'.format(timebase)))
+            raise(NotImplementedError('Not implemented yet: {0} based processing'.format(timebase)))
             raise(ValueError('Bad timebase for product: {0}'.format(process_id)))
         return files, input_product_id
 
@@ -275,7 +275,7 @@ class ProcessQueue(object):
 
         daterange = self.dbu.getFileDates(file_id[0])
 
-        # whole fucntion is in this loop
+        # whole function is in this loop
         for utc_file_date in daterange:
 
             files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date, daterange)
@@ -295,7 +295,7 @@ class ProcessQueue(object):
 
     def onRun(self):
         """
-        Processes can be defined as outpout timebase "RUN" whcih means to run
+        Processes can be defined as output timebase "RUN" which means to run
         them each time to processing chain is run
         """
         proc = self.dbu.getAllProcesses(timebase='RUN')
