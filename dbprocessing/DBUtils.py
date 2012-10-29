@@ -131,6 +131,10 @@ class DBUtils(object):
                 else:
                     engine = db_var.engine
 
+            else: # assume we got a filename and use that
+                engine = sqlalchemy.create_engine('sqlite:///' + self.mission, echo=False)
+                self.mission = 'rbsp'
+
             DBlogging.dblogger.info("Database Connection opened: {0}".format(str(engine)))
 
         except DBError:

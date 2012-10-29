@@ -165,6 +165,7 @@ class dbprocessing_db(object):
         data_table = schema.Table('processqueue', metadata,
             schema.Column('file_id', types.Integer,
                           schema.ForeignKey('file.file_id'), nullable=False, unique=True, ),
+            schema.Column('versio_bump', types.Integer, nullable=True),
             schema.PrimaryKeyConstraint('file_id',)
         )
 
