@@ -10,6 +10,10 @@ Module to create the database structure for dbprocessing
 """
 from __future__ import division # may not be needed but start with it
 
+from optparse import OptionParser
+
+import DBUtils
+
 import os
 
 from sqlalchemy import schema, types, Table, orm
@@ -239,10 +243,46 @@ class dbprocessing_db(object):
         self.engine = engine
         self.metadata = metadata
 
+    def addMission(self):
+        """utility to add a mission"""
+        self.dbu = DBUtils.DBUtils('dbprocessing_main.db')
+        self.mission = self.dbu.addMission('rbsp', os.path.expanduser('~/tmp'))
+
+    def addSatellite(self):
+        """add satellite utility"""
+        self.satellite = self.dbu.addSatellite('rbspa')
+        self.satellite = self.dbu.addSatellite('rbspb')
+
+    def addInstrument(self):
+        """addInstrument utility"""
+        self.instrument = self.dbu.addInstrument('hope', 1)
+        self.instrument = self.dbu.addInstrument('hope', 2)
+
+
+
+
 if __name__ == "__main__":
+    usage = "usage: %prog [options] filename"
+    parser = OptionParser()
+    parser.add_option("-p", "--populate", dest="populate", action='store_true',
+                      help="mission to connect to", default=False)
+
+    (options, args) = parser.parse_args()
+    if len(args) != 0:
+        parser.error("incorrect number of arguments")
+
     # as a demo create the db in sqlite
     try:
         os.remove('dbprocessing_main.db')
     except OSError:
         pass
+
     db = dbprocessing_db(filename = 'dbprocessing_main.db')
+
+    if options.populate: # put minimal RBSP in here
+        db.addMission()
+        db.addSatellite()
+        db.addInstrument()
+
+
+
