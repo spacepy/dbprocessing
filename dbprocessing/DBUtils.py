@@ -1628,7 +1628,7 @@ class DBUtils(object):
             m_id = sq[0].mission_id
         return m_id
 
-    def getNewestFiles(self, product=None):
+    def getNewestFiles(self, product=None, instrument=None):
         """
         for the current mission get a tuple of all file ids that are marked newest version
         """
@@ -1637,6 +1637,14 @@ class DBUtils(object):
         else:
             sq = self.session.query(self.File.file_id).filter_by(newest_version = True).filter_by(product = product).all()
         sq = zip(*sq)[0]
+        if instrument is not None:
+            ans = []
+            for s in sq:
+                ptb = self.getProductTraceback(self.getEntry('File', s).product_id)
+                tmp = ptb['instrument'].instrument_name
+                if tmp == self.getEntry('Instrument', tmp).instrument_name:
+                    ans.append(tmp)
+            sq = ans
         return sq
 
     def tag_release(self, rel_num):
