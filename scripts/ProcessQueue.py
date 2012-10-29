@@ -90,9 +90,9 @@ if __name__ == "__main__":
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
             while pq.dbu.Processqueue.len() > 0:
+                pq.dbu.Processqueue.clean()  # get rid of duplicates
                 # this loop makes all the runMe objects for all the files in the processqueue
                 while pq.dbu.Processqueue.len() > 0:
-                    pq.dbu.Processqueue.clean()  # get rid of duplicates
                     file_id = pq.dbu.Processqueue.get(version_bump=True)
                     DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
                     if file_id is None:
