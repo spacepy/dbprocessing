@@ -17,6 +17,9 @@
 # <- add the prod
 # <- create the inst_prod link
 
+
+from optparse import OptionParser
+
 import ConfigParser
 from dateutil import parser as dup
 import sys
@@ -52,13 +55,13 @@ def configCheck(conf, dbu):
             raise(ValueError('Section {0} missing from file'.format(exp)))
 
 
-def addStuff(filename):
-    cfg = readconfig(filename)
+def addStuff(filename, mission):
     # setup the db
-    dbu = DBUtils.DBUtils('rbsp') # TODO no rbsp hardcode later
+    dbu = DBUtils.DBUtils(mission)
     dbu._openDB()
     dbu._createTableObjects()
 
+    cfg = readconfig(filename)
     configCheck(cfg, dbu)
 
     print '{0}'.format(filename)
@@ -98,21 +101,18 @@ def addStuff(filename):
     dbu.updateProductSubs(prod_id)
 
 
-
-def usage():
-    """
-    print the usage message out
-    """
-    print "Usage: {0} <filename>".format(sys.argv[0])
-    print "   -> config file to read"
-    return
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        usage()
-        sys.exit(2)
-    addStuff(sys.argv[-1])
+    usage = "usage: %prog [options] filename"
+    parser = OptionParser()
+    parser.add_option("-m", "--mission", dest="mission", type="string",
+                      help="mission to connect to", default='rbsp')
+
+    (options, args) = parser.parse_args()
+    if len(args) != 1:
+        parser.error("incorrect number of arguments")
+
+    addStuff(sys.argv[-1], options.mission)
+
 
 
 
