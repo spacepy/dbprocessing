@@ -196,7 +196,7 @@ class DBUtils(object):
                 exec(c3)
                 exec(c4)
                 if verbose: print("Class %s created" % (val))
-                DBlogging.dblogger.debug("Class %s created" % (val))
+                if verbose: DBlogging.dblogger.debug("Class %s created" % (val))
 
 
 #####################################
