@@ -71,6 +71,9 @@ def runner(runme):
 
     DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))
     # TODO, think here on how to grab the output
+    # TODO For a future revision think on adding a timeout ability to the subprocess
+    #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
+    #    for some code here
     try:
         subprocess.check_call(' '.join(cmdline), shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError:
