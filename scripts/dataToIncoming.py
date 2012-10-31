@@ -19,7 +19,7 @@ dbu = DBUtils.DBUtils('rbsp')
 
 mission_path = dbu.getMissionDirectory()
 inc_path = dbu.getIncomingPath()
-data_path = os.path.expanduser(os.path.join('~ectsoc', 'data', 'level_0'))
+data_path = os.path.expanduser(os.path.join('/', 'usr', 'local', 'ectsoc', 'data', 'level_0'))
 error_path = dbu.getErrorPath()
 dbu._closeDB()
 
@@ -36,12 +36,12 @@ def sync_data(sc, inst):
     curdir = os.path.abspath(os.curdir)
     tmp_path = tempfile.mkdtemp(suffix='_dbprocessing')
     os.chdir(tmp_path)
-    
+
     subprocess.check_call(' '.join(['/usr/bin/rsync ', '--dry-run ', '-auIv ',
                                     os.path.join(data_path_inst, '*'),
                                     miss_path_inst, ' > files.txt']),
                           shell=True )
-    
+
     with open('files.txt', 'r') as fp:
         dat = fp.readlines()
     dat = set([v.strip() for v in dat if '.ptp.gz' in v])
@@ -51,12 +51,12 @@ def sync_data(sc, inst):
 
     if dat: # no need for a message if we ar movng nothing
         DBlogging.dblogger.info('Copying {0} files to incoming for processing'.format(len(dat)-4)) # the 4 is for header and footer
-    
+
     for line in dat:
         fname = os.path.join(data_path_inst, line.strip())
         shutil.copy(fname, inc_path)
         DBlogging.dblogger.debug('Copying {0} to incoming for processing'.format(fname))
-            
+
     os.chdir(curdir)
     shutil.rmtree(tmp_path)
 
