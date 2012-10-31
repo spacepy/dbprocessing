@@ -111,7 +111,7 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('file', metadata,
                 # this was a bigint, sqlalchemy doesn't seem to like this... think here
-            schema.Column('file_id', types.BigInteger, autoincrement=True, primary_key=True, nullable=False, index=True),
+            schema.Column('file_id', types.Integer, autoincrement=True, primary_key=True, nullable=False, index=True),
             schema.Column('filename', types.String(250), nullable=False, unique=True, index=True),
             schema.Column('utc_file_date', types.Date, nullable=True, index=True),
             schema.Column('utc_start_time', types.DateTime, nullable=True, index=True),
@@ -179,7 +179,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('processqueue', metadata,
-            schema.Column('file_id', types.BigInteger,
+            schema.Column('file_id', types.Integer,
                           schema.ForeignKey('file.file_id'),
                           primary_key=True, nullable=False, unique=True, index=True  ),
             schema.Column('version_bump', types.SmallInteger, nullable=True),
@@ -195,14 +195,14 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('release', metadata,
-            schema.Column('file_id', types.BigInteger,
+            schema.Column('file_id', types.Integer,
                           schema.ForeignKey('file.file_id'), nullable=False,),
             schema.Column('release_num', types.String(20), nullable=False),
             schema.PrimaryKeyConstraint('file_id', 'release_num' )
         )
 
         data_table = schema.Table('logging', metadata,
-            schema.Column('logging_id', types.BigInteger, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('logging_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('currently_processing', types.Boolean, nullable=False, default=False),
             schema.Column('pid', types.Integer, nullable=True),
             schema.Column('processing_start_time', types.DateTime, nullable=False),  # might have to be a TIMESTAMP
@@ -217,10 +217,10 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('logging_file', metadata,
-            schema.Column('logging_file_id', types.BigInteger, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('logging_id', types.BigInteger,
+            schema.Column('logging_file_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('logging_id', types.Integer,
                           schema.ForeignKey('logging.logging_id'), nullable=False),
-            schema.Column('file_id', types.BigInteger,
+            schema.Column('file_id', types.Integer,
                           schema.ForeignKey('file.file_id'), nullable=False),
             schema.Column('code_id', types.Integer,
                           schema.ForeignKey('code.code_id'), nullable=False),
