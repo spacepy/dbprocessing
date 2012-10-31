@@ -111,7 +111,7 @@ if __name__ == "__main__":
                 # now do all the running
                 # sort them so that we run the oldest date first, cuts down on reprocess
                 pq.runme_list = sorted(pq.runme_list, key=lambda val: val.utc_file_date)
-                print pq.runme_list
+                print len(pq.runme_list), pq.runme_list
                 for v in pq.runme_list:
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
                     runMe.runner(v)
