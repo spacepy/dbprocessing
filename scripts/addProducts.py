@@ -58,8 +58,6 @@ def configCheck(conf, dbu):
 def addStuff(filename, mission):
     # setup the db
     dbu = DBUtils.DBUtils(mission)
-    dbu._openDB()
-    dbu._createTableObjects()
 
     cfg = readconfig(filename)
     configCheck(cfg, dbu)

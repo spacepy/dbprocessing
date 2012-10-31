@@ -79,8 +79,6 @@ def addStuff(filename):
     cfg = readconfig(filename)
     # setup the db
     dbu = DBUtils.DBUtils('~ectsoc/RBSP_processing.sqlite') # TODO no rbsp hardcode later
-    dbu._openDB()
-    dbu._createTableObjects()
 
     prod_id_dict = configCheck(cfg, dbu)
 
