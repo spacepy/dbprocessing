@@ -91,7 +91,9 @@ def addStuff(filename):
     # add the productprocesslink (there are several)
     for sec in cfg:
         if 'input_product' in sec:
-            dbu.addproductprocesslink(prod_id_dict[cfg[sec]['product_name']], proc_id, cfg[sec]['optional'] )
+            dbu.addproductprocesslink(prod_id_dict[cfg[sec]['product_name']],
+                                      proc_id,
+                                      toBool(cfg[sec]['optional']) )
 
     # add code
     code_start_date = dup.parse(cfg['code']['code_start_date'])
