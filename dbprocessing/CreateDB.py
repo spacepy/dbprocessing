@@ -40,6 +40,9 @@ class dbprocessing_db(object):
         TODO this can/should all be redone using the new syntax and relations
         see: http://docs.sqlalchemy.org/en/rel_0_7/orm/relationships.html# for
         some examples.
+
+        NOTE: if one stops using sqlite then change file_id, logging_id and file_logging_id
+              to BigIntegers (sqlite doesn't know BigInteger)
         """
         if self.overwrite:
             raise(NotImplementedError('overwrite is not yet implemented'))
