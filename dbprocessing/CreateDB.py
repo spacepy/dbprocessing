@@ -69,8 +69,8 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('product', metadata,
-            schema.Column('product_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('product_name', types.String(100), nullable=False),  # hmm long enough?
+            schema.Column('product_id', types.Integer, autoincrement=True, primary_key=True, nullable=False, index=True),
+            schema.Column('product_name', types.String(100), nullable=False, index=True),  # hmm long enough?
             schema.Column('instrument_id', types.Integer,
                           schema.ForeignKey('instrument.instrument_id'), nullable=False,),
             schema.Column('relative_path', types.String(100), nullable=False),  # hmm long enough?
@@ -90,12 +90,12 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('process', metadata,
-            schema.Column('process_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('process_id', types.Integer, autoincrement=True, primary_key=True, nullable=False, index=True),
             schema.Column('process_name', types.String(50), nullable=False),  # hmm long enough?
             schema.Column('output_product', types.Integer,
-                          schema.ForeignKey('product.product_id'), nullable=False, unique=True),
+                          schema.ForeignKey('product.product_id'), nullable=False, unique=True, index=True),
             schema.Column('super_process_id', types.Integer, nullable=True),
-            schema.Column('output_timebase', types.String(10), nullable=True),
+            schema.Column('output_timebase', types.String(10), nullable=True, index=True),
             schema.Column('extra_params', types.Text, nullable=True),
             schema.UniqueConstraint('process_name', 'output_product')
         )
@@ -111,12 +111,12 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('file', metadata,
                 # this was a bigint, sqlalchemy doesn't seem to like this... think here
-            schema.Column('file_id', types.BigInteger, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('filename', types.String(250), nullable=False, unique=True),  # hmm long enough?
-            schema.Column('utc_file_date', types.Date, nullable=True),
-            schema.Column('utc_start_time', types.DateTime, nullable=True),  # might have to be a TIMESTAMP
-            schema.Column('utc_stop_time', types.DateTime, nullable=True),
-            schema.Column('data_level', types.Float, nullable=False),
+            schema.Column('file_id', types.BigInteger, autoincrement=True, primary_key=True, nullable=False, index=True),
+            schema.Column('filename', types.String(250), nullable=False, unique=True, index=True),
+            schema.Column('utc_file_date', types.Date, nullable=True, index=True),
+            schema.Column('utc_start_time', types.DateTime, nullable=True, index=True),
+            schema.Column('utc_stop_time', types.DateTime, nullable=True, index=True),
+            schema.Column('data_level', types.Float, nullable=False, index=True),
             schema.Column('interface_version', types.SmallInteger, nullable=False),
             schema.Column('quality_version', types.SmallInteger, nullable=False),
             schema.Column('revision_version', types.SmallInteger, nullable=False),
@@ -143,27 +143,27 @@ class dbprocessing_db(object):
                                     'product_id',
                                     'interface_version',
                                     'quality_comment',
-                                    'revision_version', name='Unique file tuple')
+                                    'revision_version', name='Unique file tuple'),
         )
 
         data_table = schema.Table('filefilelink', metadata,
             schema.Column('source_file', types.Integer,
-                          schema.ForeignKey('file.file_id'), nullable=False),
+                          schema.ForeignKey('file.file_id'), nullable=False, index=True),
             schema.Column('resulting_file', types.Integer,
-                          schema.ForeignKey('file.file_id'), nullable=False),
+                          schema.ForeignKey('file.file_id'), nullable=False, index=True),
             schema.PrimaryKeyConstraint('source_file', 'resulting_file' ),
             schema.CheckConstraint('source_file <> resulting_file'), # TODO this is supposed to be more general than !=
         )
 
         data_table = schema.Table('code', metadata,
-            schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('filename', types.String(250), nullable=False, unique=True),  # hmm long enough?
+            schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True, nullable=False, index=True),
+            schema.Column('filename', types.String(250), nullable=False, unique=True),
             schema.Column('relative_path', types.String(100), nullable=False),
-            schema.Column('code_start_date', types.Date, nullable=False),  # might have to be a TIMESTAMP
+            schema.Column('code_start_date', types.Date, nullable=False),
             schema.Column('code_stop_date', types.Date, nullable=False),
             schema.Column('code_description', types.Text, nullable=False),
             schema.Column('process_id', types.Integer,
-                          schema.ForeignKey('process.process_id'), nullable=False),
+                          schema.ForeignKey('process.process_id'), nullable=False, index=True),
             schema.Column('interface_version', types.SmallInteger, nullable=False),
             schema.Column('quality_version', types.SmallInteger, nullable=False),
             schema.Column('revision_version', types.SmallInteger, nullable=False),
@@ -181,7 +181,7 @@ class dbprocessing_db(object):
         data_table = schema.Table('processqueue', metadata,
             schema.Column('file_id', types.BigInteger,
                           schema.ForeignKey('file.file_id'),
-                          primary_key=True, nullable=False, unique=True  ),
+                          primary_key=True, nullable=False, unique=True, index=True  ),
             schema.Column('version_bump', types.SmallInteger, nullable=True),
             schema.CheckConstraint('version_bump is NULL or version_bump < 3'),
         )
@@ -229,7 +229,7 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('inspector', metadata,
-            schema.Column('inspector_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('inspector_id', types.Integer, autoincrement=True, primary_key=True, nullable=False, index=True),
             schema.Column('filename', types.String(250), nullable=False, unique=True),  # hmm long enough?
             schema.Column('relative_path', types.String(250), nullable=False),
             schema.Column('description', types.Text, nullable=False),
@@ -237,10 +237,10 @@ class dbprocessing_db(object):
             schema.Column('quality_version', types.SmallInteger, nullable=False),
             schema.Column('revision_version', types.SmallInteger, nullable=False),
             schema.Column('output_interface_version', types.SmallInteger, nullable=False),
-            schema.Column('active_code', types.Boolean, nullable=False, default=False),
+            schema.Column('active_code', types.Boolean, nullable=False, default=False, index=True),
             schema.Column('date_written', types.Date, nullable=False),
             schema.Column('shasum', types.String(40), nullable=True),
-            schema.Column('newest_version', types.Boolean, nullable=False),
+            schema.Column('newest_version', types.Boolean, nullable=False, index=True),
             schema.Column('arguments', types.Text, nullable=False),
             schema.Column('product', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False),
