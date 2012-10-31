@@ -751,8 +751,8 @@ class DBUtils(object):
 
         """
         ppl1 = self.Productprocesslink()
-        ppl1.input_product_id = input_product_id
-        ppl1.process_id = process_id
+        ppl1.input_product_id = self.getProductID(input_product_id)
+        ppl1.process_id = self.getProcessID(process_id)
         ppl1.optional = optional
         self.session.add(ppl1)
         self._commitDB()
