@@ -989,7 +989,7 @@ class DBUtilsDBTests(unittest.TestCase):
                                     product_id = 1,
                                     newest_version=True,
                                     process_keywords='process_keywords=foo',
-                                    md5sum=sha,
+                                    shasum=sha,
                                     )
 
         self.assertTrue(self.dbu.checkFileMD5(1))
@@ -1009,7 +1009,7 @@ class DBUtilsDBTests(unittest.TestCase):
                                     product_id = 1,
                                     newest_version=True,
                                     process_keywords='process_keywords=foo',
-                                    md5sum=sha,
+                                    shasum=sha,
                                     )
 
         self.assertEqual(self.dbu.checkFiles(), [(u'file1', '(100) bad checksum'), (u'file2', '(200) file not found')])
@@ -1044,7 +1044,7 @@ class DBUtilsDBTests(unittest.TestCase):
                                     product_id = 1,
                                     newest_version=True,
                                     process_keywords='process_keywords=foo',
-                                    md5sum=None,
+                                    shasum=None,
                                     )
 
         self.assertTrue(self.dbu._checkDiskForFile(self.file))

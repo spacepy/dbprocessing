@@ -36,6 +36,10 @@ class dbprocessing_db(object):
         """
         Step through and create the DB structure, relationships and constraints
         **Note that order matters here, have to define a Table before you can link to it**
+
+        TODO this can/should all be redone using the new syntax and relations
+        see: http://docs.sqlalchemy.org/en/rel_0_7/orm/relationships.html# for
+        some examples.
         """
         if self.overwrite:
             raise(NotImplementedError('overwrite is not yet implemented'))
@@ -44,8 +48,8 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('mission', metadata,
             schema.Column('mission_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('mission_name', types.String(20), nullable=False, unique=True),  # hmm long enough?
-            schema.Column('rootdir', types.String(20), nullable=False,),
+            schema.Column('mission_name', types.String(20), nullable=False, unique=True),
+            schema.Column('rootdir', types.String(50), nullable=False,), # in postgres this was also unique
         )
 
         data_table = schema.Table('satellite', metadata,
@@ -66,13 +70,14 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('product', metadata,
             schema.Column('product_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('product_name', types.String(30), nullable=False),  # hmm long enough?
+            schema.Column('product_name', types.String(100), nullable=False),  # hmm long enough?
             schema.Column('instrument_id', types.Integer,
                           schema.ForeignKey('instrument.instrument_id'), nullable=False,),
-            schema.Column('relative_path', types.String(50), nullable=False),  # hmm long enough?
+            schema.Column('relative_path', types.String(100), nullable=False),  # hmm long enough?
             schema.Column('super_product_id', types.Integer, nullable=True),
-            schema.Column('level', types.Integer, nullable=False),
-            schema.Column('format', types.String(20), nullable=False),  # hmm long enough?
+            schema.Column('level', types.Float, nullable=False),
+            schema.Column('format', types.Text, nullable=False),  # hmm long enough?
+            schema.Column('product_description', types.Text, nullable=True),  # hmm long enough?
             schema.UniqueConstraint('product_name', 'instrument_id', 'relative_path', name='unique_triplet_product')
         )
 
@@ -86,11 +91,12 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('process', metadata,
             schema.Column('process_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('process_name', types.String(20), nullable=False),  # hmm long enough?
+            schema.Column('process_name', types.String(50), nullable=False),  # hmm long enough?
             schema.Column('output_product', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False, unique=True),
             schema.Column('super_process_id', types.Integer, nullable=True),
             schema.Column('output_timebase', types.String(10), nullable=True),
+            schema.Column('extra_params', types.Text, nullable=True),
             schema.UniqueConstraint('process_name', 'output_product')
         )
 
@@ -105,8 +111,8 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('file', metadata,
                 # this was a bigint, sqlalchemy doesn't seem to like this... think here
-            schema.Column('file_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('filename', types.String(50), nullable=False, unique=True),  # hmm long enough?
+            schema.Column('file_id', types.BigInteger, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('filename', types.String(250), nullable=False, unique=True),  # hmm long enough?
             schema.Column('utc_file_date', types.Date, nullable=True),
             schema.Column('utc_start_time', types.DateTime, nullable=True),  # might have to be a TIMESTAMP
             schema.Column('utc_stop_time', types.DateTime, nullable=True),
@@ -114,10 +120,10 @@ class dbprocessing_db(object):
             schema.Column('interface_version', types.SmallInteger, nullable=False),
             schema.Column('quality_version', types.SmallInteger, nullable=False),
             schema.Column('revision_version', types.SmallInteger, nullable=False),
-            schema.Column('verbose_provenance', types.String(500), nullable=True),
+            schema.Column('verbose_provenance', types.Text, nullable=True),
             schema.Column('check_date', types.DateTime, nullable=True),
-            schema.Column('quality_comment', types.String(100), nullable=True),
-            schema.Column('caveats', types.String(20), nullable=True),
+            schema.Column('quality_comment', types.Text, nullable=True),
+            schema.Column('caveats', types.Text, nullable=True),
             schema.Column('file_create_date', types.DateTime, nullable=False),
             schema.Column('met_start_time', types.Float, nullable=True),
             schema.Column('met_stop_time', types.Float, nullable=True),
@@ -125,7 +131,7 @@ class dbprocessing_db(object):
             schema.Column('quality_checked', types.Boolean, nullable=True, default=False),
             schema.Column('product_id', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False),
-            schema.Column('md5sum', types.String(40), nullable=True),
+            schema.Column('shasum', types.String(40), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
             schema.Column('process_keywords', types.Text, nullable=True),
             schema.CheckConstraint('utc_stop_time is not NULL OR met_stop_time is not NULL'),
@@ -133,6 +139,11 @@ class dbprocessing_db(object):
             schema.CheckConstraint('met_start_time <= met_stop_time'), # in case of one entry
             schema.CheckConstraint('utc_start_time <= utc_stop_time'), # in case of one entry
             schema.CheckConstraint('interface_version >= 1'),
+            schema.UniqueConstraint('utc_file_date',
+                                    'product_id',
+                                    'interface_version',
+                                    'quality_comment',
+                                    'revision_version', name='Unique file tuple')
         )
 
         data_table = schema.Table('filefilelink', metadata,
@@ -140,16 +151,17 @@ class dbprocessing_db(object):
                           schema.ForeignKey('file.file_id'), nullable=False),
             schema.Column('resulting_file', types.Integer,
                           schema.ForeignKey('file.file_id'), nullable=False),
-            schema.PrimaryKeyConstraint('source_file', 'resulting_file' )
+            schema.PrimaryKeyConstraint('source_file', 'resulting_file' ),
+            schema.CheckConstraint('source_file <> resulting_file'), # TODO this is supposed to be more general than !=
         )
 
         data_table = schema.Table('code', metadata,
             schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('filename', types.String(50), nullable=False, unique=True),  # hmm long enough?
-            schema.Column('relative_path', types.String(50), nullable=False),
+            schema.Column('filename', types.String(250), nullable=False, unique=True),  # hmm long enough?
+            schema.Column('relative_path', types.String(100), nullable=False),
             schema.Column('code_start_date', types.Date, nullable=False),  # might have to be a TIMESTAMP
             schema.Column('code_stop_date', types.Date, nullable=False),
-            schema.Column('code_description', types.String(50), nullable=False),
+            schema.Column('code_description', types.Text, nullable=False),
             schema.Column('process_id', types.Integer,
                           schema.ForeignKey('process.process_id'), nullable=False),
             schema.Column('interface_version', types.SmallInteger, nullable=False),
@@ -158,19 +170,20 @@ class dbprocessing_db(object):
             schema.Column('output_interface_version', types.SmallInteger, nullable=False),
             schema.Column('active_code', types.Boolean, nullable=False, default=False),
             schema.Column('date_written', types.Date, nullable=False),
-            schema.Column('md5sum', types.String(40), nullable=True),
+            schema.Column('shasum', types.String(40), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
             schema.Column('arguments', types.Text, nullable=False),
-            schema.CheckConstraint('code_start_date < code_stop_date'),
+            schema.CheckConstraint('code_start_date <= code_stop_date'),
             schema.CheckConstraint('interface_version >= 1'),
             schema.CheckConstraint('output_interface_version >= 1'),
         )
 
         data_table = schema.Table('processqueue', metadata,
-            schema.Column('file_id', types.Integer,
-                          schema.ForeignKey('file.file_id'), nullable=False, unique=True, ),
-            schema.Column('version_bump', types.Integer, nullable=True),
-            schema.PrimaryKeyConstraint('file_id',)
+            schema.Column('file_id', types.BigInteger,
+                          schema.ForeignKey('file.file_id'),
+                          primary_key=True, nullable=False, unique=True  ),
+            schema.Column('version_bump', types.SmallInteger, nullable=True),
+            schema.CheckConstraint('version_bump is NULL or version_bump < 3'),
         )
 
         data_table = schema.Table('filecodelink', metadata,
@@ -182,13 +195,14 @@ class dbprocessing_db(object):
         )
 
         data_table = schema.Table('release', metadata,
-            schema.Column('file_id', types.Integer, nullable=False),
-            schema.Column('release_num', types.String(20),nullable=False),
+            schema.Column('file_id', types.BigInteger,
+                          schema.ForeignKey('file.file_id'), nullable=False,),
+            schema.Column('release_num', types.String(20), nullable=False),
             schema.PrimaryKeyConstraint('file_id', 'release_num' )
         )
 
         data_table = schema.Table('logging', metadata,
-            schema.Column('logging_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('logging_id', types.BigInteger, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('currently_processing', types.Boolean, nullable=False, default=False),
             schema.Column('pid', types.Integer, nullable=True),
             schema.Column('processing_start_time', types.DateTime, nullable=False),  # might have to be a TIMESTAMP
@@ -196,17 +210,17 @@ class dbprocessing_db(object):
             schema.Column('comment', types.Text, nullable=True),
             schema.Column('mission_id', types.Integer,
                           schema.ForeignKey('mission.mission_id'), nullable=False),
-            schema.Column('user', types.String(20), nullable=False),
-            schema.Column('hostname', types.String(50), nullable=False),
+            schema.Column('user', types.String(30), nullable=False),
+            schema.Column('hostname', types.String(100), nullable=False),
             #schema.PrimaryKeyConstraint('logging_id'),
             schema.CheckConstraint('processing_start_time < processing_end_time'),
         )
 
         data_table = schema.Table('logging_file', metadata,
-            schema.Column('logging_file_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('logging_id', types.Integer,
+            schema.Column('logging_file_id', types.BigInteger, autoincrement=True, primary_key=True, nullable=False),
+            schema.Column('logging_id', types.BigInteger,
                           schema.ForeignKey('logging.logging_id'), nullable=False),
-            schema.Column('file_id', types.Integer,
+            schema.Column('file_id', types.BigInteger,
                           schema.ForeignKey('file.file_id'), nullable=False),
             schema.Column('code_id', types.Integer,
                           schema.ForeignKey('code.code_id'), nullable=False),
@@ -216,16 +230,16 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('inspector', metadata,
             schema.Column('inspector_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
-            schema.Column('filename', types.String(50), nullable=False, unique=True),  # hmm long enough?
-            schema.Column('relative_path', types.String(50), nullable=False),
-            schema.Column('description', types.String(50), nullable=False),
+            schema.Column('filename', types.String(250), nullable=False, unique=True),  # hmm long enough?
+            schema.Column('relative_path', types.String(250), nullable=False),
+            schema.Column('description', types.Text, nullable=False),
             schema.Column('interface_version', types.SmallInteger, nullable=False),
             schema.Column('quality_version', types.SmallInteger, nullable=False),
             schema.Column('revision_version', types.SmallInteger, nullable=False),
             schema.Column('output_interface_version', types.SmallInteger, nullable=False),
             schema.Column('active_code', types.Boolean, nullable=False, default=False),
             schema.Column('date_written', types.Date, nullable=False),
-            schema.Column('md5sum', types.String(40), nullable=True),
+            schema.Column('shasum', types.String(40), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
             schema.Column('arguments', types.Text, nullable=False),
             schema.Column('product', types.Integer,
@@ -243,20 +257,25 @@ class dbprocessing_db(object):
         self.engine = engine
         self.metadata = metadata
 
-    def addMission(self):
+    def addMission(self, filename):
         """utility to add a mission"""
-        self.dbu = DBUtils.DBUtils('dbprocessing_main.db')
-        self.mission = self.dbu.addMission('rbsp', os.path.expanduser('~/tmp'))
+        self.dbu = DBUtils.DBUtils(filename)
+        self.mission = self.dbu.addMission('rbsp', os.path.join('/' , 'n', 'space_data', 'cda', 'rbsp'))
 
     def addSatellite(self):
         """add satellite utility"""
-        self.satellite = self.dbu.addSatellite('rbspa')
-        self.satellite = self.dbu.addSatellite('rbspb')
+        self.satellite = self.dbu.addSatellite('rbspa') # 1
+        self.satellite = self.dbu.addSatellite('rbspb') # 2
 
     def addInstrument(self):
         """addInstrument utility"""
         self.instrument = self.dbu.addInstrument('hope', 1)
         self.instrument = self.dbu.addInstrument('hope', 2)
+        self.instrument = self.dbu.addInstrument('rept', 1)
+        self.instrument = self.dbu.addInstrument('rept', 2)
+        self.instrument = self.dbu.addInstrument('mageis', 1)
+        self.instrument = self.dbu.addInstrument('mageis', 2)
+
 
 
 
@@ -264,23 +283,18 @@ class dbprocessing_db(object):
 if __name__ == "__main__":
     usage = "usage: %prog [options] filename"
     parser = OptionParser()
-    parser.add_option("-p", "--populate", dest="populate", action='store_true',
+    parser.add_option("", "--populate", dest="populate", action='store_true',
                       help="mission to connect to", default=False)
 
     (options, args) = parser.parse_args()
-    if len(args) != 0:
+    if len(args) != 1:
         parser.error("incorrect number of arguments")
+    filename = os.path.abspath(args[0])
 
-    # as a demo create the db in sqlite
-    try:
-        os.remove('dbprocessing_main.db')
-    except OSError:
-        pass
-
-    db = dbprocessing_db(filename = 'dbprocessing_main.db')
+    db = dbprocessing_db(filename = filename)
 
     if options.populate: # put minimal RBSP in here
-        db.addMission()
+        db.addMission(filename)
         db.addSatellite()
         db.addInstrument()
 

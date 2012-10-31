@@ -121,8 +121,7 @@ class DBUtils(object):
         if self.dbIsOpen == True:
             return
         try:
-
-            if self.mission in  ['Test', 'rbsp']:
+            if self.mission in  ['Test', 'rbsp_remote']:
                 engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
 
             elif self.mission == 'unittest':
@@ -133,7 +132,7 @@ class DBUtils(object):
 
             else: # assume we got a filename and use that
                 if not os.path.isfile(os.path.expanduser(self.mission)):
-                    raise(ValueError('Bad mission of db file specified'))
+                    raise(ValueError("DB file specified doesn't exist"))
                 engine = sqlalchemy.create_engine('sqlite:///' + os.path.expanduser(self.mission), echo=False)
                 self.mission = 'rbsp'
 
@@ -1091,7 +1090,7 @@ class DBUtils(object):
                 met_stop_time = None,
                 product_id = None,
                 newest_version = None,
-                md5sum = None,
+                shasum = None,
                 process_keywords = None):
         """
         add a datafile to the database
@@ -1153,7 +1152,7 @@ class DBUtils(object):
         d1.met_stop_time = met_stop_time
         d1.exists_on_disk = exists_on_disk
         d1. newest_version  = newest_version
-        d1.md5sum = md5sum
+        d1.shasum = shasum
         d1.process_keywords = process_keywords
         self.session.add(d1)
         self._commitDB()
@@ -1686,7 +1685,7 @@ class DBUtils(object):
         """
         given a file id or name check the db checksum and the file checksum
         """
-        db_sha = self.getEntry('File', file_id).md5sum
+        db_sha = self.getEntry('File', file_id).shasum
         disk_sha = calcDigest(self.getFileFullPath(file_id))
         if str(disk_sha) == str(db_sha):
             return True

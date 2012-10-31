@@ -126,7 +126,7 @@ class Diskfile(object):
         self.params['exists_on_disk'] = None
         self.params['quality_checked'] = None
         self.params['product_id'] = None
-        self.params['md5sum'] = None
+        self.params['shasum'] = None
         self.params['version'] = None
         self.params['filefilelink'] = None
         self.params['filecodelink'] = None

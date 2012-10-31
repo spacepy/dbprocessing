@@ -117,7 +117,7 @@ class DBfile(object):
                         met_start_time = self.diskfile.params['met_start_time'],
                         met_stop_time = self.diskfile.params['met_stop_time'],
                         newest_version = self.diskfile.params['newest_version'],
-                        md5sum = self.diskfile.params['md5sum'],
+                        shasum = self.diskfile.params['shasum'],
                         process_keywords = self.diskfile.params['process_keywords'])
         return f_id
 

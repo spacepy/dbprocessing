@@ -25,7 +25,7 @@ inspector requirements:
             self.diskfile.params['exists_on_disk'] : bool (filled by base class)
             self.diskfile.params['quality_checked'] : bool (filled by base class) (optional)
             self.diskfile.params['product_id'] : long (filled by base class)
-            self.diskfile.params['md5sum'] : str (filled by base class) (optional)
+            self.diskfile.params['shasum'] : str (filled by base class) (optional)
             * self.diskfile.params['version'] : Version object (user)
             self.diskfile.params['filefilelink'] : long (filled by db)
             self.diskfile.params['filecodelink'] : long (filled by db)
@@ -96,7 +96,7 @@ class inspector(object):
         self.diskfile.mission = ptb['mission'].mission_name
         self.diskfile.params['file_create_date'] = datetime.datetime.fromtimestamp(os.path.getmtime(self.diskfile.infile))
         self.diskfile.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
-        self.diskfile.params['md5sum'] = Diskfile.calcDigest(self.diskfile.infile)
+        self.diskfile.params['shasum'] = Diskfile.calcDigest(self.diskfile.infile)
         self.diskfile.params['product_id'] = self.product
 
     def __call__(self):
