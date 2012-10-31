@@ -326,7 +326,8 @@ class runMe(object):
         df = pq.figureProduct(current_file) # uses all the inspectors to see what product a file is
         if df is None:
             DBlogging.dblogger.error("{0} did not have a product".format(current_file))
-            raise(ProcessException("The process output file did not have a product: {0}".format(current_file)))
+            self.moveToError(current_file)
+            return
         df.params['verbose_provenance'] = ' '.join(cmdline)
         f_id = pq.diskfileToDB(df)
         ## here the file is in the DB so we can add the filefilelink an filecodelinks
