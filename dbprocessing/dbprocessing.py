@@ -195,9 +195,19 @@ class ProcessQueue(object):
                 continue
             if arg is not None:
                 kwargs = strargs_to_args(arg)
-                df = inspect.Inspector(filename, self.dbu, product, **kwargs)
+                try:
+                    df = inspect.Inspector(filename, self.dbu, product, **kwargs)
+                except:
+                    DBlogging.dblogger.error("File {0} inspector threw an exception".format(filename))
+                    self.moveToError(filename)
+                    return None
             else:
-                df = inspect.Inspector(filename, self.dbu, product, )
+                try:
+                    df = inspect.Inspector(filename, self.dbu, product, )
+                except:
+                    DBlogging.dblogger.error("File {0} inspector threw an exception".format(filename))
+                    self.moveToError(filename)
+                    return None
             if df is not None:
                 claimed.append(df)
                 DBlogging.dblogger.debug("Match found: {0}: {1}".format(filename, code, ))
