@@ -105,7 +105,7 @@ if __name__ == "__main__":
     usage = "usage: %prog [options] filename"
     parser = OptionParser()
     parser.add_option("-m", "--mission", dest="mission", type="string",
-                      help="mission to connect to", default='rbsp')
+                      help="mission to connect to", default='~ectsoc/RBSP_processing.sqlite')
 
     (options, args) = parser.parse_args()
     if len(args) != 1:

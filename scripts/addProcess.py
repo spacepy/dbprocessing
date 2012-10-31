@@ -78,7 +78,7 @@ def configCheck(conf, dbu):
 def addStuff(filename):
     cfg = readconfig(filename)
     # setup the db
-    dbu = DBUtils.DBUtils('rbsp') # TODO no rbsp hardcode later
+    dbu = DBUtils.DBUtils('~ectsoc/RBSP_processing.sqlite') # TODO no rbsp hardcode later
     dbu._openDB()
     dbu._createTableObjects()
 
