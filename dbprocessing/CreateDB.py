@@ -172,7 +172,7 @@ class dbprocessing_db(object):
             schema.Column('date_written', types.Date, nullable=False),
             schema.Column('shasum', types.String(40), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
-            schema.Column('arguments', types.Text, nullable=False),
+            schema.Column('arguments', types.Text, nullable=True),
             schema.CheckConstraint('code_start_date <= code_stop_date'),
             schema.CheckConstraint('interface_version >= 1'),
             schema.CheckConstraint('output_interface_version >= 1'),
