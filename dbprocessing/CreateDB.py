@@ -157,7 +157,7 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('code', metadata,
             schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True, nullable=False, index=True),
-            schema.Column('filename', types.String(250), nullable=False, unique=True),
+            schema.Column('filename', types.String(250), nullable=False, unique=False),
             schema.Column('relative_path', types.String(100), nullable=False),
             schema.Column('code_start_date', types.Date, nullable=False),
             schema.Column('code_stop_date', types.Date, nullable=False),
@@ -230,7 +230,7 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('inspector', metadata,
             schema.Column('inspector_id', types.Integer, autoincrement=True, primary_key=True, nullable=False, index=True),
-            schema.Column('filename', types.String(250), nullable=False, unique=True),  # hmm long enough?
+            schema.Column('filename', types.String(250), nullable=False, unique=False),
             schema.Column('relative_path', types.String(250), nullable=False),
             schema.Column('description', types.Text, nullable=False),
             schema.Column('interface_version', types.SmallInteger, nullable=False),
