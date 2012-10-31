@@ -39,7 +39,7 @@ if __name__ == "__main__":
     else:
         endDate = None
 
-    db = dbprocessing.ProcessQueue('rbsp')
+    db = dbprocessing.ProcessQueue('~ectsoc/RBSP_processing.sqlite')
 
     if options.force is not None:
         if options.force not in [0,1,2]:
