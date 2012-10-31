@@ -130,6 +130,11 @@ class DBUtils(object):
                 else:
                     engine = db_var.engine
 
+            elif self.mission == 'rbsp':
+                filename = os.path.expanduser(os.path.join('~ectsoc', 'RBSP_processing.sqlite'))
+                engine = sqlalchemy.create_engine('sqlite:///' + filename, echo=False)
+                self.mission = 'rbsp'
+
             else: # assume we got a filename and use that
                 if not os.path.isfile(os.path.expanduser(self.mission)):
                     raise(ValueError("DB file specified doesn't exist"))
