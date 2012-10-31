@@ -1139,9 +1139,6 @@ class DBUtils(object):
         @rtype: long
         """
         d1 = self.File()
-
-        self._createTableObjects()
-        d1 = self.File()
         d1.filename = filename
         d1.utc_file_date = utc_file_date
         d1.utc_start_time = utc_start_time
