@@ -427,7 +427,10 @@ class DBUtils(object):
         fileid = self.getFileID(fileid)
         pq1 = self.Processqueue()
         pq1.file_id = fileid
-        pq1.version_bump = version_bump
+        if isinstance(version_bump, (list, tuple)):
+            pq1.version_bump = version_bump[0]
+        else:
+            pq1.version_bump = version_bump
         self.session.add(pq1)
         DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self.getEntry('File', fileid).filename ) )
         self._commitDB()
