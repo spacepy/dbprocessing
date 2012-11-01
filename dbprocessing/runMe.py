@@ -198,6 +198,7 @@ class runMe(object):
         not process with that name
         """
         try:
+            DBlogging.dblogger.debug("Checking db for filename: {0}".format(self.filename))
             f_id_db = self.dbu.getFileID(self.filename)
             DBlogging.dblogger.debug("Filename: {0} is in the DB, have to make different version".format(self.filename))
             return f_id_db

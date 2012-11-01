@@ -517,28 +517,13 @@ class DBUtils(object):
         if len(pqdata) <= 1: # can't clean just one (or zero) entries
             return
 
-        ans = [] # this will hold the unique file_id's to put back on the queue
+        file_entries = [(self.getEntry('File', val[0]), val[1]) for val in pqdata]
+        keep = [(val[0].file_id, val[1]) for val in file_entries if val[0].newest_version==True]
 
-        file_entries = [self.getEntry('File', val[0]) for val in pqdata]
-        # setup a tuple of (product_id, utc_file_date)
-        dat = [(val.product_id, val.utc_file_date) for val in file_entries]
-        # now we want just the unique entries
-        uniq_dat = list(set(dat))
-        # step through the uniq ones and if there is more than one drop
-        for uval in uniq_dat:
-            # should be able to do a bailout here, TODO
-            # create a new list of just those
-            tmp = [val for val in file_entries if val.product_id == uval[0] and val.utc_file_date == uval[1]]
-            mx = max(tmp, key=lambda x: Version.Version(x.interface_version, x.quality_version, x.revision_version))
-            ## have to go through and add back any version_bump info
-            vb = self.session.query(self.Processqueue.version_bump).filter_by(file_id=mx.file_id).all()[0]
-            ans.append( (mx.file_id, vb)  )
-
-        ## now we have a list of just the unique file_id's
-
+        ## now we have a list of just the newest file_id's
         self.Processqueue.flush()
         #        self.Processqueue.push(ans)
-        for v in ans:
+        for v in keep:
             self.Processqueue.push(*v)
         DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
