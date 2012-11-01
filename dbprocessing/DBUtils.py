@@ -1795,6 +1795,17 @@ class DBUtils(object):
                 outval.append(val)
         return outval
 
+    def getProductsByInstrument(self, inst_id):
+        """
+        get all the products for a given instrument
+        """
+        inst_id = self.getInstrumentID(inst_id)
+        sq = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id = inst_id).all()
+        if sq:
+            return zip(*sq)[0]
+        else:
+            return None
+
     def getAllProcesses(self, timebase='all'):
         """
         get all processes for the given mission
