@@ -112,8 +112,9 @@ if __name__ == "__main__":
                 # sort them so that we run the oldest date first, cuts down on reprocess
                 pq.runme_list = sorted(pq.runme_list, key=lambda val: val.utc_file_date)
                 print len(pq.runme_list), pq.runme_list
-                for v in pq.runme_list:
+                for ii, v in enumerate(pq.runme_list):
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
+                    DBlogging.dblogger.info("Running {0} of {1}".format(ii+1, len(pq.runme_list)))
                     runMe.runner(v)
 
         except:
