@@ -426,6 +426,7 @@ class DBUtils(object):
         """
         if hasattr(fileid, '__iter__'):
             ans = []
+            fileid = set(fileid)
             for v in fileid:
                 ans.extend(self.Processqueue.push(v, version_bump))
             return ans
