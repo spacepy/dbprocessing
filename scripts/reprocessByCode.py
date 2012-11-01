@@ -46,14 +46,11 @@ if __name__ == "__main__":
     else:
         endDate = None
 
-    db = dbprocessing.ProcessQueue('~ectsoc/RBSP_processing.sqlite')
+    db = dbprocessing.ProcessQueue('rbsp')
 
-    if options.force is not None:
-        if options.force not in [0,1,2]:
-            parser.error("invalid force option [0,1,2]")
-        num = db.reprocessByCode(args[0], startDate=startDate, endDate=endDate, incVersion=options.force)
-    else:
-        num = db.reprocessByCode(args[0], startDate=startDate, endDate=endDate)
+    if options.force not in [0,1,2]:
+        parser.error("invalid force option [0,1,2]")
+    num = db.reprocessByCode(args[0], startDate=startDate, endDate=endDate, incVersion=options.force)
 
     print('Added {0} files to be reprocessed for code {1}'.format(num, args[0]))
     DBlogging.dblogger.info('Added {0} files to be reprocessed for code {1}'.format(num, args[0]))
