@@ -316,7 +316,7 @@ class ProcessQueue(object):
         # things made here will also have to have inspectors
         raise(NotImplementedError('Not yet implemented'))
 
-    def _reprocessBy(self, id_in, code=False, prod=False, startDate=None, endDate=None, incVersion=2):
+    def _reprocessBy(self, id_in, code=False, prod=False, inst=False, level=None, startDate=None, endDate=None, incVersion=2):
         """
         given a code_id (or name) add all files that this code touched to processqueue
             so that next -p run they will be reprocessed
@@ -338,6 +338,20 @@ class ProcessQueue(object):
         elif prod:
             prod_id = self.dbu.getProductID(id_in)
             files = self.dbu.getFilesByProduct(prod_id)
+        elif inst:
+            inst_id = self.dbu.getInstrumentID(id_in)
+            prods = self.dbu.getProductsByInstrument(inst_id)
+            if level is not None: # cull the list by level
+                prods2 = []
+                for prod in prods:
+                    ptb = self.dbu.getProductTraceback(prod)
+                    if ptb['product'].level == level:
+                        prods2.append(ptb['product'].product_id)
+                prods = prods2
+            for prod in prods: # add them all to be reprocessed
+                self.reprocessByProduct(prod, startDate=startDate, endDate=endDate, incVersion=incVersion)
+        else:
+            raise(ValueError('No reprocess by specified'))
         # files before this date are removed from the list
         if startDate is not None:
             files = [val for val in files if val.utc_file_date >= startDate]
@@ -357,6 +371,8 @@ class ProcessQueue(object):
     def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=2):
         return(self._reprocessBy(id_in, code=False, prod=True, startDate=startDate, endDate=endDate, incVersion=incVersion))
 
+    def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=2):
+        return(self._reprocessBy(id_in, code=False, prod=False, inst=True, startDate=startDate, endDate=endDate, incVersion=incVersion))
 
 
 
