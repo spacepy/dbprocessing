@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     db = dbprocessing.ProcessQueue('rbsp')
 
-    if options.force not in [0,1,2]:
+    if options.force not in [None, 0, 1, 2]:
         parser.error("invalid force option [0,1,2]")
     num = db.reprocessByCode(args[0], startDate=startDate, endDate=endDate, incVersion=options.force)
 
