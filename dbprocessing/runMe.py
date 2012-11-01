@@ -47,6 +47,8 @@ def runner(runme):
     decide what code and then run it
     """
     DBlogging.dblogger.debug("Testing if {0} can run: {1}".format(runme, runme.ableToRun))
+    if not runme.ableToRun:
+        return
 
     # make a directory to run the code
     tempdir = mk_tempdir('_dbprocessingRunMe')
