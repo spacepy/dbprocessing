@@ -361,7 +361,11 @@ class ProcessQueue(object):
         f_ids = [val.file_id for val in files]
         parents = [self.dbu.getFileParents(val, id_only=True) for val in f_ids]
         filesToReprocess = set(Utils.flatten(parents))
-        self.dbu.Processqueue.push(filesToReprocess, incVersion)
+        for f in filesToReprocess:
+            try:
+                self.dbu.Processqueue.push(f, incVersion)
+            except filesToReprocess:
+                pass
         return len(filesToReprocess)
 
     # TODO can functools.partial help here?
