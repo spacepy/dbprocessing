@@ -84,8 +84,8 @@ class DBUtils(object):
         """
         return 'DBProcessing class instance for mission ' + self.mission + ', version: ' + __version__
 
-    @classmethod
-    def _test_SQLAlchemy_version(self, version= sqlalchemy.__version__):
+    @staticmethod
+    def _test_SQLAlchemy_version(version= sqlalchemy.__version__):
         """This tests the version to be sure that it is compatible"""
         expected = '0.7'
         if version[0:len(expected)] != expected:
@@ -1594,8 +1594,8 @@ class DBUtils(object):
         except IndexError:
             return None
 
-    @classmethod
-    def daterange_to_dates(self, daterange):
+    @staticmethod
+    def daterange_to_dates(daterange):
         """
         given a daterange return the dat objects for all days in the range
         """
@@ -1864,8 +1864,8 @@ class DBUtils(object):
         else:
             return [val.file_id for val in files]
 
-    @classmethod
-    def processRunning(self, pid):
+    @staticmethod
+    def processRunning(pid):
         """
         given a PID see if it is currently running
 
