@@ -2,6 +2,7 @@
 
 from optparse import OptionParser
 import traceback
+import subprocess
 
 from dbprocessing import DBlogging, dbprocessing
 from dbprocessing.runMe import ProcessException
@@ -61,6 +62,12 @@ if __name__ == "__main__":
             raise(ProcessException("There is a processing flag set but it died, don't start another"))
     # start logging as a lock
     pq.dbu._startLogging()
+
+    # run the code to copy data to incoming
+    ## TODO this should proably move into a STARTUP process but its tough since
+    ##   there is not a output product
+    command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/dataToIncoming.py']
+    subprocess.check_call(command_line)
 
     if options.i: # import selected
         try:
