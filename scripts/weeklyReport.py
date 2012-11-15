@@ -17,50 +17,71 @@ things included are:
 """
 import bisect
 import glob
+from optparse import OptionParser
 import os
-import sys
+import re
 
 import dateutil.parser as dup
 import numpy as np
 
 from dbprocessing import reports
 
-def _getFiles(path):
+def _getFiles(path, startDT, stopDT):
     path = os.path.expanduser(path)
-    return glob.glob(os.path.join(path, 'dbprocessing_log.log*'))
+    file_all = glob.glob(os.path.join(path, 'dbprocessing_log.log.*')) # get the rest
+    files = []
+    for f in file_all:
+        tmp = re.findall(r'^.*dbprocessing_log\.log\.(\d\d\d\d\-\d\d\-\d\d)$', f)[0]
+        if tmp <= stopDT and tmp >= startDT: # can do this on the strings
+            files.append(f)
+
+    files.extend(glob.glob(os.path.join(path, 'dbprocessing_log.log'))) # always bring this one in last
+    return files
 
 def _getData(files, startT, stopT):
     """
     read in the file and combine all the lists together
     """
     ingested = []
-    errorIngesting = []
     commandsRun = []
-    dummyStart = dummy(startT)
+    movedToError = []
+    errors = []
+    dummyStart = dummy(startT) # make a class so that the comparisons work
     dummyStop = dummy(stopT)
+    dummyStop.dt = dummyStop.dt.replace(hour=23, minute=59, second=59, microsecond=999999)
 
     for f in files:
         lf = reports.logfile(f)
+        print('read: {0}'.format(f))
+        print('\tFound {0} ingested files'.format(len(lf.ingested)))
+        print('\tFound {0} commands run'.format(len(lf.commandsRun)))
+        print('\tFound {0} files moved to error files'.format(len(lf.movedToError)))
+        print('\tFound {0} errors'.format(len(lf.errors)))
         ingested.extend(lf.ingested)
-        errorIngesting.extend(lf.errorIngesting)
         commandsRun.extend(lf.commandsRun)
+        movedToError.extend(lf.movedToError)
+        errors.extend(lf.errors)
     ingested = np.sort(ingested)
     i1 = bisect.bisect_left(ingested, dummyStart)
     i2 = bisect.bisect_right(ingested, dummyStop)
     ingested = ingested[i1:i2]
-    errorIngesting = np.sort(errorIngesting)
-    i1 = bisect.bisect_left(errorIngesting, dummyStart)
-    i2 = bisect.bisect_right(errorIngesting, dummyStop)
-    errorIngesting = errorIngesting[i1:i2]
     commandsRun = np.sort(commandsRun) # no need to sort as it is a sublist
     i1 = bisect.bisect_left(commandsRun, dummyStart)
     i2 = bisect.bisect_right(commandsRun, dummyStop)
     commandsRun = commandsRun[i1:i2]
+    movedToError = np.sort(movedToError) # no need to sort as it is a sublist
+    i1 = bisect.bisect_left(movedToError, dummyStart)
+    i2 = bisect.bisect_right(movedToError, dummyStop)
+    movedToError = movedToError[i1:i2]
+    errors = np.sort(errors) # no need to sort as it is a sublist
+    i1 = bisect.bisect_left(errors, dummyStart)
+    i2 = bisect.bisect_right(errors, dummyStop)
+    errors = errors[i1:i2]
 
-    return ingested.tolist(), errorIngesting.tolist(), commandsRun.tolist()
+    return ingested.tolist(), commandsRun.tolist(), movedToError.tolist(), errors.tolist()
 
 
-def makeHTML(mission, outfile, ingested, errorIngesting, commandsRun, startT, stopT):
+def makeHTML(mission, outfile, ingested, commandsRun, movedtoerror, errors, startT, stopT):
     header = """
     <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
     <html><head>
@@ -97,10 +118,13 @@ def makeHTML(mission, outfile, ingested, errorIngesting, commandsRun, startT, st
     """
     output = open(outfile, 'w')
     output.writelines(header)
+    output.write('<h1>{0}</h1>\n'.format('Van Allen Probes - ECT'))
+    output.write('<h2>{0}--{1}</h2>\n'.format(startT.isoformat(), stopT.isoformat()))
 
     _writeHTML(ingested, output, mission, startT, stopT, 'Ingested Files')
-    _writeHTML(errorIngesting, output, mission, startT, stopT, 'Error Ingesting Files')
     _writeHTML(commandsRun, output, mission, startT, stopT, 'Commands Run')
+    _writeHTML(movedtoerror, output, mission, startT, stopT, 'Moved to Error')
+    _writeHTML(errors, output, mission, startT, stopT, 'Errors')
 
     output.writelines(footer)
     output.close()
@@ -113,8 +137,6 @@ def _writeHTML(inlist, output, mission, startT, stopT, headerStr):
     """
     make the html for this
     """
-    output.write('<h1>{0}</h1>\n'.format(mission))
-    output.write('<h2>{0}--{1}</h2>\n'.format(startT.isoformat(), stopT.isoformat()))
     output.write('<h2>{0}</h2>\n'.format(headerStr))
     output.write('<table style="border: medium none ; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">\n')
 
@@ -131,27 +153,48 @@ def _writeHTML(inlist, output, mission, startT, stopT, headerStr):
             output.write('\n')
     output.write('</table>\n')
 
-def usage():
-    """
-    print the usage message out
-    """
-    print "Usage: {0} <input directory> <startTime> <stopTime> <filename>".format(sys.argv[0])
-    print "   -> directory with the dbprocessing_log.log files"
-    print "   -> start date e.g. 2000-03-12"
-    print "   -> stop date e.g. 2000-03-17"
-    print "   -> filename to write out the report"
-    return
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        usage()
-        sys.exit(2)
-    files = _getFiles(sys.argv[1])
+    usage = \
+    """
+    Usage: {0} <input directory> <startTime> <stopTime> <filename>".format(sys.argv[0])
+       -> directory with the dbprocessing_log.log files
+       -> start date e.g. 2000-03-12
+       -> stop date e.g. 2000-03-17
+       -> filename to write out the report
+    """
+    parser = OptionParser(usage=usage)
+    parser.add_option("-i", "", dest="i", action="store_true",
+                      help="ingest mode", default=False)
+    parser.add_option("-p", "", dest="p", action="store_true",
+                      help="process mode", default=False)
+    parser.add_option("-m", "--mission", dest="mission",
+                      help="selected mission", default=None)
+    (options, args) = parser.parse_args()
+    if len(args) != 4:
+        parser.error("incorrect number of arguments")
+
+    if not re.match(r'^\d\d\d\d\-\d\d\-\d\d$', args[1]):
+        parser.error("bad date format, start date")
+    if not re.match(r'^\d\d\d\d\-\d\d\-\d\d$', args[2]):
+        parser.error("bad date format, stop date")
+
+    files = _getFiles(args[0], args[1], args[2])
     if len(files) == 0:
-        print "No log files in directory: {0}".format(sys.argv[1])
-        sys.exit(2)
-    startT = dup.parse(sys.argv[2])
-    stopT = dup.parse(sys.argv[3])
-    i, e, c = _getData(files, startT, stopT)
-    makeHTML('rbsp', sys.argv[-1], i, e, c, startT, stopT)
+        parser.error("No log files in directory: {0}".format(args[0]))
+    print('Making report from: \n\t{0}'.format('\n\t'.join(files)))
+
+    startT = dup.parse(args[1])
+    stopT = dup.parse(args[2])
+    ingested, cmdrun, movedtoerror, errors = _getData(files, startT, stopT)
+    print('TOTAL {0} ingested files'.format(len(ingested)))
+    print('TOTAL {0} commands run'.format(len(cmdrun)))
+    print('TOTAL {0} files moved to error'.format(len(movedtoerror)))
+    print('TOTAL {0} errors'.format(len(errors)))
+
+    #resort the ingested files by level and product_name and date
+    ## fails as they are different types, I hear that new numpy will work
+    #ind = np.lexsort(([v.level for v in ingested], [v.product_name for v in ingested], [v.dt for v in ingested]))
+    #makeHTML('rbsp', args[3], ingested[ind].tolist(), cmdrun, movedtoerror, errors, startT, stopT)
+    makeHTML('rbsp', args[3], ingested, cmdrun, movedtoerror, errors, startT, stopT)
 
