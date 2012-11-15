@@ -34,8 +34,6 @@ def _getFiles(path, startDT, stopDT):
         tmp = re.findall(r'^.*dbprocessing_log\.log\.(\d\d\d\d\-\d\d\-\d\d)$', f)[0]
         if tmp <= stopDT and tmp >= startDT: # can do this on the strings
             files.append(f)
-
-    files.extend(glob.glob(os.path.join(path, 'dbprocessing_log.log'))) # always bring this one in last
     return files
 
 def _getData(files, startT, stopT):
