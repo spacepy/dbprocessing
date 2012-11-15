@@ -53,10 +53,6 @@ def _getData(files, startT, stopT):
     for f in files:
         lf = reports.logfile(f)
         print('read: {0}'.format(f))
-        print('\tFound {0} ingested files'.format(len(lf.ingested)))
-        print('\tFound {0} commands run'.format(len(lf.commandsRun)))
-        print('\tFound {0} files moved to error files'.format(len(lf.movedToError)))
-        print('\tFound {0} errors'.format(len(lf.errors)))
         ingested.extend(lf.ingested)
         commandsRun.extend(lf.commandsRun)
         movedToError.extend(lf.movedToError)
@@ -64,19 +60,27 @@ def _getData(files, startT, stopT):
     ingested = np.sort(ingested)
     i1 = bisect.bisect_left(ingested, dummyStart)
     i2 = bisect.bisect_right(ingested, dummyStop)
+    print('\tFound {0} ingested files'.format(len(lf.ingested))),
     ingested = ingested[i1:i2]
+    print('kept {0}'.format(len(lf.ingested)))
     commandsRun = np.sort(commandsRun) # no need to sort as it is a sublist
     i1 = bisect.bisect_left(commandsRun, dummyStart)
     i2 = bisect.bisect_right(commandsRun, dummyStop)
+    print('\tFound {0} commands run'.format(len(lf.commandsRun))),
     commandsRun = commandsRun[i1:i2]
+    print('kept {0}'.format(len(lf.commandsRun)))
     movedToError = np.sort(movedToError) # no need to sort as it is a sublist
     i1 = bisect.bisect_left(movedToError, dummyStart)
     i2 = bisect.bisect_right(movedToError, dummyStop)
+    print('\tFound {0} files moved to error files'.format(len(lf.movedToError))),
     movedToError = movedToError[i1:i2]
+    print('kept {0}'.format(len(lf.movedToError)))
     errors = np.sort(errors) # no need to sort as it is a sublist
     i1 = bisect.bisect_left(errors, dummyStart)
     i2 = bisect.bisect_right(errors, dummyStop)
+    print('\tFound {0} errors'.format(len(lf.errors))),
     errors = errors[i1:i2]
+    print('kept {0}'.format(len(lf.errors)))
 
     return ingested.tolist(), commandsRun.tolist(), movedToError.tolist(), errors.tolist()
 
