@@ -119,7 +119,7 @@ def makeHTML(mission, outfile, ingested, commandsRun, movedtoerror, errors, star
     output = open(outfile, 'w')
     output.writelines(header)
     output.write('<h1>{0}</h1>\n'.format('Van Allen Probes - ECT'))
-    output.write('<h2>{0}--{1}</h2>\n'.format(startT.isoformat(), stopT.isoformat()))
+    output.write('<h2>{0}--{1}</h2>\n'.format(startT.isoformat(), stopT.replace(hour=23, minute=59, second=59, microsecond=999999).isoformat()))
 
     _writeHTML(ingested, output, mission, startT, stopT, 'Ingested Files')
     _writeHTML(commandsRun, output, mission, startT, stopT, 'Commands Run')
