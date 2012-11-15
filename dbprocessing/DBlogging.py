@@ -15,7 +15,7 @@ Setup routines to log information from the dbprocessing chain
 
 
 # TODO this should be setup by a config file
-LOG_FILENAME = os.path.expanduser(os.path.join('~', 'dbprocessing_log.log'))
+LOG_FILENAME = os.path.expanduser(os.path.join('~','dbprocessing_logs', 'dbprocessing_log.log'))
 
 # Set up a specific logger with our desired output level
 dblogger = logging.getLogger('DBLogger')
