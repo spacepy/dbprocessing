@@ -80,7 +80,7 @@ def runner(runme):
         subprocess.check_call(' '.join(cmdline), shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError:
         # TODO figure out how to print what the return code was
-        DBlogging.dblogger.error("Command returned a non-zero return code")
+        DBlogging.dblogger.error("Command returned a non-zero return code: {0}".format(' '.join(cmdline)))
         # assume the file is bad and move it to error
         runme.moveToError(runme.filename)
         rm_tempdir(tempdir) # clean up
