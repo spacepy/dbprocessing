@@ -138,8 +138,7 @@ if __name__ == "__main__":
         ## do this for the last 7 days if we did anything
         if number_proc > 0:
             today = datetime.datetime.utcnow().date()
-            prev = (today - datetime.timedelta(days=7))
-            outname = os.path.expanduser(os.path.join('~', 'dbprocessing_logs', 'SOCreport_{0}.html'.format(datetime.datetime.utcnow().replace(microsecond=0).isoformat())))
-            command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/weeklyReport.py', os.path.expanduser(os.path.join('~', 'dbprocessing_logs')), prev.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'), outname]
+            outname = os.path.expanduser(os.path.join('~', 'dbprocessing_logs', 'SOCreport_{0}.html'.format(datetime.datetime.utcnow().date().isoformat())))
+            command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/weeklyReport.py', os.path.expanduser(os.path.join('~', 'dbprocessing_logs')), today.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'), outname]
             subprocess.check_call(command_line)
 
