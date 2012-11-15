@@ -10,15 +10,6 @@ from dbprocessing import runMe
 
 __version__ = '2.0.3'
 
-def usage():
-    """
-    print the usage messag out
-    """
-    print "Usage: {0} [-i] [-p] [-m Test]".format("ProcessQueue")
-    print "   -i -> import"
-    print "   -p -> process"
-    print "   -m -> selects mission"
-    return
 
 if __name__ == "__main__":
     usage = \
@@ -28,7 +19,7 @@ if __name__ == "__main__":
         -p -> process
         -m -> selects mission
     """
-    parser = OptionParser(usage)
+    parser = OptionParser(usage=usage)
     parser.add_option("-i", "", dest="i", action="store_true",
                       help="ingest mode", default=False)
     parser.add_option("-p", "", dest="p", action="store_true",
