@@ -85,6 +85,7 @@ if __name__ == "__main__":
         print("Import finished: {0} files added".format(pq.dbu.Processqueue.len()-start_len))
 
     if options.p: # process selected
+        number_proc = 0
         try:
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
             # this loop does everything, both make the runMe objects and then
@@ -93,6 +94,7 @@ if __name__ == "__main__":
                 pq.dbu.Processqueue.clean()  # get rid of duplicates
                 # this loop makes all the runMe objects for all the files in the processqueue
                 while pq.dbu.Processqueue.len() > 0:
+                    number_proc += pq.dbu.Processqueue.len()
                     file_id = pq.dbu.Processqueue.get(version_bump=True)
                     DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
                     if file_id is None:
@@ -133,10 +135,11 @@ if __name__ == "__main__":
         pq.dbu._closeDB()
 
         ## at the end of processing create a weekly report
-        ## do this for the last 7 days
-        today = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
-        prev = (today - datetime.timdelta(days=7)).strftime('%Y-%m-%d')
-        outname = os.path.expanduser(os.path.join('~', 'dbprocessing_logs', 'SOCreport_{0}.html'.format(datetime.datetime.utcnow().replace(microsecond=0).isoformat())))
-        command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/weeklyReport.py', os.path.expanduser(os.path.join('~', 'dbprocessing_logs')), today, prev, outname]
-        subprocess.check_call(command_line)
+        ## do this for the last 7 days if we did anything
+        if number_proc > 0:
+            today = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
+            prev = (today - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+            outname = os.path.expanduser(os.path.join('~', 'dbprocessing_logs', 'SOCreport_{0}.html'.format(datetime.datetime.utcnow().replace(microsecond=0).isoformat())))
+            command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/weeklyReport.py', os.path.expanduser(os.path.join('~', 'dbprocessing_logs')), today, prev, outname]
+            subprocess.check_call(command_line)
 
