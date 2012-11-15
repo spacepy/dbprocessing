@@ -137,6 +137,6 @@ if __name__ == "__main__":
         today = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
         prev = (today - datetime.timdelta(days=7)).strftime('%Y-%m-%d')
         outname = os.path.expanduser(os.path.join('~', 'dbprocessing_logs', 'SOCreport_{0}.html'.format(datetime.datetime.utcnow().replace(microsecond=0).isoformat())))
-        command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/weeklyReport.py', '~ectsoc', today, prev, outname]
+        command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/weeklyReport.py', os.path.expanduser(os.path.join('~', 'dbprocessing_logs')), today, prev, outname]
         subprocess.check_call(command_line)
 
