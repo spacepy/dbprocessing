@@ -64,7 +64,7 @@ def sync_data(sc, inst):
 sats = ['a', 'b']
 #insts = ['rept', 'mageis', 'hope']
 # TODO, change this when the other instements are ready to sync also
-insts = ['rept'] #, 'mageis', 'hope']
+insts = ['rept', 'hope'] #, 'mageis', ]
 
 for s, i in itertools.product(sats, insts):
     sync_data(s, i)
