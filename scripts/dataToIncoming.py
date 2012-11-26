@@ -55,6 +55,7 @@ def sync_data(sc, inst):
     for line in dat:
         fname = os.path.join(data_path_inst, line.strip())
         shutil.copy(fname, inc_path)
+        #print 'copy', fname, inc_path
         DBlogging.dblogger.debug('Copying {0} to incoming for processing'.format(fname))
 
     os.chdir(curdir)
@@ -68,6 +69,21 @@ insts = ['rept', 'hope'] #, 'mageis', ]
 
 for s, i in itertools.product(sats, insts):
     sync_data(s, i)
-    #print s, i
+
+
+############################
+## do the magephem
+############################
+
+subprocess.check_call(' '.join(['/usr/bin/rsync ', '-auIv ',
+                                '/u/ectsoc/data/moc_data/?/ephemerides/*',
+                                '/n/space_data/cda/rbsp/MagEphem/incoming']),
+                      shell=True )
+
+subprocess.check_call(' '.join(['/usr/bin/rsync ', '-auIv ',
+                                '/u/ectsoc/data/moc_data/?/ephemeris_predict/*',
+                                '/n/space_data/cda/rbsp/MagEphem/incoming']),
+                      shell=True )
+
 
 
