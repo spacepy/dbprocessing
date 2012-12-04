@@ -6,7 +6,9 @@ import os
 import os.path
 import shutil
 import subprocess
+import sys
 import tempfile
+import traceback
 
 import DBfile
 import DBlogging
@@ -112,14 +114,8 @@ class ProcessQueue(object):
         DBlogging.dblogger.debug("Entered moveToError: {0}".format(fname))
 
         path = self.dbu.getErrorPath()
-        if os.path.isfile(os.path.join(path, os.path.basename(fname) ) ):
-        #TODO do I really want to remove old version:?
-            os.remove( os.path.join(path, os.path.basename(fname) ) )
-            DBlogging.dblogger.warning("removed {0}, as it was under a copy".format(os.path.join(path, os.path.basename(fname) )))
-        if path[-1] != os.sep:
-            path = path+os.sep
         try:
-            shutil.move(fname, path)
+            shutil.move(fname, os.path.join(path, fname))
         except IOError:
             DBlogging.dblogger.error("file {0} was not successfully moved to error".format(os.path.join(path, os.path.basename(fname) )))
         else:
@@ -177,7 +173,8 @@ class ProcessQueue(object):
             self.filename = val
             DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.filename, len(self.queue)))
             df = self.figureProduct()
-            self.diskfileToDB(df)
+            if df is not None:
+                self.diskfileToDB(df)
 
     def figureProduct(self, filename=None):
         """
@@ -198,7 +195,8 @@ class ProcessQueue(object):
                 try:
                     df = inspect.Inspector(filename, self.dbu, product, **kwargs)
                 except:
-                    DBlogging.dblogger.error("File {0} inspector threw an exception".format(filename))
+                    exc_type, exc_value, exc_traceback = sys.exc_info()
+                    DBlogging.dblogger.error("File {0} inspector threw an exception: {1} {2}".format(filename, str(exc_type), exc_value))
                     self.moveToError(filename)
                     return None
             else:
