@@ -115,7 +115,7 @@ class ProcessQueue(object):
 
         path = self.dbu.getErrorPath()
         try:
-            shutil.move(fname, os.path.join(path, fname))
+            shutil.move(fname, os.path.join(path, os.path.basename(fname)))
         except IOError:
             DBlogging.dblogger.error("file {0} was not successfully moved to error".format(os.path.join(path, os.path.basename(fname) )))
         else:
