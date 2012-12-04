@@ -173,7 +173,7 @@ class ProcessQueue(object):
             self.filename = val
             DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.filename, len(self.queue)))
             df = self.figureProduct()
-            if df is not None:
+            if df != []:
                 self.diskfileToDB(df)
 
     def figureProduct(self, filename=None):
@@ -197,15 +197,13 @@ class ProcessQueue(object):
                 except:
                     exc_type, exc_value, exc_traceback = sys.exc_info()
                     DBlogging.dblogger.error("File {0} inspector threw an exception: {1} {2}".format(filename, str(exc_type), exc_value))
-                    self.moveToError(filename)
-                    return None
+                    continue # try the next inspector
             else:
                 try:
                     df = inspect.Inspector(filename, self.dbu, product, )
                 except:
                     DBlogging.dblogger.error("File {0} inspector threw an exception".format(filename))
-                    self.moveToError(filename)
-                    return None
+                    continue # try the next inspector                    
             if df is not None:
                 claimed.append(df)
                 DBlogging.dblogger.debug("Match found: {0}: {1}".format(filename, code, ))
