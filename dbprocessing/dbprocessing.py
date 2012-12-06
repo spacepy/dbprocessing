@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.6
 
+import datetime
 import imp
 import glob
 import os
@@ -9,6 +10,8 @@ import subprocess
 import sys
 import tempfile
 import traceback
+
+import dateutil.rrule # do this long so where it is from is remembered
 
 import DBfile
 import DBlogging
@@ -219,7 +222,7 @@ class ProcessQueue(object):
         return claimed[0]  # return the diskfile
 
 
-    def _getRequiredProducts(self, process_id, file_id, utc_file_date, daterange):
+    def _getRequiredProducts(self, process_id, file_id, utc_file_date):
         #####################################################
         ## get all the input products for that process, and if they are optional
         input_product_id = self.dbu.getInputProductID(process_id) # this is a list
@@ -242,11 +245,11 @@ class ProcessQueue(object):
         elif timebase == 'DAILY':
             DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
             ## from the input file see what the timebase is and grab all files that go into process
-            DBlogging.dblogger.debug("Finding input files for {0}".format(daterange))
+            DBlogging.dblogger.debug("Finding input files for {0}".format(utc_file_date))
 
             files = []
             for val, opt in input_product_id:
-                tmp = self.dbu.getFiles_product_utc_file_date(val, daterange)
+                tmp = self.dbu.getFiles_product_utc_file_date(val, utc_file_date)
                 if tmp:  # != []
                     files.extend(tmp)
             DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
@@ -279,18 +282,24 @@ class ProcessQueue(object):
         """
         DBlogging.dblogger.debug("Entered buildChildren: process_id={0}".format(process_id))
 
-        daterange = self.dbu.getFileDates(file_id[0])
+        daterange = self.dbu.getFileDates(file_id[0]) # this is the dates that this product spans
 
-        # whole function is in this loop
-        for utc_file_date in daterange:
 
-            files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date, daterange)
+        # print '&&&&&&&&&&&&&&', Utils.expandDates(*daterange)
+
+        # iterate over all the days between the start and stop date from above (including stop date)
+        for utc_file_date in Utils.expandDates(*daterange):
+
+            files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date)
+
+            # print '***************',  utc_file_date, files, input_product_id
 
             #==============================================================================
             # do we have the required files to do the build?
             #==============================================================================
             if not self._requiredFilesPresent(files, input_product_id, process_id):
-                return None
+                # print '^^^^^^^^^^^^^^^^', 'files not present'
+                continue # go on to the next file
 
             input_files = zip(*files)[0] # this is the file_id
             DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
@@ -308,7 +317,7 @@ class ProcessQueue(object):
         #TODO just going to run there here for now.  This shold move to runMe
         for p in proc:  # run them all
             code = self.dbu.getEntry('Code', p.process_id)
-            print code.codename
+            # print code.codename
 
         # need to call a "runner" with these processes
         ######
