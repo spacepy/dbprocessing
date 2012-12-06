@@ -22,6 +22,7 @@ from optparse import OptionParser
 
 import ConfigParser
 from dateutil import parser as dup
+import os
 import sys
 
 from dbprocessing import DBUtils
@@ -101,7 +102,7 @@ def addStuff(filename, mission):
 
 if __name__ == "__main__":
     usage = "usage: %prog [options] filename"
-    parser = OptionParser()
+    parser = OptionParser(usage=usage)
     parser.add_option("-m", "--mission", dest="mission", type="string",
                       help="mission to connect to", default='~ectsoc/RBSP_processing.sqlite')
 
@@ -109,7 +110,7 @@ if __name__ == "__main__":
     if len(args) != 1:
         parser.error("incorrect number of arguments")
 
-    addStuff(sys.argv[-1], options.mission)
+    addStuff(sys.argv[-1], os.path.expanduser(options.mission) )
 
 
 

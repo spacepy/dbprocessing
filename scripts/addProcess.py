@@ -19,6 +19,7 @@
 
 import ConfigParser
 from dateutil import parser as dup
+from optparse import OptionParser
 import sys
 
 from dbprocessing import DBUtils
@@ -75,10 +76,10 @@ def configCheck(conf, dbu):
     return prod_id_dict
 
 
-def addStuff(filename):
+def addStuff(filename, db_name):
     cfg = readconfig(filename)
     # setup the db
-    dbu = DBUtils.DBUtils('~ectsoc/RBSP_processing.sqlite') # TODO no rbsp hardcode later
+    dbu = DBUtils.DBUtils(db_name) # TODO no rbsp hardcode later
 
     prod_id_dict = configCheck(cfg, dbu)
 
@@ -117,18 +118,15 @@ def addStuff(filename):
     dbu.updateProcessSubs(proc_id)
 
 
-def usage():
-    """
-    print the usage messag out
-    """
-    print "Usage: {0} <filename>".format(sys.argv[0])
-    print "   -> config file to read"
-    return
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        usage()
-        sys.exit(2)
-    addStuff(sys.argv[-1])
+    usage = "usage: %prog [options] filename"
+    parser = OptionParser(usage=usage)
+    parser.add_option("-m", "--mission", dest="mission", type="string",
+                      help="mission to connect to", default='~ectsoc/RBSP_processing.sqlite')
+
+    (options, args) = parser.parse_args()
+    if len(args) != 1:
+        parser.error("incorrect number of arguments")
+
+    addStuff(args[0], options.mission)
 
