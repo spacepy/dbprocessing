@@ -5,6 +5,12 @@ Class to hold random utilities of use throughout this code
 
 import collections
 
+import dateutil.rrule # do this long so where it is from is remembered
+
+def expandDates(start_time, stop_time):
+    return dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=start_time, until=stop_time)
+
+
 def flatten(l):
     """
     flatten an irregularly nested list of lists
@@ -53,3 +59,4 @@ def strargs_to_args(strargs):
     except (AttributeError, KeyError): # it was None
         pass
     return kwargs
+
