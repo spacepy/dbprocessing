@@ -6,6 +6,8 @@ import pwd
 import socket # to get the local hostname
 import sys
 
+import dateutil.rrule # do this long so where it is from is remembered
+
 import numpy as np
 import sqlalchemy
 from sqlalchemy import Table
@@ -16,7 +18,7 @@ try: # new version changed this annoyingly
 except ImportError:
     from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import asc
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 
 from Diskfile import calcDigest, DigestError
 import DBlogging
@@ -139,7 +141,7 @@ class DBUtils(object):
                 if not os.path.isfile(os.path.expanduser(self.mission)):
                     raise(ValueError("DB file specified doesn't exist"))
                 engine = sqlalchemy.create_engine('sqlite:///' + os.path.expanduser(self.mission), echo=False)
-                self.mission = 'rbsp'
+                self.mission = os.path.expanduser(self.mission)
 
             DBlogging.dblogger.info("Database Connection opened: {0}".format(str(engine)))
 
@@ -262,7 +264,9 @@ class DBUtils(object):
         # save this class instance so that we can finish the logging later
         self.__p1 = self._addLogging(True,
                               datetime.datetime.utcnow(),
-                              self.getMissionID(self.mission),
+                              ## for now there is one mission only per DB
+                              # self.getMissionID(self.mission),
+                              self.session.query(self.Mission.mission_id).first()[0],
                               pwd.getpwuid(os.getuid())[0],
                               socket.gethostname(),
                               pid = os.getpid() )
@@ -1355,25 +1359,16 @@ class DBUtils(object):
         [(file_id, Version, product_id, utc_file_date), ]
         """
         DBlogging.dblogger.debug( "Entered getFiles_product_utc_file_date():  product_id: {0} date: {1}".format(product_id, date) )
-        if isinstance(date, datetime.datetime):
-            date = date.date()
-        retval = []
-        try:
-            for d in date:
-                if isinstance(d, datetime.datetime):
-                    d = d.date()
-                sq = self.session.query(self.File).filter_by(product_id = product_id).filter(or_(self.File.utc_start_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1)), self.File.utc_stop_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1))))
-                #sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
-                sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getEntry('File', v.file_id).product_id, self.getEntry('File', v.file_id).utc_file_date ) for v in sq]
-                retval.extend(sq)
-        except TypeError:
-            d = date
-            sq = self.session.query(self.File).filter_by(product_id = product_id).filter(or_(self.File.utc_start_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1)), self.File.utc_stop_time.between(datetime.datetime.combine(d, datetime.time(0)), datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1))))
-            # sq = self.session.query(self.File).filter_by(product_id = product_id).filter(self.File.utc_start_time >= datetime.datetime.combine(d, datetime.time(0))).filter(self.File.utc_stop_time < datetime.datetime.combine(d, datetime.time(0))+datetime.timedelta(days=1) )
-            sq = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), self.getEntry('File', v.file_id).product_id, self.getEntry('File', v.file_id).utc_file_date ) for v in sq]
-            retval.extend(sq)
-        DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, retval) )
-        return retval
+
+        # get all the possible files:
+        ## start date is before date and end date is after date        
+        sq = self.session.query(self.File).filter_by(product_id = product_id).\
+             filter(and_(self.File.utc_start_time <= datetime.datetime.combine(date, datetime.time(0)), \
+                         self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
+
+        ans = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), v.product_id, v.utc_file_date ) for v in sq]
+        DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, ans) )
+        return ans
 
 
     def file_id_Clean(self, invals):
@@ -1551,8 +1546,8 @@ class DBUtils(object):
         @return: base directory for current mission
         @rtype: str
         """
-        sq = self.session.query(self.Mission.rootdir).filter_by(mission_name  = self.mission)
-        return sq.first()[0]  # there can be only one of each name
+        sq = self.session.query(self.Mission.rootdir).get(self.session.query(self.Mission.mission_id).first()[0])
+        return sq[0]  # there can be only one of each name
 
     def _checkIncoming(self):
         """
