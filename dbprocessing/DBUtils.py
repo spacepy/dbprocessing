@@ -1363,7 +1363,7 @@ class DBUtils(object):
         # get all the possible files:
         ## start date is before date and end date is after date        
         sq = self.session.query(self.File).filter_by(product_id = product_id).\
-             filter(and_(self.File.utc_start_time <= datetime.datetime.combine(date, datetime.time(0)), \
+             filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
                          self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
 
         ans = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), v.product_id, v.utc_file_date ) for v in sq]
