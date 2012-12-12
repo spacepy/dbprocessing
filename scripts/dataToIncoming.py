@@ -86,9 +86,4 @@ subprocess.check_call(' '.join(['/usr/bin/rsync ', '-auIv ',
                       shell=True )
 
 
-subprocess.check_call(' '.join(['/usr/bin/rsync ', '-auIv ',
-                                '/u/ectsoc/data/moc_data/?/operations_sclk_kernel/*',
-                                '/n/space_data/cda/rbsp/MagEphem/incoming']),
-                      shell=True )
-
 
