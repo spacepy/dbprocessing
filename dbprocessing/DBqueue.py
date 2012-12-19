@@ -17,17 +17,9 @@ class DBqueue(deque):
         1
         2
         3
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 6-Oct-2010 (BAL)
         """
         while len(self) != 0:
             yield self.popleft()
-
-
 
     def popiter(self):
         """
@@ -39,12 +31,6 @@ class DBqueue(deque):
         3
         2
         1
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 6-Oct-2010 (BAL)
         """
         while len(self) != 0:
             yield self.pop()

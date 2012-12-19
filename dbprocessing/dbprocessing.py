@@ -43,8 +43,9 @@ class ProcessQueue(object):
     @version: V1: 02-Dec-2010 (BAL)
     """
     def __init__(self,
-                 mission):
+                 mission, dryrun=False):
 
+        self.dryrun = dryrun
         self.mission = mission
         dbu = DBUtils.DBUtils(self.mission)
         self.tempdir = None
@@ -130,22 +131,35 @@ class ProcessQueue(object):
         """
         if df is None:
             DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.filename))
-            self.moveToError(self.filename)
+            if not self.dryrun:
+                self.moveToError(self.filename)
+            else:
+                print('<dryrun> Found no product moving to error, {0}'.format(self.filename))
             return None
 
-        # creae the DBfile
+        # create the DBfile
         dbf = DBfile.DBfile(df, self.dbu)
         try:
-            f_id = dbf.addFileToDB()
-            DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
+            if not self.dryrun:
+                f_id = dbf.addFileToDB()
+                DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
+            else:
+                print('<dryrun> File {0} entered in DB'.format(df.filename))
         except (ValueError, DBUtils.DBError) as errmsg:
-            DBlogging.dblogger.warning("Except adding file to db so" + \
-                                       " moving to error: %s" % (errmsg))
-            self.moveToError(os.path.join(df.path, df.filename))
+            if not self.dryrun:
+                DBlogging.dblogger.warning("Except adding file to db so" + \
+                                           " moving to error: %s" % (errmsg))
+                self.moveToError(os.path.join(df.path, df.filename))
+            else:
+                print('<dryrun> Except adding file to db so' +
+                                           ' moving to error: %s' % (errmsg))
             return None
 
         # move the file to the its correct home
-        dbf.move()
+        if not self.dryrun:
+            dbf.move()
+        else:
+            print('<dryrun> File moved to correct home: {0}'.format(dbf.fileame))
         # set files in the db of the same product and same utc_file_date to not be newest version
         files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
         if files:
@@ -154,16 +168,17 @@ class ProcessQueue(object):
             if f[1] != mx: # this is not the max, newest_version should be False
                 fle = self.dbu.getEntry('File', f[0])
                 fle.newest_version = False
-                self.dbu.session.add(fle)
-                # this seems good, TODO make sure .add() isn't needed as well
-                DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f[0]))
-        try:
-            self.dbu.session.commit()
-        except IntegrityError as IE:
-            self.session.rollback()
-            raise(DBUtils.DBError(IE))
-        # add to processqueue for later processing
-        self.dbu.Processqueue.push(f_id)
+                if not self.dryrun:
+                    self.dbu.session.add(fle)
+                    DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f[0]))
+        if not self.dryrun:
+            try:
+                self.dbu.session.commit()
+            except IntegrityError as IE:
+                self.session.rollback()
+                raise(DBUtils.DBError(IE))
+            # add to processqueue for later processing
+            self.dbu.Processqueue.push(f_id)
         return f_id
 
     def importFromIncoming(self):
@@ -172,7 +187,12 @@ class ProcessQueue(object):
         """
         DBlogging.dblogger.debug("Entering importFromIncoming, {0} to import".format(len(self.queue)))
 
-        for val in self.queue.popleftiter() :
+        if not self.dryrun:
+            vals = self.queue.popleftiter()
+        else:
+            vals = self.queue
+
+        for val in vals:
             self.filename = val
             DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.filename, len(self.queue)))
             df = self.figureProduct()
@@ -206,7 +226,7 @@ class ProcessQueue(object):
                     df = inspect.Inspector(filename, self.dbu, product, )
                 except:
                     DBlogging.dblogger.error("File {0} inspector threw an exception".format(filename))
-                    continue # try the next inspector                    
+                    continue # try the next inspector
             if df is not None:
                 claimed.append(df)
                 DBlogging.dblogger.debug("Match found: {0}: {1}".format(filename, code, ))

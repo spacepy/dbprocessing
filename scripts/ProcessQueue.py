@@ -16,10 +16,11 @@ __version__ = '2.0.3'
 if __name__ == "__main__":
     usage = \
     """
-    Usage: %prog [-i] [-p] [-m Test]
+    Usage: %prog [-i] [-p] [-d] [-m Test]
         -i -> import
         -p -> process
         -m -> selects mission
+        -d -> dryrun
     """
     parser = OptionParser(usage=usage)
     parser.add_option("-i", "", dest="i", action="store_true",
@@ -27,7 +28,10 @@ if __name__ == "__main__":
     parser.add_option("-p", "", dest="p", action="store_true",
                       help="process mode", default=False)
     parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission", default=None)
+                      help="selected mission database", default=None)
+    parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
+                      help="only do a dryrun processing or ingesting", default=False)
+
     (options, args) = parser.parse_args()
     if len(args) != 0:
         parser.error("incorrect number of arguments")
@@ -37,7 +41,7 @@ if __name__ == "__main__":
     if not options.i and not options.p:
         parser.error("either -i or -p must be specified")
 
-    pq = dbprocessing.ProcessQueue(options.mission)
+    pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun)
 
     # check currently processing
     curr_proc = pq.dbu._currentlyProcessing()
@@ -136,7 +140,8 @@ if __name__ == "__main__":
 
         ## at the end of processing create a weekly report
         ## do this for the last 7 days if we did anything
-        if number_proc > 0:
+
+        if number_proc > 0 and not options.dryrun:
             if os.path.isfile(pq.mission):
                 miss_name = os.path.splitext(os.path.basename(pq.mission))[0]
             else:
