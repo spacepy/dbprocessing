@@ -75,14 +75,16 @@ for s, i in itertools.product(sats, insts):
 ## do the magephem
 ############################
 
-subprocess.check_call(' '.join(['/usr/bin/rsync ', '-auIv ',
+cmdline = ' '.join(['/usr/bin/rsync ', '-auIv ',
                                 '/u/ectsoc/data/moc_data/?/ephemerides/*',
-                                '/n/space_data/cda/rbsp/MagEphem/incoming']),
+                                '/n/space_data/cda/rbsp/MagEphem/incoming'])
+subprocess.check_call(cmdline, 
                       shell=True )
 
-subprocess.check_call(' '.join(['/usr/bin/rsync ', '-auIv ',
+cmdline = ' '.join(['/usr/bin/rsync ', '-auIv ',
                                 '/u/ectsoc/data/moc_data/?/ephemeris_predict/*',
-                                '/n/space_data/cda/rbsp/MagEphem/incoming']),
+                                '/n/space_data/cda/rbsp/MagEphem/incoming'])
+subprocess.check_call(cmdline, 
                       shell=True )
 
 

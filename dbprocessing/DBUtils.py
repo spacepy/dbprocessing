@@ -1349,9 +1349,9 @@ class DBUtils(object):
         start_time = sq.utc_start_time.date()
         stop_time =  sq.utc_stop_time.date()
         retval = [start_time, stop_time]
-        ans = np.unique(retval).tolist()
-        DBlogging.dblogger.debug( "Found getFileDates():  file_id: {0}, dates: {1}".format(file_id, ans) )
-        return ans
+        # ans = np.unique(retval).tolist()
+        DBlogging.dblogger.debug( "Found getFileDates():  file_id: {0}, dates: {1}".format(file_id, retval) )
+        return retval
 
     def getFiles_product_utc_file_date(self, product_id, date):
         """

@@ -16,7 +16,7 @@ __version__ = '2.0.3'
 if __name__ == "__main__":
     usage = \
     """
-    Usage: {0} [-i] [-p] [-m Test]".format("ProcessQueue")
+    Usage: %prog [-i] [-p] [-m Test]
         -i -> import
         -p -> process
         -m -> selects mission
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         ## TODO this should proably move into a STARTUP process but its tough since
         ##   there is not a output product
         command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/dataToIncoming.py']
-        subprocess.check_call(command_line)
+#        subprocess.check_call(command_line)
         try:
             start_len = pq.dbu.Processqueue.len()
             pq.checkIncoming()
@@ -137,8 +137,16 @@ if __name__ == "__main__":
         ## at the end of processing create a weekly report
         ## do this for the last 7 days if we did anything
         if number_proc > 0:
+            if os.path.isfile(pq.mission):
+                miss_name = os.path.splitext(os.path.basename(pq.mission))[0]
+            else:
+                miss_name = pq.mission
             today = datetime.datetime.utcnow().date()
-            outname = os.path.expanduser(os.path.join('~', 'dbprocessing_logs', 'SOCreport_{0}_{1}.html'.format(datetime.datetime.utcnow().date().isoformat(), pq.mission)))
-            command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/weeklyReport.py', os.path.expanduser(os.path.join('~', 'dbprocessing_logs')), today.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d'), outname]
+            outname = os.path.expanduser(os.path.join('~', 'dbprocessing_logs', 'SOCreport_{0}_{1}.html'.format(today.isoformat(), miss_name)))
+            command_line = ['nice', '-n 2',
+                '/u/ectsoc/dbUtils/weeklyReport.py',
+                os.path.expanduser(os.path.join('~', 'dbprocessing_logs')),
+                today.strftime('%Y-%m-%d'),
+                today.strftime('%Y-%m-%d'), outname]
             subprocess.check_call(command_line)
 

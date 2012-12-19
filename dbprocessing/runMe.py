@@ -50,6 +50,15 @@ def runner(runme):
     if not runme.ableToRun:
         return
 
+    # if runme.filename is in the DB then we cannot run this.  #TODO figure out why this happens
+    try:
+        runme.dbu.getFileID(runme.filename)
+    except:
+        pass
+    else:
+        DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(runme.filename))
+        return # if the exception did not happen return
+
     # make a directory to run the code
     tempdir = mk_tempdir('_dbprocessingRunMe')
 
@@ -106,7 +115,8 @@ class runMe(object):
     """
     def __init__(self, dbu, utc_file_date, process_id, input_files,):
         DBlogging.dblogger.debug("Entered runMe {0}, {1}, {2}, {3}".format(dbu, utc_file_date, process_id, input_files))
-
+        
+        self.filename = '' # initialize it empty
         self.ableToRun = False
         self.extra_params = []
         self.args = []
@@ -161,7 +171,7 @@ class runMe(object):
             codechange = self._codeVerChange(f_id_db)
             if codechange: # if the code did change maybe we have a unique
                 continue
-            parentchange =self._parentsChanged(f_id_db)
+            parentchange = self._parentsChanged(f_id_db)
             if parentchange:
                 continue
             return # if we get here then we are not going to run anything
@@ -179,7 +189,7 @@ class runMe(object):
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.split()
             for arg in args:
-#                if 'input' not in arg and 'output' not in arg:
+                # if 'input' not in arg and 'output' not in arg:
                 self.args.append(arg)
 
         ## getting here means that we are going to be returning a full
@@ -253,14 +263,23 @@ class runMe(object):
         not used in this processing, if so increment the correct version number
         ** this is decided by the parents only have revision then revision inc
             if a parent has a quality inc then inc quality
+        ** if there are extra parents then we want to rerun with a new quality
         """
         parents = self.dbu.getFileParents(f_id_db)
+        DBlogging.dblogger.debug("db_file: {0} has parents: {1}".format(f_id_db,
+               [p.file_id for p in parents]))
 
-        DBlogging.dblogger.debug("db_file: {0} has parents: {1}".format(f_id_db, parents))
+        # if there are more input files now then we need to reprocess
+        if len(self.input_files) != len([p.file_id for p in parents]):
+            # inc quality and go back
+            self._incVersion([0,1,0])
+            return True
+      
         quality_diff = False
         revision_diff = False
         for parent in parents:
             if not parent.newest_version: # if a parent is no longer newest we need to inc
+                # this might need to go over all the dates in the time range
                 fls = self.dbu.getFiles_product_utc_file_date(parent.product_id, parent.utc_file_date)
                 ind = zip(*fls)[0].index(parent.file_id) # get the index of the file id in the output
                 vers = zip(*fls)[1]

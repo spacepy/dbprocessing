@@ -284,15 +284,10 @@ class ProcessQueue(object):
 
         daterange = self.dbu.getFileDates(file_id[0]) # this is the dates that this product spans
 
-
-        # print '&&&&&&&&&&&&&&', Utils.expandDates(*daterange)
-
         # iterate over all the days between the start and stop date from above (including stop date)
         for utc_file_date in Utils.expandDates(*daterange):
 
             files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date)
-
-            # print '***************',  utc_file_date, files, input_product_id
 
             #==============================================================================
             # do we have the required files to do the build?
