@@ -99,9 +99,9 @@ if __name__ == "__main__":
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
             while pq.dbu.Processqueue.len() > 0:
-                pq.dbu.Processqueue.clean()  # get rid of duplicates
+                pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates
                 # this loop makes all the runMe objects for all the files in the processqueue
-                while pq.dbu.Processqueue.len() > 0:
+                def do_proc():
                     number_proc += pq.dbu.Processqueue.len()
                     file_id = pq.dbu.Processqueue.get(version_bump=True)
                     DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
@@ -118,6 +118,13 @@ if __name__ == "__main__":
                         ## are all the required inputs available? For the dates we are doing
                         pq.buildChildren(child_process, file_id)
                         pq.dbu.Processqueue.pop()
+
+                if not options.dryrun:
+                    while pq.dbu.Processqueue.len() > 0:
+                        do_proc()
+                else:
+                    do_proc()
+
                 # now do all the running
                 # sort them so that we run the oldest date first, cuts down on reprocess
                 pq.runme_list = sorted(pq.runme_list, key=lambda val: val.utc_file_date)
@@ -125,7 +132,12 @@ if __name__ == "__main__":
                 for ii, v in enumerate(pq.runme_list):
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
                     DBlogging.dblogger.info("Running {0} of {1}".format(ii+1, len(pq.runme_list)))
-                    runMe.runner(v)
+                    if not options.dryrun:
+                        runMe.runner(v)
+                    else:
+                        print('<dryrun> Process: {0} Date: {1} Outname: {2} '\
+                            .format(v.process_id, v.utc_file_date, v.filename))
+
 
         except:
             #Generic top-level error handler, because otherwise people freak if

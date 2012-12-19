@@ -511,7 +511,7 @@ class DBUtils(object):
             DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
 
-    def _processqueueClean(self):
+    def _processqueueClean(self, dryrun=False):
         """
         go through the process queue and clear out lower versions of the same files
         this is determined by product and utc_file_date
@@ -526,10 +526,14 @@ class DBUtils(object):
         keep = [(val[0].file_id, val[1]) for val in file_entries if val[0].newest_version==True]
 
         ## now we have a list of just the newest file_id's
-        self.Processqueue.flush()
-        #        self.Processqueue.push(ans)
-        for v in keep:
-            self.Processqueue.push(*v)
+        if not dryrun:
+            self.Processqueue.flush()
+            #        self.Processqueue.push(ans)
+            for v in keep:
+                self.Processqueue.push(*v)
+        else:
+            print('<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(keep), self.Processqueue.len()))
+
         DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
     def _purgeFileFromDB(self, filename=None, recursive=False):
@@ -1361,7 +1365,7 @@ class DBUtils(object):
         DBlogging.dblogger.debug( "Entered getFiles_product_utc_file_date():  product_id: {0} date: {1}".format(product_id, date) )
 
         # get all the possible files:
-        ## start date is before date and end date is after date        
+        ## start date is before date and end date is after date
         sq = self.session.query(self.File).filter_by(product_id = product_id).\
              filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
                          self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
