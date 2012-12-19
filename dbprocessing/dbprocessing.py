@@ -158,8 +158,6 @@ class ProcessQueue(object):
         # move the file to the its correct home
         if not self.dryrun:
             dbf.move()
-        else:
-            print('<dryrun> File moved to correct home: {0}'.format(dbf.fileame))
         # set files in the db of the same product and same utc_file_date to not be newest version
         files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
         if files:
@@ -179,8 +177,10 @@ class ProcessQueue(object):
                 raise(DBUtils.DBError(IE))
             # add to processqueue for later processing
             self.dbu.Processqueue.push(f_id)
-        return f_id
-
+            return f_id
+        else:
+            return None
+    
     def importFromIncoming(self):
         """
         Import a file from incoming into the database

@@ -70,8 +70,12 @@ if __name__ == "__main__":
         try:
             start_len = pq.dbu.Processqueue.len()
             pq.checkIncoming()
-            while len(pq.queue) != 0:
+            if not options.dryrun:
+                while len(pq.queue) != 0:
+                    pq.importFromIncoming()
+            else:
                 pq.importFromIncoming()
+
         except:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
