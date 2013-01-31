@@ -43,7 +43,7 @@ def readconfig(config_filepath):
         ans[section] = dict(cfg.items(section))
     return ans
 
-def configCheck(conf, dbu):
+def configCheck(conf, dbu, filename):
     """
     go through a file that has been read in and make sure that it is going to
     work before we do anything
@@ -53,7 +53,7 @@ def configCheck(conf, dbu):
     expected = ['satellite', 'mission', 'product', 'instrument', 'inspector' ]
     for exp in expected:
         if exp not in sections:
-            raise(ValueError('Section {0} missing from file'.format(exp)))
+            raise(ValueError('Section {0} missing from file {1}'.format(exp, filename)))
 
 
 def addStuff(filename, mission):
@@ -61,7 +61,7 @@ def addStuff(filename, mission):
     dbu = DBUtils.DBUtils(mission)
 
     cfg = readconfig(filename)
-    configCheck(cfg, dbu)
+    configCheck(cfg, dbu, filename)
 
     print '{0}'.format(filename)
 
