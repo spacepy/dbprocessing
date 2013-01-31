@@ -110,7 +110,13 @@ if __name__ == "__main__":
     if len(args) != 1:
         parser.error("incorrect number of arguments")
 
-    addStuff(sys.argv[-1], os.path.expanduser(options.mission) )
+    filename = os.path.expanduser(sys.argv[-1])
+
+    if not os.path.isfile(filename):
+        parser.error("file: {0} does not exist or is not readable".format(filename))
+
+
+    addStuff(filename, os.path.expanduser(options.mission) )
 
 
 
