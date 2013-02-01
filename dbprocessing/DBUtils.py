@@ -591,15 +591,16 @@ class DBUtils(object):
         self.session.query(self.Logging).delete()
         self._commitDB()
 
-    def getAllFilenames(self):
+    def getAllFilenames(self, fullPath=True):
         """
         return all the file names in the database
         """
-        ans = []
-        sq = self.session.query(self.File.filename).all()
-        for v in sq:
-            ans.append( (v[0], self.getFileFullPath(v[0])) )
-        return ans
+        names = zip(*self.session.query(self.File.filename).all())[0]
+        if not fullPath:
+            return names
+        else:
+            ans = [ self.getFileFullPath(v) for v in names]
+            return ans
 
     def addMission(self,
                     mission_name,

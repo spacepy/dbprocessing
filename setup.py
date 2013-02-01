@@ -17,7 +17,8 @@ scripts = ('scripts/ProcessQueue.py', 'scripts/addProducts.py',
                'scripts/weeklyReport.py', 'scripts/qualityControlFileDates.py',
                'scripts/qualityControlEmail.py', 'scripts/QCEmailer_conf.txt',
 	           'scripts/dataToIncoming.py', 'scripts/reprocessByCode.py',
-               'scripts/reprocessByProduct.py', 'scripts/reprocessByInstrument.py')
+               'scripts/reprocessByProduct.py', 'scripts/reprocessByInstrument.py',
+               'scripts/hope_dataToIncoming.py')
 
 scripts_dir = os.path.expanduser('~/dbUtils')
 
