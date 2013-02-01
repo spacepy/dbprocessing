@@ -31,7 +31,9 @@ if __name__ == "__main__":
                       help="selected mission database", default=None)
     parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
                       help="only do a dryrun processing or ingesting", default=False)
-
+    parser.add_option("-r", "--report", dest="report", action="store_true",
+                      help="Make the html report", default=False)
+    
     (options, args) = parser.parse_args()
     if len(args) != 0:
         parser.error("incorrect number of arguments")
@@ -94,37 +96,49 @@ if __name__ == "__main__":
 
     if options.p: # process selected
         number_proc = 0
+
+        def do_proc(file_id):
+            DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
+            if file_id is None:
+                return 'break'
+            children = pq.dbu.getChildrenProducts(file_id) # returns process
+            if not children:
+                DBlogging.dblogger.debug("No children found for {0}".format(file_id))
+                if not options.dryrun:
+                    pq.dbu.Processqueue.pop() # done in two steps for crashes
+                return None
+            ## right here we have a list of processes that should run
+            # loop through the children and see which to build
+            for child_process in children:
+                ## are all the required inputs available? For the dates we are doing
+                pq.buildChildren(child_process, [file_id])
+                if not options.dryrun:
+                        pq.dbu.Processqueue.pop()
+
         try:
+            
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
             while pq.dbu.Processqueue.len() > 0:
                 pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates
                 # this loop makes all the runMe objects for all the files in the processqueue
-                def do_proc():
-                    number_proc += pq.dbu.Processqueue.len()
-                    file_id = pq.dbu.Processqueue.get(version_bump=True)
-                    DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
-                    if file_id is None:
-                        break
-                    children = pq.dbu.getChildrenProducts(file_id[0]) # returns process
-                    if not children:
-                        DBlogging.dblogger.debug("No children found for {0}".format(file_id))
-                        pq.dbu.Processqueue.pop() # done in two steps for crashes
-                        continue
-                    ## right here we have a list of processes that should run
-                    # loop through the children and see which to build
-                    for child_process in children:
-                        ## are all the required inputs available? For the dates we are doing
-                        pq.buildChildren(child_process, file_id)
-                        pq.dbu.Processqueue.pop()
 
                 if not options.dryrun:
                     while pq.dbu.Processqueue.len() > 0:
-                        do_proc()
+                        for f in pq.dbu.Processqueue.getAll():
+                            retval = do_proc(f)
+                            if retval == 'break':
+                                break
+                            else:
+                                number_proc += 1
                 else:
-                    do_proc()
-
+                    print('')
+                    for f in pq.dbu.Processqueue.getAll():
+                        print('.'),
+                        retval = do_proc(f)
+                        if retval == 'break':
+                            break
                 # now do all the running
                 # sort them so that we run the oldest date first, cuts down on reprocess
                 pq.runme_list = sorted(pq.runme_list, key=lambda val: val.utc_file_date)
@@ -157,7 +171,7 @@ if __name__ == "__main__":
         ## at the end of processing create a weekly report
         ## do this for the last 7 days if we did anything
 
-        if number_proc > 0 and not options.dryrun:
+        if number_proc > 0 and not options.dryrun and options.report:
             if os.path.isfile(pq.mission):
                 miss_name = os.path.splitext(os.path.basename(pq.mission))[0]
             else:

@@ -86,6 +86,7 @@ def runner(runme):
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
     #    for some code here
     try:
+        print('cmdline', cmdline)
         subprocess.check_call(' '.join(cmdline), shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError:
         # TODO figure out how to print what the return code was

@@ -18,7 +18,7 @@ import dbprocessing.DBlogging as DBlogging
 dbu = DBUtils.DBUtils('rbsp')
 
 mission_path = dbu.getMissionDirectory()
-inc_path = dbu.getIncomingPath()
+g_inc_path = dbu.getIncomingPath()
 data_path = os.path.expanduser(os.path.join('/', 'usr', 'local', 'ectsoc', 'data', 'level_0'))
 error_path = dbu.getErrorPath()
 dbu._closeDB()
@@ -26,9 +26,11 @@ dbu._closeDB()
 
 def sync_data(sc, inst):
     global mission_path
-    global inc_path
     global data_path
     global error_path
+
+    inc_path = g_inc_path.replace('incoming', inst + '_incoming')
+    
     data_path_inst = os.path.join(data_path, sc.lower(), inst.lower())
     miss_path_inst = os.path.join(mission_path, 'rbsp'+sc.lower(),
                                   inst, 'level0')
@@ -65,7 +67,7 @@ def sync_data(sc, inst):
 sats = ['a', 'b']
 #insts = ['rept', 'mageis', 'hope']
 # TODO, change this when the other instements are ready to sync also
-insts = ['rept', 'hope'] #, 'mageis', ]
+insts = ['hope'] #['rept', 'hope'] #, 'mageis', ]
 
 for s, i in itertools.product(sats, insts):
     sync_data(s, i)

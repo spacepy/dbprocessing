@@ -37,9 +37,9 @@ def writeconfig(my_cfg, config_filepath):
     return
 
 
-def getStuff(proc_name, filename):
+def getStuff(dbname, proc_name, filename):
     cfg = {}
-    dbu = DBUtils.DBUtils('rbsp') # TODO don't assume RBSP later
+    dbu = DBUtils.DBUtils(dbname) # TODO don't assume RBSP later
     dbu._openDB()
     dbu._createTableObjects()
     # are we trying to write files for all the products?
@@ -72,14 +72,14 @@ def usage():
     """
     print the usage messag out
     """
-    print "Usage: {0} <process name> <filename>".format(sys.argv[0])
+    print "Usage: {0} <database> <process name> <filename>".format(sys.argv[0])
     print "   -> process name (or number) to write to config file"
     return
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         usage()
         sys.exit(2)
-    getStuff(sys.argv[1], sys.argv[2])
+    getStuff(*sys.argv[1:])
 

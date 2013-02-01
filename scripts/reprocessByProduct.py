@@ -25,7 +25,10 @@ if __name__ == "__main__":
                       help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
     parser.add_option("", "--force", dest="force", type="int",
                       help="Force the reprocessing, speicify which version number {0},{1},{2}", default=None)
+    parser.add_option("-m", "--mission", dest="mission",
+                      help="selected mission database", default=None)
 
+    
     (options, args) = parser.parse_args()
     if len(args) != 1:
         parser.error("incorrect number of arguments")
@@ -39,10 +42,11 @@ if __name__ == "__main__":
     else:
         endDate = None
 
-    db = dbprocessing.ProcessQueue('rbsp')
-
     if options.force not in [None, 0, 1, 2]:
         parser.error("invalid force option [0,1,2]")
+
+    db = dbprocessing.ProcessQueue(options.mission,)
+
     num = db.reprocessByProduct(args[0], startDate=startDate, endDate=endDate, incVersion=options.force)
 
     print('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))

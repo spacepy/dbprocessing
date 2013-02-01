@@ -1570,7 +1570,8 @@ class DBUtils(object):
         return the incoming path for the current mission
         """
         basedir = self.getMissionDirectory()
-        path = os.path.join(basedir, 'incoming/')
+        # TODO make this general somehow?  Passed in?
+        path = os.path.join(basedir, 'hope_incoming/')
         return path
 
     def getErrorPath(self):

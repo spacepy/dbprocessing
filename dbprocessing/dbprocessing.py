@@ -398,7 +398,22 @@ class ProcessQueue(object):
         return(self._reprocessBy(id_in, code=True, prod=False, startDate=startDate, endDate=endDate, incVersion=incVersion))
 
     def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=2):
-        return(self._reprocessBy(id_in, code=False, prod=True, startDate=startDate, endDate=endDate, incVersion=incVersion))
+        prod_id = self.dbu.getProductID(id_in)
+        files = self.dbu.getFilesByProduct(prod_id)
+        # files before this date are removed from the list
+        if startDate is not None:
+            files = [val for val in files if val.utc_file_date >= startDate]
+        # files after this date are removed from the list
+        if endDate is not None:
+            files = [val for val in files if val.utc_file_date <= endDate]
+        f_ids = [val.file_id for val in files]
+        filesToReprocess = set(f_ids)
+        for f in filesToReprocess:
+            try:
+                self.dbu.Processqueue.push(f, incVersion)
+            except filesToReprocess:
+                pass
+        return len(filesToReprocess)
 
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=2):
         return(self._reprocessBy(id_in, code=False, prod=False, inst=True, startDate=startDate, endDate=endDate, incVersion=incVersion))
