@@ -442,7 +442,7 @@ class DBUtils(object):
         else:
             pq1.version_bump = version_bump
         self.session.add(pq1)
-        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, self.getEntry('File', fileid).filename ) )
+        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, '---')) 
         self._commitDB()
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
