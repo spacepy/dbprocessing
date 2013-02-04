@@ -29,7 +29,7 @@ dblogger.setLevel(logging.DEBUG)
 #              LOG_FILENAME, maxBytes=20000000, backupCount=0) # keep them all
 ## TODO this doesn't work so hardcode the name above, so break the rotation here
 handler = logging.handlers.TimedRotatingFileHandler(
-              LOG_FILENAME, when='midnight', interval=1000000, backupCount=0, utc=True) # keep them all
+              LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True) # keep them all
 
 LEVELS = {'debug': logging.DEBUG,
           'info': logging.INFO,
