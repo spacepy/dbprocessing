@@ -442,7 +442,7 @@ class DBUtils(object):
         else:
             pq1.version_bump = version_bump
         self.session.add(pq1)
-        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, '---')) 
+        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, '---'))
         self._commitDB()
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
@@ -1437,6 +1437,28 @@ class DBUtils(object):
         prod_id = self.getProductID(prod_id)
         sq = self.session.query(self.File).filter_by(product_id = prod_id)
         return sq.all()
+
+    def getFilesByInstrument(self, inst_id, level=None, id_only=False):
+        """
+        given an instrument_if return all the file instances associated with it
+        """
+        prod_ids = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id=inst_id).all()
+        prod_ids = zip(*prod_ids)[0]
+        prods_to_use = []
+        if level is not None: # filter only on the level we want
+            for p in prod_ids:
+                tmp = self.getEntry('Product', p)
+                if tmp.level == level:
+                    prods_to_use.append(p)
+        else:
+            prods_to_use = list(prod_ids)
+        ans = []
+        for p in prods_to_use:
+            ans.extend(self.getFilesByProduct(p))
+        if id_only:
+            return [v.file_id for v in ans]
+        else:
+            return ans
 
     def getActiveInspectors(self):
         """

@@ -1,27 +1,19 @@
 #!/usr/bin/env python2.6
 
-import datetime
 import imp
-import glob
 import os
 import os.path
 import shutil
-import subprocess
 import sys
 import tempfile
-import traceback
-
-import dateutil.rrule # do this long so where it is from is remembered
 
 import DBfile
 import DBlogging
-import DBStrings
 import DBqueue
 import DBUtils
 import runMe
 import Utils
 from Utils import strargs_to_args
-import Version
 
 try: # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
@@ -180,7 +172,7 @@ class ProcessQueue(object):
             return f_id
         else:
             return None
-    
+
     def importFromIncoming(self):
         """
         Import a file from incoming into the database
@@ -416,9 +408,20 @@ class ProcessQueue(object):
         return len(filesToReprocess)
 
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=2):
-        return(self._reprocessBy(id_in, code=False, prod=False, inst=True, startDate=startDate, endDate=endDate, incVersion=incVersion))
-
-
-
+        files = self.dbu.getFilesByInstrument(id_in, level=level, id_only=False)
+        # files before this date are removed from the list
+        if startDate is not None:
+            files = [val for val in files if val.utc_file_date >= startDate]
+        # files after this date are removed from the list
+        if endDate is not None:
+            files = [val for val in files if val.utc_file_date <= endDate]
+        f_ids = [val.file_id for val in files]
+        filesToReprocess = set(f_ids)
+        for f in filesToReprocess:
+            try:
+                self.dbu.Processqueue.push(f, incVersion)
+            except filesToReprocess:
+                pass
+        return len(filesToReprocess)
 
 
