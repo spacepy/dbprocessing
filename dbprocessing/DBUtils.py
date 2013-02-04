@@ -602,6 +602,13 @@ class DBUtils(object):
             ans = [ self.getFileFullPath(v) for v in names]
             return ans
 
+    def getAllFileIds(self):
+        """
+        return all teh file ids in teh database
+        """
+        ids = zip(*self.session.query(self.File.file_id).all())[0]
+        return ids
+
     def addMission(self,
                     mission_name,
                     rootdir):
