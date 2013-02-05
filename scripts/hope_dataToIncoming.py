@@ -56,6 +56,13 @@ def build_data_set(data_paths):
     for f in files:
         if os.path.basename(f) in err_files:
             cull_set.add(f)
+    files = files.difference(cull_set)
+    # no need to resync what is in incoming either
+    inc_files = os.listdir(g_inc_path)
+    cull_set = set()
+    for f in files:
+        if os.path.basename(f) in inc_files:
+            cull_set.add(f)
     files = files.difference(cull_set)    
     return files
 
