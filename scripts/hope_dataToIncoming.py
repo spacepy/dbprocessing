@@ -54,7 +54,7 @@ def build_data_set(data_paths):
     err_files = os.listdir(error_path)
     cull_set = set()
     for f in files:
-        os.path.basename(f) in err_files:
+        if os.path.basename(f) in err_files:
             cull_set.add(f)
     files = files.difference(cull_set)    
     return files
