@@ -50,6 +50,20 @@ def build_data_set(data_paths):
     # also cull directories
     files_to_cull = [f for f in files if not os.path.isfile(f)]
     files = files.difference(files_to_cull)
+    # cull files from error directory also
+    err_files = os.listdir(error_path)
+    cull_set = set()
+    for f in files:
+        if os.path.basename(f) in err_files:
+            cull_set.add(f)
+    files = files.difference(cull_set)
+    # no need to resync what is in incoming either
+    inc_files = os.listdir(g_inc_path)
+    cull_set = set()
+    for f in files:
+        if os.path.basename(f) in inc_files:
+            cull_set.add(f)
+    files = files.difference(cull_set)    
     return files
 
 def files_to_move(data_files, db_files):
