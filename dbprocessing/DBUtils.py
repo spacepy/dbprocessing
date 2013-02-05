@@ -1580,8 +1580,8 @@ class DBUtils(object):
         @return: base directory for current mission
         @rtype: str
         """
-        sq = self.session.query(self.Mission.rootdir).get(self.session.query(self.Mission.mission_id).first()[0])
-        return sq[0]  # there can be only one of each name
+        sq = self.session.query(self.Mission.rootdir).filter_by(mission_id = self.session.query(self.Mission.mission_id).first()[0])
+        return sq[0][0]  # there can be only one of each name
 
     def _checkIncoming(self):
         """
