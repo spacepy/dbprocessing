@@ -424,4 +424,39 @@ class ProcessQueue(object):
                 pass
         return len(filesToReprocess)
 
+    def reprocessByAll(self, level=None, startDate=None, endDate=None):
+        """
+        this is a raw call into the db meant to be fast and all every file
+        between the dates into the process queue
+        - there is no version incremnt allowed
+        """
+        if startDate is not None and endDate is not None and level is None:
+            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date >= startDate).filter(self.dbu.File.utc_file_date <= endDate).all()
+        elif startDate is not None and endDate is not None and level is not None:
+            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date >= startDate).filter(self.dbu.File.utc_file_date <= endDate).filter(self.dbu.File.data_level == level).all()
+        elif startDate is None and endDate is not None and level is not None:
+            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date <= endDate).filter(self.dbu.File.data_level == level).all()
+        elif startDate is None and endDate is None and level is not None:
+             files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.data_level == level).all()
+        elif startDate is None and endDate is None and level is None:
+             files = self.dbu.session.query(self.dbu.File.file_id).all()
+        elif startDate is not None and endDate is None and level is None:
+            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date >= startDate).all()
+        elif startDate is None and endDate is not None and level is None:
+            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date <= endDate).all()
+        elif startDate is not None and endDate is None and level is not None:
+             files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date >= startDate).filter(self.dbu.File.data_level == level).all()
+   
+        else:
+            raise(NotImplementedError("Sorry combination is not implemented"))
 
+        try:
+            ids = zip(*files)[0]
+        except IndexError:
+            ids = []
+            n_added = 0
+
+        if ids:
+            n_added = self.dbu.Processqueue.rawadd(ids)
+
+        return n_added
