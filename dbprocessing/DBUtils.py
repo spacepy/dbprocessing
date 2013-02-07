@@ -105,7 +105,8 @@ class DBUtils(object):
         self.Processqueue.pop = self._processqueuePop
         self.Processqueue.get = self._processqueueGet
         self.Processqueue.clean = self._processqueueClean
-
+        self.Processqueue.rawadd = self._processqueueRawadd
+        
 ####################################
 ###### DB and Tables ###############
 ####################################
@@ -446,6 +447,42 @@ class DBUtils(object):
         self._commitDB()
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
+
+    def _processqueueRawadd(self, fileid, version_bump=None):
+        """
+        raw add file ids to the process queue
+        *** this might break things if an id is added that does not exist
+        ***   meant to be fast and used after getting the ids
+        *** IS safe against adding ids that are already in the queue
+        
+        Parameters
+        ==========
+        fileid : (int, listlike)
+            the file id (or lisklike of file ids)
+
+        Returns
+        =======
+        num : int
+            the number of entries added to the processqueue
+        """
+        current_q = set(self._processqueueGetAll())
+        
+        if not hasattr(fileid, '__iter__'):
+            fileid = [fileid]
+
+        fileid = set(fileid)
+        # drop all the values in the current_q from fileid
+        files_to_add = fileid.difference(current_q)
+
+        # are there any left?
+        if len(files_to_add) != 0:
+            for f in files_to_add:
+                pq1 = self.Processqueue()
+                pq1.file_id = f
+                self.session.add(pq1)
+                DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, '---'))
+            self._commitDB() # commit once for all the adds
+        return  len(files_to_add)
 
     def _processqueueLen(self):
         """
