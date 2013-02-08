@@ -126,8 +126,9 @@ class runMe(object):
         self.process_id = process_id
         self.input_files = input_files
         # since we have a process do we have a code that does it?
-        self.code_id = self.dbu.getCodeFromProcess(process_id)
-
+        self.code_id = self.dbu.getCodeFromProcess(process_id, utc_file_date)
+        if self.code_id is None: # there is no code to actually run we are done
+            return 
         self.codepath = self.dbu.getCodePath(self.code_id)
         if self.codepath is None: # there is no code to actually run we are done
             return

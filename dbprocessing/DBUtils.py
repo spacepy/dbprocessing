@@ -1599,16 +1599,23 @@ class DBUtils(object):
         sq1 =  self.session.query(self.Process).filter_by(output_product = p_id).all()  # should only have one value
         return sq1[0].process_id
 
-    def getCodeFromProcess(self, proc_id):
+    def getCodeFromProcess(self, proc_id, utc_file_date):
         """
-        given a process id return the code that makes performs that process
+        given a process id return the code id that makes performs that process
+
+        Returns
+        =======
+        outval : int
+            code id that performs the process
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess: {0}".format(proc_id))
-        sq1 =  self.session.query(self.Code.code_id).filter_by(process_id = proc_id).all()  # should only have one value
-        try:
-            return sq1[0][0]
-        except IndexError:
+        # will have as many values as there are codes for a process
+        sq1 =  self.session.query(self.Code).filter_by(process_id = proc_id).filter_by(active_code = True).filter(self.Code.code_start_date <= utc_file_date).filter(self.Code.code_stop_date >= utc_file_date).all()
+        outval = sorted(sq1, key = lambda val: Version.Version(val.interface_version, val.quality_version, val.revision_version))
+        if len(outval) == 0:
             return None
+        else:
+            return outval[-1].code_id
 
     def getMissionDirectory(self):
         """
