@@ -2,6 +2,7 @@
 
 import datetime
 import os
+import operator
 from optparse import OptionParser
 import traceback
 import subprocess
@@ -140,8 +141,11 @@ if __name__ == "__main__":
                         if retval == 'break':
                             break
                 # now do all the running
-                # sort them so that we run the oldest date first, cuts down on reprocess
-                pq.runme_list = sorted(pq.runme_list, key=lambda val: val.utc_file_date)
+                # sort them so that we run the lowest level first, don't want to process in any other order
+                print pq.runme_list
+                pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry(val).level)
+                print pq.runme_list
+
                 print len(pq.runme_list), pq.runme_list
                 for ii, v in enumerate(pq.runme_list):
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
