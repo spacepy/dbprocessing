@@ -142,9 +142,7 @@ if __name__ == "__main__":
                             break
                 # now do all the running
                 # sort them so that we run the lowest level first, don't want to process in any other order
-                print pq.runme_list
-                pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry(val).level)
-                print pq.runme_list
+                pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry('Product', pq.dbu.getEntry('Process', val.process_id).output_product).level)
 
                 print len(pq.runme_list), pq.runme_list
                 for ii, v in enumerate(pq.runme_list):
