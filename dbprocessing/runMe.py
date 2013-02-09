@@ -233,6 +233,9 @@ class runMe(object):
         if db_code_id != self.code_id: # did the code change
             DBlogging.dblogger.debug("code_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id))
             ver_diff = (self.dbu.getCodeVersion(self.code_id) - self.dbu.getCodeVersion(db_code_id))
+            if ver_diff == [0,0,0]:
+                DBlogging.dblogger.error("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id))
+                raise(DBUtils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id)))            
             self._incVersion(ver_diff)
             return True
         else:
