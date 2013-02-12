@@ -390,6 +390,10 @@ class ProcessQueue(object):
         return(self._reprocessBy(id_in, code=True, prod=False, startDate=startDate, endDate=endDate, incVersion=incVersion))
 
     def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=2):
+        if isinstance(startDate, datetime.datetime):
+            startDate = startDate.date()
+        if isinstance(endDate, datetime.datetime):
+            endDate = endDate.date()
         prod_id = self.dbu.getProductID(id_in)
         files = self.dbu.getFilesByProduct(prod_id)
         # files before this date are removed from the list
