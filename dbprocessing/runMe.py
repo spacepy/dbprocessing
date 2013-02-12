@@ -10,6 +10,7 @@ import os.path
 import shutil
 import subprocess
 import tempfile
+import traceback
 
 import DBlogging
 import DBStrings
@@ -90,7 +91,7 @@ def runner(runme):
         subprocess.check_call(' '.join(cmdline), shell=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError:
         # TODO figure out how to print what the return code was
-        DBlogging.dblogger.error("Command returned a non-zero return code: {0}".format(' '.join(cmdline)))
+        DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(cmdline), traceback.format_exc()))
         # assume the file is bad and move it to error
         runme.moveToError(runme.filename)
         rm_tempdir(tempdir) # clean up
@@ -112,11 +113,10 @@ def runner(runme):
 class runMe(object):
     """
     class holds all the info it takes to run a process
-    TODO find a better name
     """
     def __init__(self, dbu, utc_file_date, process_id, input_files,):
         DBlogging.dblogger.debug("Entered runMe {0}, {1}, {2}, {3}".format(dbu, utc_file_date, process_id, input_files))
-        
+
         self.filename = '' # initialize it empty
         self.ableToRun = False
         self.extra_params = []
@@ -128,7 +128,7 @@ class runMe(object):
         # since we have a process do we have a code that does it?
         self.code_id = self.dbu.getCodeFromProcess(process_id, utc_file_date)
         if self.code_id is None: # there is no code to actually run we are done
-            return 
+            return
         self.codepath = self.dbu.getCodePath(self.code_id)
         if self.codepath is None: # there is no code to actually run we are done
             return
@@ -235,7 +235,7 @@ class runMe(object):
             ver_diff = (self.dbu.getCodeVersion(self.code_id) - self.dbu.getCodeVersion(db_code_id))
             if ver_diff == [0,0,0]:
                 DBlogging.dblogger.error("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id))
-                raise(DBUtils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id)))            
+                raise(DBUtils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id)))
             self._incVersion(ver_diff)
             return True
         else:
@@ -279,7 +279,7 @@ class runMe(object):
             # inc quality and go back
             self._incVersion([0,1,0])
             return True
-      
+
         quality_diff = False
         revision_diff = False
         for parent in parents:
@@ -351,7 +351,7 @@ class runMe(object):
         add the filefilelink and filecodelink and verbose provenance
         """
         # need to add the current file to the DB so that we have the filefilelink and filecodelink info
-        pq = dbprocessing.ProcessQueue(self.dbu.mission)  
+        pq = dbprocessing.ProcessQueue(self.dbu.mission)
         current_file = os.path.join(self.dbu.getIncomingPath(), self.filename)
         df = pq.figureProduct(current_file) # uses all the inspectors to see what product a file is
         if df is None:
