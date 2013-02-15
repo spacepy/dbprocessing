@@ -106,7 +106,7 @@ class DBUtils(object):
         self.Processqueue.get = self._processqueueGet
         self.Processqueue.clean = self._processqueueClean
         self.Processqueue.rawadd = self._processqueueRawadd
-        
+
 ####################################
 ###### DB and Tables ###############
 ####################################
@@ -454,7 +454,7 @@ class DBUtils(object):
         *** this might break things if an id is added that does not exist
         ***   meant to be fast and used after getting the ids
         *** IS safe against adding ids that are already in the queue
-        
+
         Parameters
         ==========
         fileid : (int, listlike)
@@ -466,7 +466,7 @@ class DBUtils(object):
             the number of entries added to the processqueue
         """
         current_q = set(self._processqueueGetAll())
-        
+
         if not hasattr(fileid, '__iter__'):
             fileid = [fileid]
 
@@ -1407,13 +1407,24 @@ class DBUtils(object):
         given a product id and a utc_file_date return all the files that match
         [(file_id, Version, product_id, utc_file_date), ]
         """
-        DBlogging.dblogger.debug( "Entered getFiles_product_utc_file_date():  product_id: {0} date: {1}".format(product_id, date) )
+        DBlogging.dblogger.debug( "Entered getFiles_product_utc_file_date(): " +
+                                  "product_id: {0} date: {1}".format(product_id, date) )
 
         # get all the possible files:
         ## start date is before date and end date is after date
         sq = self.session.query(self.File).filter_by(product_id = product_id).\
              filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
                          self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
+        # if these files have met_start_time then that is the logic we want, otherwise we want simpler logic
+        if len(sq) == 0:
+            return None
+
+        if not sq[0].met_start_time and not sq[0].met_stop_time: # use logic only on utc_file_date
+            if isinstance(date, datetime.datetime):
+                date = date.date()
+            sq = self.session.query(self.File).filter_by(product_id = product_id).\
+                 filter_by(utc_file_date = date)
+
 
         ans = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), v.product_id, v.utc_file_date ) for v in sq]
         DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, ans) )
