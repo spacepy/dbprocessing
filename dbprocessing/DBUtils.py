@@ -1416,7 +1416,7 @@ class DBUtils(object):
              filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
                          self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
         # if these files have met_start_time then that is the logic we want, otherwise we want simpler logic
-        if len(sq) == 0:
+        if len(sq.all()) == 0:
             return None
 
         if not sq[0].met_start_time and not sq[0].met_stop_time: # use logic only on utc_file_date
