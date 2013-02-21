@@ -155,7 +155,18 @@ def _writeTable(dbu, output, a, b):
 
     output.write('</tr>\n')
 
+    output.write('<tr>')
+    output.write('<td></td>')
 
+    for prod in a_products:
+        p = dbu.getEntry('Product', prod)
+        output.write('<th>{0}</th>'.format(p.product_id))
+    output.write('<td></td>')
+    for prod in b_products:
+        p = dbu.getEntry('Product', prod)
+        output.write('<th>{0}</th>'.format(p.product_id))
+
+    output.write('</tr>\n')
     #for attr in keys:
     #    output.write('<th>{0}</th>'.format('Date'))
     #    output.write('<th>{0}</th>'.format('Date'))
