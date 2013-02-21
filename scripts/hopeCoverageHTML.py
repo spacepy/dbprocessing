@@ -104,7 +104,7 @@ def makeHTML(mission, filename):
 
 def _writeTable(dbu, output, a, b):
 
-    dates = [datetime.datetime(2012, 11, 1) + datetime.timedelta(days = v) for v in range(4*366)]
+    dates = [datetime.datetime(2012, 11, 1) + datetime.timedelta(days = v) for v in range((datetime.datetime.utcnow().date() - datetime.date(2012, 11, 1)).days)]
     a_date = {}
     a_version = {}
     for key in a:
