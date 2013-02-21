@@ -1492,7 +1492,7 @@ class DBUtils(object):
         if newest is set return only the newest files
         """
         prod_id = self.getProductID(prod_id)
-        if newest:
+        if newest_version:
             sq = self.session.query(self.File).filter_by(product_id = prod_id).filter_by(newest_version = True)
         else:
             sq = self.session.query(self.File).filter_by(product_id = prod_id)
