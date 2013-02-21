@@ -1485,12 +1485,17 @@ class DBUtils(object):
         ans = sq1.intersection(sq2)
         return list(ans)
 
-    def getFilesByProduct(self, prod_id):
+    def getFilesByProduct(self, prod_id, newest_version=False):
         """
         given a product_id or name return all the file instances associated with it
+
+        if newest is set return only the newest files
         """
         prod_id = self.getProductID(prod_id)
-        sq = self.session.query(self.File).filter_by(product_id = prod_id)
+        if newest:
+            sq = self.session.query(self.File).filter_by(product_id = prod_id).filter_by(newest_version = True)
+        else:
+            sq = self.session.query(self.File).filter_by(product_id = prod_id)
         return sq.all()
 
     def getFilesByInstrument(self, inst_id, level=None, id_only=False):
