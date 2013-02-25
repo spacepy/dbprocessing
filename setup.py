@@ -19,7 +19,7 @@ scripts = ('scripts/ProcessQueue.py', 'scripts/addProducts.py',
 	           'scripts/dataToIncoming.py', 'scripts/reprocessByCode.py',
                'scripts/reprocessByProduct.py', 'scripts/reprocessByInstrument.py',
                'scripts/hope_dataToIncoming.py', 'scripts/reprocessByAll.py', 
-	       'scripts/hopeCoverageHTML.py')
+	       'scripts/hopeCoverageHTML.py', 'scripts/makeLatestSymlinks.py')
 
 scripts_dir = os.path.expanduser('~/dbUtils')
 
