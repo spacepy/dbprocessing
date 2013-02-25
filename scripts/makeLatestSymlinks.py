@@ -53,13 +53,15 @@ def make_symlinks(files, outdir, options):
     """
     for all the files make symlinks into outdir
     """
+    if not hasattr(files, '__iter__'):
+        files = [files]
     for f in files:
         try:
             os.symlink(f, os.path.join(outdir, os.path.basename(f)))
         except OSError:
             if options.force:
                 os.remove(os.path.join(outdir, os.path.basename(f)))
-                make_symlinks(f, outdir)
+                make_symlinks(f, outdir, options)
         except:
             warnings.warn("File {0} not linked:\n\t{1}".format(f, traceback.format_exc()))
 
@@ -71,9 +73,6 @@ if __name__ == '__main__':
     parser.add_option("-g", "--glob",
                   dest="glb",
                   help="The glob to use for files", default='*')
-    parser.add_option("-d", "--delete",
-                  dest="delete", action='store_true',
-                  help="Delete all the files in the destiniation directory before making links", default=False)
     parser.add_option("-f", "--force",
                   dest="force", action='store_true',
                   help="Allow symlinks to overwrite exists links of same name", default=False)
@@ -89,12 +88,21 @@ if __name__ == '__main__':
     indir  = os.path.abspath(os.path.expanduser((os.path.expandvars(args[0]))))
     if options.outdir == 'latest':
         outdir = os.path.join(indir, options.outdir)
+    else:
+        outdir = os.path.abspath(os.path.expanduser((os.path.expandvars(options.outdir))))
 
-    if indir == options.outdir:
+    if indir == outdir:
         parser.error("outdir cannor be the same as indir, would clobber files")
+        
+    if not os.path.isdir(outdir):
+        if options.force:
+            os.makedirs(outdir)
+        else:
+            parser.error("outdir: {0} does not exist, create or use --force".format(outdir))
 
+        
     files = get_all_files(indir, options.glb)
     files = cull_to_newest(files)
-    make_symlinks(files, options.outdir)
+    make_symlinks(files, outdir, options)
 
 
