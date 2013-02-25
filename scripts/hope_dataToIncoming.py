@@ -84,9 +84,9 @@ files = files_to_move(data_files, db_files)
 for f in files:
     try:
         shutil.copy(f, g_inc_path)
-        DBlogging.dblogger.info("{0}: moved {1} to {2}".format(__file__, f, g_inc_path))
+        DBlogging.dblogger.info("{0}: copied {1} to {2}".format(__file__, f, g_inc_path))
     except:
-        DBlogging.dblogger.error("{0}: failed moving {1} to {2}".format(__file__, f, g_inc_path))
+        DBlogging.dblogger.error("{0}: failed copying {1} to {2}".format(__file__, f, g_inc_path))
 
 
 
