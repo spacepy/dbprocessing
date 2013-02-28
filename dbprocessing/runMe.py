@@ -172,11 +172,11 @@ class runMe(object):
                 break # lets call this the only way out of here that creates the runner
             codechange = self._codeVerChange(f_id_db)
             if codechange: # if the code did change maybe we have a unique
-                DBlogging.dblogger.debug("Code did change for file: {0}".format(self.filename)
+                DBlogging.dblogger.debug("Code did change for file: {0}".format(self.filename))
                 continue
             parentchange = self._parentsChanged(f_id_db)
             if parentchange:
-                DBlogging.dblogger.debug("Parent did change for file: {0}".format(self.filename)
+                DBlogging.dblogger.debug("Parent did change for file: {0}".format(self.filename))
                 continue
             return # if we get here then we are not going to run anything
 
