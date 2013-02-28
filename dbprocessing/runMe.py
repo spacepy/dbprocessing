@@ -294,10 +294,10 @@ class runMe(object):
                 df = mx_v - vers[ind]
                 if df[1]:
                     quality_diff = True
-                    DBlogging.dblogger.debug("parent: {0} had a quality difference, will reprocess child".format(parent)
+                    DBlogging.dblogger.debug("parent: {0} had a quality difference, will reprocess child".format(parent))
                 elif df[2]:
                     revision_diff = True
-                    DBlogging.dblogger.debug("parent: {0} had a revision difference, will reprocess child".format(parent)
+                    DBlogging.dblogger.debug("parent: {0} had a revision difference, will reprocess child".format(parent))
         if quality_diff:
             self._incVersion([0,1,0])
         elif revision_diff:
