@@ -1,26 +1,26 @@
 #!/usr/bin/env python2.6
 
 import sys
+from optparse import OptionParser
 
 from dbprocessing import DBUtils
 
-def usage():
-    """
-    print the usage message out
-    """
-    print "Usage: {0} [file id to delete] ... ".format(sys.argv[0])
-    print "   -> specify as many file_ids or filenames as should be deleted from the db"
-    return
-
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        usage()
-        sys.exit(2)
-    a = DBUtils.DBUtils('rbsp')
-    a._openDB()
-    a._createTableObjects()
+    usage = '%prog file_id [file_id[file_id[...]]]'
+    parser = OptionParser()
+    parser.add_option("-m", "--mission", dest="mission",
+                      help="selected mission database", default=None)
+
+    (options, args) = parser.parse_args()
+    if len(args) < 1:
+        parser.error("incorrect number of arguments")
+
+    if options.mission is None:
+        parser.error("No mission specified")
+
+    a = DBUtils.DBUtils(options.mission)
     n_del = 0
-    for ff in sys.argv[1:]:
+    for ff in args:
         try:
             a._purgeFileFromDB(ff)
             print(' File {0} was removed from DB'.format(ff))
@@ -28,4 +28,5 @@ if __name__ == "__main__":
         except DBUtils.DBNoData:
             print(' File {0} was not in the DB'.format(ff))
     print 'deleted {0} files'.format(n_del)
+
 
