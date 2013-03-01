@@ -12,7 +12,7 @@ import warnings
 
 from rbsp import Version
 
-from dbprocessing import Utils, inspector
+from dbprocessing import inspector
 
 
 ################################################################
