@@ -76,7 +76,7 @@ def delete_symlinks(outdir):
             try:
                 os.remove(os.path.join(outdir, f))
             except OSError:
-                warnings.warn("Link {0} could not be deleted: {1}".format(os.path.join(outdir, f)))
+                warnings.warn("Link could not be deleted: {0}".format(os.path.join(outdir, f)))
   
 
 
