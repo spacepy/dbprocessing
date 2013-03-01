@@ -66,6 +66,19 @@ def make_symlinks(files, outdir, options):
             warnings.warn("File {0} not linked:\n\t{1}".format(f, traceback.format_exc()))
 
 
+def delete_symlinks(outdir):
+    """
+    delete all symlinks in outdir
+    """
+    files = glob.glob(os.path.join(outdir, '*'))
+    for f in files:
+        if os.path.islink(f):
+            try:
+                os.remove()
+            except OSError:
+                warnings.warn("Link {0} could not be deleted: {1}".format(os.path.join(outdir, f)))
+  
+
 
 if __name__ == '__main__':
     usage = "usage: %prog indir"
@@ -78,7 +91,10 @@ if __name__ == '__main__':
                   help="Allow symlinks to overwrite exists links of same name", default=False)
     parser.add_option("-o", "--outdir",
                   dest="outdir", 
-                  help="Output directory for symlinks", default='latest')    
+                  help="Output directory for symlinks", default='latest')
+    parser.add_option("-d", "--delete",
+                  dest="delete", action='store_true',
+                  help="Delete all the existing symlinks in the destination directory", default=False)    
 
     (options, args) = parser.parse_args()
 
@@ -103,6 +119,8 @@ if __name__ == '__main__':
         
     files = get_all_files(indir, options.glb)
     files = cull_to_newest(files)
+    if options.delete:
+        delete_symlinks(outdir)
     make_symlinks(files, outdir, options)
 
 
