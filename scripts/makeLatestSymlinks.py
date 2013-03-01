@@ -4,6 +4,7 @@
 in a given directory make symlinks to all the newest versions of files into another directory
 """
 
+import itertools
 import glob
 import os
 from optparse import OptionParser, OptionGroup
@@ -37,14 +38,16 @@ def cull_to_newest(files):
     """
     given a list of files cull to only the newest ones
     """
-    date_ver = [(inspector.extract_YYYYMMDD(v), inspector.extract_Version(v), v) for v in files]
+    # make a list of tuples,  datetime, version, filename, product part of filename 
+    date_ver = [(inspector.extract_YYYYMMDD(v), inspector.extract_Version(v), v, v.split('20')[0]) for v in files]
     date_ver = sorted(date_ver, key=lambda x: x[0])
     u_dates = set(zip(*date_ver)[0])
 
     # cycle over all the u_dates and keep the newest version of each
+    u_prods = list(set(zip(*date_ver)[3]))  # get the unique products
     ans = []
-    for d in u_dates:
-        tmp = [v for v in date_ver if v[0]==d]
+    for d, p in itertools.product(u_dates, u_prods):
+        tmp = [v for v in date_ver if v[0]==d and v[3]==p]
         ans.append(max(tmp, key=lambda x: x[1])[2])
 
     return ans
