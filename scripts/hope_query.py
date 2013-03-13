@@ -40,7 +40,10 @@ if __name__ == "__main__":
     file_ids = []
     for p in prod:
         tmp = a.getFiles_product_utc_file_date(p, dt)
-        file_ids.extend(zip(*tmp)[0])
+        try:
+            file_ids.extend(zip(*tmp)[0])
+        except:
+            continue
 
     for f in file_ids:
         print(a.getEntry('File', f).filename)
