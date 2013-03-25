@@ -127,8 +127,10 @@ def _writeTable(dbu, output, a, b):
     # write out the header
     output.write('<tr>')
     output.write('<td></td>')
+    output.write('<td></td>')
+
     output.write('<th></th>')
-    
+
     output.write('<th>RBSPA</th>')
     output.write('<th></th>')
     output.write('<th></th>')
@@ -144,11 +146,13 @@ def _writeTable(dbu, output, a, b):
 
     output.write('<tr>')
     output.write('<td></td>')
+    output.write('<td></td>')
 
     for prod in a_products:
         p = dbu.getEntry('Product', prod)
         output.write('<th>{0}</th>'.format(p.product_name))
     output.write('<td></td>')
+
     for prod in b_products:
         p = dbu.getEntry('Product', prod)
         output.write('<th>{0}</th>'.format(p.product_name))
@@ -156,6 +160,7 @@ def _writeTable(dbu, output, a, b):
     output.write('</tr>\n')
 
     output.write('<tr>')
+    output.write('<td></td>')
     output.write('<td></td>')
 
     for prod in a_products:
@@ -180,6 +185,8 @@ def _writeTable(dbu, output, a, b):
         else:
             output.write('<tr class="alt">')            
         output.write('<td>{0}</td>'.format(d.date().isoformat())) 
+        output.write('<td>{0}</td>'.format(int(rbsp.UTC_to_mission_day('a', d))))
+
 
         for prod in a_products:
             try:
