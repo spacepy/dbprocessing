@@ -13,8 +13,8 @@ from rbsp import Version
 
 
 hope_dir = os.path.join('/', 'n', 'space_data', 'cda', 'rbsp')
-a_products = [12, 43, 47, 50] # list of product ids # TODO hardcoded for now IN ORDER
-b_products = [29, 46, 48, 52] # list of product ids # TODO hardcoded for now IN ORDER
+a_products = [12, 37, 43, 47, 50] # list of product ids # TODO hardcoded for now IN ORDER
+b_products = [29, 40, 46, 48, 52] # list of product ids # TODO hardcoded for now IN ORDER
 dirs = [os.path.join('{sc}', 'hope', 'level0', '*22e*'),
         os.path.join('{sc}', 'hope', 'level05', '*sci*'),
         os.path.join('{sc}', 'hope', 'level1', 'pre', '*sci*'),
