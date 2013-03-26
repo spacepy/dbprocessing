@@ -298,7 +298,6 @@ class ProcessQueue(object):
         daterange = self.dbu.getFileDates(file_id[0]) # this is the dates that this product spans
 
         # iterate over all the days between the start and stop date from above (including stop date)
-        self.runme_list = [] # thi has to be cleared when you go into here
         for utc_file_date in Utils.expandDates(*daterange):
 
             files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date)

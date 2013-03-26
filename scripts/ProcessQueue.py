@@ -34,7 +34,7 @@ if __name__ == "__main__":
                       help="only do a dryrun processing or ingesting", default=False)
     parser.add_option("-r", "--report", dest="report", action="store_true",
                       help="Make the html report", default=False)
-    
+
     (options, args) = parser.parse_args()
     if len(args) != 0:
         parser.error("incorrect number of arguments")
@@ -99,6 +99,7 @@ if __name__ == "__main__":
         number_proc = 0
 
         def do_proc(file_id):
+            pq.runme_list = []
             DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
             if file_id is None:
                 return 'break'
@@ -117,7 +118,7 @@ if __name__ == "__main__":
                         pq.dbu.Processqueue.pop()
 
         try:
-            
+
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
@@ -153,6 +154,7 @@ if __name__ == "__main__":
                     else:
                         print('<dryrun> Process: {0} Date: {1} Outname: {2} '\
                             .format(v.process_id, v.utc_file_date, v.filename))
+
 
 
         except:
