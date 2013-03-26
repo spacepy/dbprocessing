@@ -39,7 +39,8 @@ def cull_to_newest(files):
     given a list of files cull to only the newest ones
     """
     # make a list of tuples,  datetime, version, filename, product part of filename 
-    date_ver = [(inspector.extract_YYYYMMDD(v), inspector.extract_Version(v), v, v.split('20')[0]) for v in files]
+    date_ver = [(inspector.extract_YYYYMMDD(v), inspector.extract_Version(v), v, v.split('20')[0]) for v in files
+                if inspector.extract_YYYYMMDD(v) is not None]
     date_ver = sorted(date_ver, key=lambda x: x[0])
     u_dates = set(zip(*date_ver)[0])
 
