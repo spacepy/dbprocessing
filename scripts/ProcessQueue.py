@@ -34,7 +34,7 @@ if __name__ == "__main__":
                       help="only do a dryrun processing or ingesting", default=False)
     parser.add_option("-r", "--report", dest="report", action="store_true",
                       help="Make the html report", default=False)
-    
+
     (options, args) = parser.parse_args()
     if len(args) != 0:
         parser.error("incorrect number of arguments")
@@ -117,7 +117,7 @@ if __name__ == "__main__":
                         pq.dbu.Processqueue.pop()
 
         try:
-            
+
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
@@ -145,14 +145,16 @@ if __name__ == "__main__":
                 pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry('Product', pq.dbu.getEntry('Process', val.process_id).output_product).level)
 
                 print len(pq.runme_list), pq.runme_list
-                for ii, v in enumerate(pq.runme_list):
+                while pq.runme_list:
+                    v = pq.runme_list.pop()
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
-                    DBlogging.dblogger.info("Running {0} of {1}".format(ii+1, len(pq.runme_list)))
+                    DBlogging.dblogger.info("Running XXX of {1}".format(None, len(pq.runme_list)))
                     if not options.dryrun:
                         runMe.runner(v)
                     else:
                         print('<dryrun> Process: {0} Date: {1} Outname: {2} '\
                             .format(v.process_id, v.utc_file_date, v.filename))
+
 
 
         except:

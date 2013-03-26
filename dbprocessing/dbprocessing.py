@@ -451,7 +451,7 @@ class ProcessQueue(object):
             files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date <= endDate).all()
         elif startDate is not None and endDate is None and level is not None:
              files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date >= startDate).filter(self.dbu.File.data_level == level).all()
-   
+
         else:
             raise(NotImplementedError("Sorry combination is not implemented"))
 
