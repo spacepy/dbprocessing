@@ -298,6 +298,7 @@ class ProcessQueue(object):
         daterange = self.dbu.getFileDates(file_id[0]) # this is the dates that this product spans
 
         # iterate over all the days between the start and stop date from above (including stop date)
+        self.runme_list = [] # thi has to be cleared when you go into here
         for utc_file_date in Utils.expandDates(*daterange):
 
             files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date)
@@ -451,7 +452,7 @@ class ProcessQueue(object):
             files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date <= endDate).all()
         elif startDate is not None and endDate is None and level is not None:
              files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date >= startDate).filter(self.dbu.File.data_level == level).all()
-   
+
         else:
             raise(NotImplementedError("Sorry combination is not implemented"))
 
