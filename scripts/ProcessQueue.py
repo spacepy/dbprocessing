@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
                 print len(pq.runme_list), pq.runme_list
                 while pq.runme_list:
-                    v = pq.runme_list.pop()
+                    v = pq.runme_list.pop(0)
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
                     DBlogging.dblogger.info("Running XXX of {1}".format(None, len(pq.runme_list)))
                     if not options.dryrun:
