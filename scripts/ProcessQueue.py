@@ -99,7 +99,6 @@ if __name__ == "__main__":
         number_proc = 0
 
         def do_proc(file_id):
-            pq.runme_list = []
             DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
             if file_id is None:
                 return 'break'
@@ -146,9 +145,10 @@ if __name__ == "__main__":
                 pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry('Product', pq.dbu.getEntry('Process', val.process_id).output_product).level)
 
                 print len(pq.runme_list), pq.runme_list
-                for ii, v in enumerate(pq.runme_list):
+                while pq.runme_list:
+                    v = pq.runme_list.pop()
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
-                    DBlogging.dblogger.info("Running {0} of {1}".format(ii+1, len(pq.runme_list)))
+                    DBlogging.dblogger.info("Running XXX of {1}".format(None, len(pq.runme_list)))
                     if not options.dryrun:
                         runMe.runner(v)
                     else:
