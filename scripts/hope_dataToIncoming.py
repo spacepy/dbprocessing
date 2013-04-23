@@ -22,6 +22,10 @@ data_path = [os.path.join('/', 'usr', 'local', 'ectsoc', 'data', 'level_0', val,
 mag_types = ['quicklook', 'l2']
 tmp = [os.path.join('/', 'n', 'space_data', 'cda', 'rbsp', 'rbsp{0}'.format(s), 'emfisis' , t) for s, t in itertools.product(sc, mag_types)]
 data_path += tmp
+magephem_types = ['pre', 'def']
+tmp = [os.path.join('/', 'n', 'projects', 'rbsp', 'rbsp{0}'.format(s), 'MagEphem' , t) for s, t in itertools.product(sc, magephem_types)]
+data_path += tmp
+
 
 error_path = dbu.getErrorPath()
 dbu._closeDB()
@@ -43,7 +47,11 @@ def build_data_set(data_paths):
     files = set()
     for path in data_paths:
         for f in os.listdir(path):
-            files.add(os.path.realpath(os.path.join(path, f)))
+            if 'MagEphem' in f:
+                if 'OP77' in f and 'txt' in f:
+                    files.add(os.path.realpath(os.path.join(path, f)))
+            else:
+                files.add(os.path.realpath(os.path.join(path, f)))
     for cull_r in cull_re:
         files_to_cull = [f for f in files if re.match(cull_r, os.path.basename(f))]
         files = files.difference(files_to_cull)
@@ -68,7 +76,7 @@ def build_data_set(data_paths):
 
 def files_to_move(data_files, db_files):
     """
-    given the data_set files, and the files form the db cull those in thge db
+    given the data_set files, and the files form the db cull those in the db
     """
     cull_set = set()
     for f in data_files:

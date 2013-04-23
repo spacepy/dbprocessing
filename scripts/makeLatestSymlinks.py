@@ -50,7 +50,7 @@ def cull_to_newest(files):
     for d, p in itertools.product(u_dates, u_prods):
         tmp = [v for v in date_ver if v[0]==d and v[3]==p]
         if tmp:
-            ans.append(max(tmp, key=lambda x: x[1])[2])
+            ans.append(max(tmp, key=lambda x: x[2])[2])
 
     return ans
 
