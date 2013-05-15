@@ -6,7 +6,6 @@ Created on Tue Oct 23 10:12:11 2012
 """
 import glob
 import os
-import os.path
 import shutil
 import subprocess
 import tempfile
@@ -80,6 +79,7 @@ def runner(runme):
         cmdline.append(runme.dbu.getFileFullPath(i_fid))
 
     cmdline.append(os.path.join(tempdir, runme.filename))
+    cmdline = [os.path.expandvars(v) for v in cmdline]
 
     DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))
     # TODO, think here on how to grab the output
