@@ -568,7 +568,7 @@ class DBUtils(object):
 #==============================================================================
         # this should make them in oder for each level
         keep = sorted(keep, key=lambda x: x[0].utc_file_date)
-        keep = sorted(keep, key=lambda x: x[0].level)
+        keep = sorted(keep, key=lambda x: x[0].data_level)
         keep = [(val[0].file_id, val[1]) for val in keep]
 
         ## now we have a list of just the newest file_id's
