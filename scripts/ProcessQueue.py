@@ -99,7 +99,7 @@ if __name__ == "__main__":
         number_proc = 0
 
         def do_proc(file_id):
-            DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get()".format(file_id))
+            DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(file_id, pq.dbu.Processqueue.len()))
             if file_id is None:
                 return 'break'
             children = pq.dbu.getChildrenProducts(file_id) # returns process
@@ -115,14 +115,14 @@ if __name__ == "__main__":
                 pq.buildChildren(child_process, [file_id])
                 if not options.dryrun:
                         pq.dbu.Processqueue.pop()
-
         try:
-
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
             while pq.dbu.Processqueue.len() > 0:
-                pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates
+                # clean the queue every 10 precesses (and the first)
+                if (number_proc % 10 ==0):
+                    pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates
                 # this loop makes all the runMe objects for all the files in the processqueue
 
                 if not options.dryrun:
@@ -141,22 +141,25 @@ if __name__ == "__main__":
                         if retval == 'break':
                             break
                 # now do all the running
-                # sort them so that we run the lowest level first, don't want to process in any other order
-                pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry('Product', pq.dbu.getEntry('Process', val.process_id).output_product).level)
+
+#==============================================================================
+#                 this all moved to inside clean()
+#                 # sort them so that we run the lowest level first, don't want to process in any other order
+#                 pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry('Product', pq.dbu.getEntry('Process', val.process_id).output_product).level)
+#==============================================================================
 
                 print len(pq.runme_list), pq.runme_list
+                run_num = 0
                 while pq.runme_list:
+                    run_num += 1
                     v = pq.runme_list.pop(0)
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
-                    DBlogging.dblogger.info("Running XXX of {1}".format(None, len(pq.runme_list)))
+                    DBlogging.dblogger.info("Running {0} of {1}".format(run_num, len(pq.runme_list)))
                     if not options.dryrun:
                         runMe.runner(v)
                     else:
                         print('<dryrun> Process: {0} Date: {1} Outname: {2} '\
                             .format(v.process_id, v.utc_file_date, v.filename))
-
-
-
         except:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
