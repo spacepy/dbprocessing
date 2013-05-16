@@ -560,14 +560,16 @@ class DBUtils(object):
             return
 
         file_entries = [(self.getEntry('File', val[0]), val[1]) for val in pqdata]
-        keep = [(val[0].file_id, val[1]) for val in file_entries if val[0].newest_version==True]
+#        keep = [(val[0].file_id, val[1]) for val in file_entries if val[0].newest_version==True]
+        keep = [(val[0], val[1]) for val in file_entries if val[0].newest_version==True]
 
 #==============================================================================
 #         # sort keep on dates, then sourt keep on level
 #==============================================================================
         # this should make them in oder for each level
-        keep = sorted(keep, key=lambda x: x.utc_file_date)
-        keep = sorted(keep, key=lambda x: x.level)
+        keep = sorted(keep, key=lambda x: x[0].utc_file_date)
+        keep = sorted(keep, key=lambda x: x[0].level)
+        keep = [(val[0].file_id, val[1]) for val in keep]
 
         ## now we have a list of just the newest file_id's
         if not dryrun:
