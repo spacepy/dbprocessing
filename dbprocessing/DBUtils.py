@@ -567,7 +567,7 @@ class DBUtils(object):
 #         # sort keep on dates, then sourt keep on level
 #==============================================================================
         # this should make them in oder for each level
-        keep = sorted(keep, key=lambda x: x[0].utc_file_date)
+        keep = sorted(keep, key=lambda x: x[0].utc_file_date, reverse=1)
         keep = sorted(keep, key=lambda x: x[0].data_level)
         keep = [(val[0].file_id, val[1]) for val in keep]
 
