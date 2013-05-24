@@ -1569,7 +1569,11 @@ class DBUtils(object):
         except ValueError:
             sq = self.session.query(self.Product).filter_by(product_name = product_name)
             try:
-                return sq[0].product_id
+                # if two products have the same name always return the lower id one
+                try:
+                    return sorted(sq, key=lambda x: x.product_id)[0].product_id
+                except TypeError:
+                    return sq[0].product_id
             except IndexError: # no file_id found
                 raise(DBNoData("No product_name %s found in the DB" % (product_name)))
 
@@ -1810,6 +1814,8 @@ class DBUtils(object):
         retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
         # instrument
         inst_id = self.getInstrumentFromProduct(prod_id)
+        if inst_id == []:
+            raise(DBError('DB ERROR, the self.getInstrumentFromProduct failed, fill in instrumentproductlink'))
         retval['instrument'] = self.getEntry('Instrument', inst_id)
         # Instrumentproductlink
         retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((inst_id, prod_id))
