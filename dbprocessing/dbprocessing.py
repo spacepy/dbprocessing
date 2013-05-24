@@ -7,6 +7,7 @@ import os.path
 import shutil
 import sys
 import tempfile
+import traceback
 
 import DBfile
 import DBlogging
@@ -212,7 +213,7 @@ class ProcessQueue(object):
                     df = inspect.Inspector(filename, self.dbu, product, **kwargs)
                 except:
                     exc_type, exc_value, exc_traceback = sys.exc_info()
-                    DBlogging.dblogger.error("File {0} inspector threw an exception: {1} {2}".format(filename, str(exc_type), exc_value))
+                    DBlogging.dblogger.error("File {0} inspector threw an exception: {1} {2} {3}".format(filename, str(exc_type), exc_value, traceback.print_tb(exc_traceback))) #exc_traceback.tb_lineno))
                     continue # try the next inspector
             else:
                 try:
@@ -306,7 +307,6 @@ class ProcessQueue(object):
             # do we have the required files to do the build?
             #==============================================================================
             if not self._requiredFilesPresent(files, input_product_id, process_id):
-                # print '^^^^^^^^^^^^^^^^', 'files not present'
                 continue # go on to the next file
 
             input_files = zip(*files)[0] # this is the file_id
