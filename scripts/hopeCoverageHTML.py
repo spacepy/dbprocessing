@@ -179,7 +179,7 @@ def _writeTable(dbu, output, a, b):
     #output.write('</tr>\n')
 
     # and write all the data
-    for ii, d in enumerate(dates):
+    for ii, d in enumerate(dates[::-1]):
         if ii % 2 == 0:
             output.write('<tr>')
         else:

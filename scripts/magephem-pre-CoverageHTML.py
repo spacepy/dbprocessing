@@ -202,7 +202,7 @@ def _writeTable(dbu, output):
     #make_header()
 
     # and write all the data
-    for ii, d in enumerate(dates):
+    for ii, d in enumerate(dates[::-1]):
         if d.day == 1:
              make_header()
         if ii % 2 == 0:
