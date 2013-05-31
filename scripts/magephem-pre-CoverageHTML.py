@@ -169,12 +169,12 @@ def _writeTable(dbu, output):
         output.write('<td></td>')
         for prod in a_products:
             p = dbu.getEntry('Product', prod)
-            output.write('<th>{0}</th>'.format(p.product_name.split('_')[-1]))
+            output.write('<th>{0}{1}</th>'.format(p.product_name.split('_')[-1], os.path.splitext(p.product_name)[1] ))
         output.write('<td></td>')
 
         for prod in b_products:
             p = dbu.getEntry('Product', prod)
-            output.write('<th>{0}</th>'.format(p.product_name.split('_')[-1]))
+            output.write('<th>{0}{1}</th>'.format(p.product_name.split('_')[-1], os.path.splitext(p.product_name)[1] ))
 
         output.write('</tr>\n')
 
