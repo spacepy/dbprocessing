@@ -30,7 +30,7 @@ dbu._closeDB()
 
 files = set(v.filename for v in files)
 
-dates = [datetime.datetime.utcnow().date() + datetime.timedelta(days=v) for v in range(15)]
+dates = [datetime.datetime.utcnow().date() + datetime.timedelta(days=v) for v in range(21)]
 
 files_2weeks = []
 for dt in dates:
