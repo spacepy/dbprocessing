@@ -128,7 +128,7 @@ def makeHTML(filename):
     output.close()
 
 def _writeTable(dbu, output):
-    dates = dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=datetime.date(2012, 8, 31), until=datetime.datetime.utcnow().date() + datetime.timedelta(days=20))
+    dates = dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=datetime.date(2012, 8, 31), until=datetime.datetime.utcnow().date() + datetime.timedelta(days=25))
 
     output.write('<h1>{0}</h1>\n'.format(dbu.mission))
     output.write('<h2>{0}</h2>\n'.format('Preliminary MagEphem'))
