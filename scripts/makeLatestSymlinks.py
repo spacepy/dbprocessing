@@ -75,21 +75,27 @@ def cull_to_newest(files, nodate=False, options=None):
         for f in files:
             tmp = getBaseVersion(f)
             if options.all:
+                if options.verbose: print("Added file1 {0}".format(f))
                 bases.append(tmp[0])
                 versions.append(tmp[1])
             elif tmp[1] is not None:
+                if options.verbose: print("Added file2 {0}".format(f))
                 bases.append(tmp[0])
                 versions.append(tmp[1])
+            else:
+                if options.verbose: print("Skipped file {0}".format(f))
         uniq_bases = list(set(bases))
         for ub in uniq_bases:
             if bases.count(ub) == 1: # there is only one
                 ans.append(files[bases.index(ub)])
-            else: # must be more than one
+            else: # must be more than 
                 indices = [i for i, x in enumerate(bases) if x == ub]
                 tmp = []
                 for i in indices:
                     tmp.append((bases[i], versions[i], files[i]))
-                ans.append(max(tmp, key=lambda x: x[1]))
+                if options.verbose: print("tmp:: {0}".format(tmp))
+                if options.verbose: print("tmpmax:: {0}".format(max(tmp, key=lambda x: x[1])[2]))
+                ans.append(max(tmp, key=lambda x: x[1])[2])
         return ans
 
 def make_symlinks(files, outdir, options):
@@ -101,13 +107,16 @@ def make_symlinks(files, outdir, options):
     for f in files:
         try:
             if os.path.isfile(f):
+                if options.verbose: print("linking1 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))
                 os.symlink(f, os.path.join(outdir, os.path.basename(f)))
             elif options.dir:
+                if options.verbose: print("linking2 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))                
                 os.symlink(f, os.path.join(outdir, os.path.basename(f)))
 
         except OSError:
             if options.force:
                 os.remove(os.path.join(outdir, os.path.basename(f)))
+                if options.verbose: print("linking3 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))                
                 make_symlinks(f, outdir, options)
         except:
             warnings.warn("File {0} not linked:\n\t{1}".format(f, traceback.format_exc()))
@@ -150,6 +159,10 @@ if __name__ == '__main__':
     parser.add_option("", "--all",
                   dest="all", action='store_true',
                   help="Make symlinks for files that do not have vx.y.z versions", default=False)
+    parser.add_option("", "--verbose",
+                  dest="verbose", action='store_true',
+                  help="Print out verbose information", default=False)
+
 
     (options, args) = parser.parse_args()
 
@@ -176,7 +189,6 @@ if __name__ == '__main__':
     files = cull_to_newest(files, nodate=options.nodate, options=options)
     if options.delete:
         delete_symlinks(outdir)
-    if files:
-        make_symlinks(files, outdir, options)
+    make_symlinks(files, outdir, options)
 
 
