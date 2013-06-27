@@ -22,7 +22,7 @@ scripts = ('scripts/ProcessQueue.py', 'scripts/addProducts.py',
 	       'scripts/hopeCoverageHTML.py', 'scripts/makeLatestSymlinks.py',
                'scripts/hope_query.py', 'scripts/magephem_dataToIncoming.py',
                'scripts/magephem-pre-CoverageHTML.py', 'scripts/magephem_def_dataToIncoming.py',
-               'scripts/addVerboseProvenance.py')
+               'scripts/addVerboseProvenance.py', 'scripts/updateSHAsum.py')
 
 scripts_dir = os.path.expanduser('~/dbUtils')
 
