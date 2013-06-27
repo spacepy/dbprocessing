@@ -33,7 +33,7 @@ def getVP(options, dbu, filename):
     go into the db and get the VP
     """
     try:
-        vp = dbu.getEntry('File', dbu.getFileID(filename)).verbose_provenance
+        vp = dbu.getEntry('File', dbu.getFileID(os.path.basename(filename))).verbose_provenance
     except DBUtils.DBNoData:
         return ''
     return vp
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     if len(args) == 1 and not options.inplace:
         parser.error("Incomplete arguments, either outfile or --inplace required")
 
-    infile = args[0]
+    infile = os.path.expanduser(os.path.expandvars(args[0]))
     if not os.path.isfile(infile):
         parser.error("Input file {0} did not exist".format(infile))
 
