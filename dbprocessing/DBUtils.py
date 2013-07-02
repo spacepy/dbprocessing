@@ -637,11 +637,17 @@ class DBUtils(object):
         self.session.query(self.Logging).delete()
         self._commitDB()
 
-    def getAllFilenames(self, fullPath=True):
+    def getAllFilenames(self, fullPath=True, level=None):
         """
         return all the file names in the database
+
+        if level==None get all filenames, otherwise only for a level
+        
         """
-        names = zip(*self.session.query(self.File.filename).all())[0]
+        if level is None:
+            names = zip(*self.session.query(self.File.filename).all())[0]
+        else:
+            names = zip(*self.session.query(self.File.filename).filter_by(data_level=level).all())[0]   
         if not fullPath:
             return names
         else:
