@@ -1674,7 +1674,10 @@ class DBUtils(object):
         """
         basedir = self.getMissionDirectory()
         # TODO make this general somehow?  Passed in?
-        path = os.path.join(basedir, 'hope_incoming/')
+        if 'RBSP_REPT' in self.mission:
+            path = os.path.join(basedir, 'rept_incoming/')
+        else:
+            path = os.path.join(basedir, 'hope_incoming/')
         return path
 
     def getErrorPath(self):
