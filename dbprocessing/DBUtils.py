@@ -648,11 +648,9 @@ class DBUtils(object):
             names = zip(*self.session.query(self.File.filename).all())[0]
         else:
             names = zip(*self.session.query(self.File.filename).filter_by(data_level=level).all())[0]   
-        if not fullPath:
-            return names
-        else:
-            ans = [ self.getFileFullPath(v) for v in names]
-            return ans
+        if fullPath:
+            names = [ self.getFileFullPath(v) for v in names]
+        return names
 
     def getAllFileIds(self):
         """
@@ -688,7 +686,7 @@ class DBUtils(object):
         return m1.mission_id
 
     def addSatellite(self,
-                    satellite_name,):
+                    satellite_name, mission_id):
         """ add a satellite to the database
 
         @param satellite_name: the name of the mission
@@ -696,12 +694,9 @@ class DBUtils(object):
         """
         if not isinstance(satellite_name, str):
             raise(ValueError("Satellite name has to  a string"))
+        s1 = self.Satellite()
 
-        try:
-            s1 = self.Satellite()
-        except AttributeError:
-            raise(DBError  ("Class Satellite not found was it created?"))
-        s1.mission_id = self.getMissionID(self.mission)
+        s1.mission_id = mission_id
         s1.satellite_name = satellite_name
         self.session.add(s1)
         self._commitDB()
@@ -1784,7 +1779,7 @@ class DBUtils(object):
                 sq[i] = self.getEntry('File', v).filename
         return sq
 
-    def checkFileMD5(self, file_id):
+    def checkFileSHA(self, file_id):
         """
         given a file id or name check the db checksum and the file checksum
         """
@@ -1804,7 +1799,7 @@ class DBUtils(object):
         bad_list = []
         for f in files:
             try:
-                if not self.checkFileMD5(f):
+                if not self.checkFileSMA(f):
                     bad_list.append((f, '(100) bad checksum'))
             except DigestError:
                 bad_list.append((f, '(200) file not found'))
