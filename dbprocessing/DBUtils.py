@@ -700,7 +700,7 @@ class DBUtils(object):
         s1.satellite_name = satellite_name
         self.session.add(s1)
         self._commitDB()
-        return self.getSatelliteID(satellite_name)
+        return s1.satellite_id
 
     def addProcess(self,
                     process_name,
@@ -730,7 +730,7 @@ class DBUtils(object):
         p1.super_process_id = super_process_id
         self.session.add(p1)
         self._commitDB()
-        self.updateProcessSubs(p1.process_id)
+        # self.updateProcessSubs(p1.process_id)
         return p1.process_id
 
     def addProduct(self,
