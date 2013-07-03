@@ -102,16 +102,13 @@ class ProcessQueue(object):
     def moveToError(self, fname):
         """
         Moves a file from incoming to error
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
         """
         DBlogging.dblogger.debug("Entered moveToError: {0}".format(fname))
 
         path = self.dbu.getErrorPath()
+        # if the file is a link then don;t move it to incoming just delete the link
+        if os.path.islink(fname):
+            os.unlink(fname) # Remove a file (same as remove(path)).
         try:
             shutil.move(fname, os.path.join(path, os.path.basename(fname)))
         except IOError:

@@ -148,16 +148,12 @@ class DBfile(object):
         """
         Move the DBfile from its current location to where it belongs
 
+        If the file is a symbolic link it is assumed already in the target directory and not
+        moved, the link is just removed
+
         @return: the from and to arguments to move with full path info
         @rtype: list
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 05-Oct-2010 (BAL)
-        @TODO check that the file in the db before doing a move
-        @TODO  add a check that the file is not already there before doing a move
         """
         path = self.getDirectory()
         ## need to do path replacements
@@ -166,27 +162,28 @@ class DBfile(object):
             path = path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in path : # need to replace with the instrument name
             path = path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-        try:
-            shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
-        except IOError:
-            dirname = os.path.split(os.path.join(path, self.diskfile.params['filename']))[0]
-            os.makedirs(dirname)
-            DBlogging.dblogger.warning("created a directory to put the date into: {0}".format(dirname))
-            shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
-        DBlogging.dblogger.info("file {0} moved to {1}".format(os.path.basename(self.diskfile.infile), os.path.dirname(os.path.join(path, self.diskfile.params['filename']))))
-        DBlogging.dblogger.debug("self.diskfile.filename: {0}".format(self.diskfile.filename))
-        # if the file we are moving is a tgz file then we want to extract it in the place we moved it to and move the tgz file into a tgz directory
-        try:
-            tf = tarfile.open(os.path.join(path, self.diskfile.params['filename']), 'r:gz')
-            if tf.getmembers(): # false if it does nat have any files inside i.e. is not a tarfile or empty, deal with empty later
-                tf.extractall(path=os.path.join(path, '..')) # up one dir level
-#                was_tf = True
-#            else:
-#                was_tf = False
-            tf.close()
-#            if was_tf:
-#                shutil.move(os.path.join(path, self.diskfile.params['filename']), os.path.join(os.path.join(path, 'tgz'), self.diskfile.params['filename']))
-        except tarfile.ReadError:
+        # if the file is a link just remove the link and pretend we moved it, this means
+        # that this file is tracked only as a dependency
+        if os.path.islink(self.diskfile.infile):
+            os.unlink(self.diskfile.infile)
+            DBlogging.dblogger.info("file {0} was a link, it was added and removed".format(os.path.basename(self.diskfile.infile)))
+        else:
+            try:
+                shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
+            except IOError:
+                dirname = os.path.split(os.path.join(path, self.diskfile.params['filename']))[0]
+                os.makedirs(dirname)
+                DBlogging.dblogger.warning("created a directory to put the date into: {0}".format(dirname))
+                shutil.move(self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
+            DBlogging.dblogger.info("file {0} moved to {1}".format(os.path.basename(self.diskfile.infile), os.path.dirname(os.path.join(path, self.diskfile.params['filename']))))
+            DBlogging.dblogger.debug("self.diskfile.filename: {0}".format(self.diskfile.filename))
+            # if the file we are moving is a tgz file then we want to extract it in the place we moved it to and move the tgz file into a tgz directory
+            try:
+                tf = tarfile.open(os.path.join(path, self.diskfile.params['filename']), 'r:gz')
+                if tf.getmembers(): # false if it does nat have any files inside i.e. is not a tarfile or empty, deal with empty later
+                    tf.extractall(path=os.path.join(path, '..')) # up one dir level
+                tf.close()
+            except tarfile.ReadError:
             pass
 
         return (self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
