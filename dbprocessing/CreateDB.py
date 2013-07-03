@@ -294,6 +294,9 @@ if __name__ == "__main__":
         parser.error("incorrect number of arguments")
     filename = os.path.abspath(args[0])
 
+    if os.path.isfile(filename):
+        parser.error("file: {0} exists will not overwrite".format(filename))
+        
     db = dbprocessing_db(filename = filename)
 
     if options.populate: # put minimal RBSP in here
