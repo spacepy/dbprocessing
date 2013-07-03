@@ -109,12 +109,14 @@ class ProcessQueue(object):
         # if the file is a link then don;t move it to incoming just delete the link
         if os.path.islink(fname):
             os.unlink(fname) # Remove a file (same as remove(path)).
-        try:
-            shutil.move(fname, os.path.join(path, os.path.basename(fname)))
-        except IOError:
-            DBlogging.dblogger.error("file {0} was not successfully moved to error".format(os.path.join(path, os.path.basename(fname) )))
+            DBlogging.dblogger.info("moveToError file {0} was a link, so link removed not moved to error".format(fname))
         else:
-            DBlogging.dblogger.info("moveToError {0} moved to {1}".format(fname, path))
+            try:
+                shutil.move(fname, os.path.join(path, os.path.basename(fname)))
+            except IOError:
+                DBlogging.dblogger.error("file {0} was not successfully moved to error".format(os.path.join(path, os.path.basename(fname) )))
+            else:
+                DBlogging.dblogger.info("moveToError {0} moved to {1}".format(fname, path))
 
     def diskfileToDB(self, df):
         """
