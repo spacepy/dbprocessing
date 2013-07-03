@@ -65,11 +65,6 @@ if __name__ == "__main__":
 
 
     if options.i: # import selected
-        # run the code to copy data to incoming
-        ## TODO this should proably move into a STARTUP process but its tough since
-        ##   there is not a output product
-        command_line = ['nice', '-n 2', '/u/ectsoc/dbUtils/dataToIncoming.py']
-#        subprocess.check_call(command_line)
         try:
             start_len = pq.dbu.Processqueue.len()
             pq.checkIncoming()
