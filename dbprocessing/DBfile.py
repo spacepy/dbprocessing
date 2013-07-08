@@ -184,6 +184,6 @@ class DBfile(object):
                     tf.extractall(path=os.path.join(path, '..')) # up one dir level
                 tf.close()
             except tarfile.ReadError:
-            pass
+                pass
 
         return (self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
