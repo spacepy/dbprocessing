@@ -91,8 +91,12 @@ files = files_to_move(data_files, db_files)
 
 for f in files:
     try:
-        shutil.copy(f, g_inc_path)
-        DBlogging.dblogger.info("{0}: copied {1} to {2}".format(__file__, f, g_inc_path))
+        if "emfisis" in f: # make a link not a copy
+            os.symlink(f, os.path.join(g_inc_path, f))
+            DBlogging.dblogger.info("{0}: Linked {1} to {2}".format(__file__, f, g_inc_path))
+        else:
+            shutil.copy(f, g_inc_path)
+            DBlogging.dblogger.info("{0}: copied {1} to {2}".format(__file__, f, g_inc_path))
     except:
         DBlogging.dblogger.error("{0}: failed copying {1} to {2}".format(__file__, f, g_inc_path))
 
