@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.6
 """
 Module to create the database structure for dbprocessing
 
@@ -12,7 +12,7 @@ from __future__ import division # may not be needed but start with it
 
 from optparse import OptionParser
 
-import DBUtils
+from dbprocessing import DBUtils
 
 import os
 
@@ -52,7 +52,8 @@ class dbprocessing_db(object):
         data_table = schema.Table('mission', metadata,
             schema.Column('mission_id', types.Integer, autoincrement=True, primary_key=True, nullable=False),
             schema.Column('mission_name', types.String(20), nullable=False, unique=True),
-            schema.Column('rootdir', types.String(50), nullable=False,), # in postgres this was also unique
+            schema.Column('rootdir', types.String(50), nullable=False,),
+            schema.Column('incoming_dir', types.String(50), nullable=False,),
         )
 
         data_table = schema.Table('satellite', metadata,
@@ -296,7 +297,7 @@ if __name__ == "__main__":
 
     if os.path.isfile(filename):
         parser.error("file: {0} exists will not overwrite".format(filename))
-        
+
     db = dbprocessing_db(filename = filename)
 
     if options.populate: # put minimal RBSP in here
