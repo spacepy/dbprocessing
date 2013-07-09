@@ -8,7 +8,7 @@ import datetime
 
 import dateutil.rrule # do this long so where it is from is remembered
 
-from dbprocessing import Version
+import Version
 
 def expandDates(start_time, stop_time):
     return dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=start_time, until=stop_time)

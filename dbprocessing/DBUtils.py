@@ -642,12 +642,12 @@ class DBUtils(object):
         return all the file names in the database
 
         if level==None get all filenames, otherwise only for a level
-        
+
         """
         if level is None:
             names = zip(*self.session.query(self.File.filename).all())[0]
         else:
-            names = zip(*self.session.query(self.File.filename).filter_by(data_level=level).all())[0]   
+            names = zip(*self.session.query(self.File.filename).filter_by(data_level=level).all())[0]
         if fullPath:
             names = [ self.getFileFullPath(v) for v in names]
         return names
@@ -661,7 +661,8 @@ class DBUtils(object):
 
     def addMission(self,
                     mission_name,
-                    rootdir):
+                    rootdir,
+                    incoming_dir):
         """ add a mission to the database
 
         @param mission_name: the name of the mission
@@ -680,7 +681,8 @@ class DBUtils(object):
             raise(DBError("Class Mission not found was it created?"))
 
         m1.mission_name = mission_name
-        m1.rootdir = rootdir
+        m1.rootdir = rootdir.replace('{MISSION}', mission_name)
+        m1.incoming_dir = incoming_dir.replace('{MISSION}', mission_name)
         self.session.add(m1)
         self._commitDB()
         return m1.mission_id
@@ -697,7 +699,7 @@ class DBUtils(object):
         s1 = self.Satellite()
 
         s1.mission_id = mission_id
-        s1.satellite_name = satellite_name
+        s1.satellite_name = satellite_name.replace('{MISSION}', self.getEntry('Mission', mission_id).mission_name)
         self.session.add(s1)
         self._commitDB()
         return s1.satellite_id
@@ -1597,7 +1599,10 @@ class DBUtils(object):
             return sq.satellite_id
         except ValueError: # it was a name
             sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).all()
-        return sq[0].satellite_id  # there can be only one of each name
+        try:
+            return sq[0].satellite_id  # there can be only one of each name
+        except IndexError:
+            raise(DBNoData("No satellite %s found in the DB" % (sat_name)))
 
     def getCodePath(self, code_id):
         """
