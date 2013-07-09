@@ -4,12 +4,27 @@ Class to hold random utilities of use throughout this code
 """
 
 import collections
+import datetime
 
 import dateutil.rrule # do this long so where it is from is remembered
+
+from dbprocessing import Version
 
 def expandDates(start_time, stop_time):
     return dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=start_time, until=stop_time)
 
+def parseDate(inval):
+    """
+    given a date of the for yyyy-mm-dd parse to a datetime
+    If the format is wrong ValueError is raised
+    """
+    return datetime.datetime.strptime(inval, '%Y-%m-%d')
+
+def parseVersion(inval):
+    """
+    given a format of the form x.y.z parse to a Version
+    """
+    return Version.Version.fromString(inval)
 
 def flatten(l):
     """
@@ -30,7 +45,7 @@ def toBool(value):
         return False
 
 def toNone(value):
-    if value in ['', 'None']:
+    if value in ['', 'None', 'none', 'NONE']:
         return None
     else:
         return value
