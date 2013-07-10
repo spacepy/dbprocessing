@@ -78,7 +78,6 @@ class dbprocessing_db(object):
             schema.Column('instrument_id', types.Integer,
                           schema.ForeignKey('instrument.instrument_id'), nullable=False,),
             schema.Column('relative_path', types.String(100), nullable=False),  # hmm long enough?
-            schema.Column('super_product_id', types.Integer, nullable=True),
             schema.Column('level', types.Float, nullable=False),
             schema.Column('format', types.Text, nullable=False),  # hmm long enough?
             schema.Column('product_description', types.Text, nullable=True),  # hmm long enough?
@@ -98,7 +97,6 @@ class dbprocessing_db(object):
             schema.Column('process_name', types.String(50), nullable=False),  # hmm long enough?
             schema.Column('output_product', types.Integer,
                           schema.ForeignKey('product.product_id'), nullable=False, unique=True, index=True),
-            schema.Column('super_process_id', types.Integer, nullable=True),
             schema.Column('output_timebase', types.String(10), nullable=True, index=True),
             schema.Column('extra_params', types.Text, nullable=True),
             schema.UniqueConstraint('process_name', 'output_product')

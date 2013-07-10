@@ -62,7 +62,7 @@ def _sectionCheck(conf):
         if not req in conf:
             raise(ValueError('Required section: "{0}" was not found'.format(req)))
 
-def _keysCheck(conf, section, keys):
+def _keysCheck(conf, section, keys, ignore=None):
     """
     go over a section and see that everything is right
     """
@@ -70,7 +70,7 @@ def _keysCheck(conf, section, keys):
         if k not in conf[section]:
             raise(ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section) ))
     for k in conf[section]:
-        if k not in keys:
+        if k not in keys and ignore not in k:
             raise(ValueError('Specified key: "{0}" is not allowed in [{1}] section'.format(k, section) ))
 
 def configCheck(conf):
@@ -87,12 +87,12 @@ def configCheck(conf):
         if k.startswith('process'):
             _keysCheck(conf, k, ['code_start_date', 'code_stop_date',
                                  'code_filename', 'code_relative_path',
-                                 'required_input1', 'code_version',
+                                 'code_version',
                                  'process_name', 'code_output_interface',
                                  'code_newest_version', 'code_date_written',
                                  'code_description', 'output_product',
                                  'code_active', 'code_arguments',
-                                 'extra_params', 'output_timebase'])
+                                 'extra_params', 'output_timebase'], ignore='input')
     # loop over the products
     for k in conf:
         if k.startswith('product'):
@@ -114,54 +114,103 @@ def addStuff(cfg, options):
     if cfg['mission']['mission_name'] not in dbu.getMissions(): # was it there?
         # add it
         mission_id = dbu.addMission(**cfg['mission'])
+        print('Added Mission: {0}'.format(mission_id))
     else:
         mission_id = dbu.getMissionID(cfg['mission']['mission_name'])
+        print('Found Mission: {0}'.format(mission_id))
 
     # is the satellite in the DB?  If not add it
     try:
-        satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name']).satellite_id
+        satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name'].replace('{MISSION}', cfg['mission']['mission_name'])).satellite_id
+        print('Found Satellite: {0}'.format(satellite_id))
     except DBUtils.DBNoData:
         # add it
         satellite_id = dbu.addSatellite(mission_id=mission_id, **cfg['satellite'])
+        print('Added Satellite: {0}'.format(satellite_id))
 
+    # is the instrument in the DB?  If not add it
+    try:
+        instrument_id = dbu.getEntry('Instrument', cfg['instrument']['instrument_name']).instrument_id
+        print('Found Instrument: {0}'.format(instrument_id))
+    except DBUtils.DBNoData:
+        # add it
+        instrument_id = dbu.addInstrument(satellite_id=satellite_id, **cfg['instrument'])
+        print('Added Instrument: {0}'.format(instrument_id))
 
-    1/0
+    # loop over all the products, check if they are there and add them if not
+    products = [k for k in cfg if k.startswith('product')]
+    db_products = [v.product_name for v in dbu.getAllProducts()]
+    for p in products:
+        # is the product in the DB?  If not add it
+        if cfg[p]['product_name'] in db_products:
+            p_id = dbu.getEntry('Product', cfg[p]['product_name']).product_id
+            cfg[p]['product_id'] = p_id
+            print('Found Product: {0}'.format(p_id))
+        else:
+            tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('inspector'))
+            p_id = dbu.addProduct(instrument_id=instrument_id, **tmp)
+            print('Added Product: {0}'.format(p_id))
+            cfg[p]['product_id'] = p_id
+            ippl = dbu.addInstrumentproductlink(instrument_id, p_id)
+            print('Added Instrumentproductlink: {0}'.format(ippl))
+            dbu.updateProductSubs(p_id)
 
+            # if the product was not there we will assume the inspector is not either (requies a product_id)
+            tmp = dict((k, cfg[p][k]) for k in cfg[p] if k.startswith('inspector'))
 
+            replace_dict = {'inspector_output_interface':'output_interface_version',
+                            'inspector_version':'version',
+                            'inspector_arguments': 'arguments',
+                            'inspector_description':'description',
+                            'inspector_newest_version':'newest_version',
+                            'inspector_relative_path':'relative_path',
+                            'inspector_date_written':'date_written',
+                            'inspector_filename':'filename',
+                            'inspector_active': 'active_code'}
+            for rd in replace_dict:
+                tmp[replace_dict[rd]] = tmp.pop(rd)
+            insp_id = dbu.addInspector(product=p_id, **tmp)
+            print('Added Inspector: {0}'.format(insp_id))
+            dbu.updateInspectorSubs(insp_id)
 
-    # add the product
-    satellite_id = dbu.getSatelliteID(cfg['satellite']['satellite_name'])
-    instrument_id = dbu.getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)
+    # loop over all the processes, check if they are there and add them if not
+    processes = [k for k in cfg if k.startswith('process')]
+    db_processes = dbu.getAllProcesses()
+    for p in processes:
+        # is the process in the DB?  If not add it
+        if cfg[p]['process_name'] in db_processes:
+            p_id = dbu.getEntry('Process', cfg[p]['process_name']).process_id
+            print('Found Process: {0}'.format(p_id))
+        else:
+            tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('code') and 'input' not in k)
+            # need to repace the output product with the right ID
+            # if it is a key then have to get the name from cfg, or it is a name itself
+            tmp['output_product'] = cfg[tmp['output_product']]['product_id']
+            p_id = dbu.addProcess(**tmp)
+            print('Added Process: {0}'.format(p_id))
 
-    prod_id = dbu.addProduct(cfg['product']['product_name'],
-                             instrument_id,
-                            cfg['product']['relative_path'],
-                            None,
-                            cfg['product']['format'],
-                            float(cfg['product']['level']),
-                            )
-    print '   added product {0}'.format(prod_id)
+            # now add the productprocesslink
+            tmp = dict((k, cfg[p][k]) for k in cfg[p] if 'input' in k)
+            for k in tmp:
+                ppl = dbu.addproductprocesslink(cfg[tmp[k]]['product_id'], p_id, 'optional' in k)
+                print('Added Productprocesslink: {0}'.format(ppl))
 
-    # add instrumentproductlink
-    dbu.addInstrumentproductlink(instrument_id, prod_id)
+            # if the process was not there we will assume the code is not either (requies a process_id)
+            tmp = dict((k, cfg[p][k]) for k in cfg[p] if k.startswith('code'))
 
-    # add inspector
-    version = Version.Version(*cfg['inspector']['version'].split('.'))
-    date_written = dup.parse(cfg['inspector']['date_written'])
+            replace_dict = {'code_filename':'filename',
+                            'code_arguments':'arguments',
+                            'code_relative_path': 'relative_path',
+                            'code_version':'version',
+                            'code_output_interface':'output_interface_version',
+                            'code_newest_version':'newest_version',
+                            'code_date_written':'date_written',
+                            'code_active':'active_code'}
+            for rd in replace_dict:
+                tmp[replace_dict[rd]] = tmp.pop(rd)
+            code_id = dbu.addCode(process_id=p_id, **tmp)
+            print('Added Code: {0}'.format(code_id))
 
-    insp_id = dbu.addInspector(cfg['inspector']['filename'],
-                               cfg['inspector']['relative_path'],
-                                cfg['inspector']['description'],
-                                version,
-                                toBool(cfg['inspector']['active_code']),
-                                date_written,
-                                int(cfg['inspector']['output_interface_version']),
-                                toBool(cfg['inspector']['newest_version']),
-                                prod_id,
-                                toNone(cfg['inspector']['arguments']),
-                                )
-    print '   added inspector {0}'.format(insp_id)
-    dbu.updateProductSubs(prod_id)
 
 
 if __name__ == "__main__":
