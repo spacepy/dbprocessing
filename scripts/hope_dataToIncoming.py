@@ -92,7 +92,7 @@ files = files_to_move(data_files, db_files)
 for f in files:
     try:
         if "emfisis" in f: # make a link not a copy
-            os.symlink(f, os.path.join(g_inc_path, f))
+            os.symlink(f, os.path.join(g_inc_path, os.path.basename(f)))
             DBlogging.dblogger.info("{0}: Linked {1} to {2}".format(__file__, f, g_inc_path))
         else:
             shutil.copy(f, g_inc_path)
