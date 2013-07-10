@@ -7,9 +7,8 @@ __version__ = '0.0'
 from distutils.core import setup
 import os
 
-scripts = ('scripts/ProcessQueue.py', 'scripts/addProducts.py',
+scripts = ('scripts/ProcessQueue.py',
                'scripts/writeDBhtml.py', 'scripts/writeProductsConf.py',
-               'scripts/updateProducts.py', 'scripts/addProcess.py',
                'scripts/writeProcessConf.py', 'scripts/deleteAllDBFiles.py',
                'scripts/README.txt', 'scripts/deleteDBFile.py',
                'scripts/flushProcessQueue.py', 'scripts/printProcessQueue.py',
@@ -18,12 +17,12 @@ scripts = ('scripts/ProcessQueue.py', 'scripts/addProducts.py',
                'scripts/qualityControlEmail.py', 'scripts/QCEmailer_conf.txt',
 	           'scripts/dataToIncoming.py', 'scripts/reprocessByCode.py',
                'scripts/reprocessByProduct.py', 'scripts/reprocessByInstrument.py',
-               'scripts/hope_dataToIncoming.py', 'scripts/reprocessByAll.py', 
-	       'scripts/hopeCoverageHTML.py', 'scripts/makeLatestSymlinks.py',
+               'scripts/hope_dataToIncoming.py', 'scripts/reprocessByAll.py',
+               'scripts/hopeCoverageHTML.py', 'scripts/makeLatestSymlinks.py',
                'scripts/hope_query.py', 'scripts/magephem_dataToIncoming.py',
                'scripts/magephem-pre-CoverageHTML.py', 'scripts/magephem_def_dataToIncoming.py',
-               'scripts/addVerboseProvenance.py', 'scripts/updateSHAsum.py', 
-	       'scripts/printInfo.py')
+               'scripts/addVerboseProvenance.py', 'scripts/updateSHAsum.py',
+               'scripts/printInfo.py', 'scripts/addFromConfig.py', 'scripts/CreateDB.py')
 
 scripts_dir = os.path.expanduser('~/dbUtils')
 

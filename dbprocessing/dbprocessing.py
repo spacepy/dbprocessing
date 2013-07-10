@@ -15,7 +15,7 @@ import DBqueue
 import DBUtils
 import runMe
 import Utils
-from Utils import strargs_to_args
+from dbprocessing.Utils import strargs_to_args
 
 try: # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError

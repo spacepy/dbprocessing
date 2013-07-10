@@ -24,6 +24,7 @@ from Diskfile import calcDigest, DigestError
 import DBlogging
 import DBStrings
 import Version
+import Utils
 
 ## This goes in the processing comment field in the DB, do update it
 __version__ = '2.0.3'
@@ -642,12 +643,12 @@ class DBUtils(object):
         return all the file names in the database
 
         if level==None get all filenames, otherwise only for a level
-        
+
         """
         if level is None:
             names = zip(*self.session.query(self.File.filename).all())[0]
         else:
-            names = zip(*self.session.query(self.File.filename).filter_by(data_level=level).all())[0]   
+            names = zip(*self.session.query(self.File.filename).filter_by(data_level=level).all())[0]
         if fullPath:
             names = [ self.getFileFullPath(v) for v in names]
         return names
@@ -661,7 +662,8 @@ class DBUtils(object):
 
     def addMission(self,
                     mission_name,
-                    rootdir):
+                    rootdir,
+                    incoming_dir):
         """ add a mission to the database
 
         @param mission_name: the name of the mission
@@ -680,7 +682,8 @@ class DBUtils(object):
             raise(DBError("Class Mission not found was it created?"))
 
         m1.mission_name = mission_name
-        m1.rootdir = rootdir
+        m1.rootdir = rootdir.replace('{MISSION}', mission_name)
+        m1.incoming_dir = incoming_dir.replace('{MISSION}', mission_name)
         self.session.add(m1)
         self._commitDB()
         return m1.mission_id
@@ -697,17 +700,16 @@ class DBUtils(object):
         s1 = self.Satellite()
 
         s1.mission_id = mission_id
-        s1.satellite_name = satellite_name
+        s1.satellite_name = satellite_name.replace('{MISSION}', self.getEntry('Mission', mission_id).mission_name)
         self.session.add(s1)
         self._commitDB()
-        return self.getSatelliteID(satellite_name)
+        return s1.satellite_id
 
     def addProcess(self,
                     process_name,
                     output_product,
                     output_timebase,
-                    extra_params=None,
-                    super_process_id=None):
+                    extra_params=None):
         """ add a process to the database
 
         @param process_name: the name of the process
@@ -716,8 +718,6 @@ class DBUtils(object):
         @type output_product: int
         @keyword extra_params: extra parameters to pass to the code
         @type extra_params: str
-        @keyword super_process_id: the process id of the superprocess for this process
-        @type super_process_id: int
         """
         if output_timebase not in ['RUN', 'ORBIT', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'FILE']:
             raise(ValueError("output_timebase invalid choice"))
@@ -727,19 +727,18 @@ class DBUtils(object):
         p1.process_name = process_name
         p1.extra_params = extra_params
         p1.output_timebase = output_timebase
-        p1.super_process_id = super_process_id
         self.session.add(p1)
         self._commitDB()
-        self.updateProcessSubs(p1.process_id)
+        # self.updateProcessSubs(p1.process_id)
         return p1.process_id
 
     def addProduct(self,
                     product_name,
                     instrument_id,
                     relative_path,
-                    super_product_id,
                     format,
-                    level):
+                    level,
+                    product_description):
         """ add a product to the database
 
         @param product_name: the name of the product
@@ -748,18 +747,16 @@ class DBUtils(object):
         @type instrument_id: int
         @param relative_path:relative path for the product
         @type relative_path: str
-        @param super_product_id: the product id of the super product for this product
-        @type super_product_id: int
         @param format: the format of the product files
-        @type super_product_id: str
+        @type format: str
         """
         p1 = self.Product()
         p1.instrument_id = instrument_id
         p1.product_name = product_name
         p1.relative_path = relative_path
-        p1.super_product_id = super_product_id
         p1.format = format
         p1.level = level
+        p1.product_description = product_description
         self.session.add(p1)
         self._commitDB()
         return p1.product_id
@@ -778,6 +775,19 @@ class DBUtils(object):
         p1.relative_path = relative_path
         fmt = self._nameSubProduct(p1.format, product_id)
         p1.format = fmt
+        self.session.add(p1)
+        self._commitDB()
+
+    def updateInspectorSubs(self, insp_id):
+        """
+        update an existing inspector performing the {} replacements
+        """
+        # need to do {} replacement, have to do it as a modification
+        p1 = self.getEntry('Inspector', insp_id)
+
+        insp_id = p1.inspector_id
+        relative_path = self._nameSubInspector(p1.relative_path, insp_id)
+        p1.relative_path = relative_path
         self.session.add(p1)
         self._commitDB()
 
@@ -912,6 +922,14 @@ class DBUtils(object):
         i1 = self.Instrument()
 
         i1.satellite_id = satellite_id
+        if '{MISSION}' in instrument_name:
+            mission_id = self.getSatelliteMission(satellite_id)
+            mission_name = self.getEntry('Mission', mission_id).mission_name
+            instrument_name = instrument_name.replace('{MISSION}', mission_name)
+        if '{SPACECRAFT}' in instrument_name:
+            satellite_name = self.getEntry('Satellite', satellite_id).satellite_name
+            instrument_name = instrument_name.replace('{SPACECRAFT}', satellite_name)
+
         i1.instrument_name = instrument_name
         self.session.add(i1)
         self._commitDB()
@@ -959,20 +977,23 @@ class DBUtils(object):
         @return: the code_id of the newly inserted code
         @rtype: long
         """
+        if isinstance(version, (str, unicode)):
+            version = Version.Version.fromString(version)
+
         c1 = self.Code()
         c1.filename = filename
         c1.relative_path = relative_path
-        c1.code_start_date = code_start_date
-        c1.code_stop_date = code_stop_date
+        c1.code_start_date = Utils.parseDate(code_start_date)
+        c1.code_stop_date = Utils.parseDate(code_stop_date)
         c1.code_description = code_description
         c1.process_id = process_id
         c1.interface_version = version.interface
         c1.quality_version =version.quality
         c1.revision_version = version.revision
-        c1.active_code = active_code
-        c1.date_written = date_written
+        c1.active_code = Utils.toBool(active_code)
+        c1.date_written = Utils.parseDate(date_written)
         c1.output_interface_version = output_interface_version
-        c1.newest_version = newest_version
+        c1.newest_version = Utils.toBool(newest_version)
         c1.arguments = arguments
 
         self.session.add(c1)
@@ -1016,6 +1037,8 @@ class DBUtils(object):
         @rtype: long
 
         """
+        if isinstance(version, (str, unicode)):
+            version = Version.Version.fromString(version)
         c1 = self.Inspector()
         c1.filename = filename
         c1.relative_path = relative_path
@@ -1026,10 +1049,10 @@ class DBUtils(object):
         c1.interface_version = version.interface
         c1.quality_version = version.quality
         c1.revision_version = version.revision
-        c1.active_code = active_code
-        c1.date_written = date_written
+        c1.active_code = Utils.toBool(active_code)
+        c1.date_written = Utils.parseDate(date_written)
         c1.output_interface_version = output_interface_version
-        c1.newest_version = newest_version
+        c1.newest_version = Utils.toBool(newest_version)
         c1.arguments = self._nameSubProduct(arguments, product)
 
         self.session.add(c1)
@@ -1042,12 +1065,14 @@ class DBUtils(object):
         """
         if inStr is None:
             return inStr
-        repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
+        repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         ftb = self.getProductTraceback(product_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+        if '{SPACECRAFT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{SPACECRAFT}', ftb['satellite'].satellite_name)
         if '{MISSION}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{MISSION}', ftb['mission'].mission_name)
         if '{PRODUCT}' in inStr : # need to replace with the instrument name
@@ -1058,6 +1083,33 @@ class DBUtils(object):
             inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
         if any(val in inStr for val in repl): # call yourself again
             inStr = self._nameSubProduct(inStr, product_id)
+        return inStr
+
+    def _nameSubInspector(self, inStr, inspector_id):
+        """
+        in inStr replace the standard {} with the names
+        """
+        if inStr is None:
+            return inStr
+        repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
+        insp = self.getEntry('Inspector', inspector_id)
+        ftb = self.getProductTraceback(insp.product)
+        if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+        if '{SATELLITE}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+        if '{SPACECRAFT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{SPACECRAFT}', ftb['satellite'].satellite_name)
+        if '{MISSION}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{MISSION}', ftb['mission'].mission_name)
+        if '{PRODUCT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
+        if '{LEVEL}' in inStr :
+            inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
+        if '{ROOTDIR}' in inStr :
+            inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
+        if any(val in inStr for val in repl): # call yourself again
+            inStr = self._nameSubProduct(inStr, inspector_id)
         return inStr
 
     def _nameSubProcess(self, inStr, process_id):
@@ -1597,7 +1649,10 @@ class DBUtils(object):
             return sq.satellite_id
         except ValueError: # it was a name
             sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).all()
-        return sq[0].satellite_id  # there can be only one of each name
+        try:
+            return sq[0].satellite_id  # there can be only one of each name
+        except IndexError:
+            raise(DBNoData("No satellite %s found in the DB" % (sat_name)))
 
     def getCodePath(self, code_id):
         """
@@ -1831,6 +1886,32 @@ class DBUtils(object):
         retval['mission'] = mission
         return retval
 
+    def getInspectorTraceback(self, inst_id):
+        """
+        given a inspector id return instances of all the tables it takes to define it
+        mission, satellite, instrument, product, inspector, Instrumentproductlink
+        """
+        prod_id = self.getProductID(prod_id) # convert name to ID
+        retval = {}
+        # get the product instance
+        retval['product'] = self.getEntry('Product', prod_id)
+        # inspector
+        retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
+        # instrument
+        inst_id = self.getInstrumentFromProduct(prod_id)
+        if inst_id == []:
+            raise(DBError('DB ERROR, the self.getInstrumentFromProduct failed, fill in instrumentproductlink'))
+        retval['instrument'] = self.getEntry('Instrument', inst_id)
+        # Instrumentproductlink
+        retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((inst_id, prod_id))
+        # satellite
+        sat_id = self.getEntry('Instrument', inst_id).satellite_id
+        retval['satellite'] = self.getEntry('Satellite', sat_id)
+        # mission
+        mission = self.getSatelliteMission(sat_id)
+        retval['mission'] = mission
+        return retval
+
     def getFileTraceback(self, file_id):
         """
         given a product id return instances of all the tables it takes to define it
@@ -1903,20 +1984,13 @@ class DBUtils(object):
 
     def getAllProcesses(self, timebase='all'):
         """
-        get all processes for the given mission
+        get all processes
         """
         outval = []
         if timebase == 'all':
             procs = self.session.query(self.Process).all()
         else:
             procs = self.session.query(self.Process).filter_by(output_timebase = timebase.upper()).all()
-        mission_id = self.getMissionID(self.mission)
-        for val in procs:
-            try:
-                if self.getProcessTraceback(val.process_id)['mission'].mission_id == mission_id:
-                    outval.append(val)
-            except ValueError: # happens when a getProcessTraceback fails
-                continue
         return outval
 
     def getAllProducts(self):

@@ -71,7 +71,6 @@ class Version(object):
     >>> v == v2
     True
     """
-
     def __init__(self,
             interface_version,
             quality_version,
@@ -80,6 +79,13 @@ class Version(object):
         self.revision = int(revision_version)
         self.quality = int(quality_version)
         self._checkVersion()
+
+    @staticmethod
+    def fromString(inval):
+        """
+        given a string of the form x.y.z return a Version object
+        """
+        return Version(*inval.split('.'))
 
     def _checkVersion(self):
         """
@@ -157,6 +163,6 @@ class Version(object):
 
     def __add__(self, other):
         return [self.interface + other.interface, self.quality + other.quality, self.revision + other.revision]
-    
-    
+
+
 
