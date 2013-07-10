@@ -133,13 +133,29 @@ inspector_arguments = sc={SPACECRAFT}  apid={20a}
 
 [product_l05hk]
 product_name = {SPACECRAFT}_pre_ect-{INSTRUMENT}-hk-L05
-relative_path = {SPACECRAFT}/{INSTRUMENT}/level1
+relative_path = {SPACECRAFT}/{INSTRUMENT}/level05
 level = 0.5
 format = {SPACECRAFT}_pre_ect-{INSTRUMENT}-hk-L05_{nnnn}_v{VERSION}.cdf
 product_description = RBSPA REPT L05 HK
 inspector_filename = ect_L05_V1.0.0.py
 inspector_relative_path = codes/inspectors
 inspector_description = RBSPA REPT L05 hk
+inspector_version = 1.0.0
+inspector_output_interface = 1
+inspector_active = True
+inspector_date_written = 2013-07-09
+inspector_newest_version = True
+inspector_arguments = product_name={PRODUCT}
+
+[product_l1hk]
+product_name = {SPACECRAFT}_pre_ect-{INSTRUMENT}-hk-L1
+relative_path = {SPACECRAFT}/{INSTRUMENT}/level1
+level = 1.0
+format = {SPACECRAFT}_pre_ect-{INSTRUMENT}-hk-L05_{DATE}_v{VERSION}.cdf
+product_description = RBSPA REPT L1 HK
+inspector_filename = ect_L1_V1.0.0.py
+inspector_relative_path = codes/inspectors
+inspector_description = RBSPA REPT L1 hk
 inspector_version = 1.0.0
 inspector_output_interface = 1
 inspector_active = True
@@ -166,6 +182,23 @@ code_date_written = 2013-07-04
 code_newest_version = True
 code_arguments = None
 
+[process_hk_l05-l1]
+process_name = repta_hk_l05_l1
+output_product = product_l1hk
+output_timebase = DAILY
+extra_params = None
+required_input1 = product_l1hk
+code_filename = l05_to_l1.py
+code_relative_path = codes/rept
+code_start_date = 2000-01-01
+code_stop_date = 2050-12-31
+code_description = processing code for L05 to L1
+code_version = 1.0.0
+code_output_interface = 1
+code_active = True
+code_date_written = 2013-07-04
+code_newest_version = True
+code_arguments = None
 
 
 
