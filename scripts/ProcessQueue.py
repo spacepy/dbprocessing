@@ -34,6 +34,8 @@ if __name__ == "__main__":
                       help="only do a dryrun processing or ingesting", default=False)
     parser.add_option("-r", "--report", dest="report", action="store_true",
                       help="Make the html report", default=False)
+    parser.add_option("-l", "--log-level", dest="loglevel",
+                      help="Set the logging level", default="debug")
 
     (options, args) = parser.parse_args()
     if len(args) != 0:
@@ -44,6 +46,11 @@ if __name__ == "__main__":
     if not options.i and not options.p:
         parser.error("either -i or -p must be specified")
 
+    if options.loglevel not in DBlogging.LEVELS:
+        parser.error("invalid --log-level specified")
+
+    DBlogging.dblogger.setLevel(DBlogging.LEVELS[options.loglevel])
+        
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun)
 
     # check currently processing
