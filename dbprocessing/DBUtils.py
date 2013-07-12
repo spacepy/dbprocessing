@@ -1730,7 +1730,7 @@ class DBUtils(object):
         """
         basedir = self.getMissionDirectory()
         # TODO make this general somehow?  Passed in?
-        if 'RBSP_REPT' in self.mission:
+        if 'REPT' in self.mission:
             path = os.path.join(basedir, 'rept_incoming/')
         else:
             path = os.path.join(basedir, 'hope_incoming/')
