@@ -103,7 +103,21 @@ def configCheck(conf):
                                  'inspector_date_written', 'inspector_filename',
                                  'inspector_description', 'inspector_active', 'product_name'])
 
+def _fileTest(filename):
+    """
+    open up the file as txt and do a check that there are no repeated section headers
+    """
+    def rep_list(inval):
+        seen = set()
+        seen_twice = set( x for x in inval if x in seen or seen.add(x) )
+        return list(seen_twice)
 
+    with open(filename, 'r') as fp:
+        data = fp.readlines()
+    data = [v.strip() for v in data if v[0] == '[']
+    seen_twice = rep_list(data)
+    if seen_twice:
+        raise(ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice) ))
 
 
 def addStuff(cfg, options):
@@ -230,6 +244,8 @@ if __name__ == "__main__":
     if not os.path.isfile(filename):
         parser.error("file: {0} does not exist or is not readable".format(filename))
 
+    _fileTest(filename)
+    
     conf = readconfig(filename)
     configCheck(conf)
     if options.verify: # we are done here if --verify is set
