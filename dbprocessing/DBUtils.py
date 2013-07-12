@@ -994,7 +994,7 @@ class DBUtils(object):
         c1.date_written = Utils.parseDate(date_written)
         c1.output_interface_version = output_interface_version
         c1.newest_version = Utils.toBool(newest_version)
-        c1.arguments = arguments
+        c1.arguments = Utils.toNone(arguments)
 
         self.session.add(c1)
         self._commitDB()
@@ -1053,7 +1053,7 @@ class DBUtils(object):
         c1.date_written = Utils.parseDate(date_written)
         c1.output_interface_version = output_interface_version
         c1.newest_version = Utils.toBool(newest_version)
-        c1.arguments = self._nameSubProduct(arguments, product)
+        c1.arguments = Utils.toNone(self._nameSubProduct(arguments, product))
 
         self.session.add(c1)
         self._commitDB()
