@@ -19,7 +19,7 @@
 
 import itertools
 from optparse import OptionParser
-
+import tempfile
 import ConfigParser
 from dateutil import parser as dup
 import os
@@ -128,28 +128,28 @@ def addStuff(cfg, options):
     if cfg['mission']['mission_name'] not in dbu.getMissions(): # was it there?
         # add it
         mission_id = dbu.addMission(**cfg['mission'])
-        print('Added Mission: {0}'.format(mission_id))
+        print('Added Mission: {0} {1}'.format(mission_id, dbu.getEntry('Mission', mission_id).mission_name))
     else:
         mission_id = dbu.getMissionID(cfg['mission']['mission_name'])
-        print('Found Mission: {0}'.format(mission_id))
+        print('Found Mission: {0} {1}'.format(mission_id, dbu.getEntry('Mission', mission_id).mission_name))
 
     # is the satellite in the DB?  If not add it
     try:
         satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name'].replace('{MISSION}', cfg['mission']['mission_name'])).satellite_id
-        print('Found Satellite: {0}'.format(satellite_id))
+        print('Found Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite',satellite_id).satellite_name ))
     except DBUtils.DBNoData:
         # add it
         satellite_id = dbu.addSatellite(mission_id=mission_id, **cfg['satellite'])
-        print('Added Satellite: {0}'.format(satellite_id))
+        print('Added Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite',satellite_id).satellite_name))
 
     # is the instrument in the DB?  If not add it
     try:
         instrument_id = dbu.getEntry('Instrument', cfg['instrument']['instrument_name']).instrument_id
-        print('Found Instrument: {0}'.format(instrument_id))
+        print('Found Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
     except DBUtils.DBNoData:
         # add it
         instrument_id = dbu.addInstrument(satellite_id=satellite_id, **cfg['instrument'])
-        print('Added Instrument: {0}'.format(instrument_id))
+        print('Added Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
 
     # loop over all the products, check if they are there and add them if not
     products = [k for k in cfg if k.startswith('product')]
@@ -159,11 +159,11 @@ def addStuff(cfg, options):
         if cfg[p]['product_name'] in db_products:
             p_id = dbu.getEntry('Product', cfg[p]['product_name']).product_id
             cfg[p]['product_id'] = p_id
-            print('Found Product: {0}'.format(p_id))
+            print('Found Product: {0} {1}'.format(p_id, dbu.getEntry('Product',p_id).product_name))
         else:
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('inspector'))
             p_id = dbu.addProduct(instrument_id=instrument_id, **tmp)
-            print('Added Product: {0}'.format(p_id))
+            print('Added Product: {0} {1}'.format(p_id, dbu.getEntry('Product',p_id).product_name))
             cfg[p]['product_id'] = p_id
             ippl = dbu.addInstrumentproductlink(instrument_id, p_id)
             print('Added Instrumentproductlink: {0}'.format(ippl))
@@ -184,7 +184,7 @@ def addStuff(cfg, options):
             for rd in replace_dict:
                 tmp[replace_dict[rd]] = tmp.pop(rd)
             insp_id = dbu.addInspector(product=p_id, **tmp)
-            print('Added Inspector: {0}'.format(insp_id))
+            print('Added Inspector: {0} {1}'.format(insp_id, dbu.getEntry('Inspector',insp_id).filename))
             dbu.updateInspectorSubs(insp_id)
 
     # loop over all the processes, check if they are there and add them if not
@@ -194,14 +194,14 @@ def addStuff(cfg, options):
         # is the process in the DB?  If not add it
         if cfg[p]['process_name'] in db_processes:
             p_id = dbu.getEntry('Process', cfg[p]['process_name']).process_id
-            print('Found Process: {0}'.format(p_id))
+            print('Found Process: {0} {1}'.format(p_id, dbu.getEntry('Process',p_id).process_name))
         else:
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('code') and 'input' not in k)
             # need to repace the output product with the right ID
             # if it is a key then have to get the name from cfg, or it is a name itself
             tmp['output_product'] = cfg[tmp['output_product']]['product_id']
             p_id = dbu.addProcess(**tmp)
-            print('Added Process: {0}'.format(p_id))
+            print('Added Process: {0} {1}'.format(p_id, dbu.getEntry('Process',p_id).process_name))
 
             # now add the productprocesslink
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if 'input' in k)
@@ -223,7 +223,7 @@ def addStuff(cfg, options):
             for rd in replace_dict:
                 tmp[replace_dict[rd]] = tmp.pop(rd)
             code_id = dbu.addCode(process_id=p_id, **tmp)
-            print('Added Code: {0}'.format(code_id))
+            print('Added Code: {0} {1}'.format(code_id, dbu.getEntry('Code',code_id).filename))
 
 
 
@@ -251,8 +251,30 @@ if __name__ == "__main__":
     if options.verify: # we are done here if --verify is set
         sys.exit(0)
 
-    addStuff(conf, options)
+    # do subsititions and use a tempfile for the processing
+    MISSION = conf['mission']['mission_name']
+    SPACECRAFT = conf['satellite']['satellite_name'].replace('{MISSION}', MISSION)
+    INSTRUMENT = conf['instrument']['instrument_name'].replace('{MISSION}', MISSION).replace('{SPACECRAFT}', SPACECRAFT)
+    print MISSION, SPACECRAFT, INSTRUMENT
+    with open(filename, 'r') as fp:
+        cfg = fp.readlines()
+    for ii, l in enumerate(cfg):
+        cfg[ii] = cfg[ii].replace('{MISSION}', MISSION)
+        cfg[ii] = cfg[ii].replace('{SPACECRAFT}', SPACECRAFT)
+        cfg[ii] = cfg[ii].replace('{INSTRUMENT}', INSTRUMENT)
 
+    try:
+        tmpf = tempfile.NamedTemporaryFile(delete=False)
+        tmpf.file.writelines(cfg)
+        tmpf.close()
+        # recheck the temp file
+        conf = readconfig(tmpf.name)
+        configCheck(conf)
+        
+        addStuff(conf, options)
+    finally:
+        #os.remove(tmpf.name)
+        pass
 
 
 
