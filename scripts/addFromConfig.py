@@ -73,6 +73,18 @@ def _keysCheck(conf, section, keys, ignore=None):
         if k not in keys and ignore not in k:
             raise(ValueError('Specified key: "{0}" is not allowed in [{1}] section'.format(k, section) ))
 
+def _keysPresentCheck(conf):
+    """
+    loop over each key looking for cross-references and complain if they are not there
+    """
+    for k in conf:
+        if k.startswith('process'):
+            for k2 in conf[k]:
+                if 'input' in k2:
+                    if conf[k][k2] not in conf:
+                        raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
+    
+
 def configCheck(conf):
     """
     go through a file that has been read in and make sure that it is going to
@@ -102,6 +114,8 @@ def configCheck(conf):
                                  'inspector_newest_version', 'inspector_relative_path',
                                  'inspector_date_written', 'inspector_filename',
                                  'inspector_description', 'inspector_active', 'product_name'])
+
+    _keysPresentCheck(conf)
 
 def _fileTest(filename):
     """
