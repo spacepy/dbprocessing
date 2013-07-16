@@ -10,17 +10,8 @@ __version__ = '2.0.3'
 
 
 class DBfileError(Exception):
-    """Exception that is raised by DBfile class
-
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
-
-    @version: V1: 05-Oct-2010 (BAL)
-    """
+    """Exception that is raised by DBfile class    """
     pass
-
-
 
 
 class DBfile(object):
@@ -28,12 +19,6 @@ class DBfile(object):
     DBfile class is an extension of Diskfile that takes a physical file on disk and
     maps it to the database file entry, this is not mapped to te file table in the DB
     but instead a bridge between the two.
-
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
-
-    @version: V1: 05-Oct-2010 (BAL)
     """
     def __init__(self,
                  diskfile, dbu, makeDiskFile = False):
@@ -46,22 +31,12 @@ class DBfile(object):
         @type infile: Diskfile
         @param dbu: pass in the current DBUtils session so that a new connection is not made
         @type dbu: DBUtils
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 05-Oct-2010 (BAL)
         """
         if makeDiskFile == True:
             diskfile = Diskfile.Diskfile(diskfile)
         if not isinstance(diskfile, Diskfile.Diskfile):
             raise(DBfileError('Wrong input, must input a Diskfile object'))
 
-        # this keeps opening connections
-        #dbu = DBUtils.DBUtils(diskfile.mission)
-        #dbu._openDB()
-        #dbu._createTableObjects()
         self.dbu = dbu
         self.diskfile = diskfile
         self.checkVersion()
@@ -77,17 +52,9 @@ class DBfile(object):
 
         @return: True the file is newest, False it is not
         @rtype: bool
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 05-Oct-2010 (BAL)
-        @TODO add code here
         """
         self.diskfile.params['newest_version'] = True
         return True
-
 
     def addFileToDB(self):
         """
@@ -95,12 +62,6 @@ class DBfile(object):
 
         @return: the file_id of the newly added file
         @rtype: long
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 05-Oct-2010 (BAL)
         """
         f_id = self.dbu.addFile(filename = self.diskfile.params['filename'],
                         data_level = self.diskfile.params['data_level'],
@@ -128,12 +89,6 @@ class DBfile(object):
 
         @return: the full path for the DBfile
         @rtype: str
-
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 05-Oct-2010 (BAL)
         """
         relative_path = self.dbu.session.query(self.dbu.Product.relative_path).filter_by(product_id  = self.diskfile.params['product_id'])
         if relative_path.count() > 1:
