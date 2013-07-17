@@ -1715,16 +1715,23 @@ class DBUtils(object):
         else:
             return outval[-1].code_id
 
-    def getMissionDirectory(self):
+    def getMissionDirectory(self, mission_id=None):
         """
         return the base directory for the current mission
 
         @return: base directory for current mission
         @rtype: str
         """
-        sq = self.session.query(self.Mission.rootdir).filter_by(mission_id = self.session.query(self.Mission.mission_id).first()[0])
-        return sq[0][0]  # there can be only one of each name
+        if mission_id is None:
+            mission_id = self.session.query(self.Mission.mission_id).all()
+            if len(mission_id) > 1:
+                raise(ValueError('No mission id specified and more than one mission present'))
+            else:
+                mission_id = mission_id[0][0]
 
+        mission = self.getEntry('Mission',mission_id)
+        return mission.rootdir
+        
     def _checkIncoming(self):
         """
         check the incoming directory for the current mission and add those files to the getting list
