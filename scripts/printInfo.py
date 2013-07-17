@@ -17,7 +17,7 @@ from dbprocessing import Version
    
 
 if __name__ == '__main__':
-    usage = "usage: %prog database field"
+    usage = "usage: %prog database field \n Field can be: Product, Mission (more to come)"
     parser = OptionParser(usage=usage)
 
     (options, args) = parser.parse_args()
@@ -43,6 +43,13 @@ if __name__ == '__main__':
                                                          p.level,
                                                          p.product_name,
                                                          os.path.join(basepath, p.relative_path)))
+    elif file == 'Mission':
+        print("{0:4} {1:40} {2:40} {3:40}".format("ID", "NAME", "ROOT", "INCOMING"))
+        for m in dbu.session.query(dbu.Mission).all():
+            print("{0:4} {1:40} {2:40} {3:40}".format(m.mission_id,
+                                                      m.mission_name,
+                                                      m.rootdir,
+                                                      m.incoming_dir))
     else:
         dbu._closeDB()        
         raise(NotImplementedError('Attr: "{0}" not yet implemented'.format(field) ))
