@@ -158,9 +158,12 @@ def addStuff(cfg, options):
 
     # is the instrument in the DB?  If not add it
     try:
-        instrument_id = dbu.getEntry('Instrument', cfg['instrument']['instrument_name']).instrument_id
+        instrument = dbu.getEntry('Instrument', cfg['instrument']['instrument_name'])
+        if instrument.satellite_id != satellite_id:
+            raise(ValueError()) # this means it is the same name on a different sat, need to add
+        instruemnt_id = instrument.instrument_id
         print('Found Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
-    except DBUtils.DBNoData:
+    except (DBUtils.DBNoData, ValueError):
         # add it
         instrument_id = dbu.addInstrument(satellite_id=satellite_id, **cfg['instrument'])
         print('Added Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
