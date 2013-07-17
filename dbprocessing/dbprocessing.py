@@ -396,7 +396,12 @@ class ProcessQueue(object):
             startDate = startDate.date()
         if isinstance(endDate, datetime.datetime):
             endDate = endDate.date()
-        prod_id = self.dbu.getProductID(id_in)
+        try:
+            prod_id = self.dbu.getProductID(id_in)
+        except DBUtils.DBNoData:
+            print('No product_id {0} found in the DB'.format(id_in))
+            return None
+
         files = self.dbu.getFilesByProduct(prod_id)
         # files before this date are removed from the list
         if startDate is not None:
@@ -406,12 +411,14 @@ class ProcessQueue(object):
             files = [val for val in files if val.utc_file_date <= endDate]
         f_ids = [val.file_id for val in files]
         filesToReprocess = set(f_ids)
+        added = 0
         for f in filesToReprocess:
             try:
                 self.dbu.Processqueue.push(f, incVersion)
-            except filesToReprocess:
-                pass
-        return len(filesToReprocess)
+                added += 1
+            except DBUtils.DBError:
+                print("File {0} failed to add, was already there".format(f))
+        return added
 
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=2):
         files = self.dbu.getFilesByInstrument(id_in, level=level, id_only=False)

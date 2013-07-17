@@ -48,7 +48,8 @@ if __name__ == "__main__":
     db = dbprocessing.ProcessQueue(options.mission,)
 
     num = db.reprocessByProduct(args[0], startDate=startDate, endDate=endDate, incVersion=options.force)
-
+    if num is None:
+        num = 0
     print('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
     DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
 

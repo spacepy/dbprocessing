@@ -150,6 +150,9 @@ if __name__ == "__main__":
 #                 pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry('Product', pq.dbu.getEntry('Process', val.process_id).output_product).level)
 #==============================================================================
 
+                # lets sort the runme_list so that they process in order, kinda nice
+                
+                pq.runme_list = sorted(pq.runme_list, key=lambda x: x.utc_file_date)
                 print len(pq.runme_list), pq.runme_list
                 run_num = 0
                 while pq.runme_list:
