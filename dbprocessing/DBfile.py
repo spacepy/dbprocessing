@@ -4,6 +4,7 @@ import tarfile
 
 import DBlogging
 import Diskfile
+import Utils
 
 
 __version__ = '2.0.3'
@@ -113,8 +114,14 @@ class DBfile(object):
         """
         path = self.getDirectory()
         ## need to do path replacements
-        path = self._doDirSubs(path)
-        
+        path = Utils.dirSubs(path,
+                             self.diskfile.params['filename'],
+                             self.diskfile.params['utc_file_date'],
+                             self.diskfile.params['utc_start_time'],
+                             '{0}.{1}.{2}'.format(self.diskfile.params['interface_version'],
+                                                                  self.diskfile.params['quality_version'],
+                                                                  self.diskfile.params['revision_version']))
+                                                                  
         # if the file is a link just remove the link and pretend we moved it, this means
         # that this file is tracked only as a dependency
         if os.path.islink(self.diskfile.infile):
@@ -141,64 +148,4 @@ class DBfile(object):
 
         return (self.diskfile.infile, os.path.join(path, self.diskfile.params['filename']))
 
-    def _doDirSubs(self, path):
-        """
-        do any substitutions that are needed to put ting in the right place
-        # Honored database substitutions used as {Y}{MILLI}{PRODUCT}
-        #	Y: 4 digit year
-        #	m: 2 digit month
-        #	b: 3 character month (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
-        #	d: 2 digit day
-        #	y: 2 digit year
-        #	j: 3 digit day of year
-        #	H: 2 digit hour (24-hour time)
-        #	M: 2 digit minute
-        #	S: 2 digit second
-        #	VERSION: version string, interface.quality.revision
-        #	DATE: the UTC date from a file, same as Ymd
-        #	MISSION: the mission name from the db
-        #	SPACECRAFT: the spacecraft name from the db
-        #	PRODUCT: the product name from the db
-        """
-        if '{INSTRUMENT}' in path or '{SATELLITE}' in path:        
-            ftb = self.dbu.getFileTraceback(self.diskfile.params['filename'])
-            if '{INSTRUMENT}' in path : # need to replace with the instrument name
-                path = path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
-            if '{SATELLITE}' in path : # need to replace with the instrument name
-                path = path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
-            if '{SPACECRAFT}' in path : # need to replace with the instrument name
-                path = path.replace('{SPACECRAFT}', ftb['satellite'].satellite_name)
-            if '{MISSION}' in path:
-                path = path.replace('{MISSION}', ftb['mission'].mission_name)
-            if '{PRODUCT}' in path:
-                path = path.replace('{PRODUCT}', ftb['product'].product_name)
-
-        if '{Y}' in path:
-            path = path.replace('{Y}', self.diskfile.params['utc_file_date'].strftime('%Y'))   
-        if '{m}' in path:
-            path = path.replace('{m}', self.diskfile.params['utc_file_date'].strftime('%m'))   
-        if '{d}' in path:
-            path = path.replace('{d}', self.diskfile.params['utc_file_date'].strftime('%d'))   
-        if '{b}' in path:
-            months = {1:'Jan', 2:'Feb', 3:'Mar', 4:'Apr', 5:'May', 6:'Jun', 7:'Jul', 8:'Aug', 9:'Sep', 10:'Oct', 11:'Nov', 12:'Dec'}
-            path = path.replace('{b}', months[self.diskfile.params['utc_file_date'].month])
-        if '{y}' in path:
-            path = path.replace('{y}', self.diskfile.params['utc_file_date'].strftime('%y'))                       
-        if '{j}' in path:
-            path = path.replace('{j}', self.diskfile.params['utc_file_date'].strftime('%j'))               
-        if '{H}' in path:
-            path = path.replace('{H}', self.diskfile.params['utc_start_time'].strftime('%H'))
-        if '{M}' in path:
-            path = path.replace('{M}', self.diskfile.params['utc_start_time'].strftime('%M'))
-        if '{S}' in path:
-            path = path.replace('{S}', self.diskfile.params['utc_start_time'].strftime('%S'))
-        if '{VERSION}' in path:
-            path = path.replace('{VERSION}', '{0}.{1}.{2}'.format(self.diskfile.params['interface_version'],
-                                                                  self.diskfile.params['quality_version'],
-                                                                  self.diskfile.params['revision_version']))
-        if '{DATE}' in path:
-             path = path.replace('{DATE}', self.diskfile.params['utc_file_date'].strftime('%Y%m%d'))
-        return path
-
-
-
+ 

@@ -37,20 +37,6 @@ class DBfileTests(unittest.TestCase):
         super(DBfileTests, self).tearDown()
         os.remove(filename)
 
-    def test_doDirSubs(self):
-        """the substitutions should work"""
-        dbf = DBfile.DBfile(self.diskfile, self.dbu)
-        path = '{Y}{m}{d}'
-        self.assertEqual('20120412', dbf._doDirSubs(path))
-        path = '{DATE}'
-        self.assertEqual('20120412', dbf._doDirSubs(path))
-        path = '{Y}{b}{d}'
-        self.assertEqual('2012Apr12', dbf._doDirSubs(path))
-        path = '{Y}{j}'
-        self.assertEqual('2012103', dbf._doDirSubs(path))
-        path = '{VERSION}'
-        self.assertEqual('1.2.3', dbf._doDirSubs(path))
-
 
 if __name__ == "__main__":
     unittest.main()

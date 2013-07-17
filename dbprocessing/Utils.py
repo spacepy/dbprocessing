@@ -75,3 +75,63 @@ def strargs_to_args(strargs):
         pass
     return kwargs
 
+def dirSubs(path, filename, utc_file_date, utc_start_time, version):
+        """
+        do any substitutions that are needed to put ting in the right place
+        # Honored database substitutions used as {Y}{MILLI}{PRODUCT}
+        #	Y: 4 digit year
+        #	m: 2 digit month
+        #	b: 3 character month (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
+        #	d: 2 digit day
+        #	y: 2 digit year
+        #	j: 3 digit day of year
+        #	H: 2 digit hour (24-hour time)
+        #	M: 2 digit minute
+        #	S: 2 digit second
+        #	VERSION: version string, interface.quality.revision
+        #	DATE: the UTC date from a file, same as Ymd
+        #	MISSION: the mission name from the db
+        #	SPACECRAFT: the spacecraft name from the db
+        #	PRODUCT: the product name from the db
+        """
+        if '{INSTRUMENT}' in path or '{SATELLITE}' in path or '{SPACECRAFT}' in path or '{MISSION}' in path or '{PRODUCT}' in path:        
+            ftb = self.dbu.getFileTraceback(filename)
+            if '{INSTRUMENT}' in path : # need to replace with the instrument name
+                path = path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
+            if '{SATELLITE}' in path : # need to replace with the instrument name
+                path = path.replace('{SATELLITE}', ftb['satellite'].satellite_name)
+            if '{SPACECRAFT}' in path : # need to replace with the instrument name
+                path = path.replace('{SPACECRAFT}', ftb['satellite'].satellite_name)
+            if '{MISSION}' in path:
+                path = path.replace('{MISSION}', ftb['mission'].mission_name)
+            if '{PRODUCT}' in path:
+                path = path.replace('{PRODUCT}', ftb['product'].product_name)
+
+        if '{Y}' in path:
+            path = path.replace('{Y}', utc_file_date.strftime('%Y'))   
+        if '{m}' in path:
+            path = path.replace('{m}', utc_file_date.strftime('%m'))   
+        if '{d}' in path:
+            path = path.replace('{d}', utc_file_date.strftime('%d'))   
+        if '{b}' in path:
+            months = {1:'Jan', 2:'Feb', 3:'Mar', 4:'Apr', 5:'May', 6:'Jun', 7:'Jul', 8:'Aug', 9:'Sep', 10:'Oct', 11:'Nov', 12:'Dec'}
+            path = path.replace('{b}', months[utc_file_date.month])
+        if '{y}' in path:
+            path = path.replace('{y}', utc_file_date.strftime('%y'))                       
+        if '{j}' in path:
+            path = path.replace('{j}', utc_file_date.strftime('%j'))               
+        if '{H}' in path:
+            path = path.replace('{H}', utc_start_time.strftime('%H'))
+        if '{M}' in path:
+            path = path.replace('{M}', utc_start_time.strftime('%M'))
+        if '{S}' in path:
+            path = path.replace('{S}', utc_start_time.strftime('%S'))
+        if '{VERSION}' in path:
+            if isinstance(version, (unicode, str)):
+                version = Version.Version.fromString(version)
+            path = path.replace('{VERSION}', '{0}'.format(str(version)))
+        if '{DATE}' in path:
+             path = path.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+        return path
+
+
