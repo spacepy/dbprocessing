@@ -13,7 +13,6 @@ inspector requirements:
             * self.diskfile.params['utc_file_date'] : date object (user)
             * self.diskfile.params['utc_start_time'] : datetime object (user)
             * self.diskfile.params['utc_stop_time'] : datetime object (user)
-            * self.diskfile.params['data_level'] : float (user)
             self.diskfile.params['check_date'] : None (optional)
             * self.diskfile.params['verbose_provenance'] : string (user) (optional)
             * self.diskfile.params['quality_comment'] : string (user) (optional)
@@ -30,6 +29,7 @@ inspector requirements:
             self.diskfile.params['filefilelink'] : long (filled by db)
             self.diskfile.params['filecodelink'] : long (filled by db)
             self.diskfile.params['newest_version'] : bool (filled by db)
+            * self.diskfile.params['data_level'] : float (filled by db)
 
 inspector suggestions:
 """
@@ -98,6 +98,11 @@ class inspector(object):
         self.diskfile.params['exists_on_disk'] = True  # we are parsing it so it exists_on_disk
         self.diskfile.params['shasum'] = Diskfile.calcDigest(self.diskfile.infile)
         self.diskfile.params['product_id'] = self.product
+        if self.diskfile.params['data_level'] is not None:
+            DBlogging.dblogger.info("Inspector {0}:  set level to {1}, this is ignored and set by the product definition".format(self.code_name, self.diskfile.params['data_level']))
+            print("Inspector {0}:  set level to {1}, this is ignored and set by the product definition".format(self.code_name, self.diskfile.params['data_level']))
+        self.diskfile.params['data_level'] = dbu.getEntry('Product', self.product).level
+
 
     def __call__(self):
         """
