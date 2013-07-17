@@ -43,7 +43,7 @@ if __name__ == '__main__':
                                                          p.level,
                                                          p.product_name,
                                                          os.path.join(basepath, p.relative_path)))
-    elif file == 'Mission':
+    elif field == 'Mission':
         print("{0:4} {1:40} {2:40} {3:40}".format("ID", "NAME", "ROOT", "INCOMING"))
         for m in dbu.session.query(dbu.Mission).all():
             print("{0:4} {1:40} {2:40} {3:40}".format(m.mission_id,
