@@ -11,19 +11,14 @@ import warnings
 
 from spacepy import pycdf
 
-from rbsp import Version
-
 from dbprocessing import DBUtils
-
-
+from dbprocessing import Version
 
    
 
 if __name__ == '__main__':
     usage = "usage: %prog database field"
     parser = OptionParser(usage=usage)
-#    parser.add_option("-m", "--mission", dest="mission",
-#                      help="selected mission database", default=None)
 
     (options, args) = parser.parse_args()
 
