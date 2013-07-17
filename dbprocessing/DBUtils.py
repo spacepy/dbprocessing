@@ -1744,17 +1744,22 @@ class DBUtils(object):
         files = glob.glob(os.path.join(path, '*'))
         return files
 
-    def getIncomingPath(self):
+    def getIncomingPath(self, mission_id=None):
         """
         return the incoming path for the current mission
         """
-        basedir = self.getMissionDirectory()
-        # TODO make this general somehow?  Passed in?
-        if 'REPT' in self.mission:
-            path = os.path.join(basedir, 'rept_incoming/')
-        else:
-            path = os.path.join(basedir, 'hope_incoming/')
-        return path
+        if mission_id is None:
+            mission_id = self.session.query(self.Mission.mission_id).all()
+            if len(mission_id) > 1:
+                raise(ValueError('No mission id specified and more than one mission present'))
+            else:
+                mission_id = mission_id[0][0]
+
+        mission = self.getEntry('Mission',mission_id)
+
+        basedir = self.getMissionDirectory(mission_id=mission_id)
+        inc_path = mission.incoming_dir
+        return os.path.join(basedir, inc_path)
 
     def getErrorPath(self):
         """
