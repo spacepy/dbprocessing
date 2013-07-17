@@ -175,6 +175,9 @@ class runMe(object):
                 DBlogging.dblogger.debug("Code did change for file: {0}".format(self.filename))
                 continue
             parentchange = self._parentsChanged(f_id_db)
+            if parentchange is None: # this is an inconsitency mark it and move on
+                DBlogging.dblogger.info("Parent was None for file: {0}".format(self.filename))
+                break
             if parentchange:
                 DBlogging.dblogger.debug("Parent did change for file: {0}".format(self.filename))
                 continue
@@ -230,6 +233,12 @@ class runMe(object):
         if db_code_id is None:
             # I think things will also crash here
             DBlogging.dblogger.error("Database inconsistency found!! A generated file {0} does not have a filecodelink".format(self.filename))
+            #attempt to figure it out and add one
+            tb = self.dbu.getFileTraceback(self.filename)
+            proc_id = self.dbu.getProcessFromOutputProduct(tb['product'].product_id)
+            self.dbu.addFilecodelink(tb['file'].file_id, proc_id)
+            db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
+            DBlogging.dblogger.debug("f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
 
         # Go through an look to see if the code version changed
         if db_code_id != self.code_id: # did the code change
@@ -273,6 +282,10 @@ class runMe(object):
         ** if there are extra parents then we want to rerun with a new quality
         """
         parents = self.dbu.getFileParents(f_id_db)
+        if not parents:
+            DBlogging.dblogger.info("db_file: {0} did not have any parents".format(f_id_db,))
+            return None
+
         DBlogging.dblogger.debug("db_file: {0} has parents: {1}".format(f_id_db,
                [p.file_id for p in parents]))
 

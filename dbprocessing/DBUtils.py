@@ -1694,7 +1694,11 @@ class DBUtils(object):
         """
         DBlogging.dblogger.debug("Entered getProcessFromOutputProduct: {0}".format(outProd))
         p_id = self.getProductID(outProd)
-        sq1 =  self.session.query(self.Process).filter_by(output_product = p_id).all()  # should only have one value
+        sq1 = self.session.query(self.Process).filter_by(output_product = p_id).all()  # should only have one value
+        if not sq1:
+            print('No Process has Product {0} as an output'.format(p_id))
+            DBlogging.dblogger.info('No Process has Product {0} as an output'.format(p_id))
+            return None
         return sq1[0].process_id
 
     def getCodeFromProcess(self, proc_id, utc_file_date):
