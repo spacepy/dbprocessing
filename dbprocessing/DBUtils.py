@@ -1296,16 +1296,29 @@ class DBUtils(object):
         (name or id is based on type)
 
         """
-        filename = self.getEntry('File', filename).filename
-        file_id = self.getFileID(filename)
+        file_entry = self.getEntry('File', filename)
+        filename = file_entry.filename
+        file_id = file_entry.file_id
         # need to know file product and mission to get whole path
         ftb = self.getFileTraceback(file_id)
         rel_path = ftb['product'].relative_path
+        if rel_path is None:
+            raise(DBError("product {0} does not have a relative_path set, fix the DB".format(ftb['product'].product_id)))
         try:
             root_dir = ftb['mission'].rootdir
+            if root_dir is None:
+                raise(KeyError())
         except KeyError:
-            raise(DBError("Mission root directory not set, fix the DB"))
-        return os.path.join(root_dir, rel_path, filename)
+            raise(DBError("Mission {0} root directory not set, fix the DB".format(ftb['mission'].mission_id)))
+        # perform anu required subitutions
+        path = os.path.join(root_dir, rel_path, filename)
+        path = Utils.dirSubs(path,
+                             file_entry.filename,
+                             file_entry.utc_file_date,
+                             file_entry.utc_start_time,
+                             self.getFileVersion(file_id)
+                             )
+        return path
 
     def getProcessFromInputProduct(self, product):
         """
@@ -1860,15 +1873,26 @@ class DBUtils(object):
                 bad_list.append((f, '(200) file not found'))
         return bad_list
 
-    def getProductTraceback(self, prod_id):
+    def getProductTraceback(self, prod_id, file_id=None):
         """
         given a product id return instances of all the tables it takes to define it
         mission, satellite, instrument, product, inspector, Instrumentproductlink
+
+        the file_id is supposed to do the relative_path substitutions,
+        does not yet work, the issue is that htis is a database object and we shouold not change it
         """
         prod_id = self.getProductID(prod_id) # convert name to ID
         retval = {}
         # get the product instance
         retval['product'] = self.getEntry('Product', prod_id)
+        #if file_id is not None: # do substitutions on the relative_path based on the file
+        #    file_entry_tmp = self.getEntry('File', file_id)
+        #    retval['product'].relative_path = Utils.dirSubs(retval['product'].relative_path,
+        #                                                    file_entry_tmp.filename,
+        #                                                    file_entry_tmp.utc_file_date,
+        #                                                    file_entry_tmp.utc_start_time,
+        #                                                    self.getFileVersion(file_id)
+        #                                                    )
         # inspector
         retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
         # instrument
@@ -1919,7 +1943,7 @@ class DBUtils(object):
         """
         file_id = self.getFileID(file_id)
         prod_id = self.getEntry('File', file_id).product_id
-        retval = self.getProductTraceback(prod_id)
+        retval = self.getProductTraceback(prod_id, file_id = file_id)
         retval['file'] = self.getEntry('File', file_id)
         return retval
 
