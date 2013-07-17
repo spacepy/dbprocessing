@@ -118,10 +118,8 @@ class DBfile(object):
                              self.diskfile.params['filename'],
                              self.diskfile.params['utc_file_date'],
                              self.diskfile.params['utc_start_time'],
-                             '{0}.{1}.{2}'.format(self.diskfile.params['interface_version'],
-                                                                  self.diskfile.params['quality_version'],
-                                                                  self.diskfile.params['revision_version']))
-                                                                  
+                             '{0}'.format(str(self.diskfile.params['version'])))
+                                                                          
         # if the file is a link just remove the link and pretend we moved it, this means
         # that this file is tracked only as a dependency
         if os.path.islink(self.diskfile.infile):
