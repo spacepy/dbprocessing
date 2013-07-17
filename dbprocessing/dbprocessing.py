@@ -3,7 +3,6 @@
 import datetime
 import imp
 import os
-import os.path
 import shutil
 import sys
 import tempfile
@@ -204,7 +203,10 @@ class ProcessQueue(object):
             try:
                 inspect = imp.load_source('inspect', code)
             except IOError, msg:
-                DBlogging.dblogger.error("Inspector: {0} not found: {1}".format(code, msg))
+                DBlogging.dblogger.error('Inspector: "{0}" not found: {1}'.format(code, msg))
+                if os.path.isfile(code + ' '):
+                    DBlogging.dblogger.info('---> However inspector: "{0}" was found'.format(code+' '))
+                    print('---> However inspector: "{0}" was found.'.format(code+' '))
                 continue
             if arg is not None:
                 kwargs = strargs_to_args(arg)
