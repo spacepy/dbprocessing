@@ -159,7 +159,7 @@ if __name__ == "__main__":
                     run_num += 1
                     v = pq.runme_list.pop(0)
                     ## TODO if one wanted to add smarts do it here, like running in parrallel
-                    DBlogging.dblogger.info("Running {0} of {1}".format(run_num, len(pq.runme_list)))
+                    DBlogging.dblogger.info("Running file {0} there are {1} left".format(run_num, len(pq.runme_list)))
                     if not options.dryrun:
                         runMe.runner(v)
                     else:
