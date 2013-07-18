@@ -247,15 +247,30 @@ class ProcessQueue(object):
         ## here decide how we build output and do it.
         timebase = self.dbu.getEntry('Process', process_id).output_timebase
         if timebase == 'FILE': # taking one file to the next file
+            # for file based processing we are going to look to the "process_keywords" and cull the
+            #   retuned files based on making sure they are all the same
+            #   If process_keywords is none it will fall back to current behavior (since they will all be the same)
             DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
             files = []
+            # get all the possible files based on dates that we might want to put into the process now
             for val, opt in input_product_id:
-                # TODO there is a suspect danger here that multiple files have the same date with different start stop
                 tmp = self.dbu.getFiles_product_utc_file_date(val, utc_file_date)
                 if tmp:  # != []
                     files.extend(tmp)
             DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
+            # remove all the files that are not the newest version
             files = self.dbu.file_id_Clean(files)
+            # grab the process_keywords column for the file_id and all the possible other files
+            infile_process_keywords = self.dbu.getEntry('File', file_id).process_keywords
+            files_process_keywords = [self.dbu.getEntry('File', v[0]).process_keywords for v in files]
+            # now if the process_keywords in files_process_keywords does not match that in infile_process_keywords
+            #   drop it
+            files_out = []
+            for ii, v in enumerate(files_process_keywords):
+                if v == infile_process_keywords:
+                    files_out.append(files[ii])
+            # and give it the right name
+            files = files_out
 
         elif timebase == 'DAILY':
             DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
