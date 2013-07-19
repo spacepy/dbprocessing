@@ -67,7 +67,7 @@ class inspector(object):
     __metaclass__ = EphemeralCallable(ABCMeta)
 
     def __init__(self, filename, dbu, product, **kwargs):
-        DBlogging.dblogger.info("Entered inspector {0} with kwargs: {1}".format(self.code_name, kwargs))
+        DBlogging.dblogger.debug("Entered inspector {0} with kwargs: {1}".format(self.code_name, kwargs))
         self.dbu = dbu # give us access to DBUtils
         self.filename = filename
         self.basename = os.path.basename(self.filename)
@@ -147,7 +147,7 @@ class inspector(object):
             DBlogging.dblogger.debug("Inspector {0}:  self.diskfile.params['version'] is None".format(self.code_name))
 
         if match is None:
-            DBlogging.dblogger.info("No match found for inspector {0}: {1}".format(self.code_name, self.diskfile.filename))
+            DBlogging.dblogger.debug("No match found for inspector {0}: {1}".format(self.code_name, self.diskfile.filename))
         else:
             DBlogging.dblogger.info("Match found for inspector {0}: {1}".format(self.code_name, self.diskfile.filename))
         return match
