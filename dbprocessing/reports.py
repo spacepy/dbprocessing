@@ -244,7 +244,7 @@ class ingested(HTMLbase):
         m = re.search( r'f\_id=(\d*)' , inStr)
         self.file_id = m.group(1)
         try:
-            tb = dbu.getFileTraceback(self.file_id)
+            tb = dbu.getTraceback('File', self.file_id)
             self.product_name = tb['product'].product_name
             self.level = tb['file'].data_level
         except:

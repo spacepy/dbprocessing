@@ -50,7 +50,7 @@ def getStuff(dbname, proc_name, filename):
 #        return
     proc_id = dbu.getProcessID(proc_name)
     # get instances of all the tables in a product traceback
-    sq = dbu.getProcessTraceback(proc_id)
+    sq = dbu.getTraceback('Process', proc_id)
     for section in sq:
         attrs = dir(sq[section])
         if section in ['input_product', 'productprocesslink']: # special case this is a list

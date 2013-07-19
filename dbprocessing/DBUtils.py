@@ -1,6 +1,7 @@
 import datetime
 import glob
 import itertools
+import functools
 import os.path
 import pwd
 import socket # to get the local hostname
@@ -63,7 +64,7 @@ class DBUtils(object):
         """
         self.dbIsOpen = False
         if mission == None:
-            raise(DBError("Must input mission name to create DBUtils instance"))
+            raise(DBError("Must input database name to create DBUtils instance"))
         self.mission = mission
         #Expose the format/regex routines of DBFormatter
         fmtr = DBStrings.DBFormatter()
@@ -115,37 +116,23 @@ class DBUtils(object):
     def _openDB(self, db_var=None, verbose=False):
         """
         setup python to talk to the database, this is where it is, name and password.
-
-        @keyword verbose: (optional) - print information out to the command line
-
-        @todo: change the user form owner to ops as DB permnissons are fixed
-
-        >>>  pnl._openDB()
         """
         if self.dbIsOpen == True:
             return
         try:
-            if self.mission in  ['Test', 'rbsp_remote']:
-                engine = sqlalchemy.create_engine('postgresql+psycopg2://rbsp_owner:rbsp_owner@edgar:5432/rbsp', echo=False)
-
-            elif self.mission == 'unittest':
+            if self.mission == 'unittest':
                 if db_var is None:
                     engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=False)
                 else:
                     engine = db_var.engine
 
-            elif self.mission == 'rbsp':
-                filename = os.path.expanduser(os.path.join('~ectsoc', 'RBSP_processing.sqlite'))
-                engine = sqlalchemy.create_engine('sqlite:///' + filename, echo=False)
-                self.mission = 'rbsp'
-
             else: # assume we got a filename and use that
                 if not os.path.isfile(os.path.expanduser(self.mission)):
                     raise(ValueError("DB file specified doesn't exist"))
                 engine = sqlalchemy.create_engine('sqlite:///' + os.path.expanduser(self.mission), echo=False)
-                self.mission = os.path.expanduser(self.mission)
+                self.mission = os.path.realpath(os.path.expanduser(self.mission))
 
-            DBlogging.dblogger.info("Database Connection opened: {0}".format(str(engine)))
+            DBlogging.dblogger.info("Database Connection opened: {0}  {1}".format(str(engine), self.mission))
 
         except DBError:
             (t, v, tb) = sys.exc_info()
@@ -164,14 +151,9 @@ class DBUtils(object):
         except Exception, msg:
             raise(DBError('Error opening database: %s'% (msg)))
 
-
     def _createTableObjects(self, verbose = False):
         """
         cycle through the database and build classes for each of the tables
-
-        @keyword verbose: (optional) - print information out to the command line
-
-        >>>  pnl._createTableObjects()
         """
         DBlogging.dblogger.debug("Entered _createTableObjects()")
 
@@ -207,7 +189,6 @@ class DBUtils(object):
                 if verbose: print("Class %s created" % (val))
                 if verbose: DBlogging.dblogger.debug("Class %s created" % (val))
 
-
 #####################################
 ####  Do processing and input to DB
 #####################################
@@ -239,8 +220,6 @@ class DBUtils(object):
 
         @keyword comment: the comment to enter into the processing log DB
         @return: True - Success, False - Failure
-
-        >>>  pnl._resetProcessingFlag()
         """
         if comment == None:
             raise(ValueError("Must enter a comment to override DB lock"))
@@ -256,8 +235,6 @@ class DBUtils(object):
     def _startLogging(self):
         """
         Add an entry to the logging table in the DB, logging
-
-        >>>  pnl._startLogging()
         """
         # this is the logging of the processing, no real use for it yet but maybe we will in the future
         # helps to know is the process ran and if it succeeded
@@ -329,8 +306,6 @@ class DBUtils(object):
 
         @param comment: (optional) a comment to insert into he DB
         @type param: str
-
-        >>>  pnl._stopLogging()
         """
         try: self.__p1
         except:
@@ -375,7 +350,7 @@ class DBUtils(object):
 
     def _processqueueFlush(self):
         """
-        remove everything from he process queue
+        remove everything from the process queue
         """
         length = self.Processqueue.len()
         self.session.query(self.Processqueue).delete()
@@ -619,24 +594,6 @@ class DBUtils(object):
             self.session.delete(self.getEntry('File', f))
             self._commitDB()
             DBlogging.dblogger.info( "File removed from db {0}".format(f) )
-
-    def deleteAllEntries(self):
-        """
-        delete all entries from the DB (leaves mission, satellite, instrument)
-        """
-        # clean everything out
-        self.session.query(self.Processqueue).delete()
-        self.session.query(self.Filefilelink).delete()
-        self.session.query(self.Filecodelink).delete()
-        self.session.query(self.File).delete()
-        self.session.query(self.Code).delete()
-        self.session.query(self.Inspector).delete()
-        self.session.query(self.Instrumentproductlink).delete()
-        self.session.query(self.Productprocesslink).delete()
-        self.session.query(self.Process).delete()
-        self.session.query(self.Product).delete()
-        self.session.query(self.Logging).delete()
-        self._commitDB()
 
     def getAllFilenames(self, fullPath=True, level=None):
         """
@@ -1066,7 +1023,7 @@ class DBUtils(object):
         if inStr is None:
             return inStr
         repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
-        ftb = self.getProductTraceback(product_id)
+        ftb = self.getTraceback('Product', product_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
@@ -1093,7 +1050,7 @@ class DBUtils(object):
             return inStr
         repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         insp = self.getEntry('Inspector', inspector_id)
-        ftb = self.getProductTraceback(insp.product)
+        ftb = self.getTraceback('Product', insp.product)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
@@ -1120,7 +1077,7 @@ class DBUtils(object):
         if inStr is None:
             return inStr
         repl = ['{INSTRUMENT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
-        ftb = self.getProcessTraceback(p_id)
+        ftb = self.getTraceback('Process', p_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
@@ -1143,7 +1100,7 @@ class DBUtils(object):
         """
         if inStr is None:
             return inStr
-        ftb = self.getFileTraceback(file_id)
+        ftb = self.getTraceback('File', file_id)
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
@@ -1266,7 +1223,7 @@ class DBUtils(object):
 
     def _codeIsActive(self, ec_id, date):
         """
-        Given a ec_id and a date is that code active for that date
+        Given a ec_id and a date is that code active for that date and is newest version
 
         @param ec_id: executable code id to see if is active
         @param date: date object to use when checking
@@ -1288,6 +1245,9 @@ class DBUtils(object):
                 return False
             if code.code_stop_date < date.date():
                 return False
+        if not code.newest_version:
+            return False
+
         return True
 
     def getFileFullPath(self, filename):
@@ -1300,7 +1260,7 @@ class DBUtils(object):
         filename = file_entry.filename
         file_id = file_entry.file_id
         # need to know file product and mission to get whole path
-        ftb = self.getFileTraceback(file_id)
+        ftb = self.getTraceback('File', file_id)
         rel_path = ftb['product'].relative_path
         if rel_path is None:
             raise(DBError("product {0} does not have a relative_path set, fix the DB".format(ftb['product'].product_id)))
@@ -1324,12 +1284,26 @@ class DBUtils(object):
         """
         given an product name or id return all the processes that use that as an input
         """
+        DBlogging.dblogger.debug("Entered getProcessFromInputProduct: {0}".format(product))
         p_id = self.getProductID(product)
         sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
         ans = []
         for v in sq:
             ans.append(v.process_id)
         return ans
+
+    def getProcessFromOutputProduct(self, outProd):
+        """
+        Gets process from the db that have the output product
+        """
+        DBlogging.dblogger.debug("Entered getProcessFromOutputProduct: {0}".format(outProd))
+        p_id = self.getProductID(outProd)
+        sq1 = self.session.query(self.Process).filter_by(output_product = p_id).all()  # should only have one value
+        if not sq1:
+            print('No Process has Product {0} as an output'.format(p_id))
+            DBlogging.dblogger.info('No Process has Product {0} as an output'.format(p_id))
+            return None
+        return sq1[0].process_id
 
     def getRunProcess(self):
         """
@@ -1361,15 +1335,8 @@ class DBUtils(object):
         given an a file name or a file ID return the mission(s) that file is
         associated with
         """
-        filename = self.getFileID(filename) # change a name to a number
-        product_id = self.getEntry('File', filename).product_id
-        # get all the instruments
-        inst_id = self.getInstrumentFromProduct(product_id)
-        # get all the satellites
-        sat_id = self.getEntry('Instrument', inst_id).satellite_id
-        # get the missions
-        mission = self.getSatelliteMission(sat_id)
-        return mission
+        tb = self.getTraceback('File', filename)
+        return tb['mission']
 
     def getSatelliteMission(self, sat_name):
         """
@@ -1688,19 +1655,6 @@ class DBUtils(object):
         except IndexError:
             raise(DBNoData("No code number {0} in the db".format(code_id)))
 
-    def getProcessFromOutputProduct(self, outProd):
-        """
-        Gets process from the db that have the output product
-        """
-        DBlogging.dblogger.debug("Entered getProcessFromOutputProduct: {0}".format(outProd))
-        p_id = self.getProductID(outProd)
-        sq1 = self.session.query(self.Process).filter_by(output_product = p_id).all()  # should only have one value
-        if not sq1:
-            print('No Process has Product {0} as an output'.format(p_id))
-            DBlogging.dblogger.info('No Process has Product {0} as an output'.format(p_id))
-            return None
-        return sq1[0].process_id
-
     def getCodeFromProcess(self, proc_id, utc_file_date):
         """
         given a process id return the code id that makes performs that process
@@ -1735,7 +1689,7 @@ class DBUtils(object):
 
         mission = self.getEntry('Mission',mission_id)
         return mission.rootdir
-        
+
     def _checkIncoming(self):
         """
         check the incoming directory for the current mission and add those files to the getting list
@@ -1821,7 +1775,7 @@ class DBUtils(object):
         if instrument is not None:
             ans = []
             for s in sq:
-                ptb = self.getProductTraceback(self.getEntry('File', s).product_id)
+                ptb = self.getTraceback('Product', self.getEntry('File', s).product_id)
                 tmp = ptb['instrument'].instrument_name
                 if tmp == self.getEntry('Instrument', tmp).instrument_name:
                     ans.append(tmp)
@@ -1889,115 +1843,89 @@ class DBUtils(object):
                 bad_list.append((f, '(200) file not found'))
         return bad_list
 
-    def getProductTraceback(self, prod_id, file_id=None):
+    def getTraceback(self, table, in_id, in_id2=None):
         """
-        given a product id return instances of all the tables it takes to define it
-        mission, satellite, instrument, product, inspector, Instrumentproductlink
-
-        the file_id is supposed to do the relative_path substitutions,
-        does not yet work, the issue is that htis is a database object and we shouold not change it
-        """
-        prod_id = self.getProductID(prod_id) # convert name to ID
-        retval = {}
-        # get the product instance
-        retval['product'] = self.getEntry('Product', prod_id)
-        #if file_id is not None: # do substitutions on the relative_path based on the file
-        #    file_entry_tmp = self.getEntry('File', file_id)
-        #    retval['product'].relative_path = Utils.dirSubs(retval['product'].relative_path,
-        #                                                    file_entry_tmp.filename,
-        #                                                    file_entry_tmp.utc_file_date,
-        #                                                    file_entry_tmp.utc_start_time,
-        #                                                    self.getFileVersion(file_id)
-        #                                                    )
-        # inspector
-        retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
-        # instrument
-        inst_id = self.getInstrumentFromProduct(prod_id)
-        if inst_id == []:
-            raise(DBError('DB ERROR, the self.getInstrumentFromProduct failed, fill in instrumentproductlink'))
-        retval['instrument'] = self.getEntry('Instrument', inst_id)
-        # Instrumentproductlink
-        retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((inst_id, prod_id))
-        # satellite
-        sat_id = self.getEntry('Instrument', inst_id).satellite_id
-        retval['satellite'] = self.getEntry('Satellite', sat_id)
-        # mission
-        mission = self.getSatelliteMission(sat_id)
-        retval['mission'] = mission
-        return retval
-
-    def getInspectorTraceback(self, inst_id):
-        """
-        given a inspector id return instances of all the tables it takes to define it
-        mission, satellite, instrument, product, inspector, Instrumentproductlink
-        """
-        prod_id = self.getProductID(prod_id) # convert name to ID
-        retval = {}
-        # get the product instance
-        retval['product'] = self.getEntry('Product', prod_id)
-        # inspector
-        retval['inspector'] = self.session.query(self.Inspector).filter_by(product = prod_id).first()
-        # instrument
-        inst_id = self.getInstrumentFromProduct(prod_id)
-        if inst_id == []:
-            raise(DBError('DB ERROR, the self.getInstrumentFromProduct failed, fill in instrumentproductlink'))
-        retval['instrument'] = self.getEntry('Instrument', inst_id)
-        # Instrumentproductlink
-        retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((inst_id, prod_id))
-        # satellite
-        sat_id = self.getEntry('Instrument', inst_id).satellite_id
-        retval['satellite'] = self.getEntry('Satellite', sat_id)
-        # mission
-        mission = self.getSatelliteMission(sat_id)
-        retval['mission'] = mission
-        return retval
-
-    def getFileTraceback(self, file_id):
-        """
-        given a product id return instances of all the tables it takes to define it
-        mission, satellite, instrument, product, inspector, Instrumentproductlink
-        """
-        file_id = self.getFileID(file_id)
-        prod_id = self.getEntry('File', file_id).product_id
-        retval = self.getProductTraceback(prod_id, file_id = file_id)
-        retval['file'] = self.getEntry('File', file_id)
-        return retval
-
-    def getProcessTraceback(self, proc_id):
-        """
-        given a process id return instances of all the tables it takes to define it
-        mission, satellite, instrument, product, process, code, productprocesslink
+        master routine for all te getXXXTraceback functions, this will make for less code
         """
         retval = {}
-        # get the product instance
-        retval['process'] = self.getEntry('Process', proc_id)
-        retval['output_product'] = self.getEntry('Product', retval['process'].output_product)
-        # instrument
-        inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)
-        try:
-            retval['instrument'] = self.getEntry('Instrument', inst_id)
-        except (TypeError):
-            raise(ValueError('Bad instrument id specified'))
-        # satellite
-        sat_id = self.getEntry('Instrument', inst_id).satellite_id
-        retval['satellite'] = self.getEntry('Satellite', sat_id)
-        # mission
-        mission_id = self.getSatelliteMission(sat_id).mission_id
-        retval['mission'] = self.getEntry('Mission', mission_id)
-        # code
-        code_id = self.getCodeFromProcess(retval['process'].process_id)
-        if code_id is not None:
+        if table.capitalize() == 'File':
+            retval['file'] = self.getEntry(table.capitalize(), in_id)
+            tmp = self.getTraceback('Product', retval['file'].product_id)
+            retval = dict(retval.items() + tmp.items())
+
+        elif table.capitalize() == 'Code':
+            retval['code'] = self.getEntry(table.capitalize(), in_id)
+            tmp = self.getTraceback('Process', retval['code'].process_id)
+            retval = dict(retval.items() + tmp.items())
+
+        elif table.capitalize() == 'Inspector':
+            retval['inspector'] = self.getEntry(table.capitalize(), in_id)
+            tmp = self.getTraceback('Product', retval['inspector'].product)
+            retval = dict(retval.items() + tmp.items())
+
+        elif table.capitalize() == 'Product':
+            retval['product'] = self.getEntry(table.capitalize(), in_id)
+            # inspector
+            retval['inspector'] = self.session.query(self.Inspector).filter_by(product = retval['product'].product_id).first()
+            tmp = self.getTraceback('Instrument', retval['product'].instrument_id)
+            retval = dict(retval.items() + tmp.items())
+            # Instrumentproductlink
+            retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((retval['product'].instrument_id, retval['product'].product_id))
+
+        elif table.capitalize() == 'Process':
+            # get the process instance
+            retval['process'] = self.getEntry('Process', in_id)
+            retval['output_product'] = self.getEntry('Product', retval['process'].output_product)
+            # instrument
+            inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)
+            tmp = self.getTraceback('Instrument', inst_id)
+            retval = dict(retval.items() + tmp.items())
+            # code
+            if 'file' in retval:
+                code_id = self.getCodeFromProcess(retval['process'].process_id, retval['file'].utc_file_date)
+            else:
+                code_id = self.getCodeFromProcess(retval['process'].process_id, datetime.date.today())
             retval['code'] = self.getEntry('Code', code_id)
-        # input products
-        retval['input_product'] = []
-        in_prod_id = self.getInputProductID(retval['process'].process_id)
-        for val, opt in in_prod_id:
-            retval['input_product'].append((self.getEntry('Product', val), opt) )
-        retval['productprocesslink'] = []
-        ppl = self.session.query(self.Productprocesslink).filter_by(process_id = retval['process'].process_id)
-        for val in ppl:
-            retval['productprocesslink'].append(ppl)
+            # input products
+            retval['input_product'] = []
+            in_prod_id = self.getInputProductID(retval['process'].process_id)
+            for val, opt in in_prod_id:
+                retval['input_product'].append((self.getEntry('Product', val), opt) )
+            retval['productprocesslink'] = []
+            ppl = self.session.query(self.Productprocesslink).filter_by(process_id = retval['process'].process_id)
+            for val in ppl:
+                retval['productprocesslink'].append(ppl)
+
+        elif table.capitalize() == 'Instrument':
+            retval['instrument'] = self.getEntry('Instrument', in_id)
+            tmp = self.getTraceback('Satellite', retval['instrument'].satellite_id)
+            retval = dict(retval.items() + tmp.items())
+
+        elif table.capitalize() == 'Satellite':
+            retval['satellite'] = self.getEntry('Satellite', in_id)
+            tmp = self.getTraceback('Mission', retval['satellite'].mission_id)
+            retval = dict(retval.items() + tmp.items())
+
+        elif table.capitalize() == 'Mission':
+            retval['mission'] = self.getEntry('Mission', in_id)
+
+        else:
+            raise(NotImplementedError('The traceback or {0} is not implemented'.format(table)))
+
         return retval
+
+    ######################
+    # add in some helpers to match what we had
+    # TODO figure ou how to do this!!
+    ######################
+#    getProductTraceback = functools.partial(getTraceback, 'Product')
+#    getFileTraceback = functools.partial(getTraceback, 'File')
+#    getCodeTraceback = functools.partial(getTraceback, 'Code')
+#    getInspectorTraceback = functools.partial(getTraceback, 'Inspector')
+#    getProcessTraceback = functools.partial(getTraceback, 'Process')
+#    getInstrumentTraceback = functools.partial(getTraceback, 'Instrument')
+#    getSatelliteTraceback = functools.partial(getTraceback, 'Satellite')
+#    getMissionTraceback = functools.partial(getTraceback, 'Mission')
 
     def getProducts(self):
         """
@@ -2007,7 +1935,7 @@ class DBUtils(object):
         prods = self.getAllProducts()
         mission_id = self.getMissionID(self.mission)
         for val in prods:
-            if self.getProductTraceback(val.product_id)['mission'].mission_id == mission_id:
+            if self.getTraceback('Product', val.product_id)['mission'].mission_id == mission_id:
                 outval.append(val)
         return outval
 
@@ -2026,12 +1954,11 @@ class DBUtils(object):
         """
         get all processes
         """
-        outval = []
         if timebase == 'all':
             procs = self.session.query(self.Process).all()
         else:
             procs = self.session.query(self.Process).filter_by(output_timebase = timebase.upper()).all()
-        return outval
+        return procs
 
     def getAllProducts(self):
         """

@@ -145,7 +145,7 @@ class runMe(object):
         except TypeError:
             pass
 
-        ptb = self.dbu.getProductTraceback(self.out_prod)
+        ptb = self.dbu.getTraceback('Product', self.out_prod)
 
         ## need to build a version string for the output file
         ## this sets the interface version
@@ -234,7 +234,7 @@ class runMe(object):
             # I think things will also crash here
             DBlogging.dblogger.error("Database inconsistency found!! A generated file {0} does not have a filecodelink".format(self.filename))
             #attempt to figure it out and add one
-            tb = self.dbu.getFileTraceback(self.filename)
+            tb = self.dbu.getTraceback('File', self.filename)
             proc_id = self.dbu.getProcessFromOutputProduct(tb['product'].product_id)
             self.dbu.addFilecodelink(tb['file'].file_id, proc_id)
             db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)

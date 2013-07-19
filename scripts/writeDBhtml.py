@@ -60,7 +60,7 @@ def _writeProducts(dbu, output):
 
     traceback = []
     for prod in prods:
-        traceback.append(dbu.getProductTraceback(prod.product_id))
+        traceback.append(dbu.getTraceback('Product', prod.product_id))
 
     data = {}
 
@@ -126,7 +126,7 @@ def _writeProcesses(dbu, output):
 
     traceback = []
     for proc in procs:
-        traceback.append(dbu.getProcessTraceback(proc.process_id))
+        traceback.append(dbu.getTraceback('Process', proc.process_id))
 
     data = {}
 

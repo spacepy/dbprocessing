@@ -378,7 +378,7 @@ class ProcessQueue(object):
             if level is not None: # cull the list by level
                 prods2 = []
                 for prod in prods:
-                    ptb = self.dbu.getProductTraceback(prod)
+                    ptb = self.dbu.getTraceback('Product', prod)
                     if ptb['product'].level == level:
                         prods2.append(ptb['product'].product_id)
                 prods = prods2

@@ -20,7 +20,7 @@ dbu = DBUtils.DBUtils('~ectsoc/MagEphem_processing.sqlite')
 prods = dbu.getAllProducts()
 ids = [v.product_id for v in prods]
 names = [v.product_name for v in prods]
-sc = [dbu.getProductTraceback(v.product_id)['satellite'].satellite_name for v in prods]
+sc = [dbu.getTraceback('Product', v.product_id)['satellite'].satellite_name for v in prods]
 
 a_files = []
 b_files = []

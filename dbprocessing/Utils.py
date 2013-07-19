@@ -95,7 +95,7 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version):
         #	PRODUCT: the product name from the db
         """
         if '{INSTRUMENT}' in path or '{SATELLITE}' in path or '{SPACECRAFT}' in path or '{MISSION}' in path or '{PRODUCT}' in path:        
-            ftb = self.dbu.getFileTraceback(filename)
+            ftb = self.dbu.getTraceback('File', filename)
             if '{INSTRUMENT}' in path : # need to replace with the instrument name
                 path = path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
             if '{SATELLITE}' in path : # need to replace with the instrument name

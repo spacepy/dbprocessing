@@ -55,7 +55,7 @@ def getStuff(prod_name, filename):
     except ValueError:
         prod_name = dbu.getProductID(prod_name)
     # get instances of all the tables in a product traceback
-    sq = dbu.getProductTraceback(prod_name)
+    sq = dbu.getTraceback('Product', prod_name)
     for section in sq:
         attrs = dir(sq[section])
         cfg[section] = {}

@@ -29,7 +29,7 @@ class QCEmailer(object):
             sys.exit(0)
 
         # get int he instrument for the email
-        ftb = a.getProductTraceback(self.prod_name)
+        ftb = a.getTraceback('Product', self.prod_name)
         inst = ftb['instrument'].instrument_name.upper()
 
         cfgFile = kwargs['configFile']

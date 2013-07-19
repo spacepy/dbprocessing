@@ -10,9 +10,8 @@ import os
 from optparse import OptionParser
 import re
 import traceback
+import sys
 import warnings
-
-from rbsp import Version
 
 from dbprocessing import inspector
 
@@ -29,14 +28,15 @@ def argsort(seq):
     #by ubuntu
     return sorted(range(len(seq)), key=seq.__getitem__)
 
-def get_all_files(indir, glb='*'):
+def get_all_files(indir, outdir, glb='*'):
     """
     in indir get all the files that follow the glob glb
     - indir is a full path
     - glb is a file glob
     """
     files = glob.glob(os.path.join(indir, glb))
-    return files
+    files_out = glob.glob(os.path.join(outdir, glb))
+    return files, files_out
 
 def getBaseVersion(f):
     """
@@ -57,6 +57,9 @@ def cull_to_newest(files, nodate=False, options=None):
         date_ver = [(inspector.extract_YYYYMMDD(v), inspector.extract_Version(v), v, v.split('20')[0]) for v in files
                     if inspector.extract_YYYYMMDD(v) is not None]
         date_ver = sorted(date_ver, key=lambda x: x[0])
+        if not date_ver:
+            print('No compatable files found')
+            sys.exit(0)
         u_dates = set(zip(*date_ver)[0])
 
         # cycle over all the u_dates and keep the newest version of each
@@ -88,7 +91,7 @@ def cull_to_newest(files, nodate=False, options=None):
         for ub in uniq_bases:
             if bases.count(ub) == 1: # there is only one
                 ans.append(files[bases.index(ub)])
-            else: # must be more than 
+            else: # must be more than
                 indices = [i for i, x in enumerate(bases) if x == ub]
                 tmp = []
                 for i in indices:
@@ -98,25 +101,28 @@ def cull_to_newest(files, nodate=False, options=None):
                 ans.append(max(tmp, key=lambda x: x[1])[2])
         return ans
 
-def make_symlinks(files, outdir, options):
+def make_symlinks(files, files_out, outdir, options):
     """
     for all the files make symlinks into outdir
     """
     if not hasattr(files, '__iter__'):
         files = [files]
+    if not hasattr(files_out, '__iter__'):
+        files_out = [files_out]
+    # if files_out then cull the files to get rid of the ones
     for f in files:
         try:
             if os.path.isfile(f):
                 if options.verbose: print("linking1 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))
                 os.symlink(f, os.path.join(outdir, os.path.basename(f)))
             elif options.dir:
-                if options.verbose: print("linking2 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))                
+                if options.verbose: print("linking2 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))
                 os.symlink(f, os.path.join(outdir, os.path.basename(f)))
 
         except OSError:
             if options.force:
                 os.remove(os.path.join(outdir, os.path.basename(f)))
-                if options.verbose: print("linking3 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))                
+                if options.verbose: print("linking3 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))
                 make_symlinks(f, outdir, options)
         except:
             warnings.warn("File {0} not linked:\n\t{1}".format(f, traceback.format_exc()))
@@ -175,7 +181,7 @@ if __name__ == '__main__':
     else:
         outdir = os.path.abspath(os.path.expanduser((os.path.expandvars(options.outdir))))
 
-    if indir == outdir:
+    if os.path.realpath(indir) == os.path.realpath(outdir):
         parser.error("outdir cannor be the same as indir, would clobber files")
 
     if not os.path.isdir(outdir):
@@ -185,10 +191,14 @@ if __name__ == '__main__':
             parser.error("outdir: {0} does not exist, create or use --force".format(outdir))
 
 
-    files = get_all_files(indir, options.glb)
-    files = cull_to_newest(files, nodate=options.nodate, options=options)
     if options.delete:
         delete_symlinks(outdir)
-    make_symlinks(files, outdir, options)
+    files, files_out = get_all_files(indir, outdir, options.glb)
+    if files:
+        files = cull_to_newest(files, nodate=options.nodate, options=options)
+    else:
+        print('No files found')
+        sys.exit(0)
+    make_symlinks(files, files_out, outdir, options)
 
 

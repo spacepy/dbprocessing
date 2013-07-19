@@ -16,6 +16,6 @@ if __name__ == "__main__":
     items = a.Processqueue.getAll()
     print('There are a total of {0} files'.format(n_items))
     for v in items:
-        tb = a.getFileTraceback(v)
+        tb = a.getTraceback('File', v)
         print('{0}\t{1}\t{2}'.format(v, tb['file'].filename, tb['product'].product_name))
 

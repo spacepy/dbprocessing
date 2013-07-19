@@ -73,7 +73,7 @@ def _writeQueue(dbu, output):
 
     traceback = []
     for v in items:
-        traceback.append(dbu.getFileTraceback(v))
+        traceback.append(dbu.getTraceback('File', v))
 
     data = {}
 
