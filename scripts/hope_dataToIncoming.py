@@ -30,7 +30,7 @@ data_path += tmp
 error_path = dbu.getErrorPath()
 dbu._closeDB()
 
-cull_re = [r'robots.*', r'^\.', '*WFR*', '*HFR*']
+cull_re = [r'robots.*', r'^\.', r'.*WFR*', r'.*HFR*']
 
 
 def build_db_set():
