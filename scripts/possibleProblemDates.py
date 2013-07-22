@@ -52,6 +52,8 @@ if __name__ == "__main__":
     parser = OptionParser(usage=usage)
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission", default=None)
+    parser.add_option("", "--fix", dest="fix", action='store_true',
+                      help="Fix the issues (make a backup first)", default=False)    
     (options, args) = parser.parse_args()
     if len(args) != 0:
         parser.error("incorrect number of arguments")
