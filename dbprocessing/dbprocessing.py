@@ -302,7 +302,7 @@ class ProcessQueue(object):
         for prod, opt in input_product_id:
             if not opt:
                 if not prod in zip(*files)[2]: # the product ID
-                    DBlogging.dblogger.info("Required products not found, continuing.  Process:{0}, product{1}".format(process_id, prod))
+                    DBlogging.dblogger.debug("Required products not found, continuing.  Process:{0}, product{1}".format(process_id, prod))
                     return False
         return True
 
