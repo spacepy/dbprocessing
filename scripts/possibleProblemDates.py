@@ -64,4 +64,4 @@ if __name__ == "__main__":
                 
     dbu = DBUtils.DBUtils(options.mission)
 
-    noNewestVersion(dbu)
+    noNewestVersion(dbu, options.fix)
