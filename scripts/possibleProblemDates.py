@@ -36,13 +36,15 @@ def noNewestVersion(dbu, fix=False):
         dates_missing =  dates_all.difference(dates_newest)
         if dates_missing:
             dates_missing = sorted(list(dates_missing))
+            fixes = []
             for f in dates_missing:
                 print('{0}, product {1}, no files are newest version'.format(f, prod_id))
                 if fix:
                     tmp = dbu.getFiles_product_utc_file_date(prod_id, f)
-                    f_tmp = dbu.getEntry('File', max(tmp, key=lambda x: x[1])[0])
-                    f_tmp.newest_version = 1
-                    print(' ** Changed {0} to be newest version'.format(f_tmp.filename))
+                    fixes.append(dbu.getEntry('File', max(tmp, key=lambda x: x[1])[0]))
+                    fixes[-1].newest_version = 1
+                    print(' ** Changed {0} to be newest version'.format(fixes[-1].filename))
+                    dbu.session.add(fixes[-1])
             dbu._commitDB() # commit for each product
 
 
