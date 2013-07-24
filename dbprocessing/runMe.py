@@ -149,11 +149,13 @@ class runMe(object):
 
         ## need to build a version string for the output file
         ## this sets the interface version
-        code_version = self.dbu.getCodeVersion(self.code_id)
+        code_entry = self.getEntry('Code', self.code_id)
+        code_version = code_entry.code_id
+        output_interface_version = code.output_interface_version
 
         fmtr = DBStrings.DBFormatter()
         # set the default version for the output file
-        self.output_version = Version.Version(code_version.interface, 0, 0)
+        self.output_version = Version.Version(output_interface_version, 0, 0)
 
         ## we have a filename, now we need to increment versions as needed/appropriate to
         ## come up with a unique one
