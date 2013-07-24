@@ -149,9 +149,9 @@ class runMe(object):
 
         ## need to build a version string for the output file
         ## this sets the interface version
-        code_entry = self.getEntry('Code', self.code_id)
+        code_entry = self.dbu.getEntry('Code', self.code_id)
         code_version = code_entry.code_id
-        output_interface_version = code.output_interface_version
+        output_interface_version = code_entry.output_interface_version
 
         fmtr = DBStrings.DBFormatter()
         # set the default version for the output file
