@@ -149,7 +149,7 @@ def addStuff(cfg, options):
 
     # is the satellite in the DB?  If not add it
     try:
-        satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name'].replace('{MISSION}', cfg['mission']['mission_name'])).satellite_id
+        satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name']).satellite_id
         print('Found Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite',satellite_id).satellite_name ))
     except DBUtils.DBNoData:
         # add it
@@ -161,7 +161,7 @@ def addStuff(cfg, options):
         instrument = dbu.getEntry('Instrument', cfg['instrument']['instrument_name'])
         if instrument.satellite_id != satellite_id:
             raise(ValueError()) # this means it is the same name on a different sat, need to add
-        instruemnt_id = instrument.instrument_id
+        instrument_id = instrument.instrument_id
         print('Found Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
     except (DBUtils.DBNoData, ValueError):
         # add it
@@ -206,9 +206,10 @@ def addStuff(cfg, options):
 
     # loop over all the processes, check if they are there and add them if not
     processes = [k for k in cfg if k.startswith('process')]
-    db_processes = dbu.getAllProcesses()
+    db_processes = [v.process_name for v in dbu.getAllProcesses()]
     for p in processes:
         # is the process in the DB?  If not add it
+        print '1111', cfg[p]['process_name'], db_processes
         if cfg[p]['process_name'] in db_processes:
             p_id = dbu.getEntry('Process', cfg[p]['process_name']).process_id
             print('Found Process: {0} {1}'.format(p_id, dbu.getEntry('Process',p_id).process_name))
