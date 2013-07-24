@@ -101,7 +101,7 @@ if __name__ == "__main__":
         number_proc = 0
 
         def do_proc(file_id):
-            DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(file_id, pq.dbu.Processqueue.len()))
+            DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(file_id, pq.dbu.Processqueue.len()-1))
             if file_id is None:
                 return 'break'
             children = pq.dbu.getChildrenProducts(file_id) # returns process

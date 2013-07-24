@@ -1454,6 +1454,8 @@ class DBUtils(object):
 
         # get all the possible files:
         ## start date is before date and end date is after date
+        if isinstance(date, (datetime.datetime)):
+            date = date.date()
         sq = self.session.query(self.File).filter_by(product_id = product_id).filter_by(utc_file_date = date)
 #        sq = self.session.query(self.File).filter_by(product_id = product_id).\
 #             filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),

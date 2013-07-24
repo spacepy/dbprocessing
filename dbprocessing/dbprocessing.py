@@ -323,6 +323,7 @@ class ProcessQueue(object):
             # do we have the required files to do the build?
             #==============================================================================
             if not self._requiredFilesPresent(files, input_product_id, process_id):
+                DBlogging.dblogger.debug("For file: {0} date: {1} required files not present".format(file_id[0], utc_file_date))
                 continue # go on to the next file
 
             input_files = zip(*files)[0] # this is the file_id
@@ -330,7 +331,7 @@ class ProcessQueue(object):
 
             runme = runMe.runMe(self.dbu, utc_file_date, process_id, input_files, )
             self.runme_list.append(runme)
-
+            print self.runme_list
 
     def onStartup(self):
         """
