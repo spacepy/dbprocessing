@@ -331,7 +331,6 @@ class ProcessQueue(object):
 
             runme = runMe.runMe(self.dbu, utc_file_date, process_id, input_files, )
             self.runme_list.append(runme)
-            print self.runme_list
 
     def onStartup(self):
         """

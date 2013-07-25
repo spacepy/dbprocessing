@@ -1456,10 +1456,10 @@ class DBUtils(object):
         ## start date is before date and end date is after date
         if isinstance(date, (datetime.datetime)):
             date = date.date()
-        sq = self.session.query(self.File).filter_by(product_id = product_id).filter_by(utc_file_date = date)
-#        sq = self.session.query(self.File).filter_by(product_id = product_id).\
-#             filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
-#                         self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
+        #sq = self.session.query(self.File).filter_by(product_id = product_id).filter_by(utc_file_date = date)
+        sq = self.session.query(self.File).filter_by(product_id = product_id).\
+             filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
+                         self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
         # if these files have met_start_time then that is the logic we want, otherwise we want simpler logic
         if len(sq.all()) == 0:
             return None
