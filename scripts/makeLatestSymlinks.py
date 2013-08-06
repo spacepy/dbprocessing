@@ -4,14 +4,19 @@
 in a given directory make symlinks to all the newest versions of files into another directory
 """
 
+import ConfigParser
+import datetime
 import itertools
 import glob
 import os
 from optparse import OptionParser
 import re
 import traceback
+import shutil
 import sys
 import warnings
+
+from dateutil import parser as dup
 
 from dbprocessing import inspector
 
@@ -19,7 +24,8 @@ from dbprocessing import inspector
 ################################################################
 # 1) In the current directory get all the file ids from the directory
 # 2) If those files are not current version remove them from set
-# 3) Create sumlinks to the file in a specified dir (latest by default)
+# 3) Check that the files are in the wanted dates
+# 4) Create sumlinks to the file in a specified dir (latest by default)
 ################################################################
 
 
@@ -34,8 +40,8 @@ def get_all_files(indir, outdir, glb='*'):
     - indir is a full path
     - glb is a file glob
     """
-    files = glob.glob(os.path.join(indir, glb))
-    files_out = glob.glob(os.path.join(outdir, glb))
+    files = sorted(glob.glob(os.path.join(indir, glb)))
+    files_out = sorted(glob.glob(os.path.join(outdir, glb)))
     return files, files_out
 
 def getBaseVersion(f):
@@ -46,62 +52,66 @@ def getBaseVersion(f):
     version = inspector.extract_Version(f)
     return base, version
 
-def cull_to_newest(files, nodate=False, options=None):
+def cull_to_newest(files, options=None):
     """
     given a list of files cull to only the newest ones
 
-    if nodate is set just match everything in front of v\d\d?\.\d\d?\.\d\d?\.
+    match everything in front of v\d\d?\.\d\d?\.\d\d?\.
     """
-    if not nodate:
-        # make a list of tuples,  datetime, version, filename, product part of filename
-        date_ver = [(inspector.extract_YYYYMMDD(v), inspector.extract_Version(v), v, v.split('20')[0]) for v in files
-                    if inspector.extract_YYYYMMDD(v) is not None]
-        date_ver = sorted(date_ver, key=lambda x: x[0])
-        if not date_ver:
-            print('No compatable files found')
-            sys.exit(0)
-        u_dates = set(zip(*date_ver)[0])
+    ans = []
+    # make a set of all the file bases
+    bases = []
+    versions = []
+    for f in files:
+        tmp = getBaseVersion(f)
+        if tmp[1] is not None:
+            bases.append(tmp[0])
+            versions.append(tmp[1])
+        else:
+            if options.verbose: print("Skipped file {0}".format(f))
+    uniq_bases = list(set(bases))
+    for ub in uniq_bases:
+        if bases.count(ub) == 1: # there is only one
+            ans.append(files[bases.index(ub)])
+        else: # must be more than
+            indices = [i for i, x in enumerate(bases) if x == ub]
+            tmp = []
+            for i in indices:
+                tmp.append((bases[i], versions[i], files[i]))
+            ans.append(max(tmp, key=lambda x: x[1])[2])
+    return ans
 
-        # cycle over all the u_dates and keep the newest version of each
-        u_prods = list(set(zip(*date_ver)[3]))  # get the unique products
-        ans = []
-        for d, p in itertools.product(u_dates, u_prods):
-            tmp = [v for v in date_ver if v[0]==d and v[3]==p]
-            if tmp:
-                ans.append(max(tmp, key=lambda x: x[2])[2])
-        return ans
+
+def cull_to_dates(files, startdate, enddate, nodate=False, options=None):
+    """
+    loop over the files and drop the ones that are outside of the range we want to include
+    - call this after cull_to_newest()  # maybe doesn't matter
+    """
+    ans = []
+    if nodate:
+        return files
+    for f in files:
+        date = inspector.extract_YYYYMMDD(f)
+        if not date:
+            date = inspector.extract_YYYYMM(f)
+        else:
+            date = date.date()
+        if not date:
+            if options.verbose: print('skipping {0} no date found'.format(f))
+            continue
+        if date >= startdate and date <= enddate:
+            ans.append(f)
+        elif options.verbose:
+            print("File {0} culled by date".format(f))
+    return ans
+
+def toBool(value):
+    if value in ['True', 'true', True, 1, 'Yes', 'yes']:
+        return True
     else:
-        ans = []
-        # make a set of all the file bases
-        bases = []
-        versions = []
-        for f in files:
-            tmp = getBaseVersion(f)
-            if options.all:
-                if options.verbose: print("Added file1 {0}".format(f))
-                bases.append(tmp[0])
-                versions.append(tmp[1])
-            elif tmp[1] is not None:
-                if options.verbose: print("Added file2 {0}".format(f))
-                bases.append(tmp[0])
-                versions.append(tmp[1])
-            else:
-                if options.verbose: print("Skipped file {0}".format(f))
-        uniq_bases = list(set(bases))
-        for ub in uniq_bases:
-            if bases.count(ub) == 1: # there is only one
-                ans.append(files[bases.index(ub)])
-            else: # must be more than
-                indices = [i for i, x in enumerate(bases) if x == ub]
-                tmp = []
-                for i in indices:
-                    tmp.append((bases[i], versions[i], files[i]))
-                if options.verbose: print("tmp:: {0}".format(tmp))
-                if options.verbose: print("tmpmax:: {0}".format(max(tmp, key=lambda x: x[1])[2]))
-                ans.append(max(tmp, key=lambda x: x[1])[2])
-        return ans
+        return False
 
-def make_symlinks(files, files_out, outdir, options):
+def make_symlinks(files, files_out, outdir, linkdirs, mode, options):
     """
     for all the files make symlinks into outdir
     """
@@ -111,94 +121,116 @@ def make_symlinks(files, files_out, outdir, options):
         files_out = [files_out]
     # if files_out then cull the files to get rid of the ones
     for f in files:
+        if not os.path.isdir(outdir):
+            os.makedirs(outdir, int(mode, 8))
+        outf = os.path.join(outdir, os.path.basename(f))
         try:
-            if os.path.isfile(f):
-                if options.verbose: print("linking1 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))
-                os.symlink(f, os.path.join(outdir, os.path.basename(f)))
-            elif options.dir:
-                if options.verbose: print("linking2 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))
-                os.symlink(f, os.path.join(outdir, os.path.basename(f)))
-
-        except OSError:
-            if options.force:
-                os.remove(os.path.join(outdir, os.path.basename(f)))
-                if options.verbose: print("linking3 {0}->{1}".format(f, os.path.join(outdir, os.path.basename(f))))
-                make_symlinks(f, outdir, options)
+            if os.path.isfile(f) and not os.path.isfile(outf):
+                if options.verbose: print("linking1 {0}->{1}".format(f, outf))
+                os.symlink(f, outf)
+            elif toBool(linkdirs):
+                if options.verbose: print("linking2 {0}->{1}".format(f, outf))
+                os.symlink(f, outf)
         except:
             warnings.warn("File {0} not linked:\n\t{1}".format(f, traceback.format_exc()))
 
-def delete_symlinks(outdir):
+def delete_unneeded(files, files_out, options):
     """
-    delete all symlinks in outdir
+    delete the link that are not needed
     """
-    files = glob.glob(os.path.join(outdir, '*'))
-    for f in files:
-        if os.path.islink(f):
+    files_tmp = [os.path.basename(f) for f in files]
+    for f in files_out:
+        if os.path.basename(f) not in files_tmp:
             try:
-                os.unlink(os.path.join(outdir, f))
+                os.remove(f)
             except OSError:
-                warnings.warn("Link could not be deleted: {0}".format(os.path.join(outdir, f)))
+                pass
+            if options.verbose: print("removing unneeded link {0}".format(f))
 
+
+def readconfig(config_filepath):
+    expected_items = ['sourcedir', 'destdir', 'deltadays', 'startdate',
+                      'enddate', 'filter', 'linkdirs', 'outmode', 'nodate']
+    # Create a ConfigParser object, to read the config file
+    cfg=ConfigParser.SafeConfigParser()
+    cfg.read(config_filepath)
+    sections = cfg.sections()
+    # Read each parameter in turn
+    ans = {}
+    for section in sections:
+        ans[section] = dict(cfg.items(section))
+    # make sure that for each section the reqiured items are present
+    for k in ans:
+        for ei in expected_items:
+            if ei not in ans[k]:
+                raise(ValueError('Section [{0}] does not have required key "{1}"'.format(k, ei)))
+    # check that we can parse the dates
+    for k in ans:
+        try:
+            tmp = dup.parse(ans[k]['startdate'])
+        except:
+            raise(ValueError('Date "{0}" in [{1}][{2}] is not valid'.format(ans[k]['startdate'], k, 'startdate',)))
+        try:
+            tmp = dup.parse(ans[k]['enddate'])
+        except:
+            raise(ValueError('Date "{0}" in [{1}][{2}] is not valid'.format(ans[k]['enddate'], k, 'enddate')))
+        try:
+            tmp = int(ans[k]['deltadays'])
+        except:
+            raise(ValueError('Invalid "{0}" in [{1}][{2}]'.format(ans[k]['deltadays'], k, 'deltadays')))
+        try:
+            tmp = int(ans[k]['outmode'])
+        except:
+            raise(ValueError('Invalid "{0}" in [{1}][{2}]'.format(ans[k]['outmode'], k, 'outmode')))
+    for k in ans:
+        ans[k]['sourcedir'] = os.path.abspath(os.path.expanduser(os.path.expandvars(ans[k]['sourcedir'])))
+        ans[k]['destdir']   = os.path.abspath(os.path.expanduser(os.path.expandvars(ans[k]['destdir'])))
+                
+    return ans
 
 
 if __name__ == '__main__':
-    usage = "usage: %prog indir"
+    usage = "usage: %prog config"
     parser = OptionParser(usage=usage)
-    parser.add_option("-g", "--glob",
-                  dest="glb",
-                  help="The glob to use for files", default='*')
-    parser.add_option("-f", "--force",
-                  dest="force", action='store_true',
-                  help="Allow symlinks to overwrite exists links of same name", default=False)
-    parser.add_option("-o", "--outdir",
-                  dest="outdir",
-                  help="Output directory for symlinks", default='latest')
-    parser.add_option("-d", "--delete",
-                  dest="delete", action='store_true',
-                  help="Delete all the existing symlinks in the destination directory", default=False)
-    parser.add_option("", "--nodate",
-                  dest="nodate", action='store_true',
-                  help="Do not use the date part of a filename in finding latest", default=False)
-    parser.add_option("", "--dir",
-                  dest="dir", action='store_true',
-                  help="Also make symlinks of directories", default=False)
-    parser.add_option("", "--all",
-                  dest="all", action='store_true',
-                  help="Make symlinks for files that do not have vx.y.z versions", default=False)
     parser.add_option("", "--verbose",
                   dest="verbose", action='store_true',
                   help="Print out verbose information", default=False)
-
 
     (options, args) = parser.parse_args()
 
     if len(args) != 1:
         parser.error("incorrect number of arguments")
 
-    indir  = os.path.abspath(os.path.expanduser((os.path.expandvars(args[0]))))
-    if options.outdir == 'latest':
-        outdir = os.path.join(indir, options.outdir)
-    else:
-        outdir = os.path.abspath(os.path.expanduser((os.path.expandvars(options.outdir))))
+    conffile = os.path.abspath(os.path.expanduser((os.path.expandvars(args[0]))))
+    if not os.path.isfile(conffile):
+        parser.error("Config file not readable ({0})".format(conffile))
+        
+    config = readconfig(conffile)
 
-    if os.path.realpath(indir) == os.path.realpath(outdir):
-        parser.error("outdir cannor be the same as indir, would clobber files")
-
-    if not os.path.isdir(outdir):
-        if options.force:
-            os.makedirs(outdir)
+    for sec in config:
+        print('Processing [{0}]'.format(sec))
+        filter = config[sec]['filter']
+        files = []
+        files_out = []
+        for filt in filter.split(' '):
+            files_t, files_out_t = get_all_files(config[sec]['sourcedir'], config[sec]['destdir'], filt)
+            files.extend(files_t)
+            files_out.extend(files_out_t)
+        delete_unneeded(files, files_out, options)
+        if files:
+            files = cull_to_newest(files, options=options)
+            startdate = dup.parse(config[sec]['startdate']).date()
+            enddate   = dup.parse(config[sec]['enddate']).date()
+            delta     = datetime.date.today() - datetime.timedelta(days = int(config[sec]['deltadays']))
+            if delta < enddate:
+                enddate = delta
+            if not toBool(config[sec]['nodate']):
+                files = cull_to_dates(files, startdate, enddate, options=options)
         else:
-            parser.error("outdir: {0} does not exist, create or use --force".format(outdir))
+            print('   No files found for [{0}]'.format(sec))
+            delete_unneeded(files, files_out, options)
+            sys.exit(0)
+        delete_unneeded(files, files_out, options)
 
-
-    if options.delete:
-        delete_symlinks(outdir)
-    files, files_out = get_all_files(indir, outdir, options.glb)
-    if files:
-        files = cull_to_newest(files, nodate=options.nodate, options=options)
-    else:
-        print('No files found')
-        sys.exit(0)
-    make_symlinks(files, files_out, outdir, options)
-
+        make_symlinks(files, files_out, config[sec]['destdir'], config[sec]['linkdirs'], config[sec]['outmode'], options)
 
