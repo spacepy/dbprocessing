@@ -229,7 +229,6 @@ if __name__ == '__main__':
         else:
             print('   No files found for [{0}]'.format(sec))
             delete_unneeded(files, files_out, options)
-            sys.exit(0)
         delete_unneeded(files, files_out, options)
 
         make_symlinks(files, files_out, config[sec]['destdir'], config[sec]['linkdirs'], config[sec]['outmode'], options)
