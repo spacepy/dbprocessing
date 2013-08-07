@@ -210,26 +210,27 @@ if __name__ == '__main__':
     for sec in config:
         print('Processing [{0}]'.format(sec))
         filter = config[sec]['filter']
-        files = []
-        files_out = []
         for filt in filter.split(' '):
+            files = []
+            files_out = []
+            print filt
             files_t, files_out_t = get_all_files(config[sec]['sourcedir'], config[sec]['destdir'], filt)
             files.extend(files_t)
             files_out.extend(files_out_t)
-        delete_unneeded(files, files_out, options)
-        if files:
-            files = cull_to_newest(files, options=options)
-            startdate = dup.parse(config[sec]['startdate']).date()
-            enddate   = dup.parse(config[sec]['enddate']).date()
-            delta     = datetime.date.today() - datetime.timedelta(days = int(config[sec]['deltadays']))
-            if delta < enddate:
-                enddate = delta
-            if not toBool(config[sec]['nodate']):
-                files = cull_to_dates(files, startdate, enddate, options=options)
-        else:
-            print('   No files found for [{0}]'.format(sec))
             delete_unneeded(files, files_out, options)
-        delete_unneeded(files, files_out, options)
+            if files:
+                files = cull_to_newest(files, options=options)
+                startdate = dup.parse(config[sec]['startdate']).date()
+                enddate   = dup.parse(config[sec]['enddate']).date()
+                delta     = datetime.date.today() - datetime.timedelta(days = int(config[sec]['deltadays']))
+                if delta < enddate:
+                    enddate = delta
+                if not toBool(config[sec]['nodate']):
+                    files = cull_to_dates(files, startdate, enddate, options=options)
+            else:
+                print('   No files found for [{0}]'.format(sec))
+                delete_unneeded(files, files_out, options)
+            delete_unneeded(files, files_out, options)
 
-        make_symlinks(files, files_out, config[sec]['destdir'], config[sec]['linkdirs'], config[sec]['outmode'], options)
+            make_symlinks(files, files_out, config[sec]['destdir'], config[sec]['linkdirs'], config[sec]['outmode'], options)
 
