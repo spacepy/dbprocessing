@@ -135,6 +135,7 @@ class runMe(object):
         DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(self.code_id, self.codepath))
 
         self.out_prod = self.dbu.getEntry('Process', self.process_id).output_product
+        self.data_level = self.dbu.getEntry('Product', self.out_prod).level # This is the level of the output product, sorts on this and date
         # grab the format
         format_str = self.dbu.getEntry('Product', self.out_prod).format
         # get the process_keywords from the file if there are any
