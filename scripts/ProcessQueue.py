@@ -124,11 +124,13 @@ if __name__ == "__main__":
             while pq.dbu.Processqueue.len() > 0:
                 # clean the queue every 10 precesses (and the first)
                 if (number_proc % 10 ==0):
+                    print('Cleaning Processqueue')
                     pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates
                 # this loop makes all the runMe objects for all the files in the processqueue
 
                 if not options.dryrun:
                     while pq.dbu.Processqueue.len() > 0:
+                        print('Deciding what can run')
                         for f in pq.dbu.Processqueue.getAll():
                             retval = do_proc(f)
                             if retval == 'break':
@@ -152,10 +154,10 @@ if __name__ == "__main__":
 
                 # lets sort the runme_list so that they process in order, kinda nice
                 # level then date
-                
+                print('Sorting runMe list')
                 pq.runme_list = sorted(pq.runme_list, key=lambda x: (x.data_level, x.utc_file_date))
-                print len(pq.runme_list), pq.runme_list
                 run_num = 0
+                print('Running processes')
                 while pq.runme_list:
                     run_num += 1
                     v = pq.runme_list.pop(0)
