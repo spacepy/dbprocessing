@@ -331,10 +331,9 @@ class DBUtils(object):
         @keyword fix: (optional) set to have the DB fixed to match the filesystem
            this is **NOT** sure to be safe
         """
-        file_id = self.getFileID(file_id)
         sq = self.getEntry('File', file_id)
         if sq.exists_on_disk:
-            file_path = self.getFileFullPath(file_id)
+            file_path = self.getFileFullPath(sq.file_id)
             if not os.path.exists(file_path):
                 if fix:
                     sq.exists_on_disk = False
@@ -495,6 +494,7 @@ class DBUtils(object):
                     self.session.delete(fid)
                     break # there can be only one
             self._commitDB()
+            DBlogging.dblogger.info( "File removed from process queue {0}:{1}".format(fid_ret, '---'))
             return fid_ret
 
     def _processqueueGet(self, index=0, version_bump=None):
@@ -1257,10 +1257,8 @@ class DBUtils(object):
 
         """
         file_entry = self.getEntry('File', filename)
-        filename = file_entry.filename
-        file_id = file_entry.file_id
         # need to know file product and mission to get whole path
-        ftb = self.getTraceback('File', file_id)
+        ftb = self.getTraceback('File', file_entry.file_id)
         rel_path = ftb['product'].relative_path
         if rel_path is None:
             raise(DBError("product {0} does not have a relative_path set, fix the DB".format(ftb['product'].product_id)))
@@ -1271,12 +1269,12 @@ class DBUtils(object):
         except KeyError:
             raise(DBError("Mission {0} root directory not set, fix the DB".format(ftb['mission'].mission_id)))
         # perform anu required subitutions
-        path = os.path.join(root_dir, rel_path, filename)
+        path = os.path.join(root_dir, rel_path, file_entry.filename)
         path = Utils.dirSubs(path,
                              file_entry.filename,
                              file_entry.utc_file_date,
                              file_entry.utc_start_time,
-                             self.getFileVersion(file_id)
+                             self.getFileVersion(file_entry.file_id)
                              )
         return path
 

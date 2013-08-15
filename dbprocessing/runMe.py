@@ -184,6 +184,7 @@ class runMe(object):
             if parentchange:
                 DBlogging.dblogger.debug("Parent did change for file: {0}".format(self.filename))
                 continue
+            # Need to check for version_bump in the processqueue 
             return # if we get here then we are not going to run anything
 
         ## get extra_params from the process # they are split by 2 spaces
