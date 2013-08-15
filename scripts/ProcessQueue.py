@@ -155,7 +155,10 @@ if __name__ == "__main__":
                 # lets sort the runme_list so that they process in order, kinda nice
                 # level then date
                 print('Sorting runMe list')
-                pq.runme_list = sorted(pq.runme_list, key=lambda x: (x.data_level, x.utc_file_date))
+                try:
+                    pq.runme_list = sorted(pq.runme_list, key=lambda x: (x.data_level, x.utc_file_date))
+                except AttributeError:
+                    pq.runme_list = sorted(pq.runme_list, key=lambda x: (x.utc_file_date))
                 run_num = 0
                 print('Running processes')
                 while pq.runme_list:
