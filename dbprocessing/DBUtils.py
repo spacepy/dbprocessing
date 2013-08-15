@@ -1387,6 +1387,15 @@ class DBUtils(object):
         sq = self.session.query(self.Mission.mission_name)
         return [val[0] for val in sq.all()]
 
+    def renameFile(self, filename, newname):
+        """
+        rename a file in the db
+        """
+        f = self.getEntry('File', filename)
+        f.filename = newname
+        self.session.add(rel)
+        self._commitDB()    
+
     def getFileID(self, filename):
         """
         Return the fileID for the input filename
