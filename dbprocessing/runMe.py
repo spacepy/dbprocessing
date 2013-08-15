@@ -220,10 +220,10 @@ class runMe(object):
         try:
             DBlogging.dblogger.debug("Filename: {0} check in db".format(self.filename))
             f_id_db = self.dbu.getFileID(self.filename)
-            DBlogging.dblogger.debug("Filename: {0} is in the DB, have to make different version".format(self.filename))
+            DBlogging.dblogger.info("Filename: {0} is in the DB, have to make different version".format(self.filename))
             return f_id_db
         except (DBUtils.DBError, DBUtils.DBNoData):
-            DBlogging.dblogger.debug("Filename: {0} is not in the DB, can process".format(self.filename))
+            DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(self.filename))
             return False
 
     def _codeVerChange(self, f_id_db):
