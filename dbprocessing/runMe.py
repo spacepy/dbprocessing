@@ -128,9 +128,11 @@ class runMe(object):
         # since we have a process do we have a code that does it?
         self.code_id = self.dbu.getCodeFromProcess(process_id, utc_file_date)
         if self.code_id is None: # there is no code to actually run we are done
+            DBlogging.dblogger.debug("Code_id is None: can't run")
             return
         self.codepath = self.dbu.getCodePath(self.code_id)
         if self.codepath is None: # there is no code to actually run we are done
+            DBlogging.dblogger.debug("Codepath is None: can't run")
             return
         DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(self.code_id, self.codepath))
 
