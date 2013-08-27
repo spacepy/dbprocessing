@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 import traceback
 
 import DBlogging
@@ -88,7 +89,10 @@ def runner(runme):
     #    for some code here
     try:
         print('cmdline', cmdline)
+        t0 = time.time()
+        t1 = None
         subprocess.check_call(' '.join(cmdline), shell=True, stderr=subprocess.STDOUT)
+        t1 = time.time() - t0
     except subprocess.CalledProcessError:
         # TODO figure out how to print what the return code was
         DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(cmdline), traceback.format_exc()))
@@ -96,6 +100,8 @@ def runner(runme):
         runme.moveToError(runme.filename)
         rm_tempdir(tempdir) # clean up
         return None
+    if t1 is not None:
+        DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(cmdline[0]), t1))    
     DBlogging.dblogger.debug("command finished")
 
     try:
