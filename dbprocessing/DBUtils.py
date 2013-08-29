@@ -595,17 +595,21 @@ class DBUtils(object):
             self._commitDB()
             DBlogging.dblogger.info( "File removed from db {0}".format(f) )
 
-    def getAllFilenames(self, fullPath=True, level=None):
+    def getAllFilenames(self, fullPath=True, level=None, product=None):
         """
         return all the file names in the database
 
         if level==None get all filenames, otherwise only for a level
 
         """
-        if level is None:
+        if level is None and product is None:
             names = zip(*self.session.query(self.File.filename).all())[0]
-        else:
+        elif product is None:
             names = zip(*self.session.query(self.File.filename).filter_by(data_level=level).all())[0]
+        elif level is None:
+            names = zip(*self.session.query(self.File.filename).filter_by(product_id=product).all())[0]
+        else: # both specified
+            names = zip(*self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).all())[0]
         if fullPath:
             names = [ self.getFileFullPath(v) for v in names]
         return names
