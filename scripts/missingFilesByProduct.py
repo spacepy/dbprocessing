@@ -83,7 +83,7 @@ if __name__ == "__main__":
         for m in missing:
             print("   {0}".format(m))
             num = db.reprocessByProduct(options.parent, startDate=m, endDate=m)
-            print('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
-            DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
+            print('Added {0} files to be reprocessed for product {1}'.format(num, options.parent))
+            DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, options.parent))
 
 
