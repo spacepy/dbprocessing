@@ -1284,12 +1284,13 @@ class DBUtils(object):
 
     def getProcessFromInputProduct(self, product):
         """
-        given an product name or id return all the processes that use that as an input
+        given a product id return all the processes that use that as an input
+
+        Use getProductID if have a name (or not sure)
         """
         DBlogging.dblogger.debug("Entered getProcessFromInputProduct: {0}".format(product))
-        p_id = self.getProductID(product)
-        sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
-        return [v.process_id for v in sq]
+        sq = self.session.query(self.Productprocesslink.process_id).filter_by(input_product_id = product).all()
+        return [v[0] for v in sq]
 
     def getProcessFromOutputProduct(self, outProd):
         """
@@ -1590,8 +1591,7 @@ class DBUtils(object):
         product_id = self.getEntry('File', file_id).product_id
 
         # get all the process ids that have this product as an input
-        proc_ids = self.getProcessFromInputProduct(product_id)
-        return proc_ids
+        return self.getProcessFromInputProduct(product_id)
 
     def getProductID(self,
                      product_name):
