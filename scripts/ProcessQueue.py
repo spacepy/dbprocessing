@@ -102,8 +102,6 @@ if __name__ == "__main__":
 
         def do_proc(file_id):
             DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(file_id, pq.dbu.Processqueue.len()-1))
-            if file_id is None:
-                return 'break'
             children = pq.dbu.getChildrenProducts(file_id) # returns process
             if not children:
                 DBlogging.dblogger.debug("No children found for {0}".format(file_id))
@@ -117,6 +115,7 @@ if __name__ == "__main__":
                 pq.buildChildren(child_process, [file_id])
                 if not options.dryrun:
                         pq.dbu.Processqueue.pop()
+
         try:
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
             # this loop does everything, both make the runMe objects and then
@@ -132,18 +131,17 @@ if __name__ == "__main__":
                     while pq.dbu.Processqueue.len() > 0:
                         print('Deciding what can run')
                         for f in pq.dbu.Processqueue.getAll():
-                            retval = do_proc(f)
-                            if retval == 'break':
+                            if f is None:
                                 break
-                            else:
-                                number_proc += 1
+                            do_proc(f)
+                            number_proc += 1
                 else:
                     print('')
                     for f in pq.dbu.Processqueue.getAll():
                         print('.'),
-                        retval = do_proc(f)
-                        if retval == 'break':
+                        if f is None:
                             break
+                        do_proc(f)
                 # now do all the running
 
 #==============================================================================
