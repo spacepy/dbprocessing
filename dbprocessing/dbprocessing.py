@@ -240,12 +240,13 @@ class ProcessQueue(object):
     def _getRequiredProducts(self, process_id, file_id, utc_file_date):
         #####################################################
         ## get all the input products for that process, and if they are optional
-        input_product_id = self.dbu.getInputProductID(process_id) # this is a list
+        input_product_id = self.dbu.getInputProductID(process_id) # this is a list of tuples (id, optional)
 
         DBlogging.dblogger.debug("Finding input files for file_id:{0} process_id:{1} date:{2}".format(file_id, process_id, utc_file_date))
 
         ## here decide how we build output and do it.
-        timebase = self.dbu.getEntry('Process', process_id).output_timebase
+        timebase = self.dbu.session.query(self.dbu.Process.output_timebase).get(process_id)[0] # faster
+
         if timebase == 'FILE': # taking one file to the next file
             # for file based processing we are going to look to the "process_keywords" and cull the
             #   retuned files based on making sure they are all the same
@@ -254,14 +255,14 @@ class ProcessQueue(object):
             files = []
             # get all the possible files based on dates that we might want to put into the process now
             for val, opt in input_product_id:
-                tmp = self.dbu.getFiles_product_utc_file_date(val, utc_file_date)
-                if tmp:  # != []
-                    files.extend(tmp)
+                files.extend(self.dbu.getFiles_product_utc_file_date(val, utc_file_date))
+
             DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
             # remove all the files that are not the newest version
             files = self.dbu.file_id_Clean(files)
             # grab the process_keywords column for the file_id and all the possible other files
-            infile_process_keywords = self.dbu.getEntry('File', file_id).process_keywords
+            # infile_process_keywords = self.dbu.getEntry('File', file_id).process_keywords # below is faster
+            infile_process_keywords = self.dbu.session.query(self.dbu.File.process_keywords).get(file_id)[0]
             files_process_keywords = [self.dbu.getEntry('File', v[0]).process_keywords for v in files]
             # now if the process_keywords in files_process_keywords does not match that in infile_process_keywords
             #   drop it
