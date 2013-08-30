@@ -63,7 +63,7 @@ class DBUtils(object):
         @summary: Initialize the DBUtils class, default mission is 'Test'
         """
         self.dbIsOpen = False
-        if mission == None:
+        if mission is None:
             raise(DBError("Must input database name to create DBUtils instance"))
         self.mission = mission
         #Expose the format/regex routines of DBFormatter
@@ -221,7 +221,7 @@ class DBUtils(object):
         @keyword comment: the comment to enter into the processing log DB
         @return: True - Success, False - Failure
         """
-        if comment == None:
+        if comment is None:
             raise(ValueError("Must enter a comment to override DB lock"))
         sq = self.session.query(self.Logging).filter_by(currently_processing = True)
         for val in sq:
@@ -1375,7 +1375,7 @@ class DBUtils(object):
             if len(sq) == 0:
                 raise(DBNoData("No instrument_name {0} found in the DB".format(name)))
             if len(sq) > 1:
-                if satellite_id == None:
+                if satellite_id is None:
                     raise(ValueError('Non unique instrument name and no satellite specified'))
                 for v in sq:
                     if v.satellite_id == satellite_id:
@@ -1412,6 +1412,8 @@ class DBUtils(object):
             if sq is None:
                 raise(DBNoData("No file_id {0} found in the DB".format(filename)))
             return sq.file_id
+        except TypeError: # came in as list or tuple
+            return [self.getFileID(v) for v in filename]
         except ValueError:
             sq = self.session.query(self.File).filter_by(filename = filename)
             try:
@@ -1434,6 +1436,8 @@ class DBUtils(object):
             code = self.session.query(self.Code).get(c_id)
             if code is None:
                 raise(DBNoData("No code id {0} found in the DB".format(c_id)))
+        except TypeError: # came in as list or tuple
+            return [self.getCodeID(v) for v in codename]
         except ValueError:
             sq = self.session.query(self.Code.code_id).filter_by(filename = codename).all()
             if len(sq) == 0:
@@ -1982,19 +1986,16 @@ class DBUtils(object):
         """
         master method to return a entry instance from any table in the db
         """
-        if table not in dir(self):
-            raise(ValueError('Invalid table specification: {0}'.format(table)))
-        if ('get' + table + 'ID') in dir(self):
-            cmd = 'get' + table + 'ID'
-            pk = getattr(self, cmd)(args[0])
-        else:
-            try:
-                pk = long(args[0])
-            except (ValueError, TypeError):
-                raise(ValueError('Invalid primary key, {1}, specified for table {0}'.format(table, args[0])))
-        retval = self.session.query(getattr(self, table)).get(pk)
-        if retval is None:
-            raise(DBNoData('No entry {0} for table {1}'.format(args[0], table)))
+        # just try and get the entry
+        retval = self.session.query(getattr(self, table)).get(args[0])
+        if retval is None: # either this was not a valid pk or not a pk that os in the db            
+            # see if it was a name
+            if ('get' + table + 'ID') in dir(self):
+                cmd = 'get' + table + 'ID'
+                pk = getattr(self, cmd)(args[0])
+                retval = self.session.query(getattr(self, table)).get(pk)
+                if retval is None:
+                    raise(DBNoData('No entry {0} for table {1}'.format(args[0], table)))
         return retval
 
     def getFilesByCode(self, code_id, id_only=False):
