@@ -1289,10 +1289,7 @@ class DBUtils(object):
         DBlogging.dblogger.debug("Entered getProcessFromInputProduct: {0}".format(product))
         p_id = self.getProductID(product)
         sq = self.session.query(self.Productprocesslink).filter_by(input_product_id = p_id).all()
-        ans = []
-        for v in sq:
-            ans.append(v.process_id)
-        return ans
+        return [v.process_id for v in sq]
 
     def getProcessFromOutputProduct(self, outProd):
         """
