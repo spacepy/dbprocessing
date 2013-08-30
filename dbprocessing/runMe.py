@@ -26,7 +26,6 @@ class ProcessException(Exception):
     pass
 
 
-
 def mk_tempdir(self, suffix='_dbprocessing'):
     """
     create a secure temp directory
@@ -65,7 +64,7 @@ def runner(runme_list):
     n_bad : int
         number of processes that failed
     """
-    MAX_PROC = 1
+    MAX_PROC = 2
     ############################################################
     # 1) build up the command line and store in a commands list
     # 2) loop over the commands
@@ -76,52 +75,49 @@ def runner(runme_list):
     ############################################################
 
     ## 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
-    commands_list = [runme.make_command_line() for runme in runme_list]
-        
+    for runme in runme_list:
+        runme.make_command_line()
+    
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
     #    for some code here
     processes = [] # tuple (command line, Popen object, start time)
 
-    while commands_list or processes:
-        while len(processes) < MAX_PROC and commands_list:
-            cmdline = commands_list.pop(0) # pop from the start of the list, it is sorted!!
-            print('cmdline', cmdline)
-            DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(cmdline))))
-            processes.append( (cmdline, subprocess.Popen(cmdline), time.time()) ) 
+    n_good = 0 # number of processes susseccfully completed
+    n_bad = 0 # number of processes failed
+
+    while runme_list or processes:
+        while len(processes) < MAX_PROC and runme_list:
+            runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
+            DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
+            processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
         finished = []
         for p in processes:
             if p[1].poll() is None: # still running
                 continue
             elif p[1].returncode != 0: # non zero return code FAILED
-                DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(cmdline), p[1].returncode))
+                DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(p[0].cmdline), p[1].returncode))
                 # assume the file is bad and move it to error
-                runme.moveToError(runme.filename)
+                p[0].moveToError(p[0].filename)
+                n_bad += 1
             else: # p[1].returncode == 0  SUCCESS
-                DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(cmdline[0]), time.time()-p[2]))
+                # this is not a perfect time since all the adding occurs before the next poll
+                DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(p[0].cmdline[0]), time.time()-p[2]))
                 try:
-                    runme.moveToIncoming(os.path.join(runme.tempdir, runme.filename))
+                    p[0].moveToIncoming(os.path.join(p[0].tempdir, p[0].filename))
                 except IOError:
-                    glb = glob.glob(os.path.join(runme.tempdir, runme.filename) + '*.png')
+                    glb = glob.glob(os.path.join(p[0].tempdir, p[0].filename) + '*.png')
                     if len(glb) == 1:
-                        runme.moveToIncoming(glb[0])
-                runme._add_links(cmdline)
-                print("Process {0} FINSIHED".format(p[0]))
-                
+                        p[0].moveToIncoming(glb[0])
+                p[0]._add_links(p[0].cmdline)
+                print("Process {0} FINSIHED".format(' '.join(p[0].cmdline)))
+                n_good += 1
             finished.append(p) # we had a return code if we get here
         for p in finished: # clean finished processes form the list
             processes.remove(p)
-        time.sleep(1)
-           
-    try:
-        runme.moveToIncoming(os.path.join(tempdir, runme.filename))
-    except IOError:
-        glb = glob.glob(os.path.join(tempdir, runme.filename) + '*.png')
-        if len(glb) == 1:
-            runme.moveToIncoming(glb[0])
+        time.sleep(0.5)
 
-    runme._add_links(cmdline)
-
+    return n_good, n_bad
 
 
 class runMe(object):
@@ -432,18 +428,18 @@ class runMe(object):
             pass
 
         # build the command line we are to run
-        cmdline = [runme.codepath]
+        cmdline = [self.codepath]
         # get extra_params from the process
-        if runme.extra_params:
-            cmdline.extend(runme.extra_params)
+        if self.extra_params:
+            cmdline.extend(self.extra_params)
         # figure out how to put the arguments together
-        if runme.args:
-            cmdline.extend(runme.args)
+        if self.args:
+            cmdline.extend(self.args)
         # put all the input files on the command line (order is not set)
-        for i_fid in runme.input_files:
-            cmdline.append(runme.dbu.getFileFullPath(i_fid))
+        for i_fid in self.input_files:
+            cmdline.append(self.dbu.getFileFullPath(i_fid))
         # the putname goes last
-        cmdline.append(os.path.join(self.tempdir, runme.filename))
+        cmdline.append(os.path.join(self.tempdir, self.filename))
         
         # and make sure to expand any path variables
         cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]

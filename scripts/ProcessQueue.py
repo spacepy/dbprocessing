@@ -171,7 +171,7 @@ if __name__ == "__main__":
                           .format(v.process_id, v.utc_file_date, v.filename))
                 else:
                     n_good, n_bad = runMe.runner(pq.runme_list)
-                    print("{0} of {1} processes were successful".format(n_good, n_bad))
+                    print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))
                     DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
 
         except:
