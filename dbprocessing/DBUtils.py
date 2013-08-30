@@ -418,7 +418,7 @@ class DBUtils(object):
         else:
             pq1.version_bump = version_bump
         self.session.add(pq1)
-        DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, '---'))
+        DBlogging.dblogger.debug( "File added to process queue {0}:{1}".format(fileid, '---'))
         self._commitDB()
         pqid = self.session.query(self.Processqueue.file_id).all()
         return pqid[-1]
@@ -455,7 +455,7 @@ class DBUtils(object):
                 pq1 = self.Processqueue()
                 pq1.file_id = f
                 self.session.add(pq1)
-                DBlogging.dblogger.info( "File added to process queue {0}:{1}".format(fileid, '---'))
+                DBlogging.dblogger.debug( "File added to process queue {0}:{1}".format(fileid, '---'))
             self._commitDB() # commit once for all the adds
         return  len(files_to_add)
 
@@ -494,7 +494,7 @@ class DBUtils(object):
                     self.session.delete(fid)
                     break # there can be only one
             self._commitDB()
-            DBlogging.dblogger.info( "File removed from process queue {0}:{1}".format(fid_ret, '---'))
+            DBlogging.dblogger.debug( "File removed from process queue {0}:{1}".format(fid_ret, '---'))
             return fid_ret
 
     def _processqueueGet(self, index=0, version_bump=None):
@@ -508,10 +508,10 @@ class DBUtils(object):
         """
         num = self.Processqueue.len()
         if num == 0:
-            DBlogging.dblogger.info( "processqueueGet() returned: None (empty queue)")
+            DBlogging.dblogger.debug( "processqueueGet() returned: None (empty queue)")
             return None
         elif index >= num:
-            DBlogging.dblogger.info( "processqueueGet() returned: None (requested index larger than size)")
+            DBlogging.dblogger.debug( "processqueueGet() returned: None (requested index larger than size)")
             return None
         else:
             for ii, fid in enumerate(self.session.query(self.Processqueue)):
@@ -521,7 +521,7 @@ class DBUtils(object):
                     else:
                         fid_ret = fid.file_id
                     break # there can be only one
-            DBlogging.dblogger.info( "processqueueGet() returned: {0}".format(fid_ret) )
+            DBlogging.dblogger.debug( "processqueueGet() returned: {0}".format(fid_ret) )
             return fid_ret
 
     def _processqueueClean(self, dryrun=False):
