@@ -413,7 +413,7 @@ class DBUtils(object):
         fileid = self.getFileID(fileid)
         pq1 = self.Processqueue()
         pq1.file_id = fileid
-        if isinstance(version_bump, (list, tuple)):
+        if hasattr(version_bump, '__iter__'):
             pq1.version_bump = version_bump[0]
         else:
             pq1.version_bump = version_bump
@@ -633,10 +633,8 @@ class DBUtils(object):
         @type rootdir: str
 
         """
-        if not isinstance(mission_name, str):
-            raise(ValueError("Mission name has to  a string"))
-        if not isinstance(rootdir, str):
-            raise(ValueError("Rootdir must be a string"))
+        mission_name = str(mission_name)
+        rootdir = str(rootdir)
         try:
             m1 = self.Mission()
         except AttributeError:
@@ -656,8 +654,7 @@ class DBUtils(object):
         @param satellite_name: the name of the mission
         @type satellite_name: str
         """
-        if not isinstance(satellite_name, str):
-            raise(ValueError("Satellite name has to  a string"))
+        satellite_name = str(satellite_name)
         s1 = self.Satellite()
 
         s1.mission_id = mission_id
