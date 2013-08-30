@@ -408,8 +408,6 @@ class runMe(object):
             for val in self.input_files: # add a link for each input file
                 self.dbu.addFilefilelink(f_id, val)
 
-
-
     def make_command_line(self):
         """
         make a command line for actually doing this running

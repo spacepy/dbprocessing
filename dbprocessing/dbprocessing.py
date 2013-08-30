@@ -50,7 +50,7 @@ class ProcessQueue(object):
         self.depends = DBqueue.DBqueue()
         self.queue = DBqueue.DBqueue()
         self.findChildren = DBqueue.DBqueue()
-        DBlogging.dblogger.info("Entering ProcessQueue")
+        DBlogging.dblogger.debug("Entering ProcessQueue")
 
     def __del__(self):
         """
