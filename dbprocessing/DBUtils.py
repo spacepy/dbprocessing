@@ -1675,12 +1675,14 @@ class DBUtils(object):
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess: {0}".format(proc_id))
         # will have as many values as there are codes for a process
-        sq1 =  self.session.query(self.Code).filter_by(process_id = proc_id).filter_by(active_code = True).filter(self.Code.code_start_date <= utc_file_date).filter(self.Code.code_stop_date >= utc_file_date).all()
-        outval = sorted(sq1, key = lambda val: Version.Version(val.interface_version, val.quality_version, val.revision_version))
-        if len(outval) == 0:
+        sq = self.session.query(self.Code.code_id).filter_by(process_id = proc_id).filter_by(newest_version = True).\
+             filter_by(active_code = True).filter(self.Code.code_start_date <= utc_file_date).\
+             filter(self.Code.code_stop_date >= utc_file_date)
+        if sq.count() == 0:
             return None
-        else:
-            return outval[-1].code_id
+        elif sq.count() > 1:
+           raise(DBError('More than one code active for a given day'))
+        return sq[0].code_id
 
     def getMissionDirectory(self, mission_id=None):
         """
