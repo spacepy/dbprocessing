@@ -32,6 +32,7 @@ def mk_tempdir(self, suffix='_dbprocessing'):
     create a secure temp directory
     """
     tempdir = tempfile.mkdtemp(suffix)
+    DBlogging.dblogger.debug("Created temp directory: {0}".format(tempdir))
     return tempdir
 
 def rm_tempdir(tempdir):
@@ -43,67 +44,75 @@ def rm_tempdir(tempdir):
     tempdir = None
     DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
 
-def runner(runme):
+
+def runner(runme_list):
     """
-    decide what code and then run it
+    Go through a list of runMe objects and run them
+
+    TODO
+    ====
+    This function can be made a smart as one wants, for now it is not made to be smart, but flexible
+    
+    Parameters
+    ==========
+    runme_list : list
+        list of runMe objects that need to be run
+
+    Returns
+    =======
+    n_good : int
+        number of processes that successfully completed
+    n_bad : int
+        number of processes that failed
     """
-    DBlogging.dblogger.debug("Testing if {0} can run: {1}".format(runme, runme.ableToRun))
-    if not runme.ableToRun:
-        return
+    MAX_PROC = 1
+    ############################################################
+    # 1) build up the command line and store in a commands list
+    # 2) loop over the commands
+    #  a) start up to MAX_PROC processes with subprocess.Popen
+    #  b) poll that they are done or not and if they finish successfully 
+    #     i) True: add data to db
+    #     ii) False: add errror messages
+    ############################################################
 
-    # if runme.filename is in the DB then we cannot run this.  #TODO figure out why this happens
-    try:
-        runme.dbu.getFileID(runme.filename)
-    except:
-        pass
-    else:
-        DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(runme.filename))
-        return # if the exception did not happen return
-
-    # make a directory to run the code
-    tempdir = mk_tempdir('_dbprocessingRunMe')
-
-    DBlogging.dblogger.debug("Created temp directory: {0}".format(tempdir))
-
-    ## build the command line we are to run
-    cmdline = [runme.codepath]
-
-    ## get extra_params from the process
-    if runme.extra_params:
-        cmdline.extend(runme.extra_params)
-
-    ## figure out how to put the arguments together
-    if runme.args:
-        cmdline.extend(runme.args)
-
-    for i_fid in runme.input_files:
-        cmdline.append(runme.dbu.getFileFullPath(i_fid))
-
-    cmdline.append(os.path.join(tempdir, runme.filename))
-    cmdline = [os.path.expandvars(v) for v in cmdline]
-
-    DBlogging.dblogger.info("running command: {0}".format(' '.join(cmdline)))
-    # TODO, think here on how to grab the output
+    ## 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+    commands_list = [runme.make_command_line() for runme in runme_list]
+        
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
     #    for some code here
-    try:
-        print('cmdline', cmdline)
-        t0 = time.time()
-        t1 = None
-        subprocess.check_call(' '.join(cmdline), shell=True, stderr=subprocess.STDOUT)
-        t1 = time.time() - t0
-    except subprocess.CalledProcessError:
-        # TODO figure out how to print what the return code was
-        DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(cmdline), traceback.format_exc()))
-        # assume the file is bad and move it to error
-        runme.moveToError(runme.filename)
-        rm_tempdir(tempdir) # clean up
-        return None
-    if t1 is not None:
-        DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(cmdline[0]), t1))    
-    DBlogging.dblogger.debug("command finished")
+    processes = [] # tuple (command line, Popen object, start time)
 
+    while commands_list or processes:
+        while len(processes) < MAX_PROC and commands_list:
+            cmdline = commands_list.pop(0) # pop from the start of the list, it is sorted!!
+            print('cmdline', cmdline)
+            DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(cmdline))))
+            processes.append( (cmdline, subprocess.Popen(cmdline), time.time()) ) 
+        finished = []
+        for p in processes:
+            if p[1].poll() is None: # still running
+                continue
+            elif p[1].returncode != 0: # non zero return code FAILED
+                DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(cmdline), p[1].returncode))
+                # assume the file is bad and move it to error
+                runme.moveToError(runme.filename)
+            else: # p[1].returncode == 0  SUCCESS
+                DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(cmdline[0]), time.time()-p[2]))
+                try:
+                    runme.moveToIncoming(os.path.join(runme.tempdir, runme.filename))
+                except IOError:
+                    glb = glob.glob(os.path.join(runme.tempdir, runme.filename) + '*.png')
+                    if len(glb) == 1:
+                        runme.moveToIncoming(glb[0])
+                runme._add_links(cmdline)
+                print("Process {0} FINSIHED".format(p[0]))
+                
+            finished.append(p) # we had a return code if we get here
+        for p in finished: # clean finished processes form the list
+            processes.remove(p)
+        time.sleep(1)
+           
     try:
         runme.moveToIncoming(os.path.join(tempdir, runme.filename))
     except IOError:
@@ -113,7 +122,6 @@ def runner(runme):
 
     runme._add_links(cmdline)
 
-    rm_tempdir(tempdir) # clean up
 
 
 class runMe(object):
@@ -214,6 +222,15 @@ class runMe(object):
         ## getting here means that we are going to be returning a full
         ##   class ready to run the process
         self.ableToRun = True
+
+        # Make a temp directory and associate it with this
+        self.tempdir = mk_tempdir('_dbprocessingRunMe')
+
+    def __del__(self):
+        try:
+            rm_tempdir(self.tempdir)
+        except Exception:
+            pass
 
     def __str__(self):
         return "RunMe({0}, {1})".format(self.utc_file_date, self.process_id)
@@ -397,4 +414,41 @@ class runMe(object):
 
 
 
+    def make_command_line(self):
+        """
+        make a command line for actually doing this running
 
+        NOTE: creates a temp directory that needs to be cleaned!!
+        """
+        
+        ## 1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a
+        # if runme.filename is in the DB then we cannot run this.  (happends if 2 identical runMe are there
+        try:
+            self.dbu.getFileID(self.filename)
+            DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(self.filename))
+            self.ableToRun = False
+            return
+        except Exception:
+            pass
+
+        # build the command line we are to run
+        cmdline = [runme.codepath]
+        # get extra_params from the process
+        if runme.extra_params:
+            cmdline.extend(runme.extra_params)
+        # figure out how to put the arguments together
+        if runme.args:
+            cmdline.extend(runme.args)
+        # put all the input files on the command line (order is not set)
+        for i_fid in runme.input_files:
+            cmdline.append(runme.dbu.getFileFullPath(i_fid))
+        # the putname goes last
+        cmdline.append(os.path.join(self.tempdir, runme.filename))
+        
+        # and make sure to expand any path variables
+        cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]
+        DBlogging.dblogger.debug("built command: {0}".format(' '.join(cmdline)))
+        self.cmdline = cmdline
+
+
+        

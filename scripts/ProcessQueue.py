@@ -155,22 +155,25 @@ if __name__ == "__main__":
                 # lets sort the runme_list so that they process in order, kinda nice
                 # level then date
                 print('Sorting runMe list')
+                # we might was well go through the runme_list and get rid of all processes
+                #   that cannot run by checking the ableToRun attribitute
+                pq.runme_list = [v for v in pq.runme_list if v.ableToRun]
                 try:
                     pq.runme_list = sorted(pq.runme_list, key=lambda x: (x.data_level, x.utc_file_date))
-                except AttributeError:
+                except AttributeError: # this seems unneeded, maybe a DB error caused this...
                     pq.runme_list = sorted(pq.runme_list, key=lambda x: (x.utc_file_date))
                 run_num = 0
                 print('Running processes')
-                while pq.runme_list:
-                    run_num += 1
-                    v = pq.runme_list.pop(0)
-                    ## TODO if one wanted to add smarts do it here, like running in parrallel
-                    DBlogging.dblogger.info("Running file {0} there are {1} left".format(run_num, len(pq.runme_list)))
-                    if not options.dryrun:
-                        runMe.runner(v)
-                    else:
-                        print('<dryrun> Process: {0} Date: {1} Outname: {2} '\
-                            .format(v.process_id, v.utc_file_date, v.filename))
+                # pass the whole runme list off to the runMe module function
+                #  it will go through and decide what can be run in parrallel
+                if options.dryrun:
+                    print('<dryrun> Process: {0} Date: {1} Outname: {2} '\
+                          .format(v.process_id, v.utc_file_date, v.filename))
+                else:
+                    n_good, n_bad = runMe.runner(pq.runme_list)
+                    print("{0} of {1} processes were successful".format(n_good, n_bad))
+                    DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
+
         except:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
