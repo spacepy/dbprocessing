@@ -37,8 +37,11 @@ if __name__ == '__main__':
     # read in each file and add to lines the lines that fit the format:
     #    2013-09-04 21:31:00,063 - runMe:105 - INFO - Command: run_hope_L0toL05_v1.4.1.py took 160.020385027 seconds
     for f in files:
-        with open(f, 'r') as fp:
-            dat = fp.readlines()
+        try:
+            with open(f, 'r') as fp:
+                dat = fp.readlines()
+        except IOError:
+            continue
         tmp = [v.strip() for v in dat if ("INFO - Command:" in v and 'seconds' in v)]
         lines.extend(tmp)
 
