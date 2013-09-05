@@ -88,9 +88,15 @@ def runner(runme_list):
 
     while runme_list or processes:
         while len(processes) < MAX_PROC and runme_list:
-            runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
-            DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
-            processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
+            # TODO make this general somehow
+            # do not start anytihng while a L3 binning is occuring, takes too much memory
+            if len(processes) == 1 and 'run_hope_PA_binned_' in runme_list[0][0]:
+                pass
+            else:
+                runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
+                DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
+                print("Process starting: {0}".format(' '.join(runme.cmdline)))
+                processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
         finished = []
         for p in processes:
             if p[1].poll() is None: # still running
@@ -110,7 +116,7 @@ def runner(runme_list):
                     if len(glb) == 1:
                         p[0].moveToIncoming(glb[0])
                 p[0]._add_links(p[0].cmdline)
-                print("Process {0} FINSIHED".format(' '.join(p[0].cmdline)))
+                print("Process {0} FINISHED".format(' '.join(p[0].cmdline)))
                 n_good += 1
             finished.append(p) # we had a return code if we get here
         for p in finished: # clean finished processes form the list
