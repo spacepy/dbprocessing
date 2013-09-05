@@ -87,15 +87,10 @@ def runner(runme_list):
 
     while runme_list or processes:
         while len(processes) < MAX_PROC and runme_list:
-            # TODO make this general somehow
-            # do not start anytihng while a L3 binning is occuring, takes too much memory
-            if len(processes) == 1 and 'run_hope_PA_binned_' in runme_list[0].cmdline[0]:
-                pass
-            else:
-                runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
-                DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
-                print("Process starting: {0}".format(' '.join(runme.cmdline)))
-                processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
+            runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
+            DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
+            print("Process starting: {0}".format(' '.join(runme.cmdline)))
+            processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
         finished = []
         for p in processes:
             if p[1].poll() is None: # still running
@@ -205,7 +200,7 @@ class runMe(object):
             # Need to check for version_bump in the processqueue 
             return # if we get here then we are not going to run anything
 
-        ## get extra_params from the process # they are split by 2 spaces
+        ## get extra_params from the process 
         args = self.dbu.getEntry('Process', self.process_id).extra_params
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
