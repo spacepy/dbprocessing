@@ -90,7 +90,7 @@ def runner(runme_list):
         while len(processes) < MAX_PROC and runme_list:
             # TODO make this general somehow
             # do not start anytihng while a L3 binning is occuring, takes too much memory
-            if len(processes) == 1 and 'run_hope_PA_binned_' in runme_list[0][0]:
+            if len(processes) == 1 and 'run_hope_PA_binned_' in runme_list[0].cmdline[0]:
                 pass
             else:
                 runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
