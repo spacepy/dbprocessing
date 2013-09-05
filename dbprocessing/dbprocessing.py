@@ -254,8 +254,11 @@ class ProcessQueue(object):
             DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
             files = []
             # get all the possible files based on dates that we might want to put into the process now
+            
             for val, opt in input_product_id:
-                files.extend(self.dbu.getFiles_product_utc_file_date(val, utc_file_date))
+                tmp1 = self.dbu.getFiles_product_utc_file_date(val, utc_file_date)
+                if tmp1:
+                    files.extend(self.dbu.getFiles_product_utc_file_date(val, utc_file_date))
 
             DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
             # remove all the files that are not the newest version
@@ -339,7 +342,7 @@ class ProcessQueue(object):
         them each time to processing chain is run
         """
         proc = self.dbu.getAllProcesses(timebase='STARTUP')
-        #TODO just going to run there here for now.  This shold move to runMe
+        #TODO just going to run there here for now.  This should move to runMe
         for p in proc:  # run them all
             code = self.dbu.getEntry('Code', p.process_id)
             # print code.codename
