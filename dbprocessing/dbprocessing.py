@@ -42,7 +42,6 @@ class ProcessQueue(object):
         self.mission = mission
         dbu = DBUtils.DBUtils(self.mission)
         self.tempdir = None
-#        self.current_file = None
         self.runme_list = []
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()
@@ -56,7 +55,8 @@ class ProcessQueue(object):
         """
         attempt a bit of up
         """
-
+        del self.dbu
+        
     def rm_tempdir(self):
         """
         remove the temp directory
@@ -330,7 +330,7 @@ class ProcessQueue(object):
             input_files = zip(*files)[0] # this is the file_id
             DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
-            runme = runMe.runMe(self.dbu, utc_file_date, process_id, input_files, )
+            runme = runMe.runMe(self.dbu, utc_file_date, process_id, input_files, self)
             self.runme_list.append(runme)
 
     def onStartup(self):

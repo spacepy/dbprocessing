@@ -124,7 +124,7 @@ class runMe(object):
     """
     class holds all the info it takes to run a process
     """
-    def __init__(self, dbu, utc_file_date, process_id, input_files,):
+    def __init__(self, dbu, utc_file_date, process_id, input_files, pq):
         DBlogging.dblogger.debug("Entered runMe {0}, {1}, {2}, {3}".format(dbu, utc_file_date, process_id, input_files))
 
         self.filename = '' # initialize it empty
@@ -132,6 +132,7 @@ class runMe(object):
         self.extra_params = []
         self.args = []
         self.dbu = dbu
+        self.pq = pq # the ProcessQueue instance
         self.utc_file_date = utc_file_date
         self.process_id = process_id
         self.input_files = input_files
@@ -393,15 +394,14 @@ class runMe(object):
         add the filefilelink and filecodelink and verbose provenance
         """
         # need to add the current file to the DB so that we have the filefilelink and filecodelink info
-        pq = dbprocessing.ProcessQueue(self.dbu.mission)
         current_file = os.path.join(self.dbu.getIncomingPath(), self.filename)
-        df = pq.figureProduct(current_file) # uses all the inspectors to see what product a file is
+        df = self.pq.figureProduct(current_file) # uses all the inspectors to see what product a file is
         if df is None:
             DBlogging.dblogger.error("{0} did not have a product".format(current_file))
             self.moveToError(current_file)
             return
         df.params['verbose_provenance'] = ' '.join(cmdline)
-        f_id = pq.diskfileToDB(df)
+        f_id = self.pq.diskfileToDB(df)
         ## here the file is in the DB so we can add the filefilelink an filecodelinks
         if f_id is not None: # None comes back if the file goes to error
             self.dbu.addFilecodelink(f_id, self.code_id)
