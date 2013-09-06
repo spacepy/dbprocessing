@@ -210,7 +210,6 @@ def addStuff(cfg, options):
     db_processes = [v.process_name for v in dbu.getAllProcesses()]
     for p in processes:
         # is the process in the DB?  If not add it
-        print '1111', cfg[p]['process_name'], db_processes
         if cfg[p]['process_name'] in db_processes:
             p_id = dbu.getEntry('Process', cfg[p]['process_name']).process_id
             print('Found Process: {0} {1}'.format(p_id, dbu.getEntry('Process',p_id).process_name))
