@@ -30,7 +30,7 @@ from dbprocessing import DBUtils
 from dbprocessing import Version
 from dbprocessing.Utils import toBool, toNone
 
-expected = ['mission', 'satellite', 'instrument', 'product', 'process',]
+expected = ['mission', 'satellite', 'instrument', 'product', 'process']
 
 def readconfig(config_filepath):
     # Create a ConfigParser object, to read the config file
@@ -249,7 +249,7 @@ def addStuff(cfg, options):
 
 
 if __name__ == "__main__":
-    usage = "usage: %prog [options] filename"
+    usage = "usage: %prog [options] -m mission_db filename"
     parser = OptionParser(usage=usage)
     parser.add_option("-m", "--mission", dest="mission", type="string",
                       help="mission to connect to", default='~ectsoc/RBSP_processing.sqlite')

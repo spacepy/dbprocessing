@@ -286,7 +286,7 @@ class dbprocessing_db(object):
 
 if __name__ == "__main__":
     usage = "usage: %prog [options] filename"
-    parser = OptionParser()
+    parser = OptionParser(usage=usage)
     parser.add_option("", "--populate", dest="populate", action='store_true',
                       help="mission to connect to", default=False)
 
