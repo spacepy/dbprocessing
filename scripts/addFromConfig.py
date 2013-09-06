@@ -105,7 +105,7 @@ def configCheck(conf):
                                  'code_newest_version', 'code_date_written',
                                  'code_description', 'output_product',
                                  'code_active', 'code_arguments',
-                                 'extra_params', 'output_timebase'], ignore='input')
+                                 'extra_params', 'output_timebase', 'code_ram', 'code_cpu'], ignore='input')
     # loop over the products
     for k in conf:
         if k.startswith('product'):
@@ -238,7 +238,9 @@ def addStuff(cfg, options):
                             'code_output_interface':'output_interface_version',
                             'code_newest_version':'newest_version',
                             'code_date_written':'date_written',
-                            'code_active':'active_code'}
+                            'code_active':'active_code',
+                            'code_ram':'ram',
+                            'code_cpu':'cpu'}
             for rd in replace_dict:
                 tmp[replace_dict[rd]] = tmp.pop(rd)
             code_id = dbu.addCode(process_id=p_id, **tmp)

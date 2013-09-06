@@ -905,7 +905,9 @@ class DBUtils(object):
                    date_written,
                    output_interface_version,
                    newest_version,
-                   arguments=None):
+                   arguments=None,
+                   cpu=1,
+                   ram=1):
         """
         Add an executable code to the DB
 
@@ -953,6 +955,8 @@ class DBUtils(object):
         c1.output_interface_version = output_interface_version
         c1.newest_version = Utils.toBool(newest_version)
         c1.arguments = Utils.toNone(arguments)
+        c1.ram = ram
+        c1.cpu = cpu
 
         self.session.add(c1)
         self._commitDB()
