@@ -133,10 +133,6 @@ class Diskfile(object):
         self.params['newest_version'] = None
         self.params['process_keywords'] = None
 
-        # this keeps opening connections
-        #dbu = DBUtils.DBUtils('Test')
-        #dbu._openDB()
-        #dbu._createTableObjects()
         self.dbu = dbu
         self.mission = self.dbu.mission  # keeps track if we found a parsematch
 
