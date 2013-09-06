@@ -175,6 +175,8 @@ class dbprocessing_db(object):
             schema.Column('shasum', types.String(40), nullable=True),
             schema.Column('newest_version', types.Boolean, nullable=False),
             schema.Column('arguments', types.Text, nullable=True),
+            schema.Column('ram', types.Float, nullable=True),  # amanount of ram used in Gigs
+            schema.Column('cpu', types.SmallInteger, nullable=True),  # number of cpus used
             schema.CheckConstraint('code_start_date <= code_stop_date'),
             schema.CheckConstraint('interface_version >= 1'),
             schema.CheckConstraint('output_interface_version >= 1'),
