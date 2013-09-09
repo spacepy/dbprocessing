@@ -52,7 +52,7 @@ if __name__ == "__main__":
         num = db.reprocessByProduct(prod, startDate=startDate, endDate=endDate, incVersion=options.force)
         if num is None:
             num = 0
-        print('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
-        DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
+        print('Added {0} files to be reprocessed for product {1}'.format(num, prod))
+        DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, prod))
 
 
