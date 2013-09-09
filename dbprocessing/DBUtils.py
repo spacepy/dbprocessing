@@ -189,6 +189,7 @@ class DBUtils(object):
                 if verbose: print("Class %s created" % (val))
                 if verbose: DBlogging.dblogger.debug("Class %s created" % (val))
 
+
 #####################################
 ####  Do processing and input to DB
 #####################################
@@ -2051,7 +2052,17 @@ class DBUtils(object):
         else:
             return True
 
+    def getVersion(self, fileid):
+        """
+        return the version instance for a file
+        """
+        if not isinstance(fileid, self.File):
+            fileid = self.getEntry('File', fileid)
+        return Version.Version(fileid.interface_version,
+                               fileid.quality_version,
+                               fileid.revision_version)
 
+        
 
 
 
