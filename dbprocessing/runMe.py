@@ -76,6 +76,19 @@ def runner(runme_list):
     ## 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     for runme in runme_list:
         runme.make_command_line()
+
+    # found some cases where the same command line was in the list more than once based on
+    #   more than one dependency in the process queue, go through and clean these out
+    outnames = [os.path.basename(v.filename) for v in runme_list]
+    uniq_out = list(set(outnames))
+    runme_list_tmp = []
+    while uniq_out: # loop until we have them all
+        # pop the first name and find it in runme_list
+        uniqo = uniq_out.pop(0) # pop from left, they are sorted
+        ind = outnames.index(uniqo)
+        runme_list_tmp.append(runme_list[ind])
+        
+    runme_list = runme_list_tmp
     
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
