@@ -17,6 +17,7 @@ from sqlalchemy import func
 import rbsp #rbsp.mission_day_to_UTC
 
 from dbprocessing import DBUtils, Utils, Version, inspector
+from dbprocessing.runMe import ProcessException
 from rbsp import Version
 
 from dbprocessing import DBlogging
@@ -111,6 +112,23 @@ if __name__ == "__main__":
                 
     dbu = DBUtils.DBUtils(options.mission)
 
+    # If we will be editing the DB we have to have lock
+    if options.fix:
+        # check currently processing
+        curr_proc = dbu._currentlyProcessing()
+        if curr_proc:  # returns False or the PID
+            # check if the PID is running
+            if dbu.processRunning(curr_proc):
+                # we still have an instance processing, don't start another
+                dbu._closeDB()
+                DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
+                raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
+            else:
+                # There is a processing flag set but it died, don't start another
+                dbu._closeDB()
+                DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
+                raise(ProcessException("There is a processing flag set but it died, don't start another"))
+        
     print("Running noNewestVersion()")
     noNewestVersion(dbu, options.fix)
     print("Running wrongNewestVersion()")
