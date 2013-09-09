@@ -129,21 +129,17 @@ class Version(object):
         return False
 
     def __gt__(self, other):
-        if self.interface > other.interface:
-            return True
-        elif self.quality > other.quality:
-            return True
-        elif self.revision > other.revision:
+        val_s = 10000*self.interface + 100*self.quality + self.revision
+        val_o = 10000*other.interface + 100*other.quality + other.revision
+        if val_s > val_o:
             return True
         else:
             return False
 
     def __lt__(self, other):
-        if self.interface < other.interface:
-            return True
-        elif self.quality < other.quality:
-            return True
-        elif self.revision < other.revision:
+        val_s = 10000*self.interface + 100*self.quality + self.revision
+        val_o = 10000*other.interface + 100*other.quality + other.revision
+        if val_s < val_o:
             return True
         else:
             return False
