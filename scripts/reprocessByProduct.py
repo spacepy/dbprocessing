@@ -18,7 +18,8 @@ import dbprocessing.dbprocessing as dbprocessing
 
 
 if __name__ == "__main__":
-    parser = OptionParser()
+    usage = "%prog [-s yyyymmdd] [-e yyyymmdd] -m product_id [[product_id] ...]"
+    parser = OptionParser(usage=usage)
     parser.add_option("-s", "--startDate", dest="startDate", type="string",
                       help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
     parser.add_option("-e", "--endDate", dest="endDate", type="string",
@@ -30,7 +31,7 @@ if __name__ == "__main__":
 
     
     (options, args) = parser.parse_args()
-    if len(args) != 1:
+    if len(args) < 1:
         parser.error("incorrect number of arguments")
 
     if options.startDate is not None:
@@ -47,10 +48,11 @@ if __name__ == "__main__":
 
     db = dbprocessing.ProcessQueue(options.mission,)
 
-    num = db.reprocessByProduct(args[0], startDate=startDate, endDate=endDate, incVersion=options.force)
-    if num is None:
-        num = 0
-    print('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
-    DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
+    for prod in args:
+        num = db.reprocessByProduct(prod, startDate=startDate, endDate=endDate, incVersion=options.force)
+        if num is None:
+            num = 0
+        print('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
+        DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
 
 
