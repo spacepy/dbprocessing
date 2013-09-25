@@ -213,14 +213,6 @@ class DBUtilsDBTests(unittest.TestCase):
         self.assertEqual(0, self.dbu.session.query(self.dbu.Inspector).count())
         self.assertRaises(DBUtils.DBNoData, self.dbu.delInspector, 1)
 
-    def test_getProducts(self):
-        """getProducts"""
-        self.addMission()
-        self.addSatellite()
-        self.addInstrument()
-        self.addProduct()
-        self.assertEqual(1, self.dbu.getProducts()[0].product_id)
-
     def addProductOutput(self):
         """addProductOutput utility"""
         self.productOutput = self.dbu.addProduct('prod2', 1, 'prod2_path', None, 'format', 0)

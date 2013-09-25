@@ -1944,18 +1944,6 @@ class DBUtils(object):
 #    getSatelliteTraceback = functools.partial(getTraceback, 'Satellite')
 #    getMissionTraceback = functools.partial(getTraceback, 'Mission')
 
-    def getProducts(self):
-        """
-        get all products for the given mission
-        """
-        outval = []
-        prods = self.getAllProducts()
-        mission_id = self.getMissionID(self.mission)
-        for val in prods:
-            if self.getTraceback('Product', val.product_id)['mission'].mission_id == mission_id:
-                outval.append(val)
-        return outval
-
     def getProductsByInstrument(self, inst_id):
         """
         get all the products for a given instrument
