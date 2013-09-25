@@ -55,6 +55,7 @@ class ProcessQueue(object):
         """
         attempt a bit of up
         """
+        self.rm_tempdir()
         del self.dbu
         
     def rm_tempdir(self):
