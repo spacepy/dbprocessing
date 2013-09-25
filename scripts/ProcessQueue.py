@@ -105,16 +105,12 @@ if __name__ == "__main__":
             children = pq.dbu.getChildrenProducts(file_id) # returns process
             if not children:
                 DBlogging.dblogger.debug("No children found for {0}".format(file_id))
-                if not options.dryrun:
-                    pq.dbu.Processqueue.pop() # done in two steps for crashes
                 return None
             ## right here we have a list of processes that should run
             # loop through the children and see which to build
             for child_process in children:
                 ## are all the required inputs available? For the dates we are doing
                 pq.buildChildren(child_process, [file_id])
-                if not options.dryrun:
-                        pq.dbu.Processqueue.pop()
 
         try:
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
@@ -130,9 +126,13 @@ if __name__ == "__main__":
                 if not options.dryrun:
                     while pq.dbu.Processqueue.len() > 0:
                         print('Deciding what can run')
-                        for f in pq.dbu.Processqueue.getAll():
+                        # instead of getAll() here lets pop 10 and run those in this batch
+                        #  this should be more robust against network hiccups
+                        queue_f = [pq.dbu.Processqueue.pop() for v in range(10)] # this is empty queue safe, gives None
+                        # for f in pq.dbu.Processqueue.getAll():
+                        for f in queue_f:
                             if f is None:
-                                break
+                                continue
                             do_proc(f)
                             number_proc += 1
                 else:
@@ -186,21 +186,4 @@ if __name__ == "__main__":
         else:
             pq.dbu._stopLogging('Nominal Exit')
         pq.dbu._closeDB()
-
-        ## at the end of processing create a weekly report
-        ## do this for the last 7 days if we did anything
-
-        if number_proc > 0 and not options.dryrun and options.report:
-            if os.path.isfile(pq.mission):
-                miss_name = os.path.splitext(os.path.basename(pq.mission))[0]
-            else:
-                miss_name = pq.mission
-            today = datetime.datetime.utcnow().date()
-            outname = os.path.expanduser(os.path.join('~', 'dbprocessing_logs', 'SOCreport_{0}_{1}.html'.format(today.isoformat(), miss_name)))
-            command_line = ['nice', '-n 2',
-                '/u/ectsoc/dbUtils/weeklyReport.py',
-                os.path.expanduser(os.path.join('~', 'dbprocessing_logs')),
-                today.strftime('%Y-%m-%d'),
-                today.strftime('%Y-%m-%d'), outname]
-            subprocess.check_call(command_line)
 

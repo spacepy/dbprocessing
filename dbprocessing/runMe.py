@@ -101,6 +101,8 @@ def runner(runme_list):
     while runme_list or processes:
         while len(processes) < MAX_PROC and runme_list:
             runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
+            if not hasattr(runme, 'cmdline'):
+                runme.make_command_line()
             DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
             print("Process starting: {0}".format(' '.join(runme.cmdline)))
             processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
