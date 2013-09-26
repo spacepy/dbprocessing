@@ -2050,8 +2050,25 @@ class DBUtils(object):
                                fileid.quality_version,
                                fileid.revision_version)
 
-        
 
+    def _childTree(self, inprod):
+        """
+        given an input product return a dict of its output prods
+        """
+        out_proc = self.getProcessFromInputProduct(inprod)
+        return [self.getEntry('Process', op).output_product for op in out_proc]
 
+    def getProductParentTree(self):
+        """
+        go through the db and return a tree of all products are thier parents
 
-
+        This will allow for a run all the non done files script
+        """
+        prods = self.getAllProducts()
+        prods = sorted(prods, key=lambda x: x.level)
+        tree = []
+        # for each of the level 0 products add a base tree then iterate through them with dbu.getProcessFromInputProduct
+        #  then get the output for that process
+        for p in prods:
+            tree.append( [p.product_id, self._childTree(p.product_id)] )
+        return tree
