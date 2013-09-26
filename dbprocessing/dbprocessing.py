@@ -40,8 +40,8 @@ class ProcessQueue(object):
 
         self.dryrun = dryrun
         self.mission = mission
-        dbu = DBUtils.DBUtils(self.mission)
         self.tempdir = None
+        dbu = DBUtils.DBUtils(self.mission)
         self.runme_list = []
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()
@@ -56,17 +56,23 @@ class ProcessQueue(object):
         attempt a bit of up
         """
         self.rm_tempdir()
-        del self.dbu
+        try:
+            del self.dbu
+        except AttributeError:
+            pass
         
     def rm_tempdir(self):
         """
         remove the temp directory
         """
-        if self.tempdir != None:
-            name = self.tempdir
-            shutil.rmtree(self.tempdir)
-            self.tempdir = None
-            DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
+        try:
+            if self.tempdir != None:
+                name = self.tempdir
+                shutil.rmtree(self.tempdir)
+                self.tempdir = None
+                DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
+        except AttributeError:
+            pass
             
     def mk_tempdir(self, suffix='_dbprocessing'):
         """

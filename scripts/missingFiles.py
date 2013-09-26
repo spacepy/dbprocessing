@@ -53,7 +53,7 @@ if __name__ == "__main__":
     for t1 in tree:
         for t2 in t1[1]:
             cmd = [ os.path.expanduser('~/dbUtils/missingFilesByProduct.py'),
-                    '-m', 'options.mission',
+                    '-m', options.mission,
                     '-s', startDate.date().isoformat(),
                     '-e', endDate.date().isoformat(),
                     '-p', '--parent={0}'.format(t1[0]), str(t2) ]
