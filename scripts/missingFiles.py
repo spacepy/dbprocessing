@@ -8,6 +8,7 @@ go through the DB and print put a list of dates that do not have files for a giv
 
 import datetime
 import fnmatch
+import os
 from optparse import OptionParser
 import subprocess
 
@@ -30,7 +31,7 @@ if __name__ == "__main__":
 
     
     (options, args) = parser.parse_args()
-    if len(args) != 1:
+    if len(args) != 0:
         parser.error("incorrect number of arguments")
 
     if options.startDate is not None:
@@ -55,7 +56,7 @@ if __name__ == "__main__":
                     '-m', 'options.mission',
                     '-s', startDate.date().isoformat(),
                     '-e', endDate.date().isoformat(),
-                    '-p', '--parent={0}'.format(t1[0]), t2 ]
+                    '-p', '--parent={0}'.format(t1[0]), str(t2) ]
             subprocess.call(cmd)
             
 

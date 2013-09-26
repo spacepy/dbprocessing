@@ -67,7 +67,7 @@ class ProcessQueue(object):
             shutil.rmtree(self.tempdir)
             self.tempdir = None
             DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
-
+            
     def mk_tempdir(self, suffix='_dbprocessing'):
         """
         create a secure temp directory
