@@ -421,8 +421,8 @@ class DBUtils(object):
         self.session.add(pq1)
         DBlogging.dblogger.debug( "File added to process queue {0}:{1}".format(fileid, '---'))
         self._commitDB()
-        pqid = self.session.query(self.Processqueue.file_id).all()
-        return pqid[-1]
+#        pqid = self.session.query(self.Processqueue.file_id).all()
+        return pq1.file_id
 
     def _processqueueRawadd(self, fileid, version_bump=None):
         """
@@ -541,9 +541,9 @@ class DBUtils(object):
         keep = [(val[0], val[1]) for val in file_entries if val[0].newest_version==True]
 
 #==============================================================================
-#         # sort keep on dates, then sourt keep on level
+#         # sort keep on dates, then sort keep on level
 #==============================================================================
-        # this should make them in oder for each level
+        # this should make them in order for each level
         keep = sorted(keep, key=lambda x: x[0].utc_file_date, reverse=1)
         keep = sorted(keep, key=lambda x: x[0].data_level)
         keep = [(val[0].file_id, val[1]) for val in keep]
@@ -1396,7 +1396,7 @@ class DBUtils(object):
         f = self.getEntry('File', filename)
         f.filename = newname
         self.session.add(rel)
-        self._commitDB()    
+        self._commitDB()
 
     def getFileID(self, filename):
         """
@@ -1978,7 +1978,7 @@ class DBUtils(object):
         """
         # just try and get the entry
         retval = self.session.query(getattr(self, table)).get(args[0])
-        if retval is None: # either this was not a valid pk or not a pk that os in the db            
+        if retval is None: # either this was not a valid pk or not a pk that os in the db
             # see if it was a name
             if ('get' + table + 'ID') in dir(self):
                 cmd = 'get' + table + 'ID'
