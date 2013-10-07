@@ -43,14 +43,14 @@ def rm_tempdir(tempdir):
     DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
 
 
-def runner(runme_list):
+def runner(runme_list, MAX_PROC = 2):
     """
     Go through a list of runMe objects and run them
 
     TODO
     ====
     This function can be made a smart as one wants, for now it is not made to be smart, but flexible
-    
+
     Parameters
     ==========
     runme_list : list
@@ -63,12 +63,11 @@ def runner(runme_list):
     n_bad : int
         number of processes that failed
     """
-    MAX_PROC = 2
     ############################################################
     # 1) build up the command line and store in a commands list
     # 2) loop over the commands
     #  a) start up to MAX_PROC processes with subprocess.Popen
-    #  b) poll that they are done or not and if they finish successfully 
+    #  b) poll that they are done or not and if they finish successfully
     #     i) True: add data to db
     #     ii) False: add errror messages
     ############################################################
@@ -87,9 +86,9 @@ def runner(runme_list):
         uniqo = uniq_out.pop(0) # pop from left, they are sorted
         ind = outnames.index(uniqo)
         runme_list_tmp.append(runme_list[ind])
-        
+
     runme_list = runme_list_tmp
-    
+
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
     #    for some code here
@@ -105,7 +104,7 @@ def runner(runme_list):
                 runme.make_command_line()
             DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
             print("Process starting: {0}".format(' '.join(runme.cmdline)))
-            processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
+            processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) )
         finished = []
         for p in processes:
             if p[1].poll() is None: # still running
@@ -212,10 +211,10 @@ class runMe(object):
             if parentchange:
                 DBlogging.dblogger.debug("Parent did change for file: {0}".format(self.filename))
                 continue
-            # Need to check for version_bump in the processqueue 
+            # Need to check for version_bump in the processqueue
             return # if we get here then we are not going to run anything
 
-        ## get extra_params from the process 
+        ## get extra_params from the process
         args = self.dbu.getEntry('Process', self.process_id).extra_params
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
@@ -429,7 +428,7 @@ class runMe(object):
 
         NOTE: creates a temp directory that needs to be cleaned!!
         """
-        
+
         ## 1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a
         # if runme.filename is in the DB then we cannot run this.  (happends if 2 identical runMe are there
         try:
@@ -453,11 +452,11 @@ class runMe(object):
             cmdline.append(self.dbu.getFileFullPath(i_fid))
         # the putname goes last
         cmdline.append(os.path.join(self.tempdir, self.filename))
-        
+
         # and make sure to expand any path variables
         cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]
         DBlogging.dblogger.debug("built command: {0}".format(' '.join(cmdline)))
         self.cmdline = cmdline
 
 
-        
+
