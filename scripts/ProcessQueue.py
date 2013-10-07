@@ -36,6 +36,8 @@ if __name__ == "__main__":
                       help="Make the html report", default=False)
     parser.add_option("-l", "--log-level", dest="loglevel",
                       help="Set the logging level", default="debug")
+    parser.add_option("-n", "--num-proc", dest="numproc", type='int',
+                      help="Number of processes to run in parallel", default=2)
 
     (options, args) = parser.parse_args()
     if len(args) != 0:
@@ -50,7 +52,7 @@ if __name__ == "__main__":
         parser.error("invalid --log-level specified")
 
     DBlogging.dblogger.setLevel(DBlogging.LEVELS[options.loglevel])
-        
+
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun)
 
     # check currently processing
@@ -118,59 +120,33 @@ if __name__ == "__main__":
             #   do all the actuall running
             while pq.dbu.Processqueue.len() > 0:
                 # clean the queue every 10 precesses (and the first)
-                if (number_proc % 10 ==0):
+                if (number_proc % 10 == 0):
                     print('Cleaning Processqueue')
-                    pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates
+                    pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates and sort
                 # this loop makes all the runMe objects for all the files in the processqueue
 
-                if not options.dryrun:
-                    while pq.dbu.Processqueue.len() > 0:
-                        print('Deciding what can run')
-                        # instead of getAll() here lets pop 10 and run those in this batch
-                        #  this should be more robust against network hiccups
-                        queue_f = [pq.dbu.Processqueue.pop() for v in range(10)] # this is empty queue safe, gives None
-                        # for f in pq.dbu.Processqueue.getAll():
-                        for f in queue_f:
-                            if f is None:
-                                continue
-                            do_proc(f)
-                            number_proc += 1
-                else:
-                    print('')
-                    for f in pq.dbu.Processqueue.getAll():
-                        print('.'),
-                        if f is None:
-                            break
-                        do_proc(f)
-                # now do all the running
-
-#==============================================================================
-#                 this all moved to inside clean()
-#                 # sort them so that we run the lowest level first, don't want to process in any other order
-#                 pq.runme_list = sorted(pq.runme_list, key=lambda val: pq.dbu.getEntry('Product', pq.dbu.getEntry('Process', val.process_id).output_product).level)
-#==============================================================================
-
-                # lets sort the runme_list so that they process in order, kinda nice
-                # level then date
-                print('Sorting runMe list')
-                # we might was well go through the runme_list and get rid of all processes
-                #   that cannot run by checking the ableToRun attribitute
-                pq.runme_list = [v for v in pq.runme_list if v.ableToRun]
-                try:
-                    pq.runme_list = sorted(pq.runme_list, key=lambda x: (x.data_level, x.utc_file_date))
-                except AttributeError: # this seems unneeded, maybe a DB error caused this...
-                    pq.runme_list = sorted(pq.runme_list, key=lambda x: (x.utc_file_date))
                 run_num = 0
-                print('Running processes')
-                # pass the whole runme list off to the runMe module function
-                #  it will go through and decide what can be run in parrallel
-                if options.dryrun:
-                    print('<dryrun> Process: {0} Date: {1} Outname: {2} '\
-                          .format(v.process_id, v.utc_file_date, v.filename))
-                else:
-                    n_good, n_bad = runMe.runner(pq.runme_list)
-                    print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))
-                    DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
+                n_good  = 0
+                n_bad   = 0
+
+                while pq.dbu.Processqueue.len() > 0:
+                    # do smarter pop that sorts at the db level
+                    f = pq.dbu.session.query(pq.dbu.Processqueue.file_id).join(pq.dbu.File).order_by(pq.dbu.File.data_level).order_by(pq.dbu.File.utc_file_date).first()
+                    pq.dbu.Processqueue.remove(f) # remove by file_id
+                    #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
+                    if f is None:
+                        continue
+                    do_proc(f)
+                    number_proc += 1
+                    pq.runme_list = [v for v in pq.runme_list if v.ableToRun]
+                    if len(pq.runme_list >= options.numproc) and pq.dbu.Processqueue.len() > 0:
+                        # pass the whole runme list off to the runMe module function
+                        #  it will go through and decide what can be run in parrallel
+                        n_good_t, n_bad_t = runMe.runner(pq.runme_list, options.numproc)
+                    n_good += n_good_t
+                    n_bad  += n_bad_t
+                print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))
+                DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
 
         except:
             #Generic top-level error handler, because otherwise people freak if
