@@ -5,6 +5,7 @@ Class to hold random utilities of use throughout this code
 
 import collections
 import datetime
+import re
 
 import dateutil.rrule # do this long so where it is from is remembered
 
@@ -133,5 +134,22 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version):
         if '{DATE}' in path:
              path = path.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
         return path
+
+def split_code_args(args):
+    """
+    split a string with a bunch of commadn line arguments into a list
+    as needed by Popen
+
+    This is different thatn just split() since we have to keep options
+    together with the flags
+    e.g. "code -n hello outfile" -> [code, -n hello, outfile]
+    """
+    # just do the spit
+    ans = args.split()
+    # loop through and see if an index has just a -x (any letter)
+    for ii, v in enumerate(ans):
+        if re.match(r'\-\S', v): # found a single letter option
+            pass
+
 
 

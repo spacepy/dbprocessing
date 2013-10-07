@@ -102,9 +102,12 @@ def runner(runme_list, MAX_PROC = 2):
             runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
             if not hasattr(runme, 'cmdline'):
                 runme.make_command_line()
-            DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
-            print("Process starting: {0}".format(' '.join(runme.cmdline)))
-            processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) )
+            try:
+                DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
+                print("Process starting: {0}".format(' '.join(runme.cmdline)))
+            except AttributeError:
+                continue
+            processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
         finished = []
         for p in processes:
             if p[1].poll() is None: # still running
