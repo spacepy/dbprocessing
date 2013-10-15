@@ -56,8 +56,9 @@ def _sectionCheck(conf):
     # do we have any left over keys?
     if keys:
         for k in keys:
-            print('Section name: "{0}" not understood'.format(k))
-        raise(ValueError('Section error, {0} was not understood'.format(keys)))
+            if k.lower() == 'default':
+                continue
+            raise(ValueError('Section error, {0} was not understood'.format(keys)))
     # check that all the required sections are there
     for req in expected[:-2]:
         if not req in conf:
