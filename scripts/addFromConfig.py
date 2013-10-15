@@ -228,7 +228,7 @@ def addStuff(cfg, options):
             print('Added Instrumentproductlink: {0}'.format(ippl))
             dbu.updateProductSubs(p_id)
 
-            # if the product was not there we will assume the inspector is not either (requies a product_id)
+            # if the product was not there we will assume the inspector is not either (requires a product_id)
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if k.startswith('inspector'))
 
             replace_dict = {'inspector_output_interface':'output_interface_version',
@@ -256,7 +256,7 @@ def addStuff(cfg, options):
             print('Found Process: {0} {1}'.format(p_id, dbu.getEntry('Process',p_id).process_name))
         else:
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('code') and 'input' not in k)
-            # need to repace the output product with the right ID
+            # need to replace the output product with the right ID
             # if it is a key then have to get the name from cfg, or it is a name itself
             tmp['output_product'] = cfg[tmp['output_product']]['product_id']
             p_id = dbu.addProcess(**tmp)
@@ -268,7 +268,7 @@ def addStuff(cfg, options):
                 ppl = dbu.addproductprocesslink(cfg[tmp[k]]['product_id'], p_id, 'optional' in k)
                 print('Added Productprocesslink: {0}'.format(ppl))
 
-            # if the process was not there we will assume the code is not either (requies a process_id)
+            # if the process was not there we will assume the code is not either (requires a process_id)
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if k.startswith('code'))
 
             replace_dict = {'code_filename':'filename',
@@ -312,7 +312,7 @@ if __name__ == "__main__":
     if options.verify: # we are done here if --verify is set
         sys.exit(0)
 
-    # do subsititions and use a tempfile for the processing
+    # do substitutions and use a tempfile for the processing
     MISSION = conf['mission']['mission_name']
     SPACECRAFT = conf['satellite']['satellite_name'].replace('{MISSION}', MISSION)
     INSTRUMENT = conf['instrument']['instrument_name'].replace('{MISSION}', MISSION).replace('{SPACECRAFT}', SPACECRAFT)
