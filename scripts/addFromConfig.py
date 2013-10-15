@@ -136,6 +136,9 @@ def _keysPresentCheck(conf):
                 if 'input' in k2:
                     if conf[k][k2] not in conf:
                         raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
+                elif 'output_product' in k2:
+                    if conf[k][k2] not in conf:
+                        raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))                   
 
 def configCheck(conf):
     """
@@ -202,7 +205,8 @@ def addStuff(cfg, options):
 
     # is the instrument in the DB?  If not add it
     try:
-        instrument = dbu.getEntry('Instrument', cfg['instrument']['instrument_name'])
+        inst_id = dbu.getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)        
+        instrument = dbu.session.query(dbu.Instrument).get(inst_id)
         if instrument.satellite_id != satellite_id:
             raise(ValueError()) # this means it is the same name on a different sat, need to add
         instrument_id = instrument.instrument_id
