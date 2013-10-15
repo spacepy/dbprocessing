@@ -31,6 +31,27 @@ from dbprocessing import Version
 from dbprocessing.Utils import toBool, toNone
 
 expected = ['mission', 'satellite', 'instrument', 'product', 'process']
+expected_keyword = {}
+expected_keyword['mission'] = ['incoming_dir', 'mission_name', 'rootdir']
+expected_keyword['satellite'] = ['satellite_name']
+expected_keyword['instrument'] = ['instrument_name']
+expected_keyword['product'] = ['product_name', 'relative_path',
+                               'level', 'format', 'product_description', 
+                               'inspector_filename', 'inspector_relative_path', 
+                               'inspector_description', 'inspector_version', 
+                               'inspector_output_interface', 'inspector_active', 
+                               'inspector_date_written', 'inspector_newest_version', 
+                               'inspector_arguments']
+expected_keyword['process'] = ['process_name', 'output_product',
+                               'output_timebase', 'extra_params',
+                               'required_input', 'optional_input',
+                               'code_filename', 'code_relative_path', 
+                               'code_start_date', 'code_stop_date', 
+                               'code_description', 'code_version', 
+                               'code_output_interface', 'code_active', 
+                               'code_date_written', 'code_newest_version', 
+                               'code_arguments', 'code_cpu', 'code_ram']
+
 
 def readconfig(config_filepath):
     # Create a ConfigParser object, to read the config file
@@ -56,7 +77,7 @@ def _sectionCheck(conf):
     # do we have any left over keys?
     if keys:
         for k in keys:
-            if k.lower() == 'default':
+            if k.lower() == 'default': #default is ok
                 continue
             raise(ValueError('Section error, {0} was not understood'.format(keys)))
     # check that all the required sections are there
@@ -64,17 +85,45 @@ def _sectionCheck(conf):
         if not req in conf:
             raise(ValueError('Required section: "{0}" was not found'.format(req)))
 
-def _keysCheck(conf, section, keys, ignore=None):
+def _keysCheck(conf, section):
     """
     go over a section and see that everything is right
     """
+    if section.startswith('process'):
+        section_ex = 'process'
+    elif section.startswith('product'):
+        section_ex = 'product'
+    else:
+        section_ex = section
+    keys = expected_keyword[section_ex]
     for k in keys:
-        if k not in conf[section]:
-            raise(ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section) ))
-    for k in conf[section]:
-        if k not in keys and ignore not in k:
-            raise(ValueError('Specified key: "{0}" is not allowed in [{1}] section'.format(k, section) ))
+        if k.startswith('required_input') or k.startswith('optional_input'):
+            continue
+        else:
+            if k not in conf[section]:
+                raise(ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section) ))
 
+def _keysRemoveExtra(conf, section):
+    """
+    go over a section and remove keys form the dict that are not needed
+    -- they were either added by [default] or just extra and not used
+    """
+    if section.startswith('process'):
+        section_ex = 'process'
+    elif section.startswith('product'):
+        section_ex = 'product'
+    else:
+        section_ex = section
+    keys = conf[section].keys()
+    for k in keys:
+        if k.startswith('required_input') or k.startswith('optional_input'):
+            continue            
+        else:
+            if k not in expected_keyword[section_ex]:
+                print('Removed keyword {0}[{1}][{2}]={3}'.format('conf', section, k, conf[section][k]))
+                del conf[section][k]
+    return conf[section]
+            
 def _keysPresentCheck(conf):
     """
     loop over each key looking for cross-references and complain if they are not there
@@ -85,7 +134,6 @@ def _keysPresentCheck(conf):
                 if 'input' in k2:
                     if conf[k][k2] not in conf:
                         raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
-    
 
 def configCheck(conf):
     """
@@ -93,29 +141,22 @@ def configCheck(conf):
     work before we do anything
     """
     _sectionCheck(conf)
-    _keysCheck(conf, 'mission', ['mission_name', 'rootdir', 'incoming_dir'])
-    _keysCheck(conf, 'satellite', ['satellite_name'])
-    _keysCheck(conf, 'instrument', ['instrument_name'])
+    _keysCheck(conf, 'mission')
+    _keysCheck(conf, 'satellite')
+    _keysCheck(conf, 'instrument')
+    conf['mission'] = _keysRemoveExtra(conf, 'mission')
+    conf['satellite'] = _keysRemoveExtra(conf, 'satellite')
+    conf['instrument'] = _keysRemoveExtra(conf, 'instrument')
     # loop over the processes
     for k in conf:
         if k.startswith('process'):
-            _keysCheck(conf, k, ['code_start_date', 'code_stop_date',
-                                 'code_filename', 'code_relative_path',
-                                 'code_version',
-                                 'process_name', 'code_output_interface',
-                                 'code_newest_version', 'code_date_written',
-                                 'code_description', 'output_product',
-                                 'code_active', 'code_arguments',
-                                 'extra_params', 'output_timebase', 'code_ram', 'code_cpu'], ignore='input')
+            _keysCheck(conf, k)
+            conf[k] = _keysRemoveExtra(conf, k)
     # loop over the products
     for k in conf:
         if k.startswith('product'):
-            _keysCheck(conf, k, ['inspector_output_interface', 'inspector_version',
-                                 'inspector_arguments', 'format', 'level',
-                                 'product_description', 'relative_path',
-                                 'inspector_newest_version', 'inspector_relative_path',
-                                 'inspector_date_written', 'inspector_filename',
-                                 'inspector_description', 'inspector_active', 'product_name'])
+            _keysCheck(conf, k)
+            conf[k] = _keysRemoveExtra(conf, k)
 
     _keysPresentCheck(conf)
 
@@ -134,7 +175,6 @@ def _fileTest(filename):
     seen_twice = rep_list(data)
     if seen_twice:
         raise(ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice) ))
-
 
 def addStuff(cfg, options):
     # setup the db
