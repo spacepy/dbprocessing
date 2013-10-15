@@ -103,7 +103,6 @@ if __name__ == "__main__":
         number_proc = 0
 
         def do_proc(file_id):
-            DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(file_id, pq.dbu.Processqueue.len()-1))
             children = pq.dbu.getChildrenProducts(file_id) # returns process
             if not children:
                 DBlogging.dblogger.debug("No children found for {0}".format(file_id))
@@ -131,20 +130,23 @@ if __name__ == "__main__":
 
                 while pq.dbu.Processqueue.len() > 0:
                     # do smarter pop that sorts at the db level
-                    f = pq.dbu.session.query(pq.dbu.Processqueue.file_id).join(pq.dbu.File).order_by(pq.dbu.File.data_level).order_by(pq.dbu.File.utc_file_date).first()
+                    f = pq.dbu.session.query(pq.dbu.Processqueue.file_id).join(pq.dbu.File).order_by(pq.dbu.File.data_level, pq.dbu.File.utc_file_date).first()
+                    if hasattr(f, '__iter__') and len(f) == 1:
+                        f = f[0]
                     pq.dbu.Processqueue.remove(f) # remove by file_id
+                    DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(f, pq.dbu.Processqueue.len()))
                     #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
                     if f is None:
                         continue
                     do_proc(f)
                     number_proc += 1
-                    pq.runme_list = [v for v in pq.runme_list if v.ableToRun]
-                    if len(pq.runme_list >= options.numproc) and pq.dbu.Processqueue.len() > 0:
+                    pq.runme_list = sorted([v for v in pq.runme_list if v.ableToRun], key=lambda x: x.utc_file_date)
+                    if len(pq.runme_list) >= options.numproc or pq.dbu.Processqueue.len() == 0:
                         # pass the whole runme list off to the runMe module function
                         #  it will go through and decide what can be run in parrallel
                         n_good_t, n_bad_t = runMe.runner(pq.runme_list, options.numproc)
-                    n_good += n_good_t
-                    n_bad  += n_bad_t
+                        n_good += n_good_t
+                        n_bad  += n_bad_t
                 print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))
                 DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
 
@@ -162,4 +164,4 @@ if __name__ == "__main__":
         else:
             pq.dbu._stopLogging('Nominal Exit')
         pq.dbu._closeDB()
-
+        del pq
