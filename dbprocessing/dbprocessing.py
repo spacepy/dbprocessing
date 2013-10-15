@@ -74,7 +74,7 @@ class ProcessQueue(object):
         except AttributeError:
             pass
             
-    def mk_tempdir(self, suffix='_dbprocessing'):
+    def mk_tempdir(self, suffix='_dbprocessing_{0}'.format(os.getpid())):
         """
         create a secure temp directory
         """
