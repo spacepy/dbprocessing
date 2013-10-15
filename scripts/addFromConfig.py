@@ -77,7 +77,9 @@ def _sectionCheck(conf):
     # do we have any left over keys?
     if keys:
         for k in keys:
-            if k.lower() == 'default': #default is ok
+            if k == 'default':
+                raise(ValueError('Found section: {0}, it must be {1}'.format('defualt', 'DEFAULT')))
+            if k == 'DEFAULT': #default is ok
                 continue
             raise(ValueError('Section error, {0} was not understood'.format(keys)))
     # check that all the required sections are there
