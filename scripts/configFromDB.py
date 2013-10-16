@@ -55,7 +55,7 @@ header_comments = """
 # [instrument] <- once and only once with
 #   instrument_name  (string)
 ##### products and inspector are defined together since they are a one-to-one
-# [product] <- multiple entries starting with "product" then a unique identifer
+# [product] <- multiple entries starting with "product" then a unique identifier
 #   product_name  (string)
 #   relative_path  (string)
 #   level  (float)
@@ -72,20 +72,20 @@ header_comments = """
 #   inspector_arguments (string)
 #### processes and codes operate on the names of the products, they can be in
 #### this config file or already in the db codes are one-to-one with processes
-# [process] <- multiple entries starting with "process" then a unique identifer
+# [process] <- multiple entries starting with "process" then a unique identifier
 #   process_name (string)
-#   output_product (string)  - identifer from section heading
+#   output_product (string)  - identifier from section heading
 #   output_timebase  (string, FILE/DAILY/WEEKLY/MONTHLY/YEARLY)
 #   extra_params (string)
 ## A collection of input names entered as such
 ## the required portion is "optional_input" or "required_input" then some
-## unique identifer on the end
-#   optional_input1  (string) name of product - identifer from section heading
-#   optional_input2  (string) name of product - identifer from section heading
-#   optional_input3  (string) name of product - identifer from section heading
-#   required_input1  (string) name of product - identifer from section heading
-#   required_input2  (string) name of product - identifer from section heading
-#   required_input3  (string) name of product - identifer from section heading
+## unique identifier on the end
+#   optional_input1  (string) name of product - identifier from section heading
+#   optional_input2  (string) name of product - identifier from section heading
+#   optional_input3  (string) name of product - identifier from section heading
+#   required_input1  (string) name of product - identifier from section heading
+#   required_input2  (string) name of product - identifier from section heading
+#   required_input3  (string) name of product - identifier from section heading
 ## code is entered as part of process
 #   code_filename (string)
 #   code_relative_path (string)
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     parser.add_option("-m", "--mission", dest="mission", type="string",
                       help="mission to connect to")
     parser.add_option("-f", "--force", dest="force", action="store_true",
-                      help="Force the proiessing, overwrite the outfile")
+                      help="Force the processing, overwrite the outfile")
     parser.add_option("-s", "--satellite", dest="satellite", type="string",
                       help="satellite to write to conf file (one per file)")
     parser.add_option("-i", "--instrument", dest="instrument", type="string",
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     filename = os.path.expandvars(os.path.expanduser(args[0]))
 
     if os.path.isfile(filename) and not options.force:
-        parser.error("file: {0} exists and will not be overwriten (use --force)".format(filename))
+        parser.error("file: {0} exists and will not be overwritten (use --force)".format(filename))
 
     dbu = DBUtils.DBUtils(options.mission)
 
@@ -177,7 +177,7 @@ if __name__ == "__main__":
         if v['mission'].mission_id != mission.mission_id:
             raise(NotImplementedError("Can't yet handle multi mission db"))
 #        if v['satellite'].satellite_name != options.satellite:
-#            raise(ValueError("More than one sat in db and no --satelite set\n    {0}".format([v['satellite'].satellite_name for v in sats])))
+#            raise(ValueError("More than one sat in db and no --satellite set\n    {0}".format([v['satellite'].satellite_name for v in sats])))
     ninsts = len(Utils.unique([v['instrument'].instrument_id for v in insts if v['satellite'].satellite_name == options.satellite]))
     if ninsts > 1 and options.instrument is None:
         raise(ValueError("More than one instrument in db and no --instrument set\n    {0}".format([v['instrument'].instrument_name for v in insts])))
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     procs = []
     for p in procs_tmp:
         tmp = dbu.getTraceback('Process', p.process_id)
-        # if this is not our sallite continue
+        # if this is not our satellite continue
         if tmp['satellite'].satellite_name != options.satellite:
             continue
         # if this is not our instrument continue

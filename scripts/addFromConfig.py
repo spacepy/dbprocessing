@@ -75,7 +75,7 @@ def _sectionCheck(conf):
     if keys:
         for k in keys:
             if k == 'default':
-                raise(ValueError('Found section: {0}, it must be {1}'.format('defualt', 'DEFAULT')))
+                raise(ValueError('Found section: {0}, it must be {1}'.format('default', 'DEFAULT')))
             if k == 'DEFAULT': #default is ok
                 continue
             raise(ValueError('Section error, {0} was not understood'.format(keys)))
