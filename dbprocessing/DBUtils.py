@@ -596,6 +596,26 @@ class DBUtils(object):
             self._commitDB()
             DBlogging.dblogger.info( "File removed from db {0}".format(f) )
 
+    def getAllSatellites(self):
+        """
+        return dictionaries of satellite, mission objects
+        """
+        ans = []
+        sats = self.session.query(self.Satellite).all()
+        for s in sats:
+            ans.append(self.getTraceback('Satellite', s.satellite_id))
+        return ans
+
+    def getAllInstruments(self):
+        """
+        return dictionaries of instrument traceback dictionaries
+        """
+        ans = []
+        sats = self.session.query(self.Instrument).all()
+        for s in sats:
+            ans.append(self.getTraceback('Instrument', s.instrument_id))
+        return ans
+
     def getAllFilenames(self, fullPath=True, level=None, product=None):
         """
         return all the file names in the database
