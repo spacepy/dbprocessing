@@ -287,8 +287,6 @@ class dbprocessing_db(object):
 if __name__ == "__main__":
     usage = "usage: %prog [options] filename"
     parser = OptionParser(usage=usage)
-    parser.add_option("", "--populate", dest="populate", action='store_true',
-                      help="mission to connect to", default=False)
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
@@ -299,11 +297,5 @@ if __name__ == "__main__":
         parser.error("file: {0} exists will not overwrite".format(filename))
 
     db = dbprocessing_db(filename = filename)
-
-    if options.populate: # put minimal RBSP in here
-        db.addMission(filename)
-        db.addSatellite()
-        db.addInstrument()
-
 
 
