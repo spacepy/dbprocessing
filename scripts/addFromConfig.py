@@ -21,14 +21,11 @@ import itertools
 from optparse import OptionParser
 import tempfile
 import ConfigParser
-from dateutil import parser as dup
 import os
 import shutil
 import sys
 
 from dbprocessing import DBUtils
-from dbprocessing import Version
-from dbprocessing.Utils import toBool, toNone
 
 expected = ['mission', 'satellite', 'instrument', 'product', 'process']
 expected_keyword = {}
@@ -36,20 +33,20 @@ expected_keyword['mission'] = ['incoming_dir', 'mission_name', 'rootdir']
 expected_keyword['satellite'] = ['satellite_name']
 expected_keyword['instrument'] = ['instrument_name']
 expected_keyword['product'] = ['product_name', 'relative_path',
-                               'level', 'format', 'product_description', 
-                               'inspector_filename', 'inspector_relative_path', 
-                               'inspector_description', 'inspector_version', 
-                               'inspector_output_interface', 'inspector_active', 
-                               'inspector_date_written', 'inspector_newest_version', 
+                               'level', 'format', 'product_description',
+                               'inspector_filename', 'inspector_relative_path',
+                               'inspector_description', 'inspector_version',
+                               'inspector_output_interface', 'inspector_active',
+                               'inspector_date_written', 'inspector_newest_version',
                                'inspector_arguments']
 expected_keyword['process'] = ['process_name', 'output_product',
                                'output_timebase', 'extra_params',
                                'required_input', 'optional_input',
-                               'code_filename', 'code_relative_path', 
-                               'code_start_date', 'code_stop_date', 
-                               'code_description', 'code_version', 
-                               'code_output_interface', 'code_active', 
-                               'code_date_written', 'code_newest_version', 
+                               'code_filename', 'code_relative_path',
+                               'code_start_date', 'code_stop_date',
+                               'code_description', 'code_version',
+                               'code_output_interface', 'code_active',
+                               'code_date_written', 'code_newest_version',
                                'code_arguments', 'code_cpu', 'code_ram']
 
 
@@ -119,13 +116,13 @@ def _keysRemoveExtra(conf, section):
     keys = conf[section].keys()
     for k in keys:
         if k.startswith('required_input') or k.startswith('optional_input'):
-            continue            
+            continue
         else:
             if k not in expected_keyword[section_ex]:
                 print('Removed keyword {0}[{1}][{2}]={3}'.format('conf', section, k, conf[section][k]))
                 del conf[section][k]
     return conf[section]
-            
+
 def _keysPresentCheck(conf):
     """
     loop over each key looking for cross-references and complain if they are not there
@@ -138,7 +135,7 @@ def _keysPresentCheck(conf):
                         raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
                 elif 'output_product' in k2:
                     if conf[k][k2] not in conf:
-                        raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))                   
+                        raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
 
 def configCheck(conf):
     """
@@ -205,7 +202,7 @@ def addStuff(cfg, options):
 
     # is the instrument in the DB?  If not add it
     try:
-        inst_id = dbu.getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)        
+        inst_id = dbu.getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)
         instrument = dbu.session.query(dbu.Instrument).get(inst_id)
         if instrument.satellite_id != satellite_id:
             raise(ValueError()) # this means it is the same name on a different sat, need to add
@@ -312,7 +309,7 @@ if __name__ == "__main__":
         parser.error("file: {0} does not exist or is not readable".format(filename))
 
     _fileTest(filename)
-    
+
     conf = readconfig(filename)
     configCheck(conf)
     if options.verify: # we are done here if --verify is set
