@@ -26,7 +26,7 @@ scripts = ('scripts/ProcessQueue.py',
            'scripts/clearProcessingFlag.py', 'scripts/possibleProblemDates.py',
            'scripts/missingFilesByProduct.py', 'scripts/histogramCodes.py',
            'scripts/rept_dataToIncoming.py', 'scripts/htmlCoverage.py',
-           'scripts/missingFiles.py')
+           'scripts/missingFiles.py', 'scripts/configFromDB.py')
 
 scripts_dir = os.path.expanduser('~/dbUtils')
 
