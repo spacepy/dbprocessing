@@ -11,6 +11,11 @@ import dateutil.rrule # do this long so where it is from is remembered
 
 import Version
 
+def unique(seq):
+    seen = set()
+    seen_add = seen.add
+    return [ x for x in seq if x not in seen and not seen_add(x)]
+
 def expandDates(start_time, stop_time):
     return dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=start_time, until=stop_time)
 
@@ -95,7 +100,7 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version):
         #	SPACECRAFT: the spacecraft name from the db
         #	PRODUCT: the product name from the db
         """
-        if '{INSTRUMENT}' in path or '{SATELLITE}' in path or '{SPACECRAFT}' in path or '{MISSION}' in path or '{PRODUCT}' in path:        
+        if '{INSTRUMENT}' in path or '{SATELLITE}' in path or '{SPACECRAFT}' in path or '{MISSION}' in path or '{PRODUCT}' in path:
             ftb = self.dbu.getTraceback('File', filename)
             if '{INSTRUMENT}' in path : # need to replace with the instrument name
                 path = path.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
@@ -109,18 +114,18 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version):
                 path = path.replace('{PRODUCT}', ftb['product'].product_name)
 
         if '{Y}' in path:
-            path = path.replace('{Y}', utc_file_date.strftime('%Y'))   
+            path = path.replace('{Y}', utc_file_date.strftime('%Y'))
         if '{m}' in path:
-            path = path.replace('{m}', utc_file_date.strftime('%m'))   
+            path = path.replace('{m}', utc_file_date.strftime('%m'))
         if '{d}' in path:
-            path = path.replace('{d}', utc_file_date.strftime('%d'))   
+            path = path.replace('{d}', utc_file_date.strftime('%d'))
         if '{b}' in path:
             months = {1:'Jan', 2:'Feb', 3:'Mar', 4:'Apr', 5:'May', 6:'Jun', 7:'Jul', 8:'Aug', 9:'Sep', 10:'Oct', 11:'Nov', 12:'Dec'}
             path = path.replace('{b}', months[utc_file_date.month])
         if '{y}' in path:
-            path = path.replace('{y}', utc_file_date.strftime('%y'))                       
+            path = path.replace('{y}', utc_file_date.strftime('%y'))
         if '{j}' in path:
-            path = path.replace('{j}', utc_file_date.strftime('%j'))               
+            path = path.replace('{j}', utc_file_date.strftime('%j'))
         if '{H}' in path:
             path = path.replace('{H}', utc_start_time.strftime('%H'))
         if '{M}' in path:
