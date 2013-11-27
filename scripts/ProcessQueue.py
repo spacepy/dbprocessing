@@ -144,7 +144,7 @@ if __name__ == "__main__":
                     if len(pq.runme_list) >= options.numproc or pq.dbu.Processqueue.len() == 0:
                         # pass the whole runme list off to the runMe module function
                         #  it will go through and decide what can be run in parrallel
-                        n_good_t, n_bad_t = runMe.runner(pq.runme_list, options.numproc)
+                        n_good_t, n_bad_t = runMe.runner(pq.runme_list, pq.dbu, options.numproc)
                         n_good += n_good_t
                         n_bad  += n_bad_t
                 print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))

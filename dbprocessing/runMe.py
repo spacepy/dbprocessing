@@ -43,7 +43,7 @@ def rm_tempdir(tempdir):
     DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
 
 
-def runner(runme_list, MAX_PROC = 2):
+def runner(runme_list, dbu, MAX_PROC = 2):
     """
     Go through a list of runMe objects and run them
 
@@ -107,7 +107,13 @@ def runner(runme_list, MAX_PROC = 2):
                 print("Process starting: {0}".format(' '.join(runme.cmdline)))
             except AttributeError:
                 continue
-            processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
+
+            # make sure the file is not in the DB before you try this
+            try:
+                tmp = dbu.getEntry('File', os.path.basename(runme.cmdline[-1])) # output is last
+                DBlogging.dblogger.info("Did Not run: {0} output was in db".format(os.path.basename(' '.join(runme.cmdline))))
+            except DBUtils.DBNoData:
+                processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
         finished = []
         for p in processes:
             if p[1].poll() is None: # still running

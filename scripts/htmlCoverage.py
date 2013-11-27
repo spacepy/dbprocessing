@@ -94,7 +94,7 @@ def makeHTML(dbu, info, satellite, delta_days=3):
     header = """
     <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
     <html><head>
-      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>MagEphem Pre Coverage</title>
+      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>{0}</title>
         <style type="text/css">
             table, td, th
             {
@@ -118,7 +118,7 @@ def makeHTML(dbu, info, satellite, delta_days=3):
 
     <body>
 
-    """
+    """.format(os.path.basename(dbu.mission))
     footer = \
     """
     <br>
