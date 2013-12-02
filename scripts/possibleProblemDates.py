@@ -23,6 +23,21 @@ from rbsp import Version
 from dbprocessing import DBlogging
 DBlogging.dblogger.setLevel(DBlogging.LEVELS['info'])
 
+def missingInstrumentproductlink(dbu, fix=False):
+    """
+    loop over all the products and make sure they have an instrumentproductlink
+    """
+    prods = dbu.getAllProducts()
+    prod_ids = [v.product_id for v in prods]
+    for prod_id in prod_ids:
+        num = dbu.session.query(dbu.Instrumentproductlink).filter_by(product_id=prod_id).count() 
+        if num == 0:
+            print('Product {0}:{1} does not have an instrument link'.format(prod_id, dbu.getEntry('Product', prod_id).product_name))
+        if num > 1:
+            print('Product {0}:{1} has more than one instrument link'.format(prod_id, dbu.getEntry('Product', prod_id).product_name))
+            
+
+
 def wrongNewestVersion(dbu, fix=False):
     """
     loop over products and dates and make sure the correct version is marked latest
@@ -133,3 +148,5 @@ if __name__ == "__main__":
     noNewestVersion(dbu, options.fix)
     print("Running wrongNewestVersion()")
     wrongNewestVersion(dbu, options.fix)
+    print("Running missingInstrumentproductlink()")
+    missingInstrumentproductlink(dbu, options.fix)
