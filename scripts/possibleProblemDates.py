@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.6
 
+from __future__ import division
+
 import bisect
 import datetime
 import glob
@@ -36,7 +38,27 @@ def missingInstrumentproductlink(dbu, fix=False):
         if num > 1:
             print('Product {0}:{1} has more than one instrument link'.format(prod_id, dbu.getEntry('Product', prod_id).product_name))
             
-
+def _timedelta2days(inval):
+    return inval.days + inval.seconds/60/60/24
+            
+def suspiciousDateRanges(dbu, fix=False):
+    """
+    check all the files makeing sure that the date ranges look reasonable, they should be
+    something like, 1 day, 1 week, 1 month, or 1 year
+    """
+    files = dbu.session.query(dbu.File).filter_by(newest_version=1).all()
+    t_range = [(v.file_id, v.filename, _timedelta2days(v.utc_stop_time - v.utc_start_time)) for v in files]
+    for fid, f, tr in t_range:
+        if tr < (1/24):  # 1 hour  1/3600
+            print("File: {0}:{1} has short duration {2} days".format(fid, f, tr))
+        elif tr > 2 and tr < 6: # more than 2 days but less that week
+            print("File: {0}:{1} has odd week duration {2} days".format(fid, f, tr))
+        elif tr > 8 and tr < 27: # more than 1 week but less than a month
+            print("File: {0}:{1} has odd month duration {2} days".format(fid, f, tr))
+        elif tr > 35 and tr < 364: # more than 1 month but less than a year
+            print("File: {0}:{1} has odd year duration {2} days".format(fid, f, tr))
+        elif tr > 368: # more than 1 year
+            print("File: {0}:{1} has odd year duration {2} days".format(fid, f, tr))
 
 def wrongNewestVersion(dbu, fix=False):
     """
@@ -150,3 +172,6 @@ if __name__ == "__main__":
     wrongNewestVersion(dbu, options.fix)
     print("Running missingInstrumentproductlink()")
     missingInstrumentproductlink(dbu, options.fix)
+    print("Running suspiciousDateRanges()")
+    suspiciousDateRanges(dbu, options.fix)
+    
