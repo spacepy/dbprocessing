@@ -79,66 +79,81 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     # found some cases where the same command line was in the list more than once based on
     #   more than one dependency in the process queue, go through and clean these out
     outnames = [os.path.basename(v.filename) for v in runme_list]
-    uniq_out = list(set(outnames))
+    uniq_out = list(set(outnames)) # this is a list of all the unque out names
     runme_list_tmp = []
     while uniq_out: # loop until we have them all
         # pop the first name and find it in runme_list
-        uniqo = uniq_out.pop(0) # pop from left, they are sorted
+        uniqo = uniq_out.pop(0) 
         ind = outnames.index(uniqo)
         runme_list_tmp.append(runme_list[ind])
 
+    # the list is now only the unique outnames
     runme_list = runme_list_tmp
 
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
     #    for some code here
-    processes = [] # tuple (command line, Popen object, start time)
+    processes = {} # dict with the key as the Popen object containing a list of command line and start time
 
     n_good = 0 # number of processes susseccfully completed
     n_bad = 0 # number of processes failed
 
     while runme_list or processes:
-        while len(processes) < MAX_PROC and runme_list:
+        while len(processes) < MAX_PROC:
             runme = runme_list.pop(0) # pop from the start of the list, it is sorted!!
-            if not hasattr(runme, 'cmdline'):
-                runme.make_command_line()
-            try:
-                DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
-                print("Process starting: {0}".format(' '.join(runme.cmdline)))
-            except AttributeError:
-                continue
+
+            DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
+            print("Process starting: {0}".format(' '.join(runme.cmdline)))
+
+            """
+            when we go to run a process capture all the stdout and stderr into a file in the running temp directory
+            if the process is successful then it just gets removed with the directory, otherwise move it to the error
+            directory
+            """
 
             # make sure the file is not in the DB before you try this
             try:
                 tmp = dbu.getEntry('File', os.path.basename(runme.cmdline[-1])) # output is last
                 DBlogging.dblogger.info("Did Not run: {0} output was in db".format(os.path.basename(' '.join(runme.cmdline))))
             except DBUtils.DBNoData:
-                processes.append( (runme, subprocess.Popen(runme.cmdline), time.time()) ) 
-        finished = []
-        for p in processes:
-            if p[1].poll() is None: # still running
-                continue
-            elif p[1].returncode != 0: # non zero return code FAILED
-                DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(p[0].cmdline), p[1].returncode))
-                # assume the file is bad and move it to error
-                p[0].moveToError(p[0].filename)
-                n_bad += 1
-            else: # p[1].returncode == 0  SUCCESS
-                # this is not a perfect time since all the adding occurs before the next poll
-                DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(p[0].cmdline[0]), time.time()-p[2]))
-                try:
-                    p[0].moveToIncoming(os.path.join(p[0].tempdir, p[0].filename))
-                except IOError:
-                    glb = glob.glob(os.path.join(p[0].tempdir, p[0].filename) + '*.png')
-                    if len(glb) == 1:
-                        p[0].moveToIncoming(glb[0])
-                p[0]._add_links(p[0].cmdline)
-                print("Process {0} FINISHED".format(' '.join(p[0].cmdline)))
-                n_good += 1
-            finished.append(p) # we had a return code if we get here
-        for p in finished: # clean finished processes form the list
-            processes.remove(p)
-        time.sleep(0.5)
+                prob_name = runme.filename + '.prob'
+                fp = open(prob_name, 'w')
+                processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp ) 
+
+        while processes:
+            for p in list(processes.keys()):
+                if p.poll() is None: # still running
+                    continue
+                rm, t, fp = processes[p] # TODO HERE!!
+                elif p.returncode != 0: # non zero return code FAILED
+                    DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
+                    fp.close()
+                    rm.moveToError(os.path.join(rm.tempdir, fp.name))
+                    # assume the file is bad and move it to error
+                    rm.moveToError(os.path.join(rm.tempdir, rm.filename))
+                    n_bad += 1
+                    ## delete the temp directory
+                    shutil.rmtree(rm.tempdir)
+                    DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))
+                elif p.returncode == 0: # p[1].returncode == 0  SUCCESS
+                    # this is not a perfect time since all the adding occurs before the next poll
+                    DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(p[0].cmdline[0]), time.time()-p[2]))
+                    fp.close()
+                    try:
+                        rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
+                    except IOError:
+                        glb = glob.glob(os.path.join(p[0].tempdir, p[0].filename) + '*.png')
+                        if len(glb) == 1:
+                            p[0].moveToIncoming(glb[0])
+                    shutil.rmtree(rm.tempdir)
+                    DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))                        
+                    rm._add_links(rm.cmdline)
+                    print("Process {0} FINISHED".format(' '.join(p[0].cmdline)))
+                    n_good += 1
+                else:
+                    raise(ValueError("Should not have gotten here"))
+                del processes[p]
+            time.sleep(0.5)
 
     return n_good, n_bad
 
