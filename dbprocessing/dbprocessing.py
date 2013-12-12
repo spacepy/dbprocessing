@@ -197,6 +197,7 @@ class ProcessQueue(object):
             df = self.figureProduct()
             if df != []:
                 self.diskfileToDB(df)
+                print('Ingested: {0}'.format(self.filename))
 
     def figureProduct(self, filename=None):
         """
