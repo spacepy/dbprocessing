@@ -1359,8 +1359,8 @@ class DBUtils(object):
         """
         given a filename or fileid return a Version instance
         """
-        fle = self.getEntry('File', filename)
-        return Version.Version(fle.interface_version, fle.quality_version, fle.revision_version)
+        fle = self.getFileID(filename)
+        return self.getVersion(fle)
 
     def getFileMission(self, filename):
         """
@@ -1514,7 +1514,7 @@ class DBUtils(object):
 #            sq = self.session.query(self.File).filter_by(product_id = product_id).\
 #                 filter_by(utc_file_date = date)
 
-        ans = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), v.product_id, v.utc_file_date ) for v in sq]
+        ans = [(v.file_id, self.getVersion(v.file_id), v.product_id, v.utc_file_date ) for v in sq]
         DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, ans) )
         return ans
 
