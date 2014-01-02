@@ -195,6 +195,12 @@ class DBUtils(object):
 ####  Do processing and input to DB
 #####################################
 
+
+
+
+
+
+
     def _currentlyProcessing(self):
         """
         Checks the db to see if it is currently processing, don't want to do 2 at the same time
@@ -1447,9 +1453,9 @@ class DBUtils(object):
         except TypeError: # came in as list or tuple
             return [self.getFileID(v) for v in filename]
         except ValueError:
-            sq = self.session.query(self.File).filter_by(filename = filename)
+            sq = self.session.query(self.File).filter_by(filename = filename).first()
             try:
-                return sq[0].file_id
+                return sq.file_id
             except IndexError: # no file_id found
                 raise(DBNoData("No filename %s found in the DB" % (filename)))
 
@@ -1893,17 +1899,52 @@ class DBUtils(object):
     def getTraceback(self, table, in_id, in_id2=None):
         """
         master routine for all te getXXXTraceback functions, this will make for less code
+
+        this is some large select statements with joins in them, these are tested and do work
         """
         retval = {}
         if table.capitalize() == 'File':
-            retval['file'] = self.getEntry(table.capitalize(), in_id)
-            tmp = self.getTraceback('Product', retval['file'].product_id)
-            retval = dict(retval.items() + tmp.items())
+            vars = ['file', 'product', 'inspector', 'instrument',
+                    'instrumentproductlink', 'satellite', 'mission']
+
+            sq = (self.session.query(self.File, self.Product,
+                                    self.Inspector, self.Instrument,
+                                    self.Instrumentproductlink, self.Satellite,
+                                    self.Mission)
+                  .filter_by(file_id=in_id)
+                  .join((self.Product, self.File.product_id == self.Product.product_id))
+                  .join((self.Inspector, self.Product.product_id == self.Inspector.product))
+                  .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
+                  .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
+                  .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
+                  .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+                  
+            if len(sq) > 1:
+                raise(DBError("Found multiple tracebacks for file {0}".format(in_id)))
+            for ii, v in enumerate(vars):
+                retval[v] = sq[0][ii]
 
         elif table.capitalize() == 'Code':
-            retval['code'] = self.getEntry(table.capitalize(), in_id)
-            tmp = self.getTraceback('Process', retval['code'].process_id)
-            retval = dict(retval.items() + tmp.items())
+            vars = ['code', 'process', 'product', 'instrument',
+                    'instrumentproductlink', 'satellite', 'mission']
+
+            sq = (self.session.query(self.Code, self.Process,
+                                     self.Product, self.Instrument,
+                                     self.Instrumentproductlink, self.Satellite,
+                                     self.Mission)
+                  .filter_by(code_id=in_id)
+                  .join((self.Process, self.Code.process_id == self.Process.process_id))
+                  .join((self.Product, self.Product.product_id == self.Process.output_product))
+                  .join((self.Inspector, self.Product.product_id == self.Inspector.product))
+                  .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
+                  .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
+                  .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
+                  .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+            
+            if len(sq) > 1:
+                raise(DBError("Found multiple tracebacks for code {0}".format(in_id)))
+            for ii, v in enumerate(vars):
+                retval[v] = sq[0][ii]
 
         elif table.capitalize() == 'Inspector':
             retval['inspector'] = self.getEntry(table.capitalize(), in_id)
@@ -1911,27 +1952,54 @@ class DBUtils(object):
             retval = dict(retval.items() + tmp.items())
 
         elif table.capitalize() == 'Product':
-            retval['product'] = self.getEntry(table.capitalize(), in_id)
-            # inspector
-            retval['inspector'] = self.session.query(self.Inspector).filter_by(product = retval['product'].product_id).first()
-            tmp = self.getTraceback('Instrument', retval['product'].instrument_id)
-            retval = dict(retval.items() + tmp.items())
-            # Instrumentproductlink
-            retval['instrumentproductlink'] = self.session.query(self.Instrumentproductlink).get((retval['product'].instrument_id, retval['product'].product_id))
+            vars = ['product', 'inspector', 'instrument',
+                    'instrumentproductlink', 'satellite', 'mission']
+
+            sq = (self.session.query(self.Product,
+                                    self.Inspector, self.Instrument,
+                                    self.Instrumentproductlink, self.Satellite,
+                                    self.Mission)
+                  .filter_by(product_id=in_id)
+                  .join((self.Inspector, self.Product.product_id == self.Inspector.product))
+                  .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
+                  .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
+                  .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
+                  .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+                  
+            if len(sq) > 1:
+                raise(DBError("Found multiple tracebacks for product {0}".format(in_id)))
+            for ii, v in enumerate(vars):
+                retval[v] = sq[0][ii]
 
         elif table.capitalize() == 'Process':
-            # get the process instance
-            retval['process'] = self.getEntry('Process', in_id)
-            retval['output_product'] = self.getEntry('Product', retval['process'].output_product)
-            # instrument
-            inst_id = self.getInstrumentFromProduct(retval['output_product'].product_id)
-            tmp = self.getTraceback('Instrument', inst_id)
-            retval = dict(retval.items() + tmp.items())
-            # code
-            if 'file' in retval:
-                code_id = self.getCodeFromProcess(retval['process'].process_id, retval['file'].utc_file_date)
-            else:
-                code_id = self.getCodeFromProcess(retval['process'].process_id, datetime.date.today())
+
+            vars = ['process', 'product', 'instrument',
+                    'instrumentproductlink', 'satellite', 'mission']
+
+            sq = (self.session.query(self.Process,
+                                     self.Product, self.Instrument,
+                                     self.Instrumentproductlink, self.Satellite,
+                                     self.Mission)
+                  .filter_by(process_id=in_id)
+                  .join((self.Product, self.Product.product_id == self.Process.output_product))
+                  .join((self.Inspector, self.Product.product_id == self.Inspector.product))
+                  .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
+                  .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
+                  .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
+                  .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+            
+            if len(sq) > 1:
+                raise(DBError("Found multiple tracebacks for process {0}".format(in_id)))
+            for ii, v in enumerate(vars):
+                retval[v] = sq[0][ii]
+
+##             if 'file' in retval:
+##                 code_id = self.getCodeFromProcess(retval['process'].process_id, retval['file'].utc_file_date)
+##             else:
+##                 code_id = self.getCodeFromProcess(retval['process'].process_id, datetime.date.today())
+
+            code_id = self.getCodeFromProcess(retval['process'].process_id, datetime.date.today())
+ 
             retval['code'] = self.getEntry('Code', code_id)
             # input products
             retval['input_product'] = []
