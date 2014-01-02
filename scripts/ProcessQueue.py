@@ -38,6 +38,8 @@ if __name__ == "__main__":
                       help="Set the logging level", default="debug")
     parser.add_option("-n", "--num-proc", dest="numproc", type='int',
                       help="Number of processes to run in parallel", default=2)
+    parser.add_option("", "--echo", dest="echo", action="store_true",
+                      help="Start sqlalchemy with echo in place for debugging", default=False)
 
     (options, args) = parser.parse_args()
     if len(args) != 0:
@@ -53,7 +55,7 @@ if __name__ == "__main__":
 
     DBlogging.dblogger.setLevel(DBlogging.LEVELS[options.loglevel])
 
-    pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun)
+    pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
 
     # check currently processing
     curr_proc = pq.dbu._currentlyProcessing()
@@ -83,7 +85,7 @@ if __name__ == "__main__":
             else:
                 pq.importFromIncoming()
 
-        except:
+        except ZeroDivisionError:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
             print('Error in running processing chain; debugging details follow:')
@@ -150,7 +152,7 @@ if __name__ == "__main__":
                 print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))
                 DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
 
-        except:
+        except ZeroDivisionError:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
             print('Error in running processing chain; debugging details follow:')
