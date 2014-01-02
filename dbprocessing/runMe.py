@@ -380,8 +380,9 @@ class runMe(object):
             if not parent.newest_version: # if a parent is no longer newest we need to inc
                 # this might need to go over all the dates in the time range
                 fls = self.dbu.getFiles_product_utc_file_date(parent.product_id, parent.utc_file_date)
-                ind = zip(*fls)[0].index(parent.file_id) # get the index of the file id in the output
-                vers = zip(*fls)[1]
+                ind = list(map(itemgetter(0), fls)).index(parent.file_id)
+                # get the index of the file id in the output
+                vers = list(map(itemgetter(1), fls))
                 mx_v = max(vers)
                 df = mx_v - vers[ind]
                 if df[1]:

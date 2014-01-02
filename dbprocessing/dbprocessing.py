@@ -3,6 +3,7 @@
 import datetime
 import imp
 import os
+from operator import itemgetter
 import shutil
 import sys
 import tempfile
@@ -160,7 +161,7 @@ class ProcessQueue(object):
         # set files in the db of the same product and same utc_file_date to not be newest version
         files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
         if files:
-            mx = max(zip(*files)[1]) # max on version
+            mx = max(list(map(itemgetter(1), files))) # max on version
         for f in files:
             if f[1] != mx: # this is not the max, newest_version should be False
                 fle = self.dbu.getEntry('File', f[0])
@@ -317,7 +318,7 @@ class ProcessQueue(object):
             return False
         for prod, opt in input_product_id:
             if not opt:
-                if not prod in zip(*files)[2]: # the product ID
+                if not prod in list(map(itemgetter(2), files)): # the product ID
                     DBlogging.dblogger.debug("Required products not found, continuing.  Process:{0}, product{1}".format(process_id, prod))
                     return False
         return True
@@ -342,7 +343,7 @@ class ProcessQueue(object):
                 DBlogging.dblogger.debug("For file: {0} date: {1} required files not present".format(file_id[0], utc_file_date))
                 continue # go on to the next file
 
-            input_files = zip(*files)[0] # this is the file_id
+            input_files = list(map(itemgetter(0), files)) # this is the file_id
             DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
             runme = runMe.runMe(self.dbu, utc_file_date, process_id, input_files, self)
@@ -495,7 +496,7 @@ class ProcessQueue(object):
             raise(NotImplementedError("Sorry combination is not implemented"))
 
         try:
-            ids = zip(*files)[0]
+            ids = list(map(itemgetter(0), files))
         except IndexError:
             ids = []
             n_added = 0

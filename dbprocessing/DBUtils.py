@@ -3,6 +3,7 @@ import glob
 import itertools
 import functools
 import os.path
+from operator import itemgetter
 import pwd
 import socket # to get the local hostname
 import sys
@@ -376,15 +377,18 @@ class DBUtils(object):
         """
         if version_bump is None:
             try:
-                pqdata = zip(*self.session.query(self.Processqueue.file_id).all())[0]
-            except IndexError:
+                pqdata = self.session.query(self.Processqueue.file_id).all()
+                pqdata = list(map(itemgetter(0), pqdata))
+            except (IndexError, TypeError):
                 pqdata = self.session.query(self.Processqueue.file_id).all()
             ans = pqdata
         else:
             try:
-                pqdata1 = zip(*self.session.query(self.Processqueue.file_id).all())[0]
-                pqdata2 = zip(*self.session.query(self.Processqueue.version_bump).all())[0]
-            except IndexError:
+                pqdata1 = self.session.query(self.Processqueue.file_id).all()
+                pqdata2 = self.session.query(self.Processqueue.version_bump).all()
+                pqdata1 = list(map(itemgetter(0), pqdata1))
+                pqdata2 = list(map(itemgetter(0), pqdata2))
+            except (IndexError, TypeError):
                 pqdata1 = self.session.query(self.Processqueue.file_id).all()
                 pqdata2 = self.session.query(self.Processqueue.version_bump).all()
             ans = zip(pqdata1, pqdata2)
@@ -622,24 +626,30 @@ class DBUtils(object):
 
         if level==None get all filenames, otherwise only for a level
 
+        I worked this for speed the zip(*names) is way too slow (this is about x18 faster)
+
         """
         if level is None and product is None:
-            names = zip(*self.session.query(self.File.filename).all())[0]
+            names = self.session.query(self.File.filename).all()
         elif product is None:
-            names = zip(*self.session.query(self.File.filename).filter_by(data_level=level).all())[0]
+            names = self.session.query(self.File.filename).filter_by(data_level=level).all()
         elif level is None:
-            names = zip(*self.session.query(self.File.filename).filter_by(product_id=product).all())[0]
+            names = self.session.query(self.File.filename).filter_by(product_id=product).all()
         else: # both specified
-            names = zip(*self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).all())[0]
+            names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).all()
+        names = list(map(itemgetter(0), names))
         if fullPath:
             names = [ self.getFileFullPath(v) for v in names]
         return names
 
     def getAllFileIds(self):
         """
-        return all teh file ids in teh database
+        return all teh file ids in the database
+
+        the itemgetter method is a lot faster then zip(*) (x16)
         """
-        ids = zip(*self.session.query(self.File.file_id).all())[0]
+        ids = self.session.query(self.File.file_id).all()
+        ids =  list(map(itemgetter(0), ids))
         return ids
 
     def addMission(self,
@@ -1349,8 +1359,8 @@ class DBUtils(object):
         """
         given a filename or fileid return a Version instance
         """
-        fle = self.getEntry('File', filename)
-        return Version.Version(fle.interface_version, fle.quality_version, fle.revision_version)
+        fle = self.getFileID(filename)
+        return self.getVersion(fle)
 
     def getFileMission(self, filename):
         """
@@ -1504,7 +1514,7 @@ class DBUtils(object):
 #            sq = self.session.query(self.File).filter_by(product_id = product_id).\
 #                 filter_by(utc_file_date = date)
 
-        ans = [(v.file_id, Version.Version(v.interface_version, v.quality_version, v.revision_version), v.product_id, v.utc_file_date ) for v in sq]
+        ans = [(v.file_id, self.getVersion(v.file_id), v.product_id, v.utc_file_date ) for v in sq]
         DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, ans) )
         return ans
 
@@ -1581,7 +1591,7 @@ class DBUtils(object):
         given an instrument_if return all the file instances associated with it
         """
         prod_ids = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id=inst_id).all()
-        prod_ids = zip(*prod_ids)[0]
+        prod_ids = list(map(itemgetter(0), prod_ids))
         prods_to_use = []
         if level is not None: # filter only on the level we want
             for p in prod_ids:
@@ -1808,7 +1818,7 @@ class DBUtils(object):
             sq = self.session.query(self.File.file_id).filter_by(newest_version = True).all()
         else:
             sq = self.session.query(self.File.file_id).filter_by(newest_version = True).filter_by(product = product).all()
-        sq = zip(*sq)[0]
+        sq = list(map(itemgetter(0), sq))
         if instrument is not None:
             ans = []
             for s in sq:
@@ -1846,7 +1856,7 @@ class DBUtils(object):
         given a release number return a list of all the filenames with the release
         """
         sq = self.session.query(self.Release.file_id).filter_by(release_num = rel_num).all()
-        sq = list(zip(*sq)[0])
+        sq = list(map(itemgetter(0), sq))
         for i, v in enumerate(sq):
             if fullpath:
                 sq[i] = self.getFileFullPath(v)
@@ -1869,7 +1879,7 @@ class DBUtils(object):
         """
         check files in the DB, return inconsistent files and why
         """
-        files = zip(*self.getAllFilenames())[0]
+        files = self.getAllFilenames(fullPath=True)
         ## check of existence and checksum
         bad_list = []
         for f in files:
@@ -1971,7 +1981,7 @@ class DBUtils(object):
         inst_id = self.getInstrumentID(inst_id)
         sq = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id = inst_id).all()
         if sq:
-            return zip(*sq)[0]
+            return  list(map(itemgetter(0), sq))
         else:
             return None
 
@@ -2014,7 +2024,7 @@ class DBUtils(object):
         """
         code_id = self.getCodeID(code_id)
         f_ids = self.session.query(self.Filecodelink.resulting_file).filter_by(source_code=code_id).all()
-        f_ids = zip(*f_ids)[0]
+        f_ids = list(map(itemgetter(0), f_ids))
         files = [self.getEntry('File', val) for val in f_ids]
         if not id_only:
             return files
@@ -2029,7 +2039,7 @@ class DBUtils(object):
         f_ids = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file=file_id).all()
         if not f_ids:
             return []
-        f_ids = zip(*f_ids)[0]
+        f_ids = list(map(itemgetter(0), f_ids))
         files = [self.getEntry('File', val) for val in f_ids]
         if not id_only:
             return files
