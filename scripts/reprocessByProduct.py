@@ -8,10 +8,11 @@ processqueue so that the next ProcessQueue -p will run them
 
 
 
-
+import datetime
 from optparse import OptionParser
 
 from dateutil import parser as dup
+from dateutil.relativedelta import relativedelta
 
 import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
@@ -39,7 +40,12 @@ if __name__ == "__main__":
     else:
         startDate = None
     if options.endDate is not None:
-        endDate = dup.parse(options.endDate)
+        try:
+            endDate = datetime.datetime.strptime(options.endDate, "%Y%m") # yyyymm
+            endDate += relativedelta(months=1)
+            endDate -= datetime.timedelta(days=1)
+        except ValueError:
+            endDate = dup.parse(options.endDate)
     else:
         endDate = None
 
@@ -47,6 +53,8 @@ if __name__ == "__main__":
         parser.error("invalid force option [0,1,2]")
 
     db = dbprocessing.ProcessQueue(options.mission,)
+
+    print startDate, endDate
 
     for prod in args:
         num = db.reprocessByProduct(prod, startDate=startDate, endDate=endDate, incVersion=options.force)
