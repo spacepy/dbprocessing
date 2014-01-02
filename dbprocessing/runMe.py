@@ -116,8 +116,12 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 tmp = dbu.getEntry('File', os.path.basename(runme.cmdline[-1])) # output is last
                 DBlogging.dblogger.info("Did Not run: {0} output was in db".format(os.path.basename(' '.join(runme.cmdline))))
             except DBUtils.DBNoData:
-                prob_name = runme.filename + '.prob'
-                fp = open(prob_name, 'w')
+                prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
+                try:
+                    fp = open(prob_name, 'w')
+                except IOError:
+                    DBlogging.dblogger.error("Could not create the prob file, so skipped {0}".format(os.path.basename(' '.join(runme.cmdline))))
+                    continue
                 processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp ) 
 
         while processes:
@@ -128,13 +132,22 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 if p.returncode != 0: # non zero return code FAILED
                     DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
                     fp.close()
-                    rm.moveToError(os.path.join(rm.tempdir, fp.name))
+                    #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
+                    #rm.moveToError(os.path.join(rm.tempdir, fp.name))
+                    #rm.moveToError(fp.name)
+                    try:
+                        shutil.copy(fp.name, os.path.join('/n', 'space_data', 'cda', 'rbsp', 'errors', os.path.basename(fp.name)))
+                    except:
+                        print("%%%%%%%%%%%% could not find .prob file!!!:   {0}".format(fp.name))
                     # assume the file is bad and move it to error
                     # rm.moveToError(os.path.join(rm.tempdir, rm.filename))
                     n_bad += 1
                     ## delete the temp directory
-                    shutil.rmtree(rm.tempdir)
-                    DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))
+                    try:
+                        shutil.rmtree(rm.tempdir)
+                        DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))
+                    except OSError:
+                        DBlogging.dblogger.error("Error removing temp directory: {0}".format(rm.tempdir))
                 elif p.returncode == 0: # p.returncode == 0  SUCCESS
                     # this is not a perfect time since all the adding occurs before the next poll
                     DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
