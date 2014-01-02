@@ -59,7 +59,7 @@ class DBUtils(object):
     be internal routines for DBProcessing
     """
 
-    def __init__(self, mission='Test', db_var=None):
+    def __init__(self, mission='Test', db_var=None, echo=False):
         """
         @summary: Initialize the DBUtils class, default mission is 'Test'
         """
@@ -71,7 +71,7 @@ class DBUtils(object):
         fmtr = DBStrings.DBFormatter()
         self.format = fmtr.format
         self.re = fmtr.re
-        self._openDB(db_var)
+        self._openDB(db_var, echo=echo)
         self._createTableObjects()
         self._patchProcessQueue()
 
@@ -114,7 +114,7 @@ class DBUtils(object):
 ###### DB and Tables ###############
 ####################################
 
-    def _openDB(self, db_var=None, verbose=False):
+    def _openDB(self, db_var=None, verbose=False, echo=False):
         """
         setup python to talk to the database, this is where it is, name and password.
         """
@@ -123,14 +123,14 @@ class DBUtils(object):
         try:
             if self.mission == 'unittest':
                 if db_var is None:
-                    engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=False)
+                    engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=echo)
                 else:
                     engine = db_var.engine
 
             else: # assume we got a filename and use that
                 if not os.path.isfile(os.path.expanduser(self.mission)):
                     raise(ValueError("DB file specified doesn't exist"))
-                engine = sqlalchemy.create_engine('sqlite:///' + os.path.expanduser(self.mission), echo=False)
+                engine = sqlalchemy.create_engine('sqlite:///' + os.path.expanduser(self.mission), echo=echo)
                 self.mission = os.path.realpath(os.path.expanduser(self.mission))
 
             DBlogging.dblogger.info("Database Connection opened: {0}  {1}".format(str(engine), self.mission))
