@@ -139,7 +139,11 @@ if __name__ == "__main__":
                       help="selected mission", default=None)
     parser.add_option("", "--fix", dest="fix", action='store_true',
                       help="Fix the issues (make a backup first)", default=False)    
+    parser.add_option("", "--echo", dest="echo", action='store_true',
+                      help="enable sqlalchemy echo mode for debugging", default=False)    
     (options, args) = parser.parse_args()
+
+
     if len(args) != 0:
         parser.error("incorrect number of arguments")
 
@@ -147,7 +151,7 @@ if __name__ == "__main__":
         parser.error("-m must be specified")
 
                 
-    dbu = DBUtils.DBUtils(options.mission)
+    dbu = DBUtils.DBUtils(options.mission, echo=options.echo)
 
     # If we will be editing the DB we have to have lock
     if options.fix:
