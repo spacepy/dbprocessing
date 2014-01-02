@@ -1454,9 +1454,9 @@ class DBUtils(object):
             return [self.getFileID(v) for v in filename]
         except ValueError:
             sq = self.session.query(self.File).filter_by(filename = filename).first()
-            try:
+            if sq is not None:
                 return sq.file_id
-            except IndexError: # no file_id found
+            else: # no file_id found
                 raise(DBNoData("No filename %s found in the DB" % (filename)))
 
     def getCodeID(self, codename):
@@ -1508,9 +1508,14 @@ class DBUtils(object):
         if isinstance(date, (datetime.datetime)):
             date = date.date()
 
+##         sq = self.session.query(self.File).filter_by(product_id = product_id).\
+##              filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
+##                          self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
         sq = self.session.query(self.File).filter_by(product_id = product_id).\
-             filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
-                         self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
+             filter(and_(self.File.utc_start_time.between(datetime.datetime.combine(date, datetime.time(0)),
+                                                          datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0))),
+                         self.File.utc_stop_time.between(datetime.datetime.combine(date, datetime.time(0)), 
+                                                         datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)))))
 
         if not sq.count():  # there were none
             return None
