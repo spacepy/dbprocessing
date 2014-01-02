@@ -37,12 +37,12 @@ class ProcessQueue(object):
     @version: V1: 02-Dec-2010 (BAL)
     """
     def __init__(self,
-                 mission, dryrun=False):
+                 mission, dryrun=False, echo=False):
 
         self.dryrun = dryrun
         self.mission = mission
         self.tempdir = None
-        dbu = DBUtils.DBUtils(self.mission)
+        dbu = DBUtils.DBUtils(self.mission, echo=echo)
         self.runme_list = []
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()
