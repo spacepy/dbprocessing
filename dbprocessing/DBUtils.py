@@ -1857,7 +1857,7 @@ class DBUtils(object):
         """
         sq = self.session.query(self.Release.file_id).filter_by(release_num = rel_num).all()
         sq = list(map(itemgetter(0), sq))
-         for i, v in enumerate(sq):
+        for i, v in enumerate(sq):
             if fullpath:
                 sq[i] = self.getFileFullPath(v)
             else:
@@ -1879,7 +1879,7 @@ class DBUtils(object):
         """
         check files in the DB, return inconsistent files and why
         """
-        files = self.getAllFilenames()
+        files = self.getAllFilenames(fullPath=True)
         ## check of existence and checksum
         bad_list = []
         for f in files:
