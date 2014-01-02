@@ -145,8 +145,12 @@ class dbprocessing_db(object):
                                     'product_id',
                                     'interface_version',
                                     'quality_comment',
-                                    'revision_version', name='Unique file tuple'),
-        )
+                                    'revision_version', name='Unique file tuple'),)
+        schema.Index('ix_file_big', data_table.columns['filename'],
+                     data_table.columns['utc_file_date'],
+                     data_table.columns['utc_start_time'],
+                     data_table.columns['utc_stop_time'], unique=True)
+        
 
         data_table = schema.Table('filefilelink', metadata,
             schema.Column('source_file', types.Integer,
