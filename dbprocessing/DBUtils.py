@@ -419,7 +419,7 @@ class DBUtils(object):
             ans = []
             fileid = set(fileid)
             for v in fileid:
-                ans.extend(self.Processqueue.push(v, version_bump))
+                ans.extend([self._processqueuePush(v, version_bump)])
             return ans
         fileid = self.getFileID(fileid)
         pq1 = self.Processqueue()
@@ -543,29 +543,36 @@ class DBUtils(object):
         # TODO this might break with weekly input files
         DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.Processqueue.len()))
         pqdata = self.Processqueue.getAll(version_bump=True)
-        if len(pqdata) <= 1: # can't clean just one (or zero) entries
+        file_ids = list(map(itemgetter(0), pqdata))
+        version_bumps = list(map(itemgetter(1), pqdata))
+        if len(file_ids) <= 1: # can't clean just one (or zero) entries
             return
 
-        file_entries = [(self.getEntry('File', val[0]), val[1]) for val in pqdata]
-#        keep = [(val[0].file_id, val[1]) for val in file_entries if val[0].newest_version==True]
-        keep = [(val[0], val[1]) for val in file_entries if val[0].newest_version==True]
+        # speed this up using a sql in_ call not looping over getEntry for each one
+        file_entries = self.session.query(self.File).filter_by(newest_version=True).filter(self.File.file_id.in_(file_ids)).all()
+        inds = [file_ids.index(v.file_id) for v in file_entries]
+        version_bumps2 = [version_bumps[i] for i in inds]
 
 #==============================================================================
 #         # sort keep on dates, then sort keep on level
 #==============================================================================
         # this should make them in order for each level
-        keep = sorted(keep, key=lambda x: x[0].utc_file_date, reverse=1)
-        keep = sorted(keep, key=lambda x: x[0].data_level)
-        keep = [(val[0].file_id, val[1]) for val in keep]
+        file_entries = sorted(file_entries, key=lambda x: x.utc_file_date, reverse=1)
+        file_entries = sorted(file_entries, key=lambda x: x.data_level)
+        file_entries = [val.file_id for val in file_entries]
+        mixed_entries = zip(file_entries, version_bumps2)
 
         ## now we have a list of just the newest file_id's
         if not dryrun:
             self.Processqueue.flush()
             #        self.Processqueue.push(ans)
-            for v in keep:
-                self.Processqueue.push(*v)
+            if not any(version_bumps2):
+                self.Processqueue.push(file_entries)
+            else:
+                for v in mixed_entries:
+                    self.Processqueue.push(*v)
         else:
-            print('<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(keep), self.Processqueue.len()))
+            print('<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries), self.Processqueue.len()))
 
         DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
