@@ -5,6 +5,7 @@ Created on Tue Oct 23 10:12:11 2012
 @author: balarsen
 """
 import glob
+from operator import itemgetter
 import os
 import shutil
 import subprocess
