@@ -85,7 +85,7 @@ if __name__ == "__main__":
             else:
                 pq.importFromIncoming()
 
-        except ZeroDivisionError:
+        except RuntimeError:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
             print('Error in running processing chain; debugging details follow:')
@@ -152,7 +152,7 @@ if __name__ == "__main__":
                 print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))
                 DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
 
-        except ZeroDivisionError:
+        except RuntimeError:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
             print('Error in running processing chain; debugging details follow:')
