@@ -1525,7 +1525,7 @@ class DBUtils(object):
                                                          datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)))))
 
         if not sq.count():  # there were none
-            return None
+            return []
 
         # if these files have met_start_time then that is the logic we want, otherwise we want simpler logic
 #        if not sq[0].met_start_time and not sq[0].met_stop_time: # use logic only on utc_file_date
@@ -1580,16 +1580,19 @@ class DBUtils(object):
         sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional).filter_by(process_id = process_id).all()
         return sq
 
-    def getFilesByProductDate(self, product_id, daterange):
+    def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
         return the files in the db by product id that have data in the date specified
         """
-        sq1 = self.session.query(self.File).filter_by(product_id = product_id).filter_by(exists_on_disk = True).filter_by(newest_version = True).filter(self.File.utc_start_time >= daterange[0]).all()
-        sq1 = set([v.file_id for v in sq1])
-        sq2 = self.session.query(self.File).filter_by(product_id = product_id).filter_by(exists_on_disk = True).filter_by(newest_version = True).filter(self.File.utc_stop_time <= daterange[1]).all()
-        sq2 = set([v.file_id for v in sq2])
-        ans = sq1.intersection(sq2)
-        return list(ans)
+        if newest_version:
+            sq = self.session.query(self.File).filter_by(product_id = product_id).\
+                 filter(self.File.utc_start_time.between(daterange[0], daterange[1])).\
+                 filter_by(newest_version = True).all()
+        else:
+            sq = self.session.query(self.File).filter_by(product_id = product_id).\
+                 filter(self.File.utc_start_time.between(daterange[0], daterange[1])).all()
+        
+        return sq
 
     def getFilesByProduct(self, prod_id, newest_version=False):
         """
