@@ -144,6 +144,12 @@ class Version(object):
         else:
             return False
 
+    def __le__(self, other):
+        return self.__eq__(other) or self.__lt__(other)
+
+    def __ge__(self, other):
+        return self.__eq__(other) or self.__gt__(other)
+           
     def __ne__(self, other):
         if self.interface != other.interface:
             return True

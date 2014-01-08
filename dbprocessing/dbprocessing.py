@@ -6,6 +6,7 @@ import os
 from operator import itemgetter
 import shutil
 import sys
+import re
 import tempfile
 import traceback
 
@@ -159,16 +160,21 @@ class ProcessQueue(object):
         if not self.dryrun:
             dbf.move()
         # set files in the db of the same product and same utc_file_date to not be newest version
-        files = self.dbu.getFiles_product_utc_file_date(dbf.diskfile.params['product_id'], dbf.diskfile.params['utc_file_date'])
+        files = self.dbu.getFilesByProductDate(dbf.diskfile.params['product_id'], [dbf.diskfile.params['utc_file_date']]*2)
         if files:
-            mx = max(list(map(itemgetter(1), files))) # max on version
+            mx = max(files, key=lambda x: self.dbu.getVersion(x)) # max on version
         for f in files:
-            if f[1] != mx: # this is not the max, newest_version should be False
-                fle = self.dbu.getEntry('File', f[0])
-                fle.newest_version = False
+            if f != mx: # this is not the max, newest_version should be False
+                f.newest_version = False
                 if not self.dryrun:
-                    self.dbu.session.add(fle)
-                    DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f[0]))
+                    self.dbu.session.add(f)
+                    DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f.file_id))
+            else:
+                f.newest_version = True
+                if not self.dryrun:
+                    self.dbu.session.add(f)
+                    DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f.file_id))
+               
         if not self.dryrun:
             try:
                 self.dbu.session.commit()
@@ -176,7 +182,7 @@ class ProcessQueue(object):
                 self.session.rollback()
                 raise(DBUtils.DBError(IE))
             # add to processqueue for later processing
-            self.dbu.Processqueue.push(f_id)
+            self.dbu.Processqueue.push(f.file_id)
             return f_id
         else:
             return None
@@ -258,9 +264,8 @@ class ProcessQueue(object):
         DBlogging.dblogger.debug("Finding input files for file_id:{0} process_id:{1} date:{2}".format(file_id, process_id, utc_file_date))
 
         ## here decide how we build output and do it.
-        timebase = self.dbu.session.query(self.dbu.Process.output_timebase).get(process_id)[0] # faster
-
-        if timebase == 'FILE': # taking one file to the next file
+        timebase = self.dbu.session.query(self.dbu.Process.output_timebase).get(process_id)[0] 
+        if timebase in ['FILE', 'DAILY']: # taking one file to the next file
             # for file based processing we are going to look to the "process_keywords" and cull the
             #   retuned files based on making sure they are all the same
             #   If process_keywords is none it will fall back to current behavior (since they will all be the same)
@@ -269,59 +274,33 @@ class ProcessQueue(object):
             # get all the possible files based on dates that we might want to put into the process now
             
             for val, opt in input_product_id:
-                tmp1 = self.dbu.getFiles_product_utc_file_date(val, utc_file_date)
-                if tmp1:
-                    files.extend(self.dbu.getFiles_product_utc_file_date(val, utc_file_date))
+                tmp_files = self.dbu.getFilesByProductDate(val, [utc_file_date.date()]*2, newest_version=True)
+                if not tmp_files and not opt:
+                    return None, input_product_id
+                else:
+                    files.extend(tmp_files)
 
             DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
-            # remove all the files that are not the newest version
+            # remove all the files that are not the newest version, they all should be
             files = self.dbu.file_id_Clean(files)
-            # grab the process_keywords column for the file_id and all the possible other files
-            # infile_process_keywords = self.dbu.getEntry('File', file_id).process_keywords # below is faster
-            infile_process_keywords = self.dbu.session.query(self.dbu.File.process_keywords).get(file_id)[0]
-            files_process_keywords = [self.dbu.getEntry('File', v[0]).process_keywords for v in files]
-            # now if the process_keywords in files_process_keywords does not match that in infile_process_keywords
-            #   drop it
-            files_out = []
-            for ii, v in enumerate(files_process_keywords):
-                if v == infile_process_keywords:
-                    files_out.append(files[ii])
-            # and give it the right name
-            files = files_out
-
-        elif timebase == 'DAILY':
-            DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
-            ## from the input file see what the timebase is and grab all files that go into process
-            DBlogging.dblogger.debug("Finding input files for {0}".format(utc_file_date))
-
-            files = []
-            for val, opt in input_product_id:
-                tmp = self.dbu.getFiles_product_utc_file_date(val, utc_file_date)
-                if tmp:  # != []
-                    files.extend(tmp)
-            DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
-            files = self.dbu.file_id_Clean(files)
-
+            if timebase == 'FILE': # taking one file to the next file
+                files_out = []
+                # grab the process_keywords column for the file_id and all the possible other files
+                #   they have to match in order for the file to be the same
+                infile_process_keywords = self.dbu.getEntry('File', file_id).process_keywords
+                files_process_keywords = [v.process_keywords for v in files]
+                # now if the process_keywords in files_process_keywords does not match that in infile_process_keywords
+                #   drop it
+                for ii, v in enumerate(files_process_keywords):
+                    if v == infile_process_keywords:
+                        files_out.append(files[ii])
+                # and give it the right name
+                files = files_out
         else:
             DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
             raise(NotImplementedError('Not implemented yet: {0} based processing'.format(timebase)))
             raise(ValueError('Bad timebase for product: {0}'.format(process_id)))
         return files, input_product_id
-
-    def _requiredFilesPresent(self, files, input_product_id, process_id):
-        #==============================================================================
-        # do we have the required files to do the build?
-        #==============================================================================
-        # get the products of the input files
-        ## need to go through the input_product_id and make sure we have a file for each required product
-        if not files:
-            return False
-        for prod, opt in input_product_id:
-            if not opt:
-                if not prod in list(map(itemgetter(2), files)): # the product ID
-                    DBlogging.dblogger.debug("Required products not found, continuing.  Process:{0}, product{1}".format(process_id, prod))
-                    return False
-        return True
 
     def buildChildren(self, process_id, file_id):
         """
@@ -333,21 +312,30 @@ class ProcessQueue(object):
 
         # iterate over all the days between the start and stop date from above (including stop date)
         for utc_file_date in Utils.expandDates(*daterange):
-
             files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date)
+            if not files:
+                # figure out the missing products
+                DBlogging.dblogger.debug("For file: {0} date: {1} required files not present {2}".format(
+                    file_id[0], utc_file_date, input_product_id))
+                
+                continue # go on to the next file
 
             #==============================================================================
             # do we have the required files to do the build?
             #==============================================================================
-            if not self._requiredFilesPresent(files, input_product_id, process_id):
-                DBlogging.dblogger.debug("For file: {0} date: {1} required files not present".format(file_id[0], utc_file_date))
-                continue # go on to the next file
+##             if not self._requiredFilesPresent(files, input_product_id, process_id):
+##                 DBlogging.dblogger.debug("For file: {0} date: {1} required files not present".format(file_id[0], utc_file_date))
+##                 continue # go on to the next file
 
-            input_files = list(map(itemgetter(0), files)) # this is the file_id
+            input_files = [v.file_id for v in files]
             DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
             runme = runMe.runMe(self.dbu, utc_file_date, process_id, input_files, self)
-            self.runme_list.append(runme)
+
+            # only add to runme list if it can be run
+            if runme.ableToRun and (runme not in self.runme_list):
+                self.runme_list.append(runme)
+                DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
 
     def onStartup(self):
         """
@@ -434,19 +422,11 @@ class ProcessQueue(object):
             print('No product_id {0} found in the DB'.format(id_in))
             return None
 
-        files = self.dbu.getFilesByProduct(prod_id)
-        # files before this date are removed from the list
-        if startDate is not None:
-            files = [val for val in files if val.utc_file_date >= startDate]
-        # files after this date are removed from the list
-        if endDate is not None:
-            files = [val for val in files if val.utc_file_date <= endDate]
-        f_ids = [val.file_id for val in files]
-        filesToReprocess = set(f_ids)
+        files = self.dbu.getFilesByProductDate(prod_id, [startDate, endDate])
         added = 0
-        for f in filesToReprocess:
+        for f in files:
             try:
-                self.dbu.Processqueue.push(f, incVersion)
+                self.dbu.Processqueue.push(f.file_id, incVersion)
                 added += 1
             except DBUtils.DBError:
                 print("File {0} failed to add, was already there".format(f))

@@ -7,6 +7,8 @@ from optparse import OptionParser
 import traceback
 import subprocess
 
+import spacepy.toolbox as tb
+
 from dbprocessing import DBlogging, dbprocessing
 from dbprocessing.runMe import ProcessException
 from dbprocessing import runMe
@@ -120,35 +122,49 @@ if __name__ == "__main__":
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
             while pq.dbu.Processqueue.len() > 0:
-                # clean the queue every 10 precesses (and the first)
-                if (number_proc % 10 == 0):
-                    print('Cleaning Processqueue')
-                    pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates and sort
+                print('Cleaning Processes queue')
+                # clean the queue
+                pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates and sort
+                if not pq.dbu.Processqueue.len():
+                    print("Process queue is empty")
+                    break
                 # this loop makes all the runMe objects for all the files in the processqueue
 
                 run_num = 0
                 n_good  = 0
                 n_bad   = 0
-
+                
+                print('Building commands for {0} items in the queue'.format(pq.dbu.Processqueue.len()))
+         
+                # make the cpommand lines for all the files in tehj processqueue
+                totalsize = pq.dbu.Processqueue.len()
+                tmp_ind = 0
+                tb.progressbar(tmp_ind, 1, totalsize, text='Command Progress:')
                 while pq.dbu.Processqueue.len() > 0:
                     # do smarter pop that sorts at the db level
-                    f = pq.dbu.session.query(pq.dbu.Processqueue.file_id).join(pq.dbu.File).order_by(pq.dbu.File.data_level, pq.dbu.File.utc_file_date).first()
-                    if hasattr(f, '__iter__') and len(f) == 1:
-                        f = f[0]
-                    pq.dbu.Processqueue.remove(f) # remove by file_id
+                    #f = (pq.dbu.session.query(pq.dbu.Processqueue.file_id)
+                    #     .join((pq.dbu.File, pq.dbu.Processqueue.file_id==pq.dbu.File.file_id))
+                    #     .order_by(pq.dbu.File.data_level, pq.dbu.File.utc_file_date).first())
+                    #if hasattr(f, '__iter__') and len(f) == 1:
+                    #    f = f[0]
+                    #pq.dbu.Processqueue.remove(f) # remove by file_id
+                    f = pq.dbu.Processqueue.pop()
                     DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(f, pq.dbu.Processqueue.len()))
                     #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
-                    if f is None:
-                        continue
+                    #if f is None:
+                    #    continue
                     do_proc(f)
-                    number_proc += 1
-                    pq.runme_list = sorted([v for v in pq.runme_list if v.ableToRun], key=lambda x: x.utc_file_date)
-                    if len(pq.runme_list) >= options.numproc or pq.dbu.Processqueue.len() == 0:
-                        # pass the whole runme list off to the runMe module function
-                        #  it will go through and decide what can be run in parrallel
-                        n_good_t, n_bad_t = runMe.runner(pq.runme_list, pq.dbu, options.numproc)
-                        n_good += n_good_t
-                        n_bad  += n_bad_t
+                    tmp_ind += 1
+                    tb.progressbar(tmp_ind, 1, totalsize, text='Command Progress:')
+
+                    #pq.runme_list.extend(sorted([v for v in pq.runme_list if v.ableToRun], key=lambda x: x.utc_file_date))
+                    
+                # pass the whole runme list off to the runMe module function
+                #  it will go through and decide what can be run in parrallel
+                
+                n_good_t, n_bad_t = runMe.runner(pq.runme_list, pq.dbu, options.numproc)
+                n_good += n_good_t
+                n_bad  += n_bad_t
                 print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))
                 DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
 

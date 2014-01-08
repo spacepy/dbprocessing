@@ -543,36 +543,44 @@ class DBUtils(object):
         # TODO this might break with weekly input files
         DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.Processqueue.len()))
         pqdata = self.Processqueue.getAll(version_bump=True)
+
         file_ids = list(map(itemgetter(0), pqdata))
         version_bumps = list(map(itemgetter(1), pqdata))
-        if len(file_ids) <= 1: # can't clean just one (or zero) entries
-            return
-
+        
         # speed this up using a sql in_ call not looping over getEntry for each one
-        file_entries = self.session.query(self.File).filter_by(newest_version=True).filter(self.File.file_id.in_(file_ids)).all()
-        inds = [file_ids.index(v.file_id) for v in file_entries]
+        # this gets all the file objects for the processqueue file_ids
+        file_entries = self.session.query(self.File).filter(self.File.file_id.in_(file_ids)).all()
+        newest = []
+        for fe in file_entries:
+            newest.extend([v.file_id for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date]*2, newest_version=True)])
+        
+        inds = []
+        file_entries2 = []
+        for v in file_entries:
+            if v.file_id in newest:
+                inds.append(file_ids.index(v.file_id))
+                file_entries2.append(v)
         version_bumps2 = [version_bumps[i] for i in inds]
-
 #==============================================================================
 #         # sort keep on dates, then sort keep on level
 #==============================================================================
         # this should make them in order for each level
-        file_entries = sorted(file_entries, key=lambda x: x.utc_file_date, reverse=1)
-        file_entries = sorted(file_entries, key=lambda x: x.data_level)
-        file_entries = [val.file_id for val in file_entries]
-        mixed_entries = zip(file_entries, version_bumps2)
+        file_entries2 = sorted(file_entries2, key=lambda x: x.utc_file_date, reverse=1)
+        file_entries2 = sorted(file_entries2, key=lambda x: x.data_level)
+        file_entries2 = [val.file_id for val in file_entries2]
+        mixed_entries = zip(file_entries2, version_bumps2)
 
         ## now we have a list of just the newest file_id's
         if not dryrun:
             self.Processqueue.flush()
             #        self.Processqueue.push(ans)
             if not any(version_bumps2):
-                self.Processqueue.push(file_entries)
+                self.Processqueue.push(file_entries2)
             else:
                 for v in mixed_entries:
                     self.Processqueue.push(*v)
         else:
-            print('<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries), self.Processqueue.len()))
+            print('<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.Processqueue.len()))
 
         DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
@@ -834,7 +842,7 @@ class DBUtils(object):
 
         @param resulting_file_id: id of the product to link
         @type resulting_file_id: int
-        @param source_code: id of the process to link
+        @param source_code: id of the code
         @type source_code: int
 
         """
@@ -1323,7 +1331,7 @@ class DBUtils(object):
                              file_entry.filename,
                              file_entry.utc_file_date,
                              file_entry.utc_start_time,
-                             self.getFileVersion(file_entry.file_id)
+                             self.getVersion(file_entry.file_id)
                              )
         return path
 
@@ -1367,13 +1375,6 @@ class DBUtils(object):
         except ValueError: # it is not a number
             proc_id = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()[0][0]
         return proc_id
-
-    def getFileVersion(self, filename):
-        """
-        given a filename or fileid return a Version instance
-        """
-        fle = self.getFileID(filename)
-        return self.getVersion(fle)
 
     def getFileMission(self, filename):
         """
@@ -1451,6 +1452,8 @@ class DBUtils(object):
         @return: file_id: file_id of the input file
         @rtype: long
         """
+        if isinstance(filename, self.File):
+            return filename.file_id
         try:
             f_id = long(filename)
             sq = self.session.query(self.File).get(f_id)
@@ -1502,69 +1505,21 @@ class DBUtils(object):
         DBlogging.dblogger.debug( "Found getFileDates():  file_id: {0}, dates: {1}".format(file_id, retval) )
         return retval
 
-    def getFiles_product_utc_file_date(self, product_id, date):
-        """
-        given a product id and a utc_file_date return all the files that match
-        [(file_id, Version, product_id, utc_file_date), ]
-        """
-        DBlogging.dblogger.debug( "Entered getFiles_product_utc_file_date(): " +
-                                  "product_id: {0} date: {1}".format(product_id, date) )
-
-        # get all the possible files:
-        ## start date is before date and end date is after date
-        if isinstance(date, (datetime.datetime)):
-            date = date.date()
-
-##         sq = self.session.query(self.File).filter_by(product_id = product_id).\
-##              filter(and_(self.File.utc_start_time < datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)),
-##                          self.File.utc_stop_time >= datetime.datetime.combine(date, datetime.time(0))))
-        sq = self.session.query(self.File).filter_by(product_id = product_id).\
-             filter(and_(self.File.utc_start_time.between(datetime.datetime.combine(date, datetime.time(0)),
-                                                          datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0))),
-                         self.File.utc_stop_time.between(datetime.datetime.combine(date, datetime.time(0)), 
-                                                         datetime.datetime.combine(date + datetime.timedelta(1), datetime.time(0)))))
-
-        if not sq.count():  # there were none
-            return []
-
-        # if these files have met_start_time then that is the logic we want, otherwise we want simpler logic
-#        if not sq[0].met_start_time and not sq[0].met_stop_time: # use logic only on utc_file_date
-#            sq = self.session.query(self.File).filter_by(product_id = product_id).\
-#                 filter_by(utc_file_date = date)
-
-        ans = [(v.file_id, self.getVersion(v.file_id), v.product_id, v.utc_file_date ) for v in sq]
-        DBlogging.dblogger.debug( "Done getFiles_product_utc_file_date():  product_id: {0} date: {1} retval: {2}".format(product_id, date, ans) )
-        return ans
-
-
     def file_id_Clean(self, invals):
         """
-        given an input tuple (file_id, Version, product_id, utc_file_date) go through and clear out lower versions of the same files
-        this is determined by utc_file_date
+        given a list of file objects clean out older versions of matching files
+        matching is defined as same product_id and smae utc_file_date
+        
         """
         # TODO this might break with weekly input files
-        # build up a list of tuples file_id, product_id, utc_file_date, version
 
-        ## think here on better, but a dict makes for easy del
-        data2 = dict((x, (y1, y2, y3)) for x, y1, y2, y3 in invals)
+        prod_ids = set([v.product_id for v in invals])
+        utc_file_dates = set([v.utc_file_date for v in invals])
 
-        for k1, k2 in itertools.combinations(data2, 2):
-            ## TODO this can be done cleaner
-            try: # if the key is gone, move on
-                tmp = data2[k1]
-                tmp = data2[k2]
-            except KeyError:
-                continue
-            if data2[k1][1] != data2[k2][1]:   # not the same product
-                continue
-            if data2[k1][2] == data2[k2][2]: # same date
-                # drop the one with the lower version
-                if data2[k1][0] > data2[k2][0]:
-                    del data2[k2]
-                else:
-                    del data2[k1]
-        ## now we have a dict of just the unique files
-        ans = [(key, data2[key][0], data2[key][1], data2[key][2]) for key in data2]
+        ans = []
+        for p, u in itertools.product(prod_ids, utc_file_dates):
+            ans.append(max([v for v in invals if v.product_id == p and v.utc_file_date == u],
+                           key=lambda x: self.getVersion(x)))
         return ans
 
     def getInputProductID(self, process_id):
@@ -1584,14 +1539,16 @@ class DBUtils(object):
         """
         return the files in the db by product id that have data in the date specified
         """
+        if any([isinstance(v, datetime.datetime) for v in daterange]):
+            raise(ValueError("daterange must be datetime.date not datetime.datetime"))
+
+        sq = self.session.query(self.File).filter_by(product_id = product_id).\
+             filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
+
         if newest_version:
-            sq = self.session.query(self.File).filter_by(product_id = product_id).\
-                 filter(self.File.utc_start_time.between(daterange[0], daterange[1])).\
-                 filter_by(newest_version = True).all()
-        else:
-            sq = self.session.query(self.File).filter_by(product_id = product_id).\
-                 filter(self.File.utc_start_time.between(daterange[0], daterange[1])).all()
-        
+            # don't trust that the db has this correct
+            # get them all and file the newest
+            sq = self.file_id_Clean(sq)
         return sq
 
     def getFilesByProduct(self, prod_id, newest_version=False):
@@ -1922,6 +1879,8 @@ class DBUtils(object):
             vars = ['file', 'product', 'inspector', 'instrument',
                     'instrumentproductlink', 'satellite', 'mission']
 
+            in_id = self.getFileID(in_id)
+
             sq = (self.session.query(self.File, self.Product,
                                     self.Inspector, self.Instrument,
                                     self.Instrumentproductlink, self.Satellite,
@@ -1933,7 +1892,10 @@ class DBUtils(object):
                   .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
                   .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
-                  
+            
+            if not sq: # did not find a matchm this is a dberror
+                raise(DBError("file {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+            
             if len(sq) > 1:
                 raise(DBError("Found multiple tracebacks for file {0}".format(in_id)))
             for ii, v in enumerate(vars):
@@ -1942,6 +1904,8 @@ class DBUtils(object):
         elif table.capitalize() == 'Code':
             vars = ['code', 'process', 'product', 'instrument',
                     'instrumentproductlink', 'satellite', 'mission']
+
+            in_id = self.getCodeID(in_id)
 
             sq = (self.session.query(self.Code, self.Process,
                                      self.Product, self.Instrument,
@@ -1956,6 +1920,9 @@ class DBUtils(object):
                   .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
             
+            if not sq: # did not find a match this is a dberror
+                raise(DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+
             if len(sq) > 1:
                 raise(DBError("Found multiple tracebacks for code {0}".format(in_id)))
             for ii, v in enumerate(vars):
@@ -1970,6 +1937,8 @@ class DBUtils(object):
             vars = ['product', 'inspector', 'instrument',
                     'instrumentproductlink', 'satellite', 'mission']
 
+            in_id = self.getProductID(in_id)
+
             sq = (self.session.query(self.Product,
                                     self.Inspector, self.Instrument,
                                     self.Instrumentproductlink, self.Satellite,
@@ -1980,7 +1949,10 @@ class DBUtils(object):
                   .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
                   .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
-                  
+             
+            if not sq: # did not find a match this is a dberror
+                raise(DBError("product {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+                 
             if len(sq) > 1:
                 raise(DBError("Found multiple tracebacks for product {0}".format(in_id)))
             for ii, v in enumerate(vars):
@@ -1990,6 +1962,8 @@ class DBUtils(object):
 
             vars = ['process', 'product', 'instrument',
                     'instrumentproductlink', 'satellite', 'mission']
+
+            in_id = self.getProcessID(in_id)
 
             sq = (self.session.query(self.Process,
                                      self.Product, self.Instrument,
@@ -2002,6 +1976,9 @@ class DBUtils(object):
                   .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
                   .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+
+            if not sq: # did not find a match this is a dberror
+                raise(DBError("process {0} did not have a traceback, this is a problem, fix it".format(in_id)))
             
             if len(sq) > 1:
                 raise(DBError("Found multiple tracebacks for process {0}".format(in_id)))
@@ -2097,8 +2074,6 @@ class DBUtils(object):
                 cmd = 'get' + table + 'ID'
                 pk = getattr(self, cmd)(args[0])
                 retval = self.session.query(getattr(self, table)).get(pk)
-                if retval is None:
-                    raise(DBNoData('No entry {0} for table {1}'.format(args[0], table)))
         return retval
 
     def getFilesByCode(self, code_id, id_only=False):
@@ -2162,7 +2137,6 @@ class DBUtils(object):
         return Version.Version(fileid.interface_version,
                                fileid.quality_version,
                                fileid.revision_version)
-
 
     def _childTree(self, inprod):
         """
