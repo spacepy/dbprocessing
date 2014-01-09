@@ -549,7 +549,8 @@ class DBUtils(object):
         
         # speed this up using a sql in_ call not looping over getEntry for each one
         # this gets all the file objects for the processqueue file_ids
-        file_entries = self.session.query(self.File).filter(self.File.file_id.in_(file_ids)).all()
+        subq = self.session.query(self.Processqueue.file_id).subquery()
+        file_entries = self.session.query(self.File).filter(self.File.file_id.in_(subq)).all()
         newest = []
         for fe in file_entries:
             newest.extend([v.file_id for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date]*2, newest_version=True)])
@@ -1080,7 +1081,23 @@ class DBUtils(object):
         if inStr is None:
             return inStr
         repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
-        ftb = self.getTraceback('Product', product_id)
+
+        # are there any repalcements to do?  If not we are done
+        match = False
+        for r in repl:
+            if r in inStr:
+                match = True
+        if not match:
+            return inStr
+
+        try:
+            ftb = self.getTraceback('Product', product_id)
+        except DBError: # during the addFromConfig process the full traceback is not yet there
+            ftb = {}
+            # fill in as much as we can know manually
+            if '{PRODUCT}' in inStr :
+                ftb['product'] = self.getEntry('Product', product_id)
+
         if '{INSTRUMENT}' in inStr : # need to replace with the instrument name
             inStr = inStr.replace('{INSTRUMENT}', ftb['instrument'].instrument_name)
         if '{SATELLITE}' in inStr : # need to replace with the instrument name
