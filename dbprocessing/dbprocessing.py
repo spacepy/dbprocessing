@@ -160,7 +160,11 @@ class ProcessQueue(object):
         if not self.dryrun:
             dbf.move()
         # set files in the db of the same product and same utc_file_date to not be newest version
-        files = self.dbu.getFilesByProductDate(dbf.diskfile.params['product_id'], [dbf.diskfile.params['utc_file_date']]*2)
+        try:
+            files = self.dbu.getFilesByProductDate(dbf.diskfile.params['product_id'], [dbf.diskfile.params['utc_file_date'].date()]*2)
+        except AttributeError:
+            files = self.dbu.getFilesByProductDate(dbf.diskfile.params['product_id'], [dbf.diskfile.params['utc_file_date']]*2)
+
         if files:
             mx = max(files, key=lambda x: self.dbu.getVersion(x)) # max on version
         for f in files:
