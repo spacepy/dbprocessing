@@ -79,6 +79,9 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     # get rid of all the runme objects that are not runnable
     runme_list = [v for v in runme_list if v.ableToRun]
 
+    # sort the runme_list on level
+    runme_list = sorted(runme_list, key = lambda x: x.data_level)
+
     # found some cases where the same command line was in the list more than once based on
     #   more than one dependency in the process queue, go through and clean these out
     #outnames = [os.path.basename(v.filename) for v in runme_list]
@@ -102,7 +105,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     n_bad = 0 # number of processes failed
     
     #    while runme_list or processes:
-    while runme_list:
+    while runme_list or processes:
         while (len(processes) < MAX_PROC) and runme_list:
             runme = runme_list.pop(0) # pop from the list, it is sorted!!
             # belt and suspenders
@@ -127,63 +130,65 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
                 try:
                     fp = open(prob_name, 'w')
+                    fp.write(' '.join(runme.cmdline))
+                    fp.write('\n\n')
                 except IOError:
                     DBlogging.dblogger.error("Could not create the prob file, so skipped {0}".format(os.path.basename(' '.join(runme.cmdline))))
                     #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
                     continue
                 
                 processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
-                time.sleep(0.5)
+                time.sleep(1)
 
-        while processes:
-            for p in list(processes.keys()):
-                if p.poll() is None: # still running
-                    continue
-                rm, t, fp = processes[p]
-                if p.returncode != 0: # non zero return code FAILED
-                    DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
-                    fp.close()
-                    #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
-                    #rm.moveToError(os.path.join(rm.tempdir, fp.name))
-                    #rm.moveToError(fp.name)
-                    try:
-                        shutil.copy(fp.name, os.path.join('/n', 'space_data', 'cda', 'rbsp', 'errors', os.path.basename(fp.name)))
-                    except:
-                        print("%%%%%%%%%%%% could not find .prob file!!!:   {0}".format(fp.name))
-                    # assume the file is bad and move it to error
-                    # rm.moveToError(os.path.join(rm.tempdir, rm.filename))
-                    n_bad += 1
-                    ## delete the temp directory
-                    try:
-                        shutil.rmtree(rm.tempdir)
-                        DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))
-                    except OSError:
-                        DBlogging.dblogger.error("Error removing temp directory: {0}".format(rm.tempdir))
-                elif p.returncode == 0: # p.returncode == 0  SUCCESS
-                    # this is not a perfect time since all the adding occurs before the next poll
-                    DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
-                    print("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
-                    fp.close()
-                    try:
-                        rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
-                    except IOError:
-                        glb = glob.glob(os.path.join(rm.tempdir, rm.filename) + '*.png')
-                        if len(glb) == 1:
-                            rm.moveToIncoming(glb[0])
-                    shutil.rmtree(rm.tempdir)
-                    DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))                        
-                    rm._add_links(rm.cmdline)
-                    print("Process {0} FINISHED".format(' '.join(rm.cmdline)))
-                    n_good += 1
-                else:
-                    raise(ValueError("Should not have gotten here"))
-                # execution gets here iff the process finished
-                del processes[p]
+
+        for p in list(processes.keys()):
+            if p.poll() is None: # still running
+                continue
+            rm, t, fp = processes[p]
+            if p.returncode != 0: # non zero return code FAILED
+                DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
+                fp.close()
+                #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
+                #rm.moveToError(os.path.join(rm.tempdir, fp.name))
+                #rm.moveToError(fp.name)
                 try:
-                    rm_tempdir(rm.tempdir)
-                except Exception:
-                    pass
-            time.sleep(0.5)
+                    shutil.copy(fp.name, os.path.join('/n', 'space_data', 'cda', 'rbsp', 'errors', os.path.basename(fp.name)))
+                except:
+                    print("%%%%%%%%%%%% could not find .prob file!!!:   {0}".format(fp.name))
+                # assume the file is bad and move it to error
+                # rm.moveToError(os.path.join(rm.tempdir, rm.filename))
+                n_bad += 1
+                ## delete the temp directory
+                try:
+                    shutil.rmtree(rm.tempdir)
+                    DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))
+                except OSError:
+                    DBlogging.dblogger.error("Error removing temp directory: {0}".format(rm.tempdir))
+            elif p.returncode == 0: # p.returncode == 0  SUCCESS
+                # this is not a perfect time since all the adding occurs before the next poll
+                DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
+                print("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
+                fp.close()
+                try:
+                    rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
+                except IOError:
+                    glb = glob.glob(os.path.join(rm.tempdir, rm.filename) + '*.png')
+                    if len(glb) == 1:
+                        rm.moveToIncoming(glb[0])
+                shutil.rmtree(rm.tempdir)
+                DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))                        
+                rm._add_links(rm.cmdline)
+                print("Process {0} FINISHED".format(' '.join(rm.cmdline)))
+                n_good += 1
+            else:
+                raise(ValueError("Should not have gotten here"))
+            # execution gets here iff the process finished
+            del processes[p]
+            try:
+                rm_tempdir(rm.tempdir)
+            except Exception:
+                pass
+        time.sleep(0.5)
 
     return n_good, n_bad
 
