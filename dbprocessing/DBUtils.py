@@ -19,7 +19,7 @@ try: # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
 except ImportError:
     from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql.expression import asc
+from sqlalchemy.sql.expression import asc, desc
 from sqlalchemy import or_, and_
 
 from Diskfile import calcDigest, DigestError
@@ -508,23 +508,17 @@ class DBUtils(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        num = self.Processqueue.len()
-        if num == 0:
-            return None
-        elif index >= num:
-            return None
-        else:
-            for ii, fid in enumerate(self.session.query(self.Processqueue)):
-                if ii == index:
-                    if version_bump is not None:
-                        fid_ret = (fid.file_id, fid.version_bump)
-                    else:
-                        fid_ret = fid.file_id
-                    self.session.delete(fid)
-                    break # there can be only one
+        if index < 0:  # emable the python from the end indexing
+            index = self.Processqueue.len() + index
+
+        sq = self.session.query(self.Processqueue).offset(index).first()
+        if sq:
+            ans = (sq.file_id, sq.version_bump)
+            self.session.delete(sq)
             self._commitDB()
-            DBlogging.dblogger.debug( "File removed from process queue {0}:{1}".format(fid_ret, '---'))
-            return fid_ret
+        else:
+            ans = (sq, None) # sq is also None
+        return ans
 
     def _processqueueGet(self, index=0, version_bump=None):
         """

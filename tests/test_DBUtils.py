@@ -120,6 +120,21 @@ class ProcessqueueTests(unittest.TestCase):
         for v in [18,19,21]:
             self.assertTrue(v in pq)
 
+    def test_pq_pop_reverse(self):
+        """test self.Processqueue.pop with negative indices"""
+        self.add_files()
+        self.assertEqual(5, self.dbu.Processqueue.len())
+        self.dbu.Processqueue.pop(-1)
+        self.assertEqual(4, self.dbu.Processqueue.len())
+        pq = self.dbu.Processqueue.getAll()
+        for v in [17,18,19,20]:
+            self.assertTrue(v in pq)
+        self.dbu.Processqueue.pop(-2)
+        self.assertEqual(3, self.dbu.Processqueue.len())
+        pq = self.dbu.Processqueue.getAll()
+        for v in [17,18,20]:
+            self.assertTrue(v in pq)
+
     def test_pq_get(self):
         """test self.Processqueue.get"""
         self.add_files()
