@@ -508,19 +508,12 @@ class DBUtils(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        if index < 0:  # emable the python from the end indexing
-            index = self.Processqueue.len() + index
+        val = self._processqueueGet(index=index, version_bump=version_bump, instance=True)
+        self.session.delete(val)
+        self._commitDB()
+        return (val.file_id, val.version_bump)
 
-        sq = self.session.query(self.Processqueue).offset(index).first()
-        if sq:
-            ans = (sq.file_id, sq.version_bump)
-            self.session.delete(sq)
-            self._commitDB()
-        else:
-            ans = (sq, None) # sq is also None
-        return ans
-
-    def _processqueueGet(self, index=0, version_bump=None):
+    def _processqueueGet(self, index=0, version_bump=None, instance=False):
         """
         get the file at the head of the queue (from the left)
 
@@ -529,23 +522,15 @@ class DBUtils(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        num = self.Processqueue.len()
-        if num == 0:
-            DBlogging.dblogger.debug( "processqueueGet() returned: None (empty queue)")
-            return None
-        elif index >= num:
-            DBlogging.dblogger.debug( "processqueueGet() returned: None (requested index larger than size)")
-            return None
+        if index < 0:  # emable the python from the end indexing
+            index = self.Processqueue.len() + index
+
+        sq = self.session.query(self.Processqueue).offset(index).first()
+        if instance:
+            ans = sq
         else:
-            for ii, fid in enumerate(self.session.query(self.Processqueue)):
-                if ii == index:
-                    if version_bump is not None:
-                        fid_ret = (fid.file_id, fid.version_bump)
-                    else:
-                        fid_ret = fid.file_id
-                    break # there can be only one
-            DBlogging.dblogger.debug( "processqueueGet() returned: {0}".format(fid_ret) )
-            return fid_ret
+            ans = (sq.file_id, sq.version_bump)
+        return ans
 
     def _processqueueClean(self, dryrun=False):
         """

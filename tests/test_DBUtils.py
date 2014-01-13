@@ -139,9 +139,18 @@ class ProcessqueueTests(unittest.TestCase):
         """test self.Processqueue.get"""
         self.add_files()
         self.assertEqual(5, self.dbu.Processqueue.len())
-        self.assertEqual(17, self.dbu.Processqueue.get(0))
+        self.assertEqual((17, None), self.dbu.Processqueue.get(0))
         self.assertEqual(5, self.dbu.Processqueue.len())
-        self.assertEqual(19, self.dbu.Processqueue.get(2))
+        self.assertEqual((19, None), self.dbu.Processqueue.get(2))
+        self.assertEqual(5, self.dbu.Processqueue.len())
+
+    def test_pq_get_reverse(self):
+        """test self.Processqueue.get with negative indices"""
+        self.add_files()
+        self.assertEqual(5, self.dbu.Processqueue.len())
+        self.assertEqual((21, None), self.dbu.Processqueue.get(-1))
+        self.assertEqual(5, self.dbu.Processqueue.len())
+        self.assertEqual((20, None), self.dbu.Processqueue.get(-2))
         self.assertEqual(5, self.dbu.Processqueue.len())
 
     def test_pq_clean(self):
