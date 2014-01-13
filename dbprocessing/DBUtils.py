@@ -406,9 +406,6 @@ class DBUtils(object):
     def _processqueuePush(self, fileid, version_bump=None):
         """
         push a file onto the process queue (onto the right)
-        TODO: currenlty this make teh DB write after each file so that readding one that is
-        already there will not cause a crash of teh whole add.  This would probaby work well
-        with an "in" call
 
         Parameters
         ==========
@@ -420,24 +417,33 @@ class DBUtils(object):
         file_id : int
             the file_id that was passed in, but grabbed from the db
         """
-        if hasattr(fileid, '__iter__'):
-            ans = []
-            fileid = set(fileid)
-            for v in fileid:
-                ans.extend([self._processqueuePush(v, version_bump)])
-            return ans
-        fileid = self.getFileID(fileid)
-        pq1 = self.Processqueue()
-        pq1.file_id = fileid
-        if hasattr(version_bump, '__iter__'):
-            pq1.version_bump = version_bump[0]
-        else:
+        if not hasattr(fileid, '__iter__'):
+            fileid = [fileid]
+        # first filter() takes care of putting in values that are not in the DB.  It is silent
+        # second filter() takes care of not readding files that are alereadhy in the queue
+        subq = self.session.query(self.Processqueue.file_id).subquery()
+
+        fileid = (self.session.query(self.File.file_id)
+                  .filter(self.File.file_id.in_(fileid))
+                  .filter(~self.File.file_id.in_(subq)))
+
+        fileid = list(map(itemgetter(0), fileid)) # nested tuples to list
+
+        pq = set(self.Processqueue.getAll())
+        fileid = set(fileid).difference(pq)
+
+        outval = []
+        for f in fileid:
+            pq1 = self.Processqueue()
+            pq1.file_id = f
             pq1.version_bump = version_bump
-        self.session.add(pq1)
+            self.session.add(pq1)
+            outval.append(pq1.file_id)
         DBlogging.dblogger.debug( "File added to process queue {0}:{1}".format(fileid, '---'))
-        self._commitDB()
+        if fileid:
+            self._commitDB()
 #        pqid = self.session.query(self.Processqueue.file_id).all()
-        return pq1.file_id
+        return outval
 
     def _processqueueRawadd(self, fileid, version_bump=None):
         """
