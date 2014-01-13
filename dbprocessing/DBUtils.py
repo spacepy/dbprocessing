@@ -559,9 +559,9 @@ class DBUtils(object):
                 inds.append(file_ids.index(v.file_id))
                 file_entries2.append(v)
         version_bumps2 = [version_bumps[i] for i in inds]
-#==============================================================================
-#         # sort keep on dates, then sort keep on level
-#==============================================================================
+        #==============================================================================
+        #         # sort keep on dates, then sort keep on level
+        #==============================================================================
         # this should make them in order for each level
         file_entries2 = sorted(file_entries2, key=lambda x: x.utc_file_date, reverse=1)
         file_entries2 = sorted(file_entries2, key=lambda x: x.data_level)
