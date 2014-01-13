@@ -59,6 +59,15 @@ class ProcessqueueTests(unittest.TestCase):
 
     def add_files(self):
         self.dbu.Processqueue.push([17,18,19,20,21])
+
+    def test_pq_getall(self):
+        """test self.Processqueue.getAll"""
+        self.assertEqual(0, self.dbu.Processqueue.len())
+        self.add_files()
+        self.assertEqual(5, self.dbu.Processqueue.len())
+        self.assertEqual([17,18,19,20,21], self.dbu.Processqueue.getAll())
+        self.assertEqual(zip([17,18,19,20,21], [None]*5), self.dbu.Processqueue.getAll(version_bump=True))
+
     
     def test_pq_flush(self):
         """test self.Processqueue.flush"""
@@ -98,7 +107,6 @@ class ProcessqueueTests(unittest.TestCase):
         self.assertFalse(self.dbu.Processqueue.push(20))
         self.assertEqual([17,18,19,21], self.dbu.Processqueue.push([17,18,19,20,21]))
 
-    
     def test_pq_len(self):
         """test self.Processqueue.len"""
         self.assertEqual(0, self.dbu.Processqueue.len())
