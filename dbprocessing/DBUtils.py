@@ -369,15 +369,20 @@ class DBUtils(object):
     def _processqueueRemoveItem(self, item):
         """
         remove a file from the queue by name or number
-        TODO: this does a get all then orders them then removes one, this has to be doabing in sql
         """
-        item = self.getFileID(item)
-        contents = self.Processqueue.getAll()
-        try:
-            ind = contents.index(item)
-            self.Processqueue.pop(ind)
-        except ValueError:
-            raise(DBNoData("No Item ID={0} found".format(item)))
+        # if the input is a filename need to handle that
+        if not hasattr(item, '__iter__'): 
+            item = [item]
+        for ii, v in enumerate(item):
+            try:
+                int(v)
+            except ValueError: # it was name
+                item[ii] = self.getFileID(v)
+        sq = self.session.query(self.Processqueue).filter(self.Processqueue.file_id.in_(item))
+        for v in sq:
+            self.session.delete(v)
+        if sq:
+            self._commitDB()
 
     def _processqueueGetAll(self, version_bump=None):
         """
@@ -433,14 +438,16 @@ class DBUtils(object):
         fileid = set(fileid).difference(pq)
 
         outval = []
+        objs = []
         for f in fileid:
             pq1 = self.Processqueue()
             pq1.file_id = f
             pq1.version_bump = version_bump
-            self.session.add(pq1)
+            objs.append(pq1)
             outval.append(pq1.file_id)
         DBlogging.dblogger.debug( "File added to process queue {0}:{1}".format(fileid, '---'))
         if fileid:
+            self.session.add_all(objs)
             self._commitDB()
 #        pqid = self.session.query(self.Processqueue.file_id).all()
         return outval

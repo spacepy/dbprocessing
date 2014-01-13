@@ -76,6 +76,14 @@ class ProcessqueueTests(unittest.TestCase):
         pq = self.dbu.Processqueue.getAll()
         for v in [17,18,19,21]:
             self.assertTrue(v in pq)
+        self.dbu.Processqueue.remove([17,18])
+        self.assertEqual(2, self.dbu.Processqueue.len())
+        pq = self.dbu.Processqueue.getAll()
+        for v in [19,21]:
+            self.assertTrue(v in pq)
+        self.dbu.Processqueue.remove('ect_rbspb_0377_381_03.ptp.gz')
+        self.assertEqual(1, self.dbu.Processqueue.len())
+        self.assertEqual([21],  self.dbu.Processqueue.getAll())
 
     def test_pq_push(self):
         """test self.Processqueue.push"""
