@@ -358,6 +358,7 @@ class DBUtils(object):
     def _processqueueFlush(self):
         """
         remove everything from the process queue
+        This is as optimized as it can be
         """
         length = self.Processqueue.len()
         self.session.query(self.Processqueue).delete()
@@ -368,6 +369,7 @@ class DBUtils(object):
     def _processqueueRemoveItem(self, item):
         """
         remove a file from the queue by name or number
+        TODO: this does a get all then orders them then removes one, this has to be doabing in sql
         """
         item = self.getFileID(item)
         contents = self.Processqueue.getAll()
@@ -404,6 +406,9 @@ class DBUtils(object):
     def _processqueuePush(self, fileid, version_bump=None):
         """
         push a file onto the process queue (onto the right)
+        TODO: currenlty this make teh DB write after each file so that readding one that is
+        already there will not cause a crash of teh whole add.  This would probaby work well
+        with an "in" call
 
         Parameters
         ==========
