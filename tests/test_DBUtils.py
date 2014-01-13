@@ -85,6 +85,11 @@ class ProcessqueueTests(unittest.TestCase):
         self.assertEqual(1, self.dbu.Processqueue.len())
         pq = self.dbu.Processqueue.getAll()
         self.assertTrue(20 in pq)
+        # push a value that is not there
+        self.assertFalse(self.dbu.Processqueue.push(214442))
+        self.assertFalse(self.dbu.Processqueue.push(20))
+        self.assertEqual([17,18,19,21], self.dbu.Processqueue.push([17,18,19,20,21]))
+
     
     def test_pq_len(self):
         """test self.Processqueue.len"""
