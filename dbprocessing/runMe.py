@@ -4,6 +4,7 @@ Created on Tue Oct 23 10:12:11 2012
 
 @author: balarsen
 """
+from collections import namedtuple
 import glob
 from operator import itemgetter
 import os
@@ -20,6 +21,11 @@ import Version
 
 from Utils import strargs_to_args
 
+runObj = namedtuple('runObj', 'runme time probfile')
+"""
+used in _start_a_run() and runner() to hold the runme object that is running, 
+the time it started, and the probfile pointer
+"""
 
 class ProcessException(Exception):
     """Class for errors in running processes"""
@@ -42,6 +48,81 @@ def rm_tempdir(tempdir):
     shutil.rmtree(tempdir)
     tempdir = None
     DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
+
+
+def _extract_files(cmdline):
+    """
+    given a command line extract out the files that are input to the process
+    """
+    # is the input a list, if so make it a string
+    if hasattr(cmdline, '__iter__'):
+        cmdline = ' '.join(cmdline)
+    files = []
+    # the first argument of of course the code grab it and put it in
+    splits = cmdline.split()
+    files.append(os.path.abspath(splits[0]))
+    splits = splits[1:] # drop the one we used
+    # the last argument is the output file, it will not exist, drop it
+    splits = splits[:-1]
+    # loop over what is left and see if it looks like a file or an option
+    for s in splits:
+        # a long option will need another split
+        if s.startswith('--'):
+            tmp = s.split('=')
+            if os.path.sep in tmp[-1]: # this looks like a file
+                files.append(tmp[-1])
+        else:
+            if os.path.sep in s: # this looks like a file
+                files.append(s)
+    return files
+
+def _pokeFile(filename):
+    """
+    given a filename open it nonblocking and see if it works
+    """
+    try:
+        fp = os.open(filename, os.O_NONBLOCK, os.O_RDONLY)
+    except OSError: 
+        return 'NOFILE'
+    except Exception:
+        return 'OTHER'
+    if fp: # this means it opened
+        os.close(fp)
+        return 'FILE'
+    else:
+        os.close(fp)
+        return 'ERROR'
+
+def _start_a_run(runme):
+    """
+    given a runme that we want to start poke the all teh files to be sure the automunter has them all up
+
+    intermediate steps:
+    1) need to extract all the files that will be used for the process and poke them all
+       with a os.open with non-blocking.  This will make sure the automounter has seen attempts
+       on them all
+    2) Then if the open works close it and move all.  If it fails, note that and move on.
+    3) Start the process after all opened and closed
+    """
+    # processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
+    files2poke = _extract_files(runme.cmdline)
+    for f in files2poke:
+        ans = _pokeFile(f)
+        if ans is 'NOFILE':
+            DBlogging.dblogger.error("Command line referenced a file that did not exist {0}.  {1}"
+                                     .format(f, runme.cmdline))
+        elif ans is 'OTHER':
+            DBlogging.dblogger.error("Command line referenced a file that did 'other' {0}.  {1}"
+                                     .format(f, runme.cmdline))
+        elif ans is 'ERROR':
+            DBlogging.dblogger.error("Command line referenced a file that did not open {0}.  {1}"
+                                     .format(f, runme.cmdline))
+        elif ans is 'FILE':
+            DBlogging.dblogger.debug("Command line referenced a file opened fine {0}.  {1}"
+                                     .format(f, runme.cmdline))
+        else:
+            print("Count not have gotten here")
+            raise(RuntimeError("Should not have gotten here"))
 
 
 def runner(runme_list, dbu, MAX_PROC = 2):
@@ -136,7 +217,9 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                     DBlogging.dblogger.error("Could not create the prob file, so skipped {0}".format(os.path.basename(' '.join(runme.cmdline))))
                     #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
                     continue
-                
+
+                #def _start_a_run(rumne, processes, probfile):
+                _start_a_run(runme)
                 processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
                 time.sleep(1)
 
@@ -144,7 +227,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
         for p in list(processes.keys()):
             if p.poll() is None: # still running
                 continue
-            rm, t, fp = processes[p]
+            rm, t, fp = processes[p] # unpack the tuple
             if p.returncode != 0: # non zero return code FAILED
                 DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
                 fp.close()
