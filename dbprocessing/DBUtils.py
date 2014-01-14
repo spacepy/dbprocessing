@@ -17,8 +17,10 @@ from sqlalchemy.orm import mapper
 from sqlalchemy.orm import sessionmaker
 try: # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
+    from sqlalchemy.orm.exceptions import NoResultFound
 except ImportError:
     from sqlalchemy.exc import IntegrityError
+    from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import asc, desc
 from sqlalchemy import or_, and_
 
@@ -194,12 +196,6 @@ class DBUtils(object):
 #####################################
 ####  Do processing and input to DB
 #####################################
-
-
-
-
-
-
 
     def _currentlyProcessing(self):
         """
@@ -1327,9 +1323,8 @@ class DBUtils(object):
         (name or id is based on type)
 
         """
-        file_entry = self.getEntry('File', filename)
-        # need to know file product and mission to get whole path
-        ftb = self.getTraceback('File', file_entry.file_id)
+        ftb = self.getTraceback('File', filename)
+        file_entry = ftb['file']
         rel_path = ftb['product'].relative_path
         if rel_path is None:
             raise(DBError("product {0} does not have a relative_path set, fix the DB".format(ftb['product'].product_id)))
@@ -1339,7 +1334,7 @@ class DBUtils(object):
                 raise(KeyError())
         except KeyError:
             raise(DBError("Mission {0} root directory not set, fix the DB".format(ftb['mission'].mission_id)))
-        # perform anu required subitutions
+        # perform any required subitutions
         path = os.path.join(root_dir, rel_path, file_entry.filename)
         path = Utils.dirSubs(path,
                              file_entry.filename,
@@ -1367,7 +1362,6 @@ class DBUtils(object):
         p_id = self.getProductID(outProd)
         sq1 = self.session.query(self.Process).filter_by(output_product = p_id).all()  # should only have one value
         if not sq1:
-            print('No Process has Product {0} as an output'.format(p_id))
             DBlogging.dblogger.info('No Process has Product {0} as an output'.format(p_id))
             return None
         return sq1[0].process_id
@@ -1385,18 +1379,12 @@ class DBUtils(object):
         """
         try:
            proc_id = long(proc_name)
-           self.session.query(self.Process).get(proc_id)
+           proc_name = self.session.query(self.Process).get(proc_id)
+           if proc_name is None:
+               raise(NoResultFound('No row was found for id={0}'.format(proc_id)))
         except ValueError: # it is not a number
-            proc_id = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).all()[0][0]
+            proc_id = self.session.query(self.Process.process_id).filter_by(process_name = proc_name).one()[0]
         return proc_id
-
-    def getFileMission(self, filename):
-        """
-        given an a file name or a file ID return the mission(s) that file is
-        associated with
-        """
-        tb = self.getTraceback('File', filename)
-        return tb['mission']
 
     def getSatelliteMission(self, sat_name):
         """
@@ -1405,17 +1393,6 @@ class DBUtils(object):
         s_id = self.getSatelliteID(sat_name) # is a name
         m_id = self.getEntry('Satellite', s_id).mission_id
         return self.getEntry('Mission', m_id)
-
-    def getInstrumentFromProduct(self, product_id):
-        """
-        given a product ID get the instrument(s) id associated with it
-        """
-        sq = self.session.query(self.Instrumentproductlink.instrument_id).filter_by(product_id = product_id).all()
-        inst_id = [v[0] for v in sq]
-        if len(inst_id) == 1: # it should
-            return inst_id[0]
-        else:
-            return inst_id
 
     def getInstrumentID(self, name, satellite_id=None):
         """
@@ -1437,9 +1414,11 @@ class DBUtils(object):
             if len(sq) > 1:
                 if satellite_id is None:
                     raise(ValueError('Non unique instrument name and no satellite specified'))
+                sat_id = self.getSatelliteID(satellite_id)
                 for v in sq:
-                    if v.satellite_id == satellite_id:
+                    if v.satellite_id == sat_id:
                         return v.instrument_id
+                raise(ValueError("No matching instrument, satellite found. {0}:{1}".format(name, satellite_id)))
             return sq[0].instrument_id
 
     def getMissions(self):
@@ -1504,7 +1483,7 @@ class DBUtils(object):
             sq = self.session.query(self.Code.code_id).filter_by(filename = codename).all()
             if len(sq) == 0:
                 raise(DBNoData("No code name {0} found in the DB".format(codename)))
-            c_id = sq[0].code_id
+            c_id = list(map(itemgetter(0), sq))
         return c_id
 
     def getFileDates(self, file_id):
@@ -1662,14 +1641,13 @@ class DBUtils(object):
             return s_id
         try:
             sat_id = long(sat_name)
-            sq = self.session.query(self.Satellite).get(sat_id)
-            return sq.satellite_id
+            sq = self.session.query(self.Satellite.satellite_id).get(sat_id)
+            if sq is None:
+                raise(NoResultFound("No satellite id={0} found".format(sat_id)))
+            return sq[0]
         except ValueError: # it was a name
-            sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).all()
-        try:
-            return sq[0].satellite_id  # there can be only one of each name
-        except IndexError:
-            raise(DBNoData("No satellite %s found in the DB" % (sat_name)))
+            sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).one()
+            return sq.satellite_id  # there can be only one of each name
 
     def getCodePath(self, code_id):
         """
