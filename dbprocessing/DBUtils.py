@@ -1561,23 +1561,24 @@ class DBUtils(object):
         """
         given an instrument_if return all the file instances associated with it
         """
-        prod_ids = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id=inst_id).all()
-        prod_ids = list(map(itemgetter(0), prod_ids))
-        prods_to_use = []
-        if level is not None: # filter only on the level we want
-            for p in prod_ids:
-                tmp = self.getEntry('Product', p)
-                if tmp.level == level:
-                    prods_to_use.append(p)
-        else:
-            prods_to_use = list(prod_ids)
-        ans = []
-        for p in prods_to_use:
-            ans.extend(self.getFilesByProduct(p))
+        inst_id = self.getInstrumentID(inst_id) # name or number
+        if level is None:
+            files = (self.session.query(self.File)
+                     .join( (self.Product, self.Product.product_id == self.File.product_id) )
+                     .join( (self.Instrumentproductlink, self.Instrumentproductlink.product_id == self.Product.product_id) )
+                     .join( (self.Instrument, self.Instrument.instrument_id == self.Instrumentproductlink.instrument_id) )
+                     .filter(self.Instrument.instrument_id == 1).all())
+        else:   
+            files = (self.session.query(self.File).filter(self.File.data_level==level)
+                     .join( (self.Product, self.Product.product_id == self.File.product_id) )
+                     .join( (self.Instrumentproductlink, self.Instrumentproductlink.product_id == self.Product.product_id) )
+                     .join( (self.Instrument, self.Instrument.instrument_id == self.Instrumentproductlink.instrument_id) )
+                     .filter(self.Instrument.instrument_id == 1).all())
+            
         if id_only:
-            return [v.file_id for v in ans]
+            return [v.file_id for v in files]
         else:
-            return ans
+            return files
 
     def getActiveInspectors(self):
         """

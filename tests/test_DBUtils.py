@@ -214,6 +214,39 @@ class DBUtilsGetTests(unittest.TestCase):
         self.assertEqual(1, len(val))
         self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], [v.filename for v in val] )
 
+    def test_getFilesByProduct(self):
+        """getFilesByProduct"""
+        self.assertFalse(self.dbu.getFilesByProduct(2))
+        self.assertEqual([], self.dbu.getFilesByProduct(2))
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilesByProduct, 343423)
+        val = self.dbu.getFilesByProduct(1)
+        self.assertEqual(30, len(val))
+        val = self.dbu.getFilesByProduct(187)
+        self.assertEqual(90, len(val))
+        val = self.dbu.getFilesByProduct(187, newest_version=True)
+        self.assertEqual(24, len(val))
+        filenames = [v.filename for v in self.dbu.getFilesByProduct(187, newest_version=True)]
+        self.assertTrue('ect_rbspb_0380_381_02.ptp.gz' in filenames)
+        
+    def test_getFilesByInstrument(self):
+        """getFilesByInstrument"""
+        files = self.dbu.getFilesByInstrument(1)
+        self.assertEqual(3220, len(files))
+        filenames = [v.filename for v in files]
+        self.assertTrue('rbsp-a_magnetometer_uvw_emfisis-Quick-Look_20130909_v1.3.1.cdf' in
+                        filenames)
+        files = self.dbu.getFilesByInstrument(1, id_only=True)
+        self.assertEqual(3220, len(files))
+        self.assertTrue(582 in files)
+        files = self.dbu.getFilesByInstrument(1, id_only=True, level=2)
+        self.assertEqual(94, len(files))
+        self.assertTrue(5880 in files)
+        self.assertFalse(self.dbu.getFilesByInstrument(1, id_only=True, level=6))
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilesByInstrument, 'badval')
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilesByInstrument, 100)
+        ids = [int(v) for v in files]
+
+
 
 class ProcessqueueTests(unittest.TestCase):
     """Test all the processqueue functionality"""
