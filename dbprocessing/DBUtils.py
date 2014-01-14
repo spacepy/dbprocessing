@@ -1,3 +1,4 @@
+from collections import namedtuple
 import datetime
 import glob
 import itertools
@@ -1584,9 +1585,10 @@ class DBUtils(object):
         """
         query the db and return a list of all the active inspector file names [(filename, arguments, product), ...]
         """
+        activeInspector = namedtuple('activeInspector', 'path arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
         basedir = self.getMissionDirectory()
-        retval = [(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments, ans.product) for ans in sq]
+        retval = [activeInspector(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments, ans.product) for ans in sq]
         return retval
 
     def getChildrenProducts(self, file_id):
@@ -1664,12 +1666,8 @@ class DBUtils(object):
         """
         Given a code_id the code version
         """
-        DBlogging.dblogger.debug("Entered getCodeVersion: {0}".format(code_id))
-        sq =  self.session.query(self.Code.interface_version, self.Code.quality_version, self.Code.revision_version).filter_by(code_id = code_id)  # should only have one value
-        try:
-            return Version.Version(*sq[0])
-        except IndexError:
-            raise(DBNoData("No code number {0} in the db".format(code_id)))
+        code = self.getEntry('Code', code_id)
+        return Version.Version(code.interface_version, code.quality_version, code.revision_version)
 
     def getCodeFromProcess(self, proc_id, utc_file_date):
         """
@@ -1682,9 +1680,10 @@ class DBUtils(object):
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess: {0}".format(proc_id))
         # will have as many values as there are codes for a process
-        sq = self.session.query(self.Code.code_id).filter_by(process_id = proc_id).filter_by(newest_version = True).\
-             filter_by(active_code = True).filter(self.Code.code_start_date <= utc_file_date).\
-             filter(self.Code.code_stop_date >= utc_file_date)
+        sq = (self.session.query(self.Code.code_id).filter_by(process_id = proc_id)
+              .filter_by(newest_version = True)
+              .filter_by(active_code = True).filter(self.Code.code_start_date <= utc_file_date)
+              .filter(self.Code.code_stop_date >= utc_file_date))
         if sq.count() == 0:
             return None
         elif sq.count() > 1:
@@ -1781,30 +1780,15 @@ class DBUtils(object):
             m_id = sq[0].mission_id
         return m_id
 
-    def getNewestFiles(self, product=None, instrument=None):
-        """
-        for the current mission get a tuple of all file ids that are marked newest version
-        """
-        if product is None:
-            sq = self.session.query(self.File.file_id).filter_by(newest_version = True).all()
-        else:
-            sq = self.session.query(self.File.file_id).filter_by(newest_version = True).filter_by(product = product).all()
-        sq = list(map(itemgetter(0), sq))
-        if instrument is not None:
-            ans = []
-            for s in sq:
-                ptb = self.getTraceback('Product', self.getEntry('File', s).product_id)
-                tmp = ptb['instrument'].instrument_name
-                if tmp == self.getEntry('Instrument', tmp).instrument_name:
-                    ans.append(tmp)
-            sq = ans
-        return sq
-
     def tag_release(self, rel_num):
         """
         tag all the newest versions of files to a release number (integer)
         """
-        newest_files = self.getNewestFiles()
+        newest_files = []
+        prod_ids = [v.product_id for v in self.getAllProducts()]
+        for prod in prods:
+            newest_files.extend(self.getFilesByProduct(prod_ids, newest_version=True))
+
         for f in newest_files:
             self.addRelease(f, rel_num, commit=False)
         self._commitDB()

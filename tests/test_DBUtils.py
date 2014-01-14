@@ -246,6 +246,94 @@ class DBUtilsGetTests(unittest.TestCase):
         self.assertRaises(DBUtils.DBNoData, self.dbu.getFilesByInstrument, 100)
         ids = [int(v) for v in files]
 
+    def test_getActiveInspectors(self):
+        """getActiveInspectors"""
+        val = self.dbu.getActiveInspectors()
+        self.assertEqual(190, len(val))
+        v2 = set([v[0] for v in val])
+        ans = set([u'/n/space_data/cda/rbsp/codes/inspectors/ect_L05_V1.0.0.py',
+                   u'/n/space_data/cda/rbsp/codes/inspectors/ect_L0_V1.0.0.py',
+                   u'/n/space_data/cda/rbsp/codes/inspectors/ect_L1_V1.0.0.py',
+                   u'/n/space_data/cda/rbsp/codes/inspectors/ect_L2_V1.0.0.py',
+                   u'/n/space_data/cda/rbsp/codes/inspectors/emfisis_V1.0.0.py',
+                   u'/n/space_data/cda/rbsp/codes/inspectors/rbsp_pre_MagEphem_insp.py'])
+        self.assertEqual(ans, v2)
+        v3 = set([v[-1] for v in val])
+        self.assertEqual(set(range(1, 191)), v3)
+
+    def test_getChildrenProducts(self):
+        """getChildrenProducts"""
+        self.assertEqual([35, 38, 39, 46, 47, 51, 52, 59, 61], 
+                         self.dbu.getChildrenProducts(1))
+        self.assertEqual([44], self.dbu.getChildrenProducts(123))        
+        self.assertFalse(self.dbu.getChildrenProducts(5998))
+        self.assertEqual([], self.dbu.getChildrenProducts(5998))
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getChildrenProducts, 59498)
+
+    def test_getProductID(self):
+        """getProductID"""
+        self.assertEqual(1, self.dbu.getProductID(1))
+        self.assertEqual(2, self.dbu.getProductID(2))
+        self.assertEqual(163, self.dbu.getProductID('rbspb_mageis-M75-sp-hg-L0'))
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getProductID, 'badval')
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getProductID, 343423)
+        
+    def test_getSatelliteID(self):
+        """getSatelliteID"""
+        self.assertEqual(1, self.dbu.getSatelliteID(1))
+        self.assertEqual(2, self.dbu.getSatelliteID(2))
+        self.assertEqual(1, self.dbu.getSatelliteID('rbspa'))
+        self.assertEqual(2, self.dbu.getSatelliteID('rbspb'))
+        self.assertRaises(NoResultFound, self.dbu.getSatelliteID, 'badval')
+        self.assertRaises(NoResultFound, self.dbu.getSatelliteID, 343423)
+        
+    def test_getCodePath(self):
+        """getCodePath"""
+        self.assertEqual('/n/space_data/cda/rbsp/codes/l05_to_l1.py',
+                         self.dbu.getCodePath(1))
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodePath, 'badval')
+
+    def test_getCodeVersion(self):
+        """getCodeVersion"""
+        self.assertEqual(Version.Version(3,0,0), self.dbu.getCodeVersion(1))
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodeVersion, 'badval')
+        
+    def test_getCodeFromProcess(self):
+        """getCodeFromProcess"""
+        self.assertEqual(1, self.dbu.getCodeFromProcess(1, datetime.date(2013, 9, 10)))
+        self.assertFalse(self.dbu.getCodeFromProcess(1, datetime.date(1900, 9, 11)))
+        self.assertTrue(self.dbu.getCodeFromProcess(1, datetime.date(1900, 9, 11)) is None)
+
+    def test_getMissionDirectory(self):
+        """getMissionDirectory"""
+        self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory(1))
+        self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory())
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getMissionDirectory, 3)
+
+    def test_getIncomingPath(self):
+        """getIncomingPath"""
+        self.assertEqual('/n/space_data/cda/rbsp/mageis_incoming', self.dbu.getIncomingPath(1))
+        self.assertEqual('/n/space_data/cda/rbsp/mageis_incoming', self.dbu.getIncomingPath())
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getIncomingPath, 3)
+                        
+    def test_getErrorPath(self):
+        """getErrorPath"""
+        self.assertEqual('/n/space_data/cda/rbsp/errors/', self.dbu.getErrorPath())
+        self.assertRaises(TypeError, self.dbu.getErrorPath, 3)
+
+    def test_getFilecodelink_byfile(self):
+        """getFilecodelink_byfile"""
+        self.assertEqual(26, self.dbu.getFilecodelink_byfile(5974))
+        self.assertFalse(self.dbu.getFilecodelink_byfile(1))
+        self.assertTrue(self.dbu.getFilecodelink_byfile(1) is None)
+
+    def test_getMissionID(self):
+        """getMissionID"""
+        self.assertEqual(1, self.dbu.getMissionID(1))
+        self.assertEqual(1, self.dbu.getMissionID('rbsp'))
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getMissionID, 'badval')
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getMissionID, 343423)
+                     
 
 
 class ProcessqueueTests(unittest.TestCase):
