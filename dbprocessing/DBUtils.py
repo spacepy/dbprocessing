@@ -178,18 +178,13 @@ class DBUtils(object):
 ##         pass
 ##     missions = Table('missions', metadata, autoload=True)
 ##     mapper(Missions, missions)
-#        try:
         for val in table_dict:
             if verbose: print val
             if not hasattr(self, val):  # then make it
-                c1 = compile("""class %s(object):\n\tpass""" % (val), '', 'exec')
-                c2 = compile("%s = Table('%s', self.metadata, autoload=True)" % (str(table_dict[val]), table_dict[val]) , '', 'exec')
-                c3 = compile("mapper(%s, %s)" % (val, str(table_dict[val])), '', 'exec')
-                c4 = compile("self.%s = %s" % (val, val), '', 'exec' )
-                exec(c1)
-                exec(c2)
-                exec(c3)
-                exec(c4)
+                myclass = type(str(val), (object,), dict())
+                tableobj = Table(table_dict[val], self.metadata, autoload=True)
+                mapper(myclass, tableobj)
+                setattr(self, str(val), myclass)
                 if verbose: print("Class %s created" % (val))
                 if verbose: DBlogging.dblogger.debug("Class %s created" % (val))
 
