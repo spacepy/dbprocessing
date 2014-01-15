@@ -113,6 +113,12 @@ class DBUtils(object):
         self.Processqueue.clean = self._processqueueClean
         self.Processqueue.rawadd = self._processqueueRawadd
 
+        # TODO to do thus cleaner and allow for [] to work on the classes
+        # ...info here...
+        # metaclass that is dbutils aware
+        # get __getitem__ to be a class mo
+
+
 ####################################
 ###### DB and Tables ###############
 ####################################
