@@ -86,11 +86,11 @@ def _pokeFile(filename):
         return 'NOFILE'
     except Exception:
         return 'OTHER'
-    if fp: # this means it opened
+    if fp>0: # this means it opened
         os.close(fp)
         return 'FILE'
-    else:
-        os.close(fp)
+    else: # was never opened so doesn't need to be closed
+        #os.close(fp)
         return 'ERROR'
 
 def _start_a_run(runme):
