@@ -23,6 +23,7 @@ except ImportError:
     from sqlalchemy.exc import IntegrityError
     from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import asc, desc
+from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 
 from Diskfile import calcDigest, DigestError
@@ -1503,20 +1504,12 @@ class DBUtils(object):
     def file_id_Clean(self, invals):
         """
         given a list of file objects clean out older versions of matching files
-        matching is defined as same product_id and smae utc_file_date
-        
+        matching is defined as same product_id and smae utc_file_date      
         """
-        # TODO this might break with weekly input files
-
-        prod_ids = set([v.product_id for v in invals])
-        utc_file_dates = set([v.utc_file_date for v in invals])
-
-        ans = []
-        for p, u in itertools.product(prod_ids, utc_file_dates):
-            ans.append(max([v for v in invals if v.product_id == p and v.utc_file_date == u],
-                           key=lambda x: self.getVersion(x)))
-        return ans
-
+        newest = set((v.file_id for fe in invals
+                      for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date]*2, newest_version=True)))
+        return list(newest.intersection(invals))
+        
     def getInputProductID(self, process_id):
         """
         Return the fileID for the input filename
@@ -1537,13 +1530,21 @@ class DBUtils(object):
         if any([isinstance(v, datetime.datetime) for v in daterange]):
             raise(ValueError("daterange must be datetime.date not datetime.datetime"))
 
-        sq = self.session.query(self.File).filter_by(product_id = product_id).\
-             filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
-
         if newest_version:
             # don't trust that the db has this correct
-            # get them all and file the newest
-            sq = self.file_id_Clean(sq)
+           sq = (self.session.query(self.File, 
+           func.max(self.File.interface_version*1000 
+                    + self.File.quality_version*100 
+                    + self.File.revision_version))
+            .filter(self.File.product_id==product_id)
+            .filter(self.File.utc_file_date.between(*daterange))
+            .group_by(self.File.utc_file_date).all())
+           sq = list(map(itemgetter(0), sq))
+           
+        else: 
+            sq = self.session.query(self.File).filter_by(product_id = product_id).\
+              filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
+           
         return sq
 
     def getFilesByProduct(self, prod_id, newest_version=False):
@@ -1564,23 +1565,23 @@ class DBUtils(object):
         given an instrument_if return all the file instances associated with it
         """
         inst_id = self.getInstrumentID(inst_id) # name or number
+        subq = (self.session.query(self.Instrumentproductlink.product_id)
+                .filter(self.Instrumentproductlink.instrument_id == inst_id).subquery())
+
+        getme = (self.File.file_id if id_only else self.File)
+        
         if level is None:
-            files = (self.session.query(self.File)
-                     .join( (self.Product, self.Product.product_id == self.File.product_id) )
-                     .join( (self.Instrumentproductlink, self.Instrumentproductlink.product_id == self.Product.product_id) )
-                     .join( (self.Instrument, self.Instrument.instrument_id == self.Instrumentproductlink.instrument_id) )
-                     .filter(self.Instrument.instrument_id == 1).all())
+            files = (self.session.query(getme)
+                     .filter(self.File.product_id.in_(subq))
+                     .all())
         else:   
-            files = (self.session.query(self.File).filter(self.File.data_level==level)
-                     .join( (self.Product, self.Product.product_id == self.File.product_id) )
-                     .join( (self.Instrumentproductlink, self.Instrumentproductlink.product_id == self.Product.product_id) )
-                     .join( (self.Instrument, self.Instrument.instrument_id == self.Instrumentproductlink.instrument_id) )
-                     .filter(self.Instrument.instrument_id == 1).all())
-            
+            files = (self.session.query(getme)
+                     .filter(self.File.data_level==level)
+                     .filter(self.File.product_id.in_(subq))
+                     .all())
         if id_only:
-            return [v.file_id for v in files]
-        else:
-            return files
+            files = list(map(itemgetter(0), files))
+        return files
 
     def getActiveInspectors(self):
         """
@@ -1645,10 +1646,10 @@ class DBUtils(object):
             return s_id
         try:
             sat_id = long(sat_name)
-            sq = self.session.query(self.Satellite.satellite_id).get(sat_id)
+            sq = self.session.query(self.Satellite).get(sat_id)
             if sq is None:
                 raise(NoResultFound("No satellite id={0} found".format(sat_id)))
-            return sq[0]
+            return sq.satellite_id
         except ValueError: # it was a name
             sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).one()
             return sq.satellite_id  # there can be only one of each name
@@ -1851,7 +1852,7 @@ class DBUtils(object):
         master routine for all te getXXXTraceback functions, this will make for less code
 
         this is some large select statements with joins in them, these are tested and do work
-        """
+        """       
         retval = {}
         if table.capitalize() == 'File':
             vars = ['file', 'product', 'inspector', 'instrument',

@@ -24,12 +24,12 @@ from dbprocessing import Version
 __version__ = '2.0.3'
 
 
-
-class DBUtilsGetTests(unittest.TestCase):
-    """Tests for database gets through DBUtils"""
-
+class TestSetup(unittest.TestCase):
+    """
+    master class for the setup and teardown
+    """
     def setUp(self):
-        super(DBUtilsGetTests, self).setUp()
+        super(TestSetup, self).setUp()
         sqpath = os.path.join(os.path.dirname(__file__), 'RBSP_MAGEIS.sqlite')
         self.sqlworking = sqpath.replace('RBSP_MAGEIS.sqlite', 'working.sqlite')
         shutil.copy(sqpath, self.sqlworking)
@@ -37,11 +37,14 @@ class DBUtilsGetTests(unittest.TestCase):
         self.dbu = DBUtils.DBUtils(self.sqlworking)
 
     def tearDown(self):
-        super(DBUtilsGetTests, self).tearDown()
+        super(TestSetup, self).tearDown()
         self.dbu._closeDB()
         del self.dbu
         os.remove(self.sqlworking)
 
+    
+class DBUtilsGetTests(TestSetup):
+    """Tests for database gets through DBUtils"""
     def test_init(self):
         """__init__ has an exception to test"""
         self.assertRaises(DBUtils.DBError, DBUtils.DBUtils, None)
@@ -99,7 +102,7 @@ class DBUtilsGetTests(unittest.TestCase):
         """getAllFileIds"""
         files = self.dbu.getAllFileIds()
         self.assertEqual(6681, len(files))
-        self.assertEqual(range(1, 6682), files)
+        self.assertEqual(range(1, 6682), sorted(files))
 
     def test_getFileFullPath(self):
         """getFileFullPath"""
@@ -238,6 +241,8 @@ class DBUtilsGetTests(unittest.TestCase):
         files = self.dbu.getFilesByInstrument(1, id_only=True)
         self.assertEqual(3220, len(files))
         self.assertTrue(582 in files)
+        files = self.dbu.getFilesByInstrument(2, id_only=True)
+        self.assertEqual(3461, len(files))
         files = self.dbu.getFilesByInstrument(1, id_only=True, level=2)
         self.assertEqual(94, len(files))
         self.assertTrue(5880 in files)
@@ -336,23 +341,8 @@ class DBUtilsGetTests(unittest.TestCase):
                      
 
 
-class ProcessqueueTests(unittest.TestCase):
+class ProcessqueueTests(TestSetup):
     """Test all the processqueue functionality"""
-
-    def setUp(self):
-        super(ProcessqueueTests, self).setUp()
-        sqpath = os.path.join(os.path.dirname(__file__), 'RBSP_MAGEIS.sqlite')
-        self.sqlworking = sqpath.replace('RBSP_MAGEIS.sqlite', 'working.sqlite')
-        shutil.copy(sqpath, self.sqlworking)
-        os.chmod(self.sqlworking, stat.S_IRUSR|stat.S_IWUSR)
-        self.dbu = DBUtils.DBUtils(self.sqlworking, echo=False)
-
-    def tearDown(self):
-        super(ProcessqueueTests, self).tearDown()
-        self.dbu._closeDB()
-        del self.dbu
-        os.remove(self.sqlworking)
-
     def add_files(self):
         self.dbu.Processqueue.push([17,18,19,20,21])
 
