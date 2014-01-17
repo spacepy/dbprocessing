@@ -221,7 +221,7 @@ class DBUtils(object):
         @keyword comment: the comment to enter into the processing log DB
         @return: True - Success, False - Failure
         """
-        sq2 = self.session.query(self.Logging).filter_by(currently_processing = True).any()
+        sq2 = self.session.query(self.Logging).filter_by(currently_processing = True).count()
         if sq2 and comment is None:
             raise(ValueError("Must enter a comment to override DB lock"))
         sq = self.session.query(self.Logging).filter_by(currently_processing = True)
