@@ -131,17 +131,10 @@ class DBUtils(object):
         if self.dbIsOpen == True:
             return
         try:
-            if self.mission == 'unittest':
-                if db_var is None:
-                    engine = sqlalchemy.create_engine('sqlite:///:memory:', echo=echo)
-                else:
-                    engine = db_var.engine
-
-            else: # assume we got a filename and use that
-                if not os.path.isfile(os.path.expanduser(self.mission)):
-                    raise(ValueError("DB file specified doesn't exist"))
-                engine = sqlalchemy.create_engine('sqlite:///' + os.path.expanduser(self.mission), echo=echo)
-                self.mission = os.path.realpath(os.path.expanduser(self.mission))
+            if not os.path.isfile(os.path.expanduser(self.mission)):
+                raise(ValueError("DB file specified doesn't exist"))
+            engine = sqlalchemy.create_engine('sqlite:///' + os.path.expanduser(self.mission), echo=echo)
+            self.mission = os.path.realpath(os.path.expanduser(self.mission))
 
             DBlogging.dblogger.info("Database Connection opened: {0}  {1}".format(str(engine), self.mission))
 
@@ -228,7 +221,8 @@ class DBUtils(object):
         @keyword comment: the comment to enter into the processing log DB
         @return: True - Success, False - Failure
         """
-        if comment is None:
+        sq2 = self.session.query(self.Logging).filter_by(currently_processing = True).any()
+        if sq2 and comment is None:
             raise(ValueError("Must enter a comment to override DB lock"))
         sq = self.session.query(self.Logging).filter_by(currently_processing = True)
         for val in sq:
@@ -237,7 +231,8 @@ class DBUtils(object):
             val.comment = 'Overridden:' + comment + ':' + __version__
             DBlogging.dblogger.error( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
             self.session.add(val)
-        self._commitDB()
+        if sq2:
+            self._commitDB()
 
     def _startLogging(self):
         """
@@ -547,16 +542,9 @@ class DBUtils(object):
         # this gets all the file objects for the processqueue file_ids
         subq = self.session.query(self.Processqueue.file_id).subquery()
         file_entries = self.session.query(self.File).filter(self.File.file_id.in_(subq)).all()
-        newest = []
-        for fe in file_entries:
-            newest.extend([v.file_id for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date]*2, newest_version=True)])
-        
-        inds = []
-        file_entries2 = []
-        for v in file_entries:
-            if v.file_id in newest:
-                inds.append(file_ids.index(v.file_id))
-                file_entries2.append(v)
+
+        file_entries2 = self.file_id_Clean(file_entries)
+        inds = [file_entries.index(v) for v in file_entries2]
         version_bumps2 = [version_bumps[i] for i in inds]
         #==============================================================================
         #         # sort keep on dates, then sort keep on level
@@ -1158,7 +1146,7 @@ class DBUtils(object):
             inStr = inStr.replace('{PRODUCT}', ftb['input_product'][0][0].product_name)
         if '{LEVEL}' in inStr :
             inStr = inStr.replace('{LEVEL}', str(ftb['input_product'][0][0].level))
-        if '{ROOTDIR}' in inStr :
+        if '{ROOTDIR}' in inStr:
             inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
         if any(val in inStr for val in repl): # call yourself again
             inStr = self._nameSubProcess(inStr, p_id)
@@ -1179,6 +1167,10 @@ class DBUtils(object):
             inStr = inStr.replace('{MISSION}', ftb['mission'].mission_name)
         if '{LEVEL}' in inStr :
             inStr = inStr.replace('{LEVEL}', str(ftb['product'].level))
+        if '{PRODUCT}' in inStr : # need to replace with the instrument name
+            inStr = inStr.replace('{PRODUCT}', ftb['product'].product_name)
+        if '{ROOTDIR}' in inStr:
+            inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
         return inStr
 
     def _commitDB(self):
@@ -1435,7 +1427,7 @@ class DBUtils(object):
         """
         f = self.getEntry('File', filename)
         f.filename = newname
-        self.session.add(rel)
+        self.session.add(f)
         self._commitDB()
 
     def getFileID(self, filename):
@@ -1506,7 +1498,7 @@ class DBUtils(object):
         given a list of file objects clean out older versions of matching files
         matching is defined as same product_id and smae utc_file_date      
         """
-        newest = set((v.file_id for fe in invals
+        newest = set((v for fe in invals
                       for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date]*2, newest_version=True)))
         return list(newest.intersection(invals))
         
