@@ -1524,19 +1524,28 @@ class DBUtils(object):
 
         if newest_version:
             # don't trust that the db has this correct
-           sq = (self.session.query(self.File, 
-           func.max(self.File.interface_version*1000 
-                    + self.File.quality_version*100 
-                    + self.File.revision_version))
-            .filter(self.File.product_id==product_id)
-            .filter(self.File.utc_file_date.between(*daterange))
-            .group_by(self.File.utc_file_date).all())
-           sq = list(map(itemgetter(0), sq))
+            # create a tabel populated with
+            #   versionnum, file_id, utc_file_date
+            version = (self.session.query( (self.File.interface_version*1000  
+                                           + self.File.quality_version*100 
+                                           + self.File.revision_version).label('versionnum'), 
+                                          self.File.file_id,
+                                          self.File.utc_file_date )
+                       .filter(self.File.utc_file_date.between(*daterange))
+                       .filter(self.File.product_id == product_id)
+                       .group_by(self.File.file_id).subquery())
+
+            subq = (self.session.query(func.max(version.c.versionnum))
+                  .group_by(version.c.utc_file_date)).subquery()
+
+            sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
+
+            sq = list(map(itemgetter(0), sq))
+            sq = self.session.query(self.File).filter(self.File.file_id.in_(sq)).all()
            
         else: 
             sq = self.session.query(self.File).filter_by(product_id = product_id).\
-              filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
-           
+                filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
         return sq
 
     def getFilesByProduct(self, prod_id, newest_version=False):
@@ -1547,7 +1556,25 @@ class DBUtils(object):
         """
         prod_id = self.getProductID(prod_id)
         if newest_version:
-            sq = self.session.query(self.File).filter_by(product_id = prod_id).filter_by(newest_version = True)
+            # don't trust that the db has this correct
+            # create a tabel populated with
+            #   versionnum, file_id, utc_file_date
+            version = (self.session.query( (self.File.interface_version*1000  
+                                           + self.File.quality_version*100 
+                                           + self.File.revision_version).label('versionnum'), 
+                                          self.File.file_id,
+                                          self.File.utc_file_date )
+                       .filter(self.File.product_id == prod_id)
+                       .group_by(self.File.file_id).subquery())
+
+            subq = (self.session.query(func.max(version.c.versionnum))
+                  .group_by(version.c.utc_file_date)).subquery()
+
+            sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
+
+            sq = list(map(itemgetter(0), sq))
+            sq = self.session.query(self.File).filter(self.File.file_id.in_(sq))
+
         else:
             sq = self.session.query(self.File).filter_by(product_id = prod_id)
         return sq.all()

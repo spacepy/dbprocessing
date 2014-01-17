@@ -329,7 +329,7 @@ class DBUtilsGetTests(TestSetup):
         val = self.dbu.getFilesByProduct(187)
         self.assertEqual(90, len(val))
         val = self.dbu.getFilesByProduct(187, newest_version=True)
-        self.assertEqual(24, len(val))
+        self.assertEqual(23, len(val))
         filenames = [v.filename for v in self.dbu.getFilesByProduct(187, newest_version=True)]
         self.assertTrue('ect_rbspb_0380_381_02.ptp.gz' in filenames)
         
