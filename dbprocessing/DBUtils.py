@@ -418,13 +418,21 @@ class DBUtils(object):
         """
         if not hasattr(fileid, '__iter__'):
             fileid = [fileid]
+        else:
+            # do this in chunks as too many entries breaks things
+            MAX_ADD = 150
+            if len(fileid) > MAX_ADD:
+                for v in Utils.chunker(fileid, MAX_ADD):
+                    self._processqueuePush(v, version_bump=version_bump)
+                return
+        
         # first filter() takes care of putting in values that are not in the DB.  It is silent
         # second filter() takes care of not readding files that are alereadhy in the queue
-        subq = self.session.query(self.Processqueue.file_id).subquery()
-
+        subq  = self.session.query(self.Processqueue.file_id).subquery()
+        
         fileid = (self.session.query(self.File.file_id)
                   .filter(self.File.file_id.in_(fileid))
-                  .filter(~self.File.file_id.in_(subq)))
+                  .filter(~self.File.file_id.in_(subq))).all()
 
         fileid = list(map(itemgetter(0), fileid)) # nested tuples to list
 
@@ -603,8 +611,9 @@ class DBUtils(object):
                 pass
             ## file
             self.session.delete(self.getEntry('File', f))
-            self._commitDB()
             DBlogging.dblogger.info( "File removed from db {0}".format(f) )
+
+        self._commitDB()
 
     def getAllSatellites(self):
         """

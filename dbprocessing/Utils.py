@@ -11,6 +11,10 @@ import dateutil.rrule # do this long so where it is from is remembered
 
 import Version
 
+# from http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
+def chunker(seq, size):
+    return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
+
 def unique(seq):
     seen = set()
     seen_add = seen.add
