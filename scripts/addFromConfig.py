@@ -26,6 +26,7 @@ import shutil
 import sys
 
 from dbprocessing import DBUtils
+from sqlalchemy.orm.exc import NoResultFound
 
 expected = ['mission', 'satellite', 'instrument', 'product', 'process']
 expected_keyword = {}
@@ -195,7 +196,7 @@ def addStuff(cfg, options):
     try:
         satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name']).satellite_id
         print('Found Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite',satellite_id).satellite_name ))
-    except DBUtils.DBNoData:
+    except (DBUtils.DBNoData, NoResultFound):
         # add it
         satellite_id = dbu.addSatellite(mission_id=mission_id, **cfg['satellite'])
         print('Added Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite',satellite_id).satellite_name))
@@ -208,7 +209,7 @@ def addStuff(cfg, options):
             raise(ValueError()) # this means it is the same name on a different sat, need to add
         instrument_id = instrument.instrument_id
         print('Found Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
-    except (DBUtils.DBNoData, ValueError):
+    except (DBUtils.DBNoData, ValueError, NoResultFound):
         # add it
         instrument_id = dbu.addInstrument(satellite_id=satellite_id, **cfg['instrument'])
         print('Added Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
