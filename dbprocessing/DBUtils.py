@@ -1621,7 +1621,7 @@ class DBUtils(object):
         retval = [activeInspector(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments, ans.product) for ans in sq]
         return retval
 
-    def getChildrenProducts(self, file_id):
+    def getChildrenProcesses(self, file_id):
         """
         given a file ID return all the processes that use this as input
         """

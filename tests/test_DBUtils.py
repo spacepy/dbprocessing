@@ -368,14 +368,14 @@ class DBUtilsGetTests(TestSetup):
         v3 = set([v[-1] for v in val])
         self.assertEqual(set(range(1, 191)), v3)
 
-    def test_getChildrenProducts(self):
-        """getChildrenProducts"""
+    def test_getChildrenProcesses(self):
+        """getChildrenProcesses"""
         self.assertEqual([35, 38, 39, 46, 47, 51, 52, 59, 61], 
-                         self.dbu.getChildrenProducts(1))
-        self.assertEqual([44], self.dbu.getChildrenProducts(123))        
-        self.assertFalse(self.dbu.getChildrenProducts(5998))
-        self.assertEqual([], self.dbu.getChildrenProducts(5998))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getChildrenProducts, 59498)
+                         self.dbu.getChildrenProcesses(1))
+        self.assertEqual([44], self.dbu.getChildrenProcesses(123))        
+        self.assertFalse(self.dbu.getChildrenProcesses(5998))
+        self.assertEqual([], self.dbu.getChildrenProcesses(5998))
+        self.assertRaises(DBUtils.DBNoData, self.dbu.getChildrenProcesses, 59498)
 
     def test_getProductID(self):
         """getProductID"""

@@ -107,7 +107,7 @@ if __name__ == "__main__":
         number_proc = 0
 
         def do_proc(file_id):
-            children = pq.dbu.getChildrenProducts(file_id) # returns process
+            children = pq.dbu.getChildrenProcesses(file_id) # returns process
             if not children:
                 DBlogging.dblogger.debug("No children found for {0}".format(file_id))
                 return None
