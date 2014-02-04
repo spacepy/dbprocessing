@@ -194,7 +194,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 continue
 
             DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
-            print("Process starting: {0}".format(' '.join(runme.cmdline)))
+            print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
 
             """
             when we go to run a process capture all the stdout and stderr into a file in the running temp directory
