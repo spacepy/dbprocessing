@@ -155,14 +155,19 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     ############################################################
 
     ## 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+    # in make_command_line a tempdir gets created (self.tempdir) it will need to be cleaned
     for runme in runme_list:
         runme.make_command_line()
     # get rid of all the runme objects that are not runnable
-    runme_list = [v for v in runme_list if v.ableToRun]
+    runme_list2 = set([v for v in runme_list if v.ableToRun])
+    # get the ones we are not running and delete thier tempdir
+    left_overs = set(runme_list).difference(runme_list2)
+    for lo in left_overs: # remove the tempdir
+        rm_tempdir(lo.tempdir)
 
-    # sort the runme_list on level
-    runme_list = sorted(runme_list, key = lambda x: x.data_level)
-
+    # sort the runme_list on level and filename (which is like date and product and s/c together)
+    runme_list = sorted(list(runme_list2), key = lambda x: (x.data_level, x.filename))
+    
     # found some cases where the same command line was in the list more than once based on
     #   more than one dependency in the process queue, go through and clean these out
     # TODO add this to the DB so that we can have a defined version string
@@ -386,19 +391,6 @@ class runMe(object):
         ## getting here means that we are going to be returning a full
         ##   class ready to run the process
         self.ableToRun = True
-
-        # Make a temp directory and associate it with this
-        self.tempdir = mk_tempdir(suffix='_dbprocessingRunMe')
-
-    def __del__(self):
-        if not hasattr(self, 'tempdir'):
-            return
-        try:
-            rm_tempdir(self.tempdir)
-        except OSError:
-            print("Tried to remove temp file {0} and could not".format(self.tempdir))
-            DBlogging.dblogger.info("Tried to remove temp file {0} and could not".format(self.tempdir))
-            pass
 
     def __str__(self):
         return "RunMe({0}, {1})".format(self.utc_file_date, self.process_id)
@@ -647,6 +639,7 @@ class runMe(object):
         for i_fid in self.input_files:
             cmdline.append(self.dbu.getFileFullPath(i_fid))
         # the putname goes last
+        self.tempdir = mk_tempdir(suffix='_{0}_dbprocessing_runMe'.format(self.filename))
         cmdline.append(os.path.join(self.tempdir, self.filename))
 
         # and make sure to expand any path variables
