@@ -106,17 +106,6 @@ if __name__ == "__main__":
     if options.p: # process selected
         number_proc = 0
 
-        def do_proc(file_id):
-            children = pq.dbu.getChildrenProcesses(file_id) # returns process
-            if not children:
-                DBlogging.dblogger.debug("No children found for {0}".format(file_id))
-                return None
-            ## right here we have a list of processes that should run
-            # loop through the children and see which to build
-            for child_process in children:
-                ## are all the required inputs available? For the dates we are doing
-                pq.buildChildren(child_process, [file_id])
-
         try:
             DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
             # this loop does everything, both make the runMe objects and then
@@ -153,7 +142,7 @@ if __name__ == "__main__":
                     #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
                     #if f is None:
                     #    continue
-                    do_proc(f)
+                    pq.buildChildren(f)
                     tmp_ind += 1
                     tb.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
 
@@ -181,5 +170,6 @@ if __name__ == "__main__":
             pq.dbu._stopLogging('Abnormal exit on exception')
         else:
             pq.dbu._stopLogging('Nominal Exit')
-        pq.dbu._closeDB()
+        finally: 
+            pq.dbu._closeDB()
         del pq

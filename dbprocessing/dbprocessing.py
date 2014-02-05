@@ -306,40 +306,42 @@ class ProcessQueue(object):
             raise(ValueError('Bad timebase for product: {0}'.format(process_id)))
         return files, input_product_id
 
-    def buildChildren(self, process_id, file_id):
+    def buildChildren(self, file_id):
         """
-        go through and all all the runMe's to the runme_list variable
+        go through and all the runMe's and add to the runme_list variable
         """
-        DBlogging.dblogger.debug("Entered buildChildren: process_id={0}".format(process_id))
+        DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
 
-        daterange = self.dbu.getFileDates(file_id[0]) # this is the dates that this product spans
+        children = self.dbu.getChildrenProcesses(file_id) # returns process
+        daterange = self.dbu.getFileDates(file_id) # this is the dates that this file spans
 
-        # iterate over all the days between the start and stop date from above (including stop date)
-        for utc_file_date in Utils.expandDates(*daterange):
-            files, input_product_id = self._getRequiredProducts(process_id, file_id[0], utc_file_date)
-            if not files:
-                # figure out the missing products
-                DBlogging.dblogger.debug("For file: {0} date: {1} required files not present {2}".format(
-                    file_id[0], utc_file_date, input_product_id))
-                
-                continue # go on to the next file
+        for child_process in children:
 
-            #==============================================================================
-            # do we have the required files to do the build?
-            #==============================================================================
-##             if not self._requiredFilesPresent(files, input_product_id, process_id):
-##                 DBlogging.dblogger.debug("For file: {0} date: {1} required files not present".format(file_id[0], utc_file_date))
-##                 continue # go on to the next file
+            # iterate over all the days between the start and stop date from above (including stop date)
+            for utc_file_date in Utils.expandDates(*daterange):
+                files, input_product_id = self._getRequiredProducts(child_process, file_id, utc_file_date)
+                if not files:
+                    # figure out the missing products
+                    DBlogging.dblogger.debug("For file: {0} date: {1} required files not present {2}"
+                                             .format(file_id[0], utc_file_date, input_product_id))
+                    continue # go on to the next file
 
-            input_files = [v.file_id for v in files]
-            DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
+                #==============================================================================
+                # do we have the required files to do the build?
+                #==============================================================================
+    ##             if not self._requiredFilesPresent(files, input_product_id, process_id):
+    ##                 DBlogging.dblogger.debug("For file: {0} date: {1} required files not present".format(file_id[0], utc_file_date))
+    ##                 continue # go on to the next file
 
-            runme = runMe.runMe(self.dbu, utc_file_date, process_id, input_files, self)
+                input_files = [v.file_id for v in files]
+                DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
-            # only add to runme list if it can be run
-            if runme.ableToRun and (runme not in self.runme_list):
-                self.runme_list.append(runme)
-                DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
+                runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self)
+
+                # only add to runme list if it can be run
+                if runme.ableToRun and (runme not in self.runme_list):
+                    self.runme_list.append(runme)
+                    DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
 
     def onStartup(self):
         """
