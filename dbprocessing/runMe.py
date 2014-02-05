@@ -626,7 +626,7 @@ class runMe(object):
         for i_fid in self.input_files:
             cmdline.append(self.dbu.getFileFullPath(i_fid))
         # the putname goes last
-        self.tempdir = mk_tempdir(suffix='_{0}_dbprocessing_runMe'.format(self.filename))
+        self.tempdir = mk_tempdir(suffix='_{0}_runMe'.format(self.filename))
         cmdline.append(os.path.join(self.tempdir, self.filename))
 
         # and make sure to expand any path variables
