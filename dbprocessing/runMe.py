@@ -17,9 +17,9 @@ import traceback
 import DBlogging
 import DBStrings
 import DBUtils
+import Utils
 import Version
 
-from Utils import strargs_to_args
 
 runObj = namedtuple('runObj', 'runme time probfile')
 """
@@ -165,17 +165,21 @@ def runner(runme_list, dbu, MAX_PROC = 2):
 
     # found some cases where the same command line was in the list more than once based on
     #   more than one dependency in the process queue, go through and clean these out
-    #outnames = [os.path.basename(v.filename) for v in runme_list]
-    #uniq_out = list(set(outnames)) # this is a list of all the unque out names
-    #runme_list_tmp = []
-    #while uniq_out: # loop until we have them all
-    #    # pop the first name and find it in runme_list
-    #    uniqo = uniq_out.pop(0) 
-    #    ind = outnames.index(uniqo)
-    #    runme_list_tmp.append(runme_list[ind])
-
-    # the list is now only the unique outnames
-    #runme_list = runme_list_tmp
+    # TODO add this to the DB so that we can have a defined version string
+    basenames = Utils.unique([v.filename.split('_v')[0] for v in runme_list])
+    runme_list_uniq = []
+    for name in basenames:
+        # loop over all the runme's with this output and see which has the most arguments
+        tmp_rme = []
+        for rme in runme_list:
+            if name in rme.filename:
+                tmp_rme.append(rme)
+            if tmp_rme:
+                runme_list_uniq.append(max(tmp_rme, key=lambda x: len(x.cmdline)))
+                
+    print runme_list_uniq, runme_list
+    runme_list = runme_list_uniq
+                
 
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
@@ -194,7 +198,6 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 continue
 
             DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
-            print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
 
             """
             when we go to run a process capture all the stdout and stderr into a file in the running temp directory
@@ -208,6 +211,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 if tmp is not None:
                     DBlogging.dblogger.info("Did Not run: {0} output was in db".format(os.path.basename(' '.join(runme.cmdline))))
             except DBUtils.DBNoData:
+                print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
                 prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
                 try:
                     fp = open(prob_name, 'w')
@@ -230,13 +234,14 @@ def runner(runme_list, dbu, MAX_PROC = 2):
             rm, t, fp = processes[p] # unpack the tuple
             if p.returncode != 0: # non zero return code FAILED
                 DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
+                print("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
                 fp.close()
                 #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
                 #rm.moveToError(os.path.join(rm.tempdir, fp.name))
                 #rm.moveToError(fp.name)
                 try:
                     shutil.copy(fp.name, os.path.join('/n', 'space_data', 'cda', 'rbsp', 'errors', os.path.basename(fp.name)))
-                except:
+                except (OSError, IOError):
                     print("%%%%%%%%%%%% could not find .prob file!!!:   {0}".format(fp.name))
                 # assume the file is bad and move it to error
                 # rm.moveToError(os.path.join(rm.tempdir, rm.filename))
@@ -258,8 +263,12 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                     glb = glob.glob(os.path.join(rm.tempdir, rm.filename) + '*.png')
                     if len(glb) == 1:
                         rm.moveToIncoming(glb[0])
-                shutil.rmtree(rm.tempdir)
-                DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))                        
+                try:
+                    shutil.rmtree(rm.tempdir)
+                    DBlogging.dblogger.info("Removed temp directory: {0}".format(rm.tempdir))
+                
+                except OSError:
+                    DBlogging.dblogger.error("Error removing temp directory: {0}".format(rm.tempdir))
                 rm._add_links(rm.cmdline)
                 print("Process {0} FINISHED".format(' '.join(rm.cmdline)))
                 n_good += 1
@@ -311,7 +320,7 @@ class runMe(object):
         format_str = ptb['product'].format
         # get the process_keywords from the file if there are any
         try:
-            process_keywords = strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
+            process_keywords = Utils.strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
             for key in process_keywords:
                 format_str = format_str.replace('{'+key+'}', process_keywords[key])
         except TypeError:
@@ -386,7 +395,7 @@ class runMe(object):
             return
         try:
             rm_tempdir(self.tempdir)
-        except Exception:
+        except OSError:
             print("Tried to remove temp file {0} and could not".format(self.tempdir))
             DBlogging.dblogger.info("Tried to remove temp file {0} and could not".format(self.tempdir))
             pass
