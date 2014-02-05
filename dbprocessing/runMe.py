@@ -216,7 +216,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 if tmp is not None: # we are not going to run
                     DBlogging.dblogger.info("Did Not run: {0} output was in db"
                                             .format(os.path.basename(' '.join(runme.cmdline))))
-                    rm_tempdir(runme) # delete the tempdir
+                    rm_tempdir(runme.tempdir) # delete the tempdir
             except DBUtils.DBNoData:
                 print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
                 prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
@@ -228,7 +228,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                     DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
                                              .format(os.path.basename(' '.join(runme.cmdline))))
                     #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
-                    rm_tempdir(runme) # delete the tempdir                    
+                    rm_tempdir(runme.tempdir) # delete the tempdir                    
                     continue # move to next process
 
                 _start_a_run(runme)
@@ -251,7 +251,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 # assume the file is bad and move it to error
                 rm.moveToError(os.path.join(rm.tempdir, rm.filename))
                 n_bad += 1
-                rm_tempdir(runme) # delete the temp directory
+                rm_tempdir(runme.tempdir) # delete the temp directory
 
             elif p.returncode == 0: # p.returncode == 0  SUCCESS
                 fp.close()
@@ -264,7 +264,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                     glb = glob.glob(os.path.join(rm.tempdir, rm.filename) + '*.png')
                     if len(glb) == 1:
                         rm.moveToIncoming(glb[0])
-                rm_tempdir(runme) # delete the temp directory
+                rm_tempdir(runme.tempdir) # delete the temp directory
                 rm._add_links(rm.cmdline)
                 print("Process {0} FINISHED".format(' '.join(rm.cmdline)))
                 n_good += 1
