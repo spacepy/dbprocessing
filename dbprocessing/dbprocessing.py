@@ -417,7 +417,7 @@ class ProcessQueue(object):
     def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=2):
         return(self._reprocessBy(id_in, code=True, prod=False, startDate=startDate, endDate=endDate, incVersion=incVersion))
 
-    def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=2):
+    def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=None):
         if isinstance(startDate, datetime.datetime):
             startDate = startDate.date()
         if isinstance(endDate, datetime.datetime):
@@ -428,17 +428,12 @@ class ProcessQueue(object):
             print('No product_id {0} found in the DB'.format(id_in))
             return None
 
-        files = self.dbu.getFilesByProductDate(prod_id, [startDate, endDate])
-        added = 0
-        for f in files:
-            try:
-                self.dbu.Processqueue.push(f.file_id, incVersion)
-                added += 1
-            except DBUtils.DBError:
-                print("File {0} failed to add, was already there".format(f))
-        return added
+        files = self.dbu.getFilesByProductDate(prod_id, [startDate, endDate], newest_version=True)
+        file_ids = [f.file_id for f in files]
+        added = self.dbu.Processqueue.push(file_ids, incVersion)
+        return len(added)
 
-    def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=2):
+    def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=None):
         files = self.dbu.getFilesByInstrument(id_in, level=level, id_only=False)
         # files before this date are removed from the list
         if startDate is not None:
@@ -447,13 +442,8 @@ class ProcessQueue(object):
         if endDate is not None:
             files = [val for val in files if val.utc_file_date <= endDate]
         f_ids = [val.file_id for val in files]
-        filesToReprocess = set(f_ids)
-        for f in filesToReprocess:
-            try:
-                self.dbu.Processqueue.push(f, incVersion)
-            except filesToReprocess:
-                pass
-        return len(filesToReprocess)
+        added = self.dbu.Processqueue.push(f_ids, incVersion)
+        return len(added)
 
     def reprocessByAll(self, level=None, startDate=None, endDate=None):
         """
