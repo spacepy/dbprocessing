@@ -163,7 +163,10 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     # get the ones we are not running and delete thier tempdir
     left_overs = set(runme_list).difference(runme_list2)
     for lo in left_overs: # remove the tempdir
-        rm_tempdir(lo.tempdir)
+        try:
+            rm_tempdir(lo.tempdir)
+        except OSError:
+            pass
 
     # sort the runme_list on level and filename (which is like date and product and s/c together)
     runme_list = sorted(list(runme_list2), key = lambda x: (x.data_level, x.filename))
@@ -171,19 +174,19 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     # found some cases where the same command line was in the list more than once based on
     #   more than one dependency in the process queue, go through and clean these out
     # TODO add this to the DB so that we can have a defined version string
-    basenames = Utils.unique([v.filename.split('_v')[0] for v in runme_list])
-    runme_list_uniq = []
-    for name in basenames:
-        # loop over all the runme's with this output and see which has the most arguments
-        tmp_rme = []
-        for rme in runme_list:
-            if name in rme.filename:
-                tmp_rme.append(rme)
-            if tmp_rme:
-                runme_list_uniq.append(max(tmp_rme, key=lambda x: len(x.cmdline)))
+    #basenames = Utils.unique([v.filename.split('_v')[0] for v in runme_list])
+    #runme_list_uniq = []
+    #for name in basenames:
+    #    # loop over all the runme's with this output and see which has the most arguments
+    #    tmp_rme = []
+    #    for rme in runme_list:
+    #        if name in rme.filename:
+    #            tmp_rme.append(rme)
+    #        if tmp_rme:
+    #            runme_list_uniq.append(max(tmp_rme, key=lambda x: len(x.cmdline)))
                 
-    print runme_list_uniq, runme_list
-    runme_list = runme_list_uniq
+    #print runme_list_uniq, runme_list
+    #runme_list = runme_list_uniq
                 
 
     # TODO For a future revision think on adding a timeout ability to the subprocess
@@ -251,7 +254,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                 # assume the file is bad and move it to error
                 rm.moveToError(os.path.join(rm.tempdir, rm.filename))
                 n_bad += 1
-                rm_tempdir(runme.tempdir) # delete the temp directory
+                rm_tempdir(rm.tempdir) # delete the temp directory
 
             elif p.returncode == 0: # p.returncode == 0  SUCCESS
                 fp.close()
@@ -264,7 +267,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                     glb = glob.glob(os.path.join(rm.tempdir, rm.filename) + '*.png')
                     if len(glb) == 1:
                         rm.moveToIncoming(glb[0])
-                rm_tempdir(runme.tempdir) # delete the temp directory
+                rm_tempdir(rm.tempdir) # delete the temp directory
                 rm._add_links(rm.cmdline)
                 print("Process {0} FINISHED".format(' '.join(rm.cmdline)))
                 n_good += 1
