@@ -231,7 +231,10 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                     DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
                                              .format(os.path.basename(' '.join(runme.cmdline))))
                     #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
-                    rm_tempdir(runme.tempdir) # delete the tempdir                    
+                    try:
+                        rm_tempdir(runme.tempdir) # delete the tempdir                    
+                    except OSError:
+                        pass
                     continue # move to next process
 
                 _start_a_run(runme)
