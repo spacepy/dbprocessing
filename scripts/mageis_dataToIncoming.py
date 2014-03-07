@@ -5,6 +5,8 @@ import os
 import re
 import shutil
 
+from spacepy import toolbox as tb
+
 import dbprocessing.DBUtils as DBUtils
 import dbprocessing.DBlogging as DBlogging
 
@@ -15,10 +17,12 @@ import dbprocessing.DBlogging as DBlogging
 
 dbu = DBUtils.DBUtils(os.path.expanduser('~ectsoc/RBSP_MAGEIS.sqlite'))
 
+DBlogging.dblogger.setLevel(DBlogging.LEVELS['info'])
+
 mission_path = dbu.getMissionDirectory()
 g_inc_path = dbu.getIncomingPath()
 sc = ['a', 'b']
-data_path = [os.path.join('/', 'usr', 'local', 'ectsoc', 'data', 'level_0', val, 'mageis_vc') for val in sc]
+data_path = [os.path.join('/', 'usr', 'local', 'ectsoc', 'data', 'level_0', val, 'mageis') for val in sc]
 mag_types = ['quicklook', 'l2']
 tmp = [os.path.join('/', 'n', 'space_data', 'cda', 'rbsp', 'rbsp{0}'.format(s), 'emfisis' , t) for s, t in itertools.product(sc, mag_types)]
 data_path += tmp
@@ -45,19 +49,24 @@ def build_data_set(data_paths):
     go through a list of paths and grab all the filenames out of there
     """
     files = set()
-    for path in data_paths:
+    for ii, path in enumerate(data_paths):
+        print("    checking {0}".format(path))
         for f in os.listdir(path):
             if 'MagEphem' in f:
                 if 'OP77' in f and 'txt' in f:
                     files.add(os.path.realpath(os.path.join(path, f)))
             else:
                 files.add(os.path.realpath(os.path.join(path, f)))
+            tb.progressbar(ii+1, 1, len(data_paths), text="Collecting disk files")
+
     for cull_r in cull_re:
         files_to_cull = [f for f in files if re.match(cull_r, os.path.basename(f))]
         files = files.difference(files_to_cull)
+    print("Culled files")
     # also cull directories
     files_to_cull = [f for f in files if not os.path.isfile(f)]
     files = files.difference(files_to_cull)
+    print("Culled directories")
     # cull files from error directory also
     err_files = os.listdir(error_path)
     cull_set = set()
@@ -72,6 +81,7 @@ def build_data_set(data_paths):
         if os.path.basename(f) in inc_files:
             cull_set.add(f)
     files = files.difference(cull_set)    
+
     return files
 
 def files_to_move(data_files, db_files):
@@ -86,21 +96,23 @@ def files_to_move(data_files, db_files):
     return data_files
 
 db_files = build_db_set()
+print("Collected db files")
 data_files = build_data_set(data_path)
+print("Collected disk files")
 files = files_to_move(data_files, db_files)
+print("Computed files to move")
 
-for f in files:
+n_files = len(files)
+for ii, f in enumerate(files):
     try:
-        if "emfisis" in f: # make a link not a copy
+        if "emfisis" in f or "MagEphem" in f: # make a link not a copy
             os.symlink(f, os.path.join(g_inc_path, os.path.basename(f)))
-            DBlogging.dblogger.info("{0}: Linked {1} to {2}".format(__file__, f, g_inc_path))
+            DBlogging.dblogger.debug("{0}: Linked {1} to {2}".format(__file__, f, g_inc_path))
         else:
             shutil.copy(f, g_inc_path)
-            DBlogging.dblogger.info("{0}: copied {1} to {2}".format(__file__, f, g_inc_path))
+            DBlogging.dblogger.debug("{0}: copied {1} to {2}".format(__file__, f, g_inc_path))
     except:
         DBlogging.dblogger.error("{0}: failed copying {1} to {2}".format(__file__, f, g_inc_path))
-
-
-
+    tb.progressbar(ii, 1, n_files, text="Populating incoming ")
 
 
