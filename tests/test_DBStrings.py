@@ -8,7 +8,7 @@ __version__ = '0.3'
 import datetime
 import unittest
 
-import DBStrings
+from dbprocessing import DBStrings
 
 
 class DBFormatterTests(unittest.TestCase):
@@ -34,6 +34,7 @@ class DBFormatterTests(unittest.TestCase):
 
     def testExpandFormat(self):
         """Add formatting codes to special fields"""
+        print '{Y:04d}',                         self.fmtr.expand_format('{Y}')
         self.assertEqual('{Y:04d}',
                          self.fmtr.expand_format('{Y}'))
         self.assertEqual(

@@ -6,9 +6,9 @@ import os
 import tempfile
 
 
-import DBfile
-import DBUtils
-import Diskfile
+from dbprocessing import DBfile
+from dbprocessing import DBUtils
+from dbprocessing import Diskfile
 
 filename = 'test_file.txt'
 

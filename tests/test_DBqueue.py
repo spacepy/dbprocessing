@@ -2,7 +2,7 @@
 
 import unittest
 
-import DBqueue
+from dbprocessing import DBqueue
 
 
 __version__ = '2.0.3'

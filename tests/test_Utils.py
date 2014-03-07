@@ -6,8 +6,8 @@ import os
 import tempfile
 
 
-import Utils
-import Version
+from dbprocessing import Utils
+from dbprocessing import Version
 
 
 

@@ -3,8 +3,8 @@
 import datetime
 import unittest
 
-import inspector
-import Version
+from dbprocessing import inspector
+from dbprocessing import Version
 
 __version__ = '2.0.3'
 
