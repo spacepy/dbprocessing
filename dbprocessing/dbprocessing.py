@@ -430,13 +430,17 @@ class ProcessQueue(object):
 
         if startDate is None and endDate is None:
             files = self.dbu.getFilesByProduct(prod_id, newest_version=True)
-        elif startDate is None:
-            startDate = datetime.date(1950, 1, 1)
-        elif endDate is None:
-            endDate = datetime.date(2100, 1, 1)
-        files = self.dbu.getFilesByProductDate(prod_id, [startDate, endDate], newest_version=True)
+        else:
+            if startDate is None:
+                startDate = datetime.date(1950, 1, 1)
+            elif endDate is None:
+                endDate = datetime.date(2100, 1, 1)
+            files = self.dbu.getFilesByProductDate(prod_id, [startDate, endDate], newest_version=True)
         file_ids = [f.file_id for f in files]
         added = self.dbu.Processqueue.push(file_ids, incVersion)
+        print 'added', added
+        if added is None:
+            added = []
         return len(added)
 
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=None):

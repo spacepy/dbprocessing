@@ -422,9 +422,10 @@ class DBUtils(object):
             # do this in chunks as too many entries breaks things
             MAX_ADD = 150
             if len(fileid) > MAX_ADD:
+                outval = []
                 for v in Utils.chunker(fileid, MAX_ADD):
-                    self._processqueuePush(v, version_bump=version_bump)
-                return
+                    outval.extend(self._processqueuePush(v, version_bump=version_bump))
+                return outval
         
         # first filter() takes care of putting in values that are not in the DB.  It is silent
         # second filter() takes care of not readding files that are alereadhy in the queue

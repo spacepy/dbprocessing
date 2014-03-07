@@ -29,7 +29,8 @@ if __name__ == "__main__":
                       help="Force the reprocessing, speicify which version number {0},{1},{2}", default=None)
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission database", default=None)
-
+    parser.add_option("", "--echo", dest="echo", action='store_true',
+                      help="echo sql queries for debugging", default=False)
     
     (options, args) = parser.parse_args()
     if len(args) < 1:
@@ -52,7 +53,7 @@ if __name__ == "__main__":
     if options.force not in [None, 0, 1, 2]:
         parser.error("invalid force option [0,1,2]")
 
-    db = dbprocessing.ProcessQueue(options.mission,)
+    db = dbprocessing.ProcessQueue(options.mission, echo=options.echo)
 
     print startDate, endDate
 
