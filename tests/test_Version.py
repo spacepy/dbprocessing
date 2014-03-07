@@ -2,7 +2,7 @@
 
 import unittest
 
-import Version
+from dbprocessing import Version
 
 
 __version__ = '2.0.3'
