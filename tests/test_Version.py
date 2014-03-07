@@ -43,6 +43,37 @@ class VersionTests(unittest.TestCase):
         for i, val in enumerate(invals):
             self.assertEqual(real_ans[i], val[0] == val[1])
 
+    def test_Version_le(self):
+        """__le__ should work"""
+        invals = (  (Version.Version(1, 0, 0), Version.Version(1, 0, 0)),
+                        (Version.Version(1, 2, 0), Version.Version(1, 0, 0)),
+                        (Version.Version(1, 0, 4), Version.Version(1, 0, 0)),
+                        (Version.Version(1, 2, 1), Version.Version(4, 0, 0)) )
+        real_ans = (True, False, False, True)
+        for i, val in enumerate(invals):
+            self.assertEqual(real_ans[i], val[0] <= val[1])
+
+
+    def test_Version_eq(self):
+        """__eq__ should work"""
+        invals = (  (Version.Version(1, 0, 0), Version.Version(1, 0, 0)),
+                        (Version.Version(1, 2, 0), Version.Version(1, 0, 0)),
+                        (Version.Version(1, 0, 4), Version.Version(1, 0, 0)),
+                        (Version.Version(4, 2, 1), Version.Version(1, 0, 0)) )
+        real_ans = (True, False, False, False)
+        for i, val in enumerate(invals):
+            self.assertEqual(real_ans[i], val[0] == val[1])
+
+    def test_Version_ge(self):
+        """__ge__ should work"""
+        invals = (  (Version.Version(1, 0, 0), Version.Version(1, 0, 0)),
+                        (Version.Version(1, 2, 0), Version.Version(1, 0, 0)),
+                        (Version.Version(1, 0, 4), Version.Version(1, 0, 0)),
+                        (Version.Version(1, 2, 1), Version.Version(4, 0, 0)) )
+        real_ans = (True, True, True, False)
+        for i, val in enumerate(invals):
+            self.assertEqual(real_ans[i], val[0] >= val[1])
+            
     def test_Version_ne(self):
         """__ne__ should work"""
         invals = (  (Version.Version(1, 0, 0), Version.Version(1, 0, 0)),
@@ -92,7 +123,10 @@ class VersionTests(unittest.TestCase):
     def test_repr(self):
         """__repr__ has known output"""
         self.assertEqual(Version.Version(1,0,1).__repr__(), 'Version: 1.0.1')
-        
+
+    def test_fromString(self):
+        """fromString"""
+        self.assertEqual(Version.Version(1,0,1), Version.Version.fromString('1.0.1'))
 
 
 if __name__ == "__main__":
