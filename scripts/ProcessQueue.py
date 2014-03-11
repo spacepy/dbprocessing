@@ -80,7 +80,8 @@ if __name__ == "__main__":
     if options.i: # import selected
         try:
             start_len = pq.dbu.Processqueue.len()
-            pq.checkIncoming()
+            print("Currently {0} entries in process queue".format(start_len))
+            pq.checkIncoming() 
             if not options.dryrun:
                 while len(pq.queue) != 0:
                     pq.importFromIncoming()
