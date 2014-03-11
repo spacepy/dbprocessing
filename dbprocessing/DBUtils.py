@@ -1558,6 +1558,38 @@ class DBUtils(object):
                 filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
         return sq
 
+    def getFilesByDate(self, daterange, newest_version=False):
+        """
+        return the files in the db that have data in the date specified
+        """
+        if any([isinstance(v, datetime.datetime) for v in daterange]):
+            raise(ValueError("daterange must be datetime.date not datetime.datetime"))
+
+        if newest_version:
+            # don't trust that the db has this correct
+            # create a tabel populated with
+            #   versionnum, file_id, utc_file_date
+            version = (self.session.query( (self.File.interface_version*1000  
+                                           + self.File.quality_version*100 
+                                           + self.File.revision_version).label('versionnum'), 
+                                          self.File.file_id,
+                                          self.File.utc_file_date )
+                       .filter(self.File.utc_file_date.between(*daterange))
+                       .group_by(self.File.file_id).subquery())
+
+            subq = (self.session.query(func.max(version.c.versionnum))
+                  .group_by(version.c.utc_file_date)).subquery()
+
+            sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
+
+            sq = list(map(itemgetter(0), sq))
+            sq = self.session.query(self.File).filter(self.File.file_id.in_(sq)).all()
+           
+        else: 
+            sq = self.session.query(self.File).\
+                filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
+        return sq
+
     def getFilesByProduct(self, prod_id, newest_version=False):
         """
         given a product_id or name return all the file instances associated with it

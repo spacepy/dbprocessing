@@ -319,6 +319,28 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], [v.filename for v in val] )
         self.assertRaises(ValueError, self.dbu.getFilesByProductDate, 187, [datetime.datetime(2013, 9, 10)]*2)
 
+    def test_getFilesByDate(self):
+        """getFilesByDate"""
+        self.assertFalse(self.dbu.getFilesByDate([datetime.date(2013, 12, 12)]*2))
+        val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)]*2)
+        self.assertEqual(256, len(val))
+        ans = ['ect_rbspa_0377_344_01.ptp.gz',
+               'ect_rbspa_0377_344_02.ptp.gz',
+               'ect_rbspa_0377_345_01.ptp.gz',
+               'ect_rbspa_0377_346_01.ptp.gz',
+               'ect_rbspa_0377_349_01.ptp.gz']
+        filenames = sorted([v.filename for v in val])
+        self.assertEqual(ans, filenames[:len(ans)])
+        val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)]*2, newest_version=True)
+        self.assertEqual(56, len(val))
+        filenames = sorted([v.filename for v in val])
+        ans = [u'rbspa_int_ect-mageis-L2_20130910_v3.0.0.cdf',
+               u'rbspa_int_ect-mageisHIGH-L2_20130910_v3.0.0.cdf',
+               u'rbspa_int_ect-mageisHIGH-L3_20130910_v3.0.0.cdf',
+               u'rbspa_int_ect-mageisHIGH-de-L05_0377_v3.0.0.cdf']
+        self.assertEqual(ans, filenames[:len(ans)] )
+        self.assertRaises(ValueError, self.dbu.getFilesByDate, [datetime.datetime(2013, 9, 10)]*2)
+
     def test_getFilesByProduct(self):
         """getFilesByProduct"""
         self.assertFalse(self.dbu.getFilesByProduct(2))
