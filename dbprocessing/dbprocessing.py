@@ -438,7 +438,6 @@ class ProcessQueue(object):
             files = self.dbu.getFilesByProductDate(prod_id, [startDate, endDate], newest_version=True)
         file_ids = [f.file_id for f in files]
         added = self.dbu.Processqueue.push(file_ids, incVersion)
-        print 'added', added
         if added is None:
             added = []
         return len(added)
