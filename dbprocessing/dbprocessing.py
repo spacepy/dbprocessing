@@ -451,7 +451,7 @@ class ProcessQueue(object):
         if startDate is None or endDate is None:
             raise(ValueError("Must specifiy start and end dates"))
 
-        files = self.dbu.getFilesByDate([startDate, endDate], newest_version=True)
+        files = self.dbu.getFilesByDate([startDate, endDate], newest_version=False)
         file_ids = [f.file_id for f in files]
         added = self.dbu.Processqueue.push(file_ids, incVersion)
         if added is None:
