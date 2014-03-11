@@ -1575,7 +1575,7 @@ class DBUtils(object):
                                           self.File.file_id,
                                           self.File.utc_file_date )
                        .filter(self.File.utc_file_date.between(*daterange))
-                       .group_by(self.File.file_id).subquery())
+                       .group_by(self.File.product_id).subquery())
 
             subq = (self.session.query(func.max(version.c.versionnum))
                   .group_by(version.c.utc_file_date)).subquery()
