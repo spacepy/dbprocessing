@@ -2,7 +2,7 @@
 
 
 """
-go through the DB and add all the files that are a certain product and put then onto the
+go through the DB and add all the files that are in a date range and put them into the
 processqueue so that the next ProcessQueue -p will run them
 """
 
