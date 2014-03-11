@@ -442,6 +442,22 @@ class ProcessQueue(object):
             added = []
         return len(added)
 
+    def reprocessByDate(self, startDate=None, endDate=None, incVersion=None):
+        if isinstance(startDate, datetime.datetime):
+            startDate = startDate.date()
+        if isinstance(endDate, datetime.datetime):
+            endDate = endDate.date()
+
+        if startDate is None or endDate is None:
+            raise(ValueError("Must specifiy start and end dates"))
+
+        files = self.dbu.getFilesByDate([startDate, endDate], newest_version=True)
+        file_ids = [f.file_id for f in files]
+        added = self.dbu.Processqueue.push(file_ids, incVersion)
+        if added is None:
+            added = []
+        return len(added)
+
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=None):
         files = self.dbu.getFilesByInstrument(id_in, level=level, id_only=False)
         # files before this date are removed from the list
