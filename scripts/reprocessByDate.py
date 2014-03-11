@@ -53,11 +53,10 @@ if __name__ == "__main__":
 
     print startDate, endDate
 
-    for prod in args:
-        num = db.reprocessByDate(startDate=startDate, endDate=endDate, incVersion=options.force)
-        if num is None:
-            num = 0
-        print('Added {0} files to be reprocessed for product {1}'.format(num, prod))
-        DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, prod))
+    num = db.reprocessByDate(startDate=startDate, endDate=endDate, incVersion=options.force)
+    if num is None:
+        num = 0
+    print('Added {0} files to be reprocessed'.format(num))
+    DBlogging.dblogger.info('Added {0} files to be reprocessed'.format(num))
 
 
