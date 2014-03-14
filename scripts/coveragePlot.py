@@ -222,6 +222,9 @@ if __name__ == "__main__":
                 f_dates = [f.utc_file_date for f in files]
                 for fd in f_dates:
                     ans[ind_pnum][ind_d][ind_pn][1][ans[ind_pnum][ind_d][ind_pn][0].index(fd)] = 1
+                print("\tcollected {0} from {1} to {2}"
+                      .format(conf['plot{0}'.format(pnum)]['product{0}'.format(pn)],
+                              d[0], d[-1]))
 
     print('Collected data')
 
