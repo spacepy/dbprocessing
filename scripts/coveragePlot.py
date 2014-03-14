@@ -272,9 +272,9 @@ if __name__ == "__main__":
                                    out[0][ind_d][1][-1].strftime("%Y-%m-%d")), fontsize='larger')
             fig.autofmt_xdate()
 
-        outfiles.append(os.path.abspath(os.path.expanduser(os.path.expandvars(
-            conf['settings']['filename_format'] + '_{0}.{1}'
-                    .format(ind_d, conf['settings']['outformat'])))))
+        outfiles.append(os.path.join('/tmp', os.path.basename(os.path.expanduser(os.path.expandvars(
+            conf['settings']['filename_format'] + '_{0:03d}.{1}'
+                    .format(ind_d, conf['settings']['outformat']))))))
         plt.savefig( outfiles[-1] )
         print("Wrote: {0}".format(outfiles[-1]))
 
