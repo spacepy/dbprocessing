@@ -272,19 +272,21 @@ if __name__ == "__main__":
                                    out[0][ind_d][1][-1].strftime("%Y-%m-%d")), fontsize='larger')
             fig.autofmt_xdate()
 
-        outfiles.append(os.path.expanduser(os.path.expandvars(os.path.abspath(
+        outfiles.append(os.path.abspath(os.path.expanduser(os.path.expandvars(
             conf['settings']['filename_format'] + '_{0}.{1}'
                     .format(ind_d, conf['settings']['outformat'])))))
         plt.savefig( outfiles[-1] )
         print("Wrote: {0}".format(outfiles[-1]))
 
-    cmd = ['pdftk'] + outfiles + ['cat', 'output']
-    cmd += [os.path.expanduser(os.path.expandvars(os.path.abspath(conf['settings']['filename_format']))) + '.{0}'
-                    .format(conf['settings']['outformat'])]
+    comb_name = (os.path.join(conf['settings']['outdirectory'],
+                         os.path.abspath(os.path.expandvars(os.path.expanduser(conf['settings']['filename_format'])))) + '.{0}'
+                    .format(conf['settings']['outformat']))
+    cmd = ['pdftk'] + outfiles + ['cat', 'output', comb_name]
     print("Running: {0}".format(' '.join(cmd)))
     subprocess.call(cmd)
     for v in outfiles:
         os.remove(v)
+    print("Wrote: {0}".format(comb_name))
 
         
 #############################
