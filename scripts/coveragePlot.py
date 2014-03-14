@@ -279,8 +279,8 @@ if __name__ == "__main__":
         print("Wrote: {0}".format(outfiles[-1]))
 
     comb_name = (os.path.join(conf['settings']['outdirectory'],
-                         os.path.abspath(os.path.expandvars(os.path.expanduser(conf['settings']['filename_format'])))) + '.{0}'
-                    .format(conf['settings']['outformat']))
+                         os.path.basename(os.path.abspath(os.path.expandvars(os.path.expanduser(conf['settings']['filename_format'] + '.{0}'
+                    .format(conf['settings']['outformat'])))))))
     cmd = ['pdftk'] + outfiles + ['cat', 'output', comb_name]
     print("Running: {0}".format(' '.join(cmd)))
     subprocess.call(cmd)
