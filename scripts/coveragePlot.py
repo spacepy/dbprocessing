@@ -17,6 +17,9 @@ import subprocess
 from optparse import OptionParser
 import os
 
+import matplotlib
+matplotlib.use('Agg')
+
 import dateutil.parser as dup
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.dates import date2num
