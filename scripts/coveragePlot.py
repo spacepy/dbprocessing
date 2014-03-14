@@ -168,7 +168,8 @@ if __name__ == "__main__":
     conf = readconfig(conffile)
     conf = _processSubs(conf)
     conf = _processDates(conf)
-
+    print('Read and parsed config file: {0}'.format(conffile))
+    
     # figure out the dates we are going to use
     # make a range of dates
     dates = list(Utils.expandDates(conf['settings']['startdate'], conf['settings']['enddate']))
@@ -219,6 +220,7 @@ if __name__ == "__main__":
                 for fd in f_dates:
                     ans[ind_pnum][ind_d][ind_pn][1][ans[ind_pnum][ind_d][ind_pn][0].index(fd)] = 1
 
+    print('Collected data')
 
     # and make the plots
     out = _combine_coverage(ans)
