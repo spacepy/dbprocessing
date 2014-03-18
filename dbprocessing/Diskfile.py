@@ -44,6 +44,7 @@ class WriteError(Exception):
         super(WriteError, self).__init__(*params)
         DBlogging.dblogger.error("WriteError raised")
 
+        
 class InputError(Exception):
     """
     Exception that input is bad to the DiskFile class
@@ -162,8 +163,6 @@ class Diskfile(object):
 #        DBlogging.dblogger.debug("{0} Access Checked out OK".format(self.infile))
 
 
-
-
 def calcDigest( infile):
     """Calculate the SHA1 digest from a file.
 
@@ -188,7 +187,7 @@ def calcDigest( infile):
             m.update(f.read())
     except IOError:
         raise(DigestError("File not found: {0}".format(infile)))
-
-    DBlogging.dblogger.debug("digest calculated: %s, file: %s " % (m.hexdigest(), infile))
+        
+    DBlogging.dblogger.debug("digest calculated: {0}, file: {1} ".format(m.hexdigest(), infile))
 
     return m.hexdigest()
