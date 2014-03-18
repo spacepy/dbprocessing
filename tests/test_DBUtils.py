@@ -633,32 +633,5 @@ class ProcessqueueTests(TestSetup):
 
 
 
-class DBUtilsClassMethodTests(unittest.TestCase):
-    """Tests for class methods of DBUtils"""
-
-#    def test_test_SQLAlchemy_version(self):
-#        """The testing of the SQLAlchemy version should work"""
-#        self.assertTrue(DBUtils.DBUtils._test_SQLAlchemy_version())
-#        errstr = 'SQLAlchemy version wrong_Ver was not expected, expected 0.7.x'
-#        try:
-#            DBUtils.DBUtils._test_SQLAlchemy_version('wrong_Ver')
-#        except DBUtils.DBError:
-#            self.assertEqual(sys.exc_info()[1].__str__(),
-#                             errstr)
-#        else:
-#            self.fail('Should have raised DBError: ' +
-#                      errstr)
-
-    def test_daterange_to_dates(self):
-        """daterange_to_dates"""
-        daterange = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 6)]
-        expected = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5), datetime.datetime(2000, 1, 6)]
-        self.assertEqual(expected, DBUtils.DBUtils.daterange_to_dates(daterange))
-        daterange = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5, 23)]
-        expected = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5)]
-        self.assertEqual(expected, DBUtils.DBUtils.daterange_to_dates(daterange))
-
-
-
 if __name__ == "__main__":
     unittest.main()
