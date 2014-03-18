@@ -495,7 +495,7 @@ class runMe(object):
             return None
 
         DBlogging.dblogger.debug("db_file: {0} has parents: {1}".format(f_id_db,
-               map(attrgetter('file_id', parents))))
+               map(attrgetter('file_id'), parents)))
 
         # if there are more input files now then we need to reprocess
         if len(self.input_files) != len(parents):
