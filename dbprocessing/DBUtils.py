@@ -4,7 +4,7 @@ import glob
 import itertools
 import functools
 import os.path
-from operator import itemgetter
+from operator import itemgetter, attrgetter
 import pwd
 import socket # to get the local hostname
 import sys
@@ -385,7 +385,7 @@ class DBUtils(object):
         if version_bump is None:
             try:
                 pqdata = self.session.query(self.Processqueue.file_id).all()
-                pqdata = list(map(itemgetter(0), pqdata))
+                pqdata = map(itemgetter(0), pqdata)
             except (IndexError, TypeError):
                 pqdata = self.session.query(self.Processqueue.file_id).all()
             ans = pqdata
@@ -553,8 +553,8 @@ class DBUtils(object):
         file_entries = self.session.query(self.File).filter(self.File.file_id.in_(subq)).all()
 
         file_entries2 = self.file_id_Clean(file_entries)
-        inds = [file_entries.index(v) for v in file_entries2]
-        version_bumps2 = [version_bumps[i] for i in inds]
+        inds = (file_entries.index(v) for v in file_entries2)
+        version_bumps2 = (version_bumps[i] for i in inds)
         #==============================================================================
         #         # sort keep on dates, then sort keep on level
         #==============================================================================
@@ -562,7 +562,7 @@ class DBUtils(object):
         file_entries2 = sorted(file_entries2, key=lambda x: x.utc_file_date, reverse=1)
         file_entries2 = sorted(file_entries2, key=lambda x: x.data_level)
         file_entries2 = [val.file_id for val in file_entries2]
-        mixed_entries = zip(file_entries2, version_bumps2)
+        mixed_entries = itertools.izip(file_entries2, version_bumps2)
 
         ## now we have a list of just the newest file_id's
         if not dryrun:
@@ -571,8 +571,9 @@ class DBUtils(object):
             if not any(version_bumps2):
                 self.Processqueue.push(file_entries2)
             else:
-                for v in mixed_entries:
-                    self.Processqueue.push(*v)
+                itertools.starmap(self.Processqueue.push, mixed_entries)
+#                for v in mixed_entries:
+#                    itertools.startmap(self.Processqueue.push, v)
         else:
             print('<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.Processqueue.len()))
 
@@ -622,8 +623,7 @@ class DBUtils(object):
         """
         ans = []
         sats = self.session.query(self.Satellite).all()
-        for s in sats:
-            ans.append(self.getTraceback('Satellite', s.satellite_id))
+        ans = map(lambda x: self.getTraceback('Satellite', x.satellite_id), sats)
         return ans
 
     def getAllInstruments(self):
@@ -631,9 +631,8 @@ class DBUtils(object):
         return dictionaries of instrument traceback dictionaries
         """
         ans = []
-        sats = self.session.query(self.Instrument).all()
-        for s in sats:
-            ans.append(self.getTraceback('Instrument', s.instrument_id))
+        insts = self.session.query(self.Instrument).all()
+        ans = map(lambda x: self.getTraceback('Instrument', x.instrument_id), insts)
         return ans
 
     def getAllFilenames(self, fullPath=True, level=None, product=None):
@@ -643,7 +642,6 @@ class DBUtils(object):
         if level==None get all filenames, otherwise only for a level
 
         I worked this for speed the zip(*names) is way too slow (this is about x18 faster)
-
         """
         if level is None and product is None:
             names = self.session.query(self.File.filename).all()
@@ -653,9 +651,9 @@ class DBUtils(object):
             names = self.session.query(self.File.filename).filter_by(product_id=product).all()
         else: # both specified
             names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).all()
-        names = list(map(itemgetter(0), names))
+        names = map(itemgetter(0), names)
         if fullPath:
-            names = [ self.getFileFullPath(v) for v in names]
+            names = map(self.getFileFullPath, names)
         return names
 
     def getAllFileIds(self):
@@ -665,14 +663,15 @@ class DBUtils(object):
         the itemgetter method is a lot faster then zip(*) (x16)
         """
         ids = self.session.query(self.File.file_id).all()
-        ids =  list(map(itemgetter(0), ids))
+        ids =  map(itemgetter(0), ids)
         return ids
 
     def addMission(self,
                     mission_name,
                     rootdir,
                     incoming_dir):
-        """ add a mission to the database
+        """
+        add a mission to the database
 
         @param mission_name: the name of the mission
         @type mission_name: str
@@ -814,13 +813,13 @@ class DBUtils(object):
                     input_product_id,
                     process_id,
                     optional):
-        """ add a product process link to the database
+        """
+        add a product process link to the database
 
         @param input_product_id: id of the product to link
         @type input_product_id: int
         @param process_id: id of the process to link
         @type process_id: int
-
         """
         ppl1 = self.Productprocesslink()
         ppl1.input_product_id = self.getProductID(input_product_id)
@@ -833,13 +832,13 @@ class DBUtils(object):
     def addFilecodelink(self,
                      resulting_file_id,
                      source_code):
-        """ add a file code  link to the database
+        """
+        add a file code  link to the database
 
         @param resulting_file_id: id of the product to link
         @type resulting_file_id: int
         @param source_code: id of the code
         @type source_code: int
-
         """
         fcl1 = self.Filecodelink()
         fcl1.resulting_file = resulting_file_id
@@ -1357,7 +1356,7 @@ class DBUtils(object):
         """
         DBlogging.dblogger.debug("Entered getProcessFromInputProduct: {0}".format(product))
         sq = self.session.query(self.Productprocesslink.process_id).filter_by(input_product_id = product).all()
-        return [v[0] for v in sq]
+        return map(itemgetter(0), sq)
 
     def getProcessFromOutputProduct(self, outProd):
         """
@@ -1404,7 +1403,6 @@ class DBUtils(object):
         Return the instrument_id for a given instrument
 
         @return: instrument_id - the instrument ID
-
         """
         try:
             i_id = long(name)
@@ -1429,7 +1427,7 @@ class DBUtils(object):
     def getMissions(self):
         """return a list of all the missions"""
         sq = self.session.query(self.Mission.mission_name)
-        return [val[0] for val in sq.all()]
+        return map(itemgetter(0), sq.all())
 
     def renameFile(self, filename, newname):
         """
@@ -1459,7 +1457,7 @@ class DBUtils(object):
                 raise(DBNoData("No file_id {0} found in the DB".format(filename)))
             return sq.file_id
         except TypeError: # came in as list or tuple
-            return [self.getFileID(v) for v in filename]
+            return map(self.getFileID, filename) 
         except ValueError:
             sq = self.session.query(self.File).filter_by(filename = filename).first()
             if sq is not None:
@@ -1483,12 +1481,12 @@ class DBUtils(object):
             if code is None:
                 raise(DBNoData("No code id {0} found in the DB".format(c_id)))
         except TypeError: # came in as list or tuple
-            return [self.getCodeID(v) for v in codename]
+            return map(self.getCodeID, codename)
         except ValueError:
             sq = self.session.query(self.Code.code_id).filter_by(filename = codename).all()
             if len(sq) == 0:
                 raise(DBNoData("No code name {0} found in the DB".format(codename)))
-            c_id = list(map(itemgetter(0), sq))
+            c_id = map(itemgetter(0), sq)
         return c_id
 
     def getFileDates(self, file_id):
@@ -1641,7 +1639,7 @@ class DBUtils(object):
                      .filter(self.File.product_id.in_(subq))
                      .all())
         if id_only:
-            files = list(map(itemgetter(0), files))
+            files = map(itemgetter(0), files)
         return files
 
     def getActiveInspectors(self):
@@ -1664,8 +1662,7 @@ class DBUtils(object):
         # get all the process ids that have this product as an input
         return self.getProcessFromInputProduct(product_id)
 
-    def getProductID(self,
-                     product_name):
+    def getProductID(self, product_name):
         """
         Return the product ID for an input product name
 
@@ -1701,9 +1698,7 @@ class DBUtils(object):
         @return: satellite_id - the requested satellite  ID
         """
         if isinstance(sat_name, (list, tuple)):
-            s_id = []
-            for v in sat_name:
-                s_id.append(self.getSatelliteID(v))
+            s_id = map(self.getSatelliteID, sat_name)
             return s_id
         try:
             sat_id = long(sat_name)
@@ -1874,7 +1869,7 @@ class DBUtils(object):
         given a release number return a list of all the filenames with the release
         """
         sq = self.session.query(self.Release.file_id).filter_by(release_num = rel_num).all()
-        sq = list(map(itemgetter(0), sq))
+        sq = map(itemgetter(0), sq)
         for i, v in enumerate(sq):
             if fullpath:
                 sq[i] = self.getFileFullPath(v)
@@ -2081,7 +2076,7 @@ class DBUtils(object):
         inst_id = self.getInstrumentID(inst_id)
         sq = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id = inst_id).all()
         if sq:
-            return  list(map(itemgetter(0), sq))
+            return  map(itemgetter(0), sq)
         else:
             return None
 
@@ -2122,8 +2117,8 @@ class DBUtils(object):
         """
         code_id = self.getCodeID(code_id)
         f_ids = self.session.query(self.Filecodelink.resulting_file).filter_by(source_code=code_id).all()
-        f_ids = list(map(itemgetter(0), f_ids))
-        files = [self.getEntry('File', val) for val in f_ids]
+        f_ids = map(itemgetter(0), f_ids)
+        files = map(lambda x: self.getEntry('File', x), f_ids)
         if not id_only:
             return files
         else:
@@ -2137,12 +2132,12 @@ class DBUtils(object):
         f_ids = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file=file_id).all()
         if not f_ids:
             return []
-        f_ids = list(map(itemgetter(0), f_ids))
+        f_ids = map(itemgetter(0), f_ids)
         files = [self.getEntry('File', val) for val in f_ids]
         if not id_only:
             return files
         else:
-            return [val.file_id for val in files]
+            return map(attrgetter('file_id'), files)
 
     @staticmethod
     def processRunning(pid):
