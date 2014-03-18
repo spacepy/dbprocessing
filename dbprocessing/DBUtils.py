@@ -1573,12 +1573,13 @@ class DBUtils(object):
                                            + self.File.quality_version*100 
                                            + self.File.revision_version).label('versionnum'), 
                                           self.File.file_id,
-                                          self.File.utc_file_date )
+                                          self.File.utc_file_date, 
+                                           self.File.product_id)
                        .filter(self.File.utc_file_date.between(*daterange))
-                       .group_by(self.File.product_id).subquery())
+                       .group_by(self.File.product_id)).subquery()
 
             subq = (self.session.query(func.max(version.c.versionnum))
-                  .group_by(version.c.utc_file_date)).subquery()
+                  .group_by(version.c.product_id)).subquery()
 
             sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
 

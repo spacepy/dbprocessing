@@ -26,8 +26,12 @@ data_path = [os.path.join('/', 'usr', 'local', 'ectsoc', 'data', 'level_0', val,
 mag_types = ['quicklook', 'l2']
 tmp = [os.path.join('/', 'n', 'space_data', 'cda', 'rbsp', 'rbsp{0}'.format(s), 'emfisis' , t) for s, t in itertools.product(sc, mag_types)]
 data_path += tmp
-magephem_types = ['pre', 'def']
+magephem_types = ['pre']
 tmp = [os.path.join('/', 'n', 'projects', 'rbsp', 'rbsp{0}'.format(s), 'MagEphem' , t) for s, t in itertools.product(sc, magephem_types)]
+data_path += tmp
+
+tmp = ['/n/space_data/cda/rbsp/rbspa/magephem_def', '/n/space_data/cda/rbsp/rbspb/magephem_def']
+
 data_path += tmp
 
 
