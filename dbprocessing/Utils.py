@@ -6,6 +6,7 @@ Class to hold random utilities of use throughout this code
 import collections
 import datetime
 import re
+import os
 
 import dateutil.rrule # do this long so where it is from is remembered
 
@@ -167,5 +168,25 @@ def split_code_args(args):
         if re.match(r'\-\S', v): # found a single letter option
             pass
 
+def processRunning(pid):
+    """
+    given a PID see if it is currently running
 
+    @param pid: a pid
+    @type pid: long
 
+    @return: True if pid is running, False otherwise
+    @rtype: bool
+
+    @author: Brandon Craig Rhodes
+    @organization: Stackoverflow
+    http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
+
+    @version: V1: 02-Dec-2010 (BAL)
+    """
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True

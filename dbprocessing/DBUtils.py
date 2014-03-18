@@ -2131,30 +2131,6 @@ class DBUtils(object):
         else:
             return map(attrgetter('file_id'), files)
 
-    @staticmethod
-    def processRunning(pid):
-        """
-        given a PID see if it is currently running
-
-        @param pid: a pid
-        @type pid: long
-
-        @return: True if pid is running, False otherwise
-        @rtype: bool
-
-        @author: Brandon Craig Rhodes
-        @organization: Stackoverflow
-        http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
-
-        @version: V1: 02-Dec-2010 (BAL)
-        """
-        try:
-            os.kill(pid, 0)
-        except OSError:
-            return False
-        else:
-            return True
-
     def getVersion(self, fileid):
         """
         return the version instance for a file

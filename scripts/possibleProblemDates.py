@@ -162,7 +162,7 @@ if __name__ == "__main__":
         curr_proc = dbu._currentlyProcessing()
         if curr_proc:  # returns False or the PID
             # check if the PID is running
-            if dbu.processRunning(curr_proc):
+            if Utils.processRunning(curr_proc):
                 # we still have an instance processing, don't start another
                 dbu._closeDB()
                 DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
