@@ -96,6 +96,15 @@ class UtilsTests(unittest.TestCase):
         invals = ['sdg', 'false', False, 'sagdfa']
         for v in invals:
             self.assertFalse(Utils.toNone(v) is None)
+            
+    def test_daterange_to_dates(self):
+        """daterange_to_dates"""
+        daterange = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 6)]
+        expected = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5), datetime.datetime(2000, 1, 6)]
+        self.assertEqual(expected, Utils.daterange_to_dates(daterange))
+        daterange = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5, 23)]
+        expected = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5)]
+        self.assertEqual(expected, Utils.daterange_to_dates(daterange))
 
 
 

@@ -23,6 +23,13 @@ def unique(seq):
 def expandDates(start_time, stop_time):
     return dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=start_time, until=stop_time)
 
+def daterange_to_dates(daterange):
+    """
+    given a daterange return the dat objects for all days in the range
+    """
+    return [daterange[0] + datetime.timedelta(days=val) for val in
+            xrange((daterange[1]-daterange[0]).days+1)]
+
 def parseDate(inval):
     """
     given a date of the for yyyy-mm-dd parse to a datetime

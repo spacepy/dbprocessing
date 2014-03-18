@@ -1814,14 +1814,6 @@ class DBUtils(object):
         except IndexError:
             return None
 
-    @staticmethod
-    def daterange_to_dates(daterange):
-        """
-        given a daterange return the dat objects for all days in the range
-        """
-        DBlogging.dblogger.debug("Entered daterange_to_dates: daterange={0}".format(daterange))
-        return [daterange[0] + datetime.timedelta(days=val) for val in xrange((daterange[1]-daterange[0]).days+1)]
-
     def getMissionID(self, mission_name):
         """
         given a mission name return its ID
