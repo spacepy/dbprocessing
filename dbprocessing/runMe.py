@@ -6,7 +6,7 @@ Created on Tue Oct 23 10:12:11 2012
 """
 from collections import namedtuple
 import glob
-from operator import itemgetter
+from operator import itemgetter, attrgetter
 import os
 import shutil
 import subprocess
@@ -48,7 +48,6 @@ def rm_tempdir(tempdir):
     shutil.rmtree(tempdir)
     tempdir = None
     DBlogging.dblogger.debug("Temp dir deleted: {0}".format(name))
-
 
 def _extract_files(cmdline):
     """
@@ -496,10 +495,10 @@ class runMe(object):
             return None
 
         DBlogging.dblogger.debug("db_file: {0} has parents: {1}".format(f_id_db,
-               [p.file_id for p in parents]))
+               map(attrgetter('file_id', parents))))
 
         # if there are more input files now then we need to reprocess
-        if len(self.input_files) != len([p.file_id for p in parents]):
+        if len(self.input_files) != len(parents):
             # inc quality and go back
             self._incVersion([0,1,0])
             return True
