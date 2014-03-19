@@ -77,7 +77,7 @@ def _extract_files(cmdline):
 
 def _pokeFile(filename):
     """
-    given a filename open it nonblocking and see if it works
+    given a filename open it non-blocking and see if it works
     """
     try:
         fp = os.open(filename, os.O_NONBLOCK, os.O_RDONLY)
@@ -94,7 +94,7 @@ def _pokeFile(filename):
 
 def _start_a_run(runme):
     """
-    given a runme that we want to start poke the all teh files to be sure the automunter has them all up
+    given a runme that we want to start poke the all the files to be sure the automunter has them all up
 
     intermediate steps:
     1) need to extract all the files that will be used for the process and poke them all
@@ -159,12 +159,12 @@ def runner(runme_list, dbu, MAX_PROC = 2):
         runme.make_command_line()
     # get rid of all the runme objects that are not runnable
     runme_list2 = set([v for v in runme_list if v.ableToRun])
-    # get the ones we are not running and delete thier tempdir
+    # get the ones we are not running and delete their tempdir
     left_overs = set(runme_list).difference(runme_list2)
     for lo in left_overs: # remove the tempdir
         try:
             rm_tempdir(lo.tempdir)
-        except OSError:
+        except (OSError, AttributeError):
             pass
 
     # sort the runme_list on level and filename (which is like date and product and s/c together)
@@ -193,7 +193,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     #    for some code here
     processes = {} # dict with the key as the Popen object containing a list of command line and start time
 
-    n_good = 0 # number of processes susseccfully completed
+    n_good = 0 # number of processes successfully completed
     n_bad = 0 # number of processes failed
     
     #    while runme_list or processes:
@@ -353,7 +353,7 @@ class runMe(object):
                 DBlogging.dblogger.debug("Code did change for file: {0}".format(self.filename))
                 continue
             parentchange = self._parentsChanged(f_id_db)
-            if parentchange is None: # this is an inconsitency mark it and move on
+            if parentchange is None: # this is an inconsistency mark it and move on
                 DBlogging.dblogger.info("Parent was None for file: {0}".format(self.filename))
                 break
             if parentchange:
@@ -407,7 +407,7 @@ class runMe(object):
 
 ##     def __hash__(self):
 ##         """
-##         implement a costom hash so that in will work and ignore the temp directory that is always different
+##         implement a custom hash so that in will work and ignore the temp directory that is always different
 ##         """
 ##         attrs = ['ableToRun', 'code_id', 'data_level', 'extra_params', 'input_files', 'out_prod', 'pq',
 ##                  'args', 'codepath', 'filename', 'output_version', 'process_id', 'utc_file_date']
@@ -517,7 +517,7 @@ class runMe(object):
             
             # if a parent is no longer newest we need to inc
             if self.dbu.getVersion(parent) != self.dbu.getVersion(parent_max): 
-                # we have a parrent file for a certain date,
+                # we have a parent file for a certain date,
                 #   get all the files for that date and see if the parent is the newest
                 #   if it is then that parent has not changed, do not run
                 #   if there is a newer parent then we do need to run
@@ -610,7 +610,7 @@ class runMe(object):
         """
 
         ## 1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a
-        # if runme.filename is in the DB then we cannot run this.  (happends if 2 identical runMe are there
+        # if runme.filename is in the DB then we cannot run this.  (happens if 2 identical runMe are there
         try:
             file_entry = self.dbu.getEntry('File', self.filename)
             DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(self.filename))
