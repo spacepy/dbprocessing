@@ -102,8 +102,6 @@ if __name__ == "__main__":
         if not len(files):
             sys.exit(0)
         files = map(itemgetter(0), files)
-#        print("Adding to process queue: {0}".format(' '.join(map(str, files))))
-        print("Adding to process queue:")
         added = dbu.Processqueue.push(files)
         print("   -- Added {0} files to be reprocessed for product {1}".format(len(added), options.parent))
         DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(len(added), options.parent))
