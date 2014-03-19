@@ -52,7 +52,6 @@ if __name__ == "__main__":
     tree = dbu.getProductParentTree()
     for t1 in tree:
         for t2 in t1[1]:
-            done.append(tmp)
             cmd = [ os.path.expanduser('~/dbUtils/missingFilesByProduct.py'),
                 '-m', options.mission,
                 '-s', startDate.date().isoformat(),
