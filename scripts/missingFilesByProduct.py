@@ -8,6 +8,7 @@ go through the DB and print put a list of dates that do not have files for a giv
 
 import datetime
 import fnmatch
+from operator import itemgetter
 from optparse import OptionParser
 import sys
 import warnings
@@ -36,6 +37,8 @@ if __name__ == "__main__":
                       help="Add those dates to the process queue for the specified DB")
     parser.add_option("", "--parent", dest='parent', type='int', default=None,
                       help="The parent product ID  to enable processing of the missing files")
+    parser.add_option("", "--echo", dest='echo', default=False, action='store_true',
+                      help="But the database in echo mode")
 
     
     (options, args) = parser.parse_args()
@@ -61,7 +64,7 @@ if __name__ == "__main__":
 
     db = dbprocessing.ProcessQueue(options.mission,)
 
-    dbu = DBUtils.DBUtils(options.mission)
+    dbu = DBUtils.DBUtils(options.mission, echo=options.echo)
 
     dates = [startDate + datetime.timedelta(days=v) for v in range((endDate-startDate).days +1)]
     if not dates: # only one day
@@ -88,15 +91,20 @@ if __name__ == "__main__":
         sys.exit(0)
        
     print("Missing files for product {0} for these dates:".format(product_id))
-    for d in missing_dates:
-        print("\t{0}".format(d.isoformat()))
+    tmp = [d.isoformat() for d in missing_dates]
+    print("{0}".format(' '.join(tmp)))
 
     if options.process:
         if options.parent is None:
             parser.error("Cannot process without a parent product id specified")
+        # do a custom query here to get all the file ids in one sweep
+        files = dbu.session.query(dbu.File.file_id).filter_by(product_id=options.parent).filter(dbu.File.utc_file_date.in_(missing_dates)).all()
+        if not len(files):
+            sys.exit(0)
+        files = map(itemgetter(0), files)
+#        print("Adding to process queue: {0}".format(' '.join(map(str, files))))
         print("Adding to process queue:")
-        for m in missing_dates:
-            num = db.reprocessByProduct(options.parent, startDate=m, endDate=m)
-            print("   {0} -- Added {1} files to be reprocessed for product {2}".format(m, num, options.parent))
-            DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, options.parent))
+        added = dbu.Processqueue.push(files)
+        print("   -- Added {0} files to be reprocessed for product {1}".format(len(added), options.parent))
+        DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(len(added), options.parent))
 
