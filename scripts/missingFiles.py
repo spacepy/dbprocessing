@@ -50,19 +50,16 @@ if __name__ == "__main__":
 
     # get the product tree:
     tree = dbu.getProductParentTree()
-    done = []
     for t1 in tree:
         for t2 in t1[1]:
-            tmp = [t1[0], startDate.date().isoformat(), endDate.date().isoformat()]
-            if tmp not in done:
-                done.append(tmp)
-                cmd = [ os.path.expanduser('~/dbUtils/missingFilesByProduct.py'),
-                        '-m', options.mission,
-                        '-s', startDate.date().isoformat(),
-                        '-e', endDate.date().isoformat(),
-                        '-p', '--parent={0}'.format(t1[0]), str(t2) ]
-                print("Running {0}".format(cmd))
-                subprocess.call(cmd)
+            done.append(tmp)
+            cmd = [ os.path.expanduser('~/dbUtils/missingFilesByProduct.py'),
+                '-m', options.mission,
+                '-s', startDate.date().isoformat(),
+                '-e', endDate.date().isoformat(),
+                '-p', '--parent={0}'.format(t1[0]), str(t2) ]
+            print("Running {0}".format(cmd))
+            subprocess.call(cmd)
             
 
 
