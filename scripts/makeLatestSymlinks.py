@@ -81,7 +81,6 @@ def cull_to_newest(files, options=None):
             ans.append(max(tmp, key=lambda x: x[1])[2])
     return ans
 
-
 def cull_to_dates(files, startdate, enddate, nodate=False, options=None):
     """
     loop over the files and drop the ones that are outside of the range we want to include
@@ -195,6 +194,12 @@ if __name__ == '__main__':
     parser.add_option("", "--verbose",
                   dest="verbose", action='store_true',
                   help="Print out verbose information", default=False)
+    parser.add_option("-l", "--list",
+                  dest="list", action='store_true',
+                  help="Instead of syncing list the sections of the conf file", default=False)
+    parser.add_option("-f", "--filter",
+                  dest="filter", 
+                  help="Comma seperated list of strings that must be in the sync conf name (e.g. -f hope,rbspa)", default=None)
 
     (options, args) = parser.parse_args()
 
@@ -206,6 +211,25 @@ if __name__ == '__main__':
         parser.error("Config file not readable ({0})".format(conffile))
         
     config = readconfig(conffile)
+
+    config2 = {}
+    if options.filter is not None:
+        filters = options.filter.split(',')
+        for c in config:
+            num = 0 
+            for f in filters:
+                if f in c:
+                    num += 1
+            if num == len(filters):
+                config2[c] = config[c]
+        config = config2
+        
+    if options.list:
+        out = []
+        for c in config:
+            print(c)
+        sys.exit(0)
+    print config
 
     for sec in config:
         print('Processing [{0}]'.format(sec))
