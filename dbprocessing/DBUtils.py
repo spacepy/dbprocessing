@@ -656,14 +656,24 @@ class DBUtils(object):
             names = map(self.getFileFullPath, names)
         return names
 
-    def getAllFileIds(self):
+    def getAllFileIds(self, newest_version=False):
         """
-        return all teh file ids in the database
+        return all the file ids in the database
 
         the itemgetter method is a lot faster then zip(*) (x16)
         """
-        ids = self.session.query(self.File.file_id).all()
-        ids =  map(itemgetter(0), ids)
+        if not newest:
+            ids = self.session.query(self.File.file_id).all()
+            ids =  map(itemgetter(0), ids)
+        else:
+            # get all the product ids
+            p_ids = self.getAllProducts()
+            p_ids =  map(attrgetter('product_id'), p_ids)
+            ids = []
+            for p in p_ids:
+                print p
+                ids.extend(self.getFilesByProduct(p, newest_version=True))
+            ids =  map(attrgetter('product_id'), ids)
         return ids
 
     def addMission(self,
@@ -1619,7 +1629,7 @@ class DBUtils(object):
         else:
             sq = self.session.query(self.File).filter_by(product_id = prod_id)
         return sq.all()
-
+    
     def getFilesByInstrument(self, inst_id, level=None, id_only=False):
         """
         given an instrument_if return all the file instances associated with it
@@ -1642,7 +1652,41 @@ class DBUtils(object):
         if id_only:
             files = map(itemgetter(0), files)
         return files
+    
+    def getFilesByLevel(self, level, id_only=False, newest_version=False):
+        """
+        given a level return all the file instances associated with it
+        """
+        # get all the product ids of that level
+        p_ids = self.getProductsByLevel(level)
+        p_ids =  map(attrgetter('product_id'), p_ids)
+        ids = []
+        for p in p_ids:
+            ids.extend(self.getFilesByProduct(p, newest_version=newest_version))
+        if id_only:
+            ids = map(attrgetter('file_id'), ids)
+        return files
 
+    def getAllFileIds(self, newest_version=False):
+        """
+        return all the file ids in the database
+
+        the itemgetter method is a lot faster then zip(*) (x16)
+        """
+        if not newest_version:
+            ids = self.session.query(self.File.file_id).all()
+            ids =  map(itemgetter(0), ids)
+        else:
+            # get all the product ids
+            p_ids = self.getAllProducts()
+            p_ids =  map(attrgetter('product_id'), p_ids)
+            ids = []
+            for p in p_ids:
+                print p
+                ids.extend(self.getFilesByProduct(p, newest_version=True))
+            ids =  map(attrgetter('product_id'), ids)
+        return ids
+    
     def getActiveInspectors(self):
         """
         query the db and return a list of all the active inspector file names [(filename, arguments, product), ...]
@@ -1898,7 +1942,7 @@ class DBUtils(object):
 
     def getTraceback(self, table, in_id, in_id2=None):
         """
-        master routine for all te getXXXTraceback functions, this will make for less code
+        master routine for all the getXXXTraceback functions, this will make for less code
 
         this is some large select statements with joins in them, these are tested and do work
         """       
@@ -2073,6 +2117,16 @@ class DBUtils(object):
         else:
             return None
 
+    def getProductsByLevel(self, level):
+        """
+        get all the products for a given level
+        """
+        sq = self.session.query(self.product).filter_by(level = level).all()
+        if sq:
+            return  map(itemgetter(0), sq)
+        else:
+            return None
+    
     def getAllProcesses(self, timebase='all'):
         """
         get all processes
