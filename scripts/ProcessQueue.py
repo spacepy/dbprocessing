@@ -48,7 +48,7 @@ if __name__ == "__main__":
     if not options.i and not options.p:
         parser.error("either -i or -p must be specified")
 
-    logname = options.mission.replace('.', '_')
+    logname = os.path.basename(options.mission).replace('.', '_')
     #imports have to happen after the log name is defined
     from dbprocessing import DBlogging, dbprocessing
     from dbprocessing.runMe import ProcessException
