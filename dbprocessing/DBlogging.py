@@ -60,3 +60,18 @@ handler.setFormatter(formatter)
 dblogger.addHandler(handler)
 
 dblogger.info("DBLogger initialized")
+
+def change_logfile(logname=None):
+    global LOG_FILENAME, handler, formatter, dblogger
+    basename = 'dbprocessing_{0}'.format(logname if logname else 'log')
+    old_filename = LOG_FILENAME
+    LOG_FILENAME = os.path.expanduser(os.path.join(log_dir, '{0}.log.{1}'.format(
+        basename, utctoday)))
+    dblogger.info("Logging file switched from {0} to {1}".format(old_filename, LOG_FILENAME))
+    new_handler = logging.handlers.TimedRotatingFileHandler(
+              LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True) # keep them all
+    new_handler.setFormatter(formatter)
+    dblogger.removeHandler(handler)
+    dblogger.addHandler(new_handler)
+    handler = new_handler
+    dblogger.info("Switching logging file from {0} to {1}".format(old_filename, LOG_FILENAME))
