@@ -16,11 +16,18 @@ Setup routines to log information from the dbprocessing chain
 
 utctoday = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
 
+try:
+    logname
+except NameError:
+    logname = None
+
 # TODO this should be setup by a config file
 log_dir = os.path.expanduser(os.path.join('~', 'dbprocessing_logs'))
 if not os.path.isdir(log_dir):
     os.makedirs(log_dir)
-LOG_FILENAME = os.path.expanduser(os.path.join(log_dir, 'dbprocessing_log.log.{0}'.format(utctoday)))
+basename = 'dbprocessing_{0}'.format(logname if logname else 'log')
+LOG_FILENAME = os.path.expanduser(os.path.join(log_dir, '{0}.log.{1}'.format(
+    basename, utctoday)))
 
 # Set up a specific logger with our desired output level
 dblogger = logging.getLogger('DBLogger')

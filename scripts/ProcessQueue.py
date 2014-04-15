@@ -9,10 +9,6 @@ import subprocess
 
 import spacepy.toolbox as tb
 
-from dbprocessing import DBlogging, dbprocessing
-from dbprocessing.runMe import ProcessException
-from dbprocessing import runMe, Utils
-
 __version__ = '2.0.3'
 
 
@@ -51,6 +47,12 @@ if __name__ == "__main__":
         parser.error("options -i and -p are mutually exclusive")
     if not options.i and not options.p:
         parser.error("either -i or -p must be specified")
+
+    logname = options.mission.replace('.', '_')
+    #imports have to happen after the log name is defined
+    from dbprocessing import DBlogging, dbprocessing
+    from dbprocessing.runMe import ProcessException
+    from dbprocessing import runMe, Utils
 
     if options.loglevel not in DBlogging.LEVELS:
         parser.error("invalid --log-level specified")
