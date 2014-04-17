@@ -30,7 +30,7 @@ magephem_types = ['pre']
 tmp = [os.path.join('/n/space_data/cda/rbsp/MagEphem/predicted/a/'), os.path.join('/n/space_data/cda/rbsp/MagEphem/predicted/b/')]
 data_path += tmp
 
-tmp = ['/n/space_data/cda/rbsp/rbspa/magephem_def', '/n/space_data/cda/rbsp/rbspb/magephem_def']
+tmp = ['/n/space_data/cda/rbsp/MagEphem_def/def/a', '/n/space_data/cda/rbsp/MagEphem_def/def/b']
 
 data_path += tmp
 
