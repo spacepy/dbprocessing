@@ -1776,6 +1776,25 @@ class DBUtils(object):
         code = self.getEntry('Code', code_id)
         return Version.Version(code.interface_version, code.quality_version, code.revision_version)
 
+    def getAllCodesFromProcess(self, proc_id):
+        """
+        given a process id return the code ids that performs that process and the valid dates
+
+        Returns
+        =======
+        outval : (int, datetime.date, datetime.date)
+            code id and dates that perform a process
+        """
+        DBlogging.dblogger.debug("Entered getAllCodesFromProcess: {0}".format(proc_id))
+        # will have as many values as there are codes for a process
+        sq = (self.session.query(self.Code).filter_by(process_id = proc_id)
+              .filter_by(newest_version = True)
+              .filter_by(active_code = True))
+        ans = []
+        for s in sq:
+            ans.append((s.code_id, s.code_start_date, s.code_stop_date))
+        return ans
+
     def getCodeFromProcess(self, proc_id, utc_file_date):
         """
         given a process id return the code id that makes performs that process
