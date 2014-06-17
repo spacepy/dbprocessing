@@ -1537,8 +1537,12 @@ class DBUtils(object):
         """
         return the files in the db by product id that have data in the date specified
         """
-        if any([isinstance(v, datetime.datetime) for v in daterange]):
-            raise(ValueError("daterange must be datetime.date not datetime.datetime"))
+        dates = []
+        for d in daterange:
+            try:
+                dates.append(d.date())
+            except AttributeError:
+                dates.append(d)
 
         if newest_version:
             # don't trust that the db has this correct
