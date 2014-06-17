@@ -278,7 +278,14 @@ class ProcessQueue(object):
             # get all the possible files based on dates that we might want to put into the process now
             
             for val, opt in input_product_id:
-                tmp_files = self.dbu.getFilesByProductDate(val, [utc_file_date.date()]*2, newest_version=True)
+                # accept a datetime.datetime or datetime.date
+                try:
+                    dt = utc_file_date.date()
+                except AttributeError:
+                    dt = utc_file_date
+                    
+                tmp_files = self.dbu.getFilesByProductDate(val, [dt]*2, newest_version=True)
+
                 if not tmp_files and not opt:
                     return None, input_product_id
                 else:
