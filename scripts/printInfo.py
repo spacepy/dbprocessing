@@ -50,6 +50,15 @@ if __name__ == '__main__':
                                                       m.mission_name,
                                                       m.rootdir,
                                                       m.incoming_dir))
+    elif field == 'Process':
+        print("{0:4} {1:40} {2:10} {3:45}".format("ID", "NAME", "TIMEBASE", "OUTPUT"))
+        for p in dbu.getAllProcesses():
+            pid = p.output_product
+            prod_name = dbu.getEntry('Product', pid).product_name
+            print("{0:4} {1:40} {2:10} {3:45}".format(p.process_id,
+                                                      p.process_name,
+                                                      p.output_timebase,
+                                                      "({0}){1}".format(pid, prod_name)))
     else:
         dbu._closeDB()        
         raise(NotImplementedError('Attr: "{0}" not yet implemented'.format(field) ))
