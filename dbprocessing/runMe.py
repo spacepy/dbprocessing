@@ -124,7 +124,7 @@ def _start_a_run(runme):
             raise(RuntimeError("Should not have gotten here"))
 
 
-def runner(runme_list, dbu, MAX_PROC = 2):
+def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     """
     Go through a list of runMe objects and run them
 
@@ -136,6 +136,8 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     ==========
     runme_list : list
         list of runMe objects that need to be run
+    rundir : str
+        directory to run in, if None then use a temp directory
 
     Returns
     =======
@@ -156,7 +158,7 @@ def runner(runme_list, dbu, MAX_PROC = 2):
     ## 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     # in make_command_line a tempdir gets created (self.tempdir) it will need to be cleaned
     for runme in runme_list:
-        runme.make_command_line()
+        runme.make_command_line(force = rundir is None, rundir=rundir)
     # get rid of all the runme objects that are not runnable
     runme_list2 = set([v for v in runme_list if v.ableToRun])
     # get the ones we are not running and delete their tempdir
@@ -221,11 +223,17 @@ def runner(runme_list, dbu, MAX_PROC = 2):
                     rm_tempdir(runme.tempdir) # delete the tempdir
             except DBUtils.DBNoData:
                 print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
-                prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
+                if rundir is None:
+                    prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
+                else:
+                    prob_name = os.path.join(rundir, runme.filename + '.prob')
                 try:
                     fp = open(prob_name, 'w')
                     fp.write(' '.join(runme.cmdline))
                     fp.write('\n\n')
+                    fp.write('-'*80)
+                    fp.write('\n\n')
+                    fp.flush()
                 except IOError:
                     DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
                                              .format(os.path.basename(' '.join(runme.cmdline))))
@@ -246,31 +254,34 @@ def runner(runme_list, dbu, MAX_PROC = 2):
             # OK process done, get the info from the dict
             rm, t, fp = processes[p] # unpack the tuple
             if p.returncode != 0: # non zero return code FAILED
-                DBlogging.dblogger.error("Command returned a non-zero return code: {0}\n\t{1}"
+                DBlogging.dblogger.error("Command returned a non-zero return code ({1}): {0}"
                                          .format(' '.join(rm.cmdline), p.returncode))
                 print("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
                 fp.close()
                 #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
                 #rm.moveToError(os.path.join(rm.tempdir, fp.name))
-                rm.moveToError(fp.name)
-                # assume the file is bad and move it to error
-                rm.moveToError(os.path.join(rm.tempdir, rm.filename))
+                if rundir is None:
+                    rm.moveToError(fp.name)
+                    # assume the file is bad and move it to error
+                    rm.moveToError(os.path.join(rm.tempdir, rm.filename))
+                    rm_tempdir(rm.tempdir) # delete the temp directory
+
                 n_bad += 1
-                rm_tempdir(rm.tempdir) # delete the temp directory
 
             elif p.returncode == 0: # p.returncode == 0  SUCCESS
                 fp.close()
                 # this is not a perfect time since all the adding occurs before the next poll
                 DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
                 print("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
-                try:
-                    rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
-                except IOError:
-                    glb = glob.glob(os.path.join(rm.tempdir, rm.filename) + '*.png')
-                    if len(glb) == 1:
-                        rm.moveToIncoming(glb[0])
-                rm_tempdir(rm.tempdir) # delete the temp directory
-                rm._add_links(rm.cmdline)
+                if rundir is None: # if rundir then this is a test
+                    try:
+                        rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
+                    except IOError:
+                        glb = glob.glob(os.path.join(rm.tempdir, rm.filename) + '*.png')
+                        if len(glb) == 1:
+                            rm.moveToIncoming(glb[0])
+                    rm_tempdir(rm.tempdir) # delete the temp directory
+                    rm._add_links(rm.cmdline)
                 print("Process {0} FINISHED".format(' '.join(rm.cmdline)))
                 n_good += 1
             else:
@@ -602,7 +613,7 @@ class runMe(object):
             for val in self.input_files: # add a link for each input file
                 self.dbu.addFilefilelink(f_id, val)
 
-    def make_command_line(self):
+    def make_command_line(self, force=False, rundir=None):
         """
         make a command line for actually doing this running
 
@@ -611,13 +622,14 @@ class runMe(object):
 
         ## 1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a
         # if runme.filename is in the DB then we cannot run this.  (happens if 2 identical runMe are there
-        try:
-            file_entry = self.dbu.getEntry('File', self.filename)
-            DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(self.filename))
-            self.ableToRun = False
-            return
-        except DBUtils.DBNoData:
-            pass # we can process this
+        if not force:
+            try:
+                file_entry = self.dbu.getEntry('File', self.filename)
+                DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(self.filename))
+                self.ableToRun = False
+                return
+            except DBUtils.DBNoData:
+                pass # we can process this
 
         # build the command line we are to run
         cmdline = [self.codepath]
@@ -631,8 +643,11 @@ class runMe(object):
         for i_fid in self.input_files:
             cmdline.append(self.dbu.getFileFullPath(i_fid))
         # the putname goes last
-        self.tempdir = mk_tempdir(suffix='_{0}_runMe'.format(self.filename))
-        cmdline.append(os.path.join(self.tempdir, self.filename))
+        if rundir is None:
+            self.tempdir = mk_tempdir(suffix='_{0}_runMe'.format(self.filename))
+            cmdline.append(os.path.join(self.tempdir, self.filename))
+        else:
+            cmdline.append(os.path.join(rundir, self.filename))
 
         # and make sure to expand any path variables
         cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]
