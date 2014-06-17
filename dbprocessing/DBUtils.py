@@ -2137,6 +2137,14 @@ class DBUtils(object):
             procs = self.session.query(self.Process).filter_by(output_timebase = timebase.upper()).all()
         return procs
 
+    def getProcessTimebase(self, process_id):
+        """
+        return the timebase for a product
+        """
+        # this is two queries but allows for name or id as input
+        process_id = self.getProcessID(process_id)
+        return self.session.query(self.Process.output_timebase).get(process_id)[0] 
+
     def getAllProducts(self):
         """
         return a list of all products as instances
