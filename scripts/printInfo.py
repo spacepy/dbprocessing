@@ -72,6 +72,12 @@ if __name__ == '__main__':
                 opt_print = "optional" if opt else ""
                 print("\t\t{0:10} ({1:3}) {2:45}".format(opt_print,
                                                          pp, dbu.getEntry('Product', pp).product_name))
+            codes = dbu.getAllCodesFromProcess(p.process_id)
+            for c, sd, ed in codes:
+                print("\t\t{0:10}c({1:3}) {2:45} {3}->{4}".format("", c,
+                                                          dbu.getEntry('Code', c).filename,
+                                                          sd.isoformat(),
+                                                          ed.isoformat()))
             
 
     else:
