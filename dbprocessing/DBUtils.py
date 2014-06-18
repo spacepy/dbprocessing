@@ -1553,7 +1553,7 @@ class DBUtils(object):
                                            + self.File.revision_version).label('versionnum'), 
                                           self.File.file_id,
                                           self.File.utc_file_date )
-                       .filter(self.File.utc_file_date.between(*daterange))
+                       .filter(self.File.utc_file_date.between(*dates))
                        .filter(self.File.product_id == product_id)
                        .group_by(self.File.file_id).subquery())
 
@@ -1567,15 +1567,19 @@ class DBUtils(object):
            
         else: 
             sq = self.session.query(self.File).filter_by(product_id = product_id).\
-                filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
+                filter(self.File.utc_file_date.between(dates[0], dates[1])).all()       
         return sq
 
     def getFilesByDate(self, daterange, newest_version=False):
         """
         return the files in the db that have data in the date specified
         """
-        if any([isinstance(v, datetime.datetime) for v in daterange]):
-            raise(ValueError("daterange must be datetime.date not datetime.datetime"))
+        dates = []
+        for d in daterange:
+            try:
+                dates.append(d.date())
+            except AttributeError:
+                dates.append(d)
 
         if newest_version:
             # don't trust that the db has this correct
@@ -1587,7 +1591,7 @@ class DBUtils(object):
                                           self.File.file_id,
                                           self.File.utc_file_date, 
                                            self.File.product_id)
-                       .filter(self.File.utc_file_date.between(*daterange))
+                       .filter(self.File.utc_file_date.between(*dates))
                        .group_by(self.File.product_id)).subquery()
 
             subq = (self.session.query(func.max(version.c.versionnum))
@@ -1600,7 +1604,7 @@ class DBUtils(object):
            
         else: 
             sq = self.session.query(self.File).\
-                filter(self.File.utc_file_date.between(daterange[0], daterange[1])).all()       
+                filter(self.File.utc_file_date.between(dates[0], dates[1])).all()       
         return sq
 
     def getFilesByProduct(self, prod_id, newest_version=False):
