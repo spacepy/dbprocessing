@@ -28,7 +28,7 @@ scripts = ('scripts/ProcessQueue.py',
            'scripts/rept_dataToIncoming.py', 'scripts/htmlCoverage.py',
            'scripts/missingFiles.py', 'scripts/configFromDB.py',
            'scripts/mageis_dataToIncoming.py', 'scripts/reprocessByDate.py',
-           'scripts/coveragePlot.py')
+           'scripts/coveragePlot.py', 'scripts/DBRunner.py')
 
 scripts_dir = os.path.expanduser('~/dbUtils')
 
