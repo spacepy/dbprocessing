@@ -5,6 +5,7 @@ Created on Tue Oct 23 10:12:11 2012
 @author: balarsen
 """
 from collections import namedtuple
+import datetime
 import glob
 from operator import itemgetter, attrgetter
 import os
@@ -158,7 +159,8 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     ## 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     # in make_command_line a tempdir gets created (self.tempdir) it will need to be cleaned
     for runme in runme_list:
-        runme.make_command_line(force = rundir is None, rundir=rundir)
+        force = False if rundir is None else True
+        runme.make_command_line(force = force, rundir=rundir)
     # get rid of all the runme objects that are not runnable
     runme_list2 = set([v for v in runme_list if v.ableToRun])
     # get the ones we are not running and delete their tempdir
@@ -216,11 +218,18 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
 
             # make sure the file is not in the DB before you try this
             try:
+                #force = False if rundir is None else True
+                if force:
+                    raise(DBUtils.DBNoData)
+
                 tmp = dbu.getEntry('File', os.path.basename(runme.cmdline[-1])) # output is last
                 if tmp is not None: # we are not going to run
                     DBlogging.dblogger.info("Did Not run: {0} output was in db"
                                             .format(os.path.basename(' '.join(runme.cmdline))))
-                    rm_tempdir(runme.tempdir) # delete the tempdir
+                    try:
+                        rm_tempdir(runme.tempdir) # delete the tempdir
+                    except AttributeError:
+                        pass
             except DBUtils.DBNoData:
                 print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
                 if rundir is None:
@@ -257,7 +266,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 DBlogging.dblogger.error("Command returned a non-zero return code ({1}): {0}"
                                          .format(' '.join(rm.cmdline), p.returncode))
                 print("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
-                fp.close()
+                fp.flush(); fp.close()
                 #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
                 #rm.moveToError(os.path.join(rm.tempdir, fp.name))
                 if rundir is None:
@@ -269,7 +278,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 n_bad += 1
 
             elif p.returncode == 0: # p.returncode == 0  SUCCESS
-                fp.close()
+                fp.flush(); fp.close()
                 # this is not a perfect time since all the adding occurs before the next poll
                 DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
                 print("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
@@ -296,9 +305,17 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
 class runMe(object):
     """
     class holds all the info it takes to run a process
+
+    dbu - DBUtils instance
+    utc_file_date - datetime.date
+    process_id - process to run (int)
+    input_files - the files that exist to run with (list of int)
+    pq - processqueue instance
     """
-    def __init__(self, dbu, utc_file_date, process_id, input_files, pq):
+    def __init__(self, dbu, utc_file_date, process_id, input_files, pq, force=False):
         DBlogging.dblogger.debug("Entered runMe {0}, {1}, {2}, {3}".format(dbu, utc_file_date, process_id, input_files))
+        if isinstance(utc_file_date, datetime.datetime):
+            utc_file_date = utc_file_date.date()
 
         self.filename = '' # initialize it empty
         self.ableToRun = False
@@ -356,7 +373,10 @@ class runMe(object):
                                                          'datetime':utc_file_date,
                                                          'INSTRUMENT':ptb['instrument'].instrument_name})
             DBlogging.dblogger.debug("Filename: %s created" % (self.filename))
-            f_id_db = self._fileInDB()
+            if not force:
+                f_id_db = self._fileInDB()
+            else:
+                f_id_db = False
             if not f_id_db: # if the file is not in the db lets make it
                 break # lets call this the only way out of here that creates the runner
             codechange = self._codeVerChange(f_id_db)
