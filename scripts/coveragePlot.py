@@ -281,7 +281,7 @@ if __name__ == "__main__":
     comb_name = (os.path.join(conf['settings']['outdirectory'],
                          os.path.basename(os.path.abspath(os.path.expandvars(os.path.expanduser(conf['settings']['filename_format'] + '.{0}'
                     .format(conf['settings']['outformat'])))))))
-    cmd = ['pdftk'] + outfiles + ['cat', 'output', comb_name]
+    cmd = ['gs', '-dBATCH', '-dNOPAUSE', '-q', '-sDEVICE=pdfwrite', '-sOutputFile={0}'.format(comb_name)] + outfiles 
     print("Running: {0}".format(' '.join(cmd)))
     subprocess.call(cmd)
     for v in outfiles:
