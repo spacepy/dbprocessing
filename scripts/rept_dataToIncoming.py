@@ -4,6 +4,9 @@ import itertools
 import os
 import re
 import shutil
+import glob
+from operator import itemgetter, attrgetter
+
 
 import dbprocessing.DBUtils as DBUtils
 import dbprocessing.DBlogging as DBlogging
@@ -106,4 +109,85 @@ for f in files:
 
 
 
+
+
+
+#########################
+# TMP hack for magephem def seperately
+#########################
+op77_files = dbu.session.query(dbu.File.filename).filter(dbu.File.filename.contains('OP77')).all()
+op77_files = set(map(itemgetter(0), op77_files))
+op77_dirs = ['/n/space_data/cda/rbsp/rbspa/MagEphem/def/2012',
+             '/n/space_data/cda/rbsp/rbspa/MagEphem/def/2013',
+             '/n/space_data/cda/rbsp/rbspa/MagEphem/def/2014',
+             '/n/space_data/cda/rbsp/rbspa/MagEphem/def/2015',
+             '/n/space_data/cda/rbsp/rbspa/MagEphem/def/2016',
+             '/n/space_data/cda/rbsp/rbspa/MagEphem/def/2017',
+             '/n/space_data/cda/rbsp/rbspa/MagEphem/def/2018',
+             '/n/space_data/cda/rbsp/rbspa/MagEphem/def/2019',
+             '/n/space_data/cda/rbsp/rbspb/MagEphem/def/2012',
+             '/n/space_data/cda/rbsp/rbspb/MagEphem/def/2013',
+             '/n/space_data/cda/rbsp/rbspb/MagEphem/def/2014',
+             '/n/space_data/cda/rbsp/rbspb/MagEphem/def/2015',
+             '/n/space_data/cda/rbsp/rbspb/MagEphem/def/2016',
+             '/n/space_data/cda/rbsp/rbspb/MagEphem/def/2017',
+             '/n/space_data/cda/rbsp/rbspb/MagEphem/def/2018',
+             '/n/space_data/cda/rbsp/rbspb/MagEphem/def/2019',
+             ]
+
+
+op77_files2 = []
+for f in op77_files:
+    if 'rbspa' in f:
+        if '2012' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2012', f))
+        elif '2013' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2013', f))
+        elif '2014' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2014', f))
+        elif '2015' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2015', f))
+        elif '2016' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2016', f))
+        elif '2017' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2017', f))
+        elif '2018' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2018', f))
+        elif '2019' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2019', f))
+    elif 'rbspb' in f:
+        if '2012' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2012', f))
+        elif '2013' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2013', f))
+        elif '2014' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2014', f))
+        elif '2015' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2015', f))
+        elif '2016' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2016', f))
+        elif '2017' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2017', f))
+        elif '2018' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2018', f))
+        elif '2019' in f:
+            op77_files2.append(os.path.join('/n/space_data/cda/rbsp/rbspa/MagEphem/def/2019', f))
+        
+
+op77_disk = []
+for v in op77_dirs:
+    op77_disk.extend(glob.glob(os.path.join(v, '*OP*')))
+
+#op77_disk = [os.path.basename(v) for v in op77_disk]
+
+op77_disk = set(op77_disk)
+op77_use = op77_disk.difference(op77_files2)
+
+
+for f in op77_use:
+    try:
+        os.symlink(f, os.path.join(g_inc_path, os.path.basename(f)))
+    except OSError:
+        pass
+    print("Symlink {0} to {1}".format(f, os.path.join(g_inc_path, os.path.basename(f))))
 
