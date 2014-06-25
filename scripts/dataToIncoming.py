@@ -1,95 +1,194 @@
 #!/usr/bin/env python2.6
+# -*- coding: utf-8 -*-
+from __future__ import division
 
-import itertools
+import ConfigParser
+import copy
+import datetime
 import glob
-import os
-import tempfile
+import fnmatch
+import itertools
 import shutil
 import subprocess
+from optparse import OptionParser
+import os
+from operator import itemgetter, attrgetter
 
-import dbprocessing.DBUtils as DBUtils
-import dbprocessing.DBlogging as DBlogging
+import dateutil.parser as dup
+import numpy as np
+import spacepy.toolbox as tb
 
-# Code users rsync to build an incremental list of files not already
-# processed (i.e. not in /n/space_data/cda/rbsp) and saves that list to a file
-# then the file is opened and each file is copied using shutils.copy
-# also checks the error directory for the filename and does not copy again
+from dbprocessing import Utils
+from dbprocessing import DBUtils
 
-dbu = DBUtils.DBUtils('rbsp')
+def readconfig(config_filepath):
+    # Create a ConfigParser object, to read the config file
+    cfg=ConfigParser.SafeConfigParser()
+    cfg.read(config_filepath)
+    sections = cfg.sections()
+    # Read each parameter in turn
+    ans = {}
+    for section in sections:
+        ans[section] = dict(cfg.items(section))
+    return ans
 
-mission_path = dbu.getMissionDirectory()
-g_inc_path = dbu.getIncomingPath()
-data_path = os.path.expanduser(os.path.join('/', 'usr', 'local', 'ectsoc', 'data', 'level_0'))
-error_path = dbu.getErrorPath()
-dbu._closeDB()
+def _fileTest(filename):
+    """
+    open up the file as txt and do a check that there are no repeated section headers
+    """
+    def rep_list(inval):
+        seen = set()
+        seen_twice = set( x for x in inval if x in seen or seen.add(x) )
+        return list(seen_twice)
+
+    with open(filename, 'r') as fp:
+        data = fp.readlines()
+    data = [v.strip() for v in data if v[0] == '[']
+    seen_twice = rep_list(data)
+    if seen_twice:
+        raise(ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice) ))
+
+def _processSubs(conf):
+    """
+    go through the conf object and deal with any substitutions
+
+    this works by looking for {}
+    """
+    for key in conf:
+        for v in conf[key]:
+            while True:
+                if isinstance(conf[key][v], (str,unicode)):
+                    if '{' in conf[key][v] and '}' in conf[key][v]:
+                        sub = conf[key][v].split('{')[1].split('}')[0]
+                        if sub == 'Y':
+                            sub_v = '????'
+                        else:
+                            raise(NotImplementedError("Unsupported substitution {0} found".format(sub)))
+                        conf[key][v] = conf[key][v].replace('{' + sub + '}', sub_v)
+                    else:
+                        break
+                else:
+                    break
+    return conf
+
+def _processBool(conf):
+    for k in conf:
+        if 'link' in conf[k]:
+            conf[k]['link'] = Utils.toBool(conf[k]['link'])
+    return conf
 
 
-def sync_data(sc, inst):
-    global mission_path
-    global data_path
-    global error_path
+def getFilesFromDisk(conf):
+    """
+    given a partial config file return the files on disk
+    ** this returns full path
 
-    try:
-        inc_path = g_inc_path.replace('incoming', inst + '_incoming')
+    this is done as conf['sync1'] from teh upper level
+    """
+    ans = glob.glob(os.path.join(conf['source'], conf['glob']))
+    return ans
+
+
+def getFilesFromDB(conf, dbu):
+    """
+    given the same conf get the files form the database
+    ** rememebnr that filenames have to be unique
+
+    this returns only basename
+    """
+    files = dbu.session.query(dbu.File.filename).filter(dbu.File.filename.like(conf['like'])).all()
+    files = map(itemgetter(0), files)
+    return files
     
-        data_path_inst = os.path.join(data_path, sc.lower(), inst.lower())
-        miss_path_inst = os.path.join(mission_path, 'rbsp'+sc.lower(),
-                                      inst, 'level0')
 
-        curdir = os.path.abspath(os.curdir)
-        tmp_path = tempfile.mkdtemp(suffix='_dbprocessingIncomming')
-        os.chdir(tmp_path)
+def basenameToFullname(diff, diskfiles):
+    """
+    diff is the files that we need to find in diskfiles
+    """
+    ans = []
+    for d in diff:
+        a2 = [v for v in diskfiles if d in v]
+        ans.extend(a2)
+    return ans
+
+def makeLinks(files, incoming):
+    """
+    given an incoming desitroy (destination) and files make symlinks between them
+    """
+    good = 0
+    bad = 0
+    for f in files:
+        newf = os.path.join(incoming, os.path.basename(f))
+        try:
+            os.symlink(f, newf)
+            print("Symlink: {0}->{1}".format(f, newf))
+            good += 1
+        except OSError:
+            bad += 1
+    return good, bad
+    
+def copyFiles(files, incoming):
+    """
+    given an incoming desitroy (destination) and files copy files between them
+    """
+    good = 0
+    bad = 0
+    for f in files:
+        newf = os.path.join(incoming, os.path.basename(f))
+        try:
+            shutil.copy(f, incoming)
+            print("Copy: {0}->{1}".format(f, newf)) 
+            good += 1
+        except shutil.Error:
+            bad += 1
+    return good, bad
+
+if __name__ == "__main__":
+    usage = "usage: %prog [options] configfile"
+    parser = OptionParser(usage=usage)
+
+    (options, args) = parser.parse_args()
+    if len(args) != 1:
+        parser.error("incorrect number of arguments")
+
+    conffile = os.path.expanduser(os.path.expandvars(os.path.abspath(args[0])))
+    if not os.path.isfile(conffile):
+        parser.error("could not read config file: {0}".format(conffile))
         
-        subprocess.check_call(' '.join(['/usr/bin/rsync ', '--dry-run ', '-auIv ',
-                                        os.path.join(data_path_inst, '*'),
-                                        miss_path_inst, ' > files.txt']),
-                              shell=True )
+    conf = readconfig(conffile)
+    conf = _processSubs(conf)
+    conf = _processBool(conf)
+    print('Read and parsed config file: {0}'.format(conffile))
+
+    dbu = DBUtils.DBUtils(conf['settings']['mission'])
+
+    inc_dir = dbu.getIncomingPath()
+    
+    for k in conf:
+        if not k.startswith('sync'):
+            continue # this is not a sync
+        diskfiles = getFilesFromDisk(conf[k])
+        print("Found {0} files on disk".format(len(diskfiles)))
+        dbfiles = getFilesFromDB(conf[k], dbu)
+        print("Found {0} files in db".format(len(dbfiles)))
+
+        # the files that need to be linked or copied are the set difference
+        df2 = set([os.path.basename(v) for v in diskfiles])
+        diff = df2.difference(set(dbfiles))
+        # the files in diff need to be found in the full path
+        tocopy = basenameToFullname(diff, diskfiles)
+        if conf[k]['link']:
+            g, b = makeLinks(tocopy, inc_dir)
+        else:
+            g, b = copyFiles(tocopy, inc_dir)
+        print("{0} Files successfully placed in {1}.  {2} Failures".format(g, inc_dir, b))
+
+    
+
+
+
+
         
-        with open('files.txt', 'r') as fp:
-            dat = fp.readlines()
-        dat = set([v.strip() for v in dat if '.ptp.gz' in v])
-        # get the files in incoming
-        dat_error = set([os.path.basename(v) for v in glob.glob(os.path.join(error_path, '*'))])
-        dat = dat.difference(dat_error)
-
-        if dat: # no need for a message if we ar movng nothing
-            DBlogging.dblogger.info('Copying {0} files to incoming for processing'.format(len(dat)-4)) # the 4 is for header and footer
-
-        for line in dat:
-            fname = os.path.join(data_path_inst, line.strip())
-            shutil.copy(fname, inc_path)
-            #print 'copy', fname, inc_path
-            DBlogging.dblogger.debug('Copying {0} to incoming for processing'.format(fname))
-
-    finally:
-        os.chdir(curdir)
-        shutil.rmtree(tmp_path)
-
-
-sats = ['a', 'b']
-#insts = ['rept', 'mageis', 'hope']
-# TODO, change this when the other instements are ready to sync also
-insts = ['hope'] #['rept', 'hope'] #, 'mageis', ]
-
-for s, i in itertools.product(sats, insts):
-    sync_data(s, i)
-
-
-############################
-## do the magephem
-############################
-
-cmdline = ' '.join(['/usr/bin/rsync ', '-auIv ',
-                                '/u/ectsoc/data/moc_data/?/ephemerides/*',
-                                '/n/space_data/cda/rbsp/MagEphem/incoming'])
-subprocess.check_call(cmdline, 
-                      shell=True )
-
-cmdline = ' '.join(['/usr/bin/rsync ', '-auIv ',
-                                '/u/ectsoc/data/moc_data/?/ephemeris_predict/*',
-                                '/n/space_data/cda/rbsp/MagEphem/incoming'])
-subprocess.check_call(cmdline, 
-                      shell=True )
-
-
-
+#############################
+# sample config file
+#############################
