@@ -31,7 +31,7 @@ LOG_FILENAME = os.path.expanduser(os.path.join(log_dir, '{0}.log.{1}'.format(
 
 # Set up a specific logger with our desired output level
 dblogger = logging.getLogger('DBLogger')
-dblogger.setLevel(logging.DEBUG)
+dblogger.setLevel(logging.INFO)
 
 # Add the log message handler to the logger
 #handler = logging.handlers.TimedRotatingFileHandler(
