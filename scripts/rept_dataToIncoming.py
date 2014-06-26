@@ -28,9 +28,6 @@ data_path += tmp
 tmp = [os.path.join('/n/space_data/cda/rbsp/MagEphem/predicted/a/'), os.path.join('/n/space_data/cda/rbsp/MagEphem/predicted/b/')]
 
 data_path += tmp
-tmp = [os.path.join('/n/space_data/cda/rbsp/MagEphem/predicted/a/'), os.path.join('/n/space_data/cda/rbsp/MagEphem/predicted/b/')]
-
-data_path += tmp
 
 
 error_path = dbu.getErrorPath()
