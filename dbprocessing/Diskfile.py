@@ -105,7 +105,10 @@ class Diskfile(object):
         Author: Brian Larsen, LANL
         """
         self.infile = infile
-        self.checkAccess()
+        try:
+            self.checkAccess()
+        except WriteError:
+            print("No write access on {0}".format(self.infile))
 
         self.path = os.path.dirname(self.infile)
         self.filename = os.path.basename(self.infile)
