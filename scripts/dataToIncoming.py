@@ -99,8 +99,14 @@ def getFilesFromDB(conf, dbu):
     files = dbu.session.query(dbu.File.filename).filter(dbu.File.filename.like(conf['like'])).all()
     files = map(itemgetter(0), files)
     return files
-    
 
+def getFilesFromIncoming(conf, incoming):
+    """
+    get current files form incoming and don't try and add them again
+    """
+    files = glob.glob(os.path.join(incoming, conf['glob']))
+    return [os.path.basename(v) for v in files]
+ 
 def basenameToFullname(diff, diskfiles):
     """
     diff is the files that we need to find in diskfiles
@@ -111,7 +117,7 @@ def basenameToFullname(diff, diskfiles):
         ans.extend(a2)
     return ans
 
-def makeLinks(files, incoming):
+def makeLinks(files, incoming, dryrun=False):
     """
     given an incoming desitroy (destination) and files make symlinks between them
     """
@@ -120,14 +126,15 @@ def makeLinks(files, incoming):
     for f in files:
         newf = os.path.join(incoming, os.path.basename(f))
         try:
-            os.symlink(f, newf)
+            if not dryrun:
+                os.symlink(f, newf)
             print("Symlink: {0}->{1}".format(f, newf))
             good += 1
         except OSError:
             bad += 1
     return good, bad
     
-def copyFiles(files, incoming):
+def copyFiles(files, incoming, dryrun=False):
     """
     given an incoming desitroy (destination) and files copy files between them
     """
@@ -136,7 +143,8 @@ def copyFiles(files, incoming):
     for f in files:
         newf = os.path.join(incoming, os.path.basename(f))
         try:
-            shutil.copy(f, incoming)
+            if not dryrun:
+                shutil.copy(f, incoming)
             print("Copy: {0}->{1}".format(f, newf)) 
             good += 1
         except shutil.Error:
@@ -146,6 +154,8 @@ def copyFiles(files, incoming):
 if __name__ == "__main__":
     usage = "usage: %prog [options] configfile"
     parser = OptionParser(usage=usage)
+    parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
+                      help="only do a dryrun of incoming", default=False)
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
@@ -171,6 +181,9 @@ if __name__ == "__main__":
         print("Found {0} files on disk".format(len(diskfiles)))
         dbfiles = getFilesFromDB(conf[k], dbu)
         print("Found {0} files in db".format(len(dbfiles)))
+        len_tmp = len(dbfiles)
+        dbfiles.extend(getFilesFromIncoming(conf[k], inc_dir))
+        print("Added {0} files from incoming".format(len(dbfiles)-len_tmp))
 
         # the files that need to be linked or copied are the set difference
         df2 = set([os.path.basename(v) for v in diskfiles])
@@ -178,9 +191,9 @@ if __name__ == "__main__":
         # the files in diff need to be found in the full path
         tocopy = basenameToFullname(diff, diskfiles)
         if conf[k]['link']:
-            g, b = makeLinks(tocopy, inc_dir)
+            g, b = makeLinks(tocopy, inc_dir, options.dryrun)
         else:
-            g, b = copyFiles(tocopy, inc_dir)
+            g, b = copyFiles(tocopy, inc_dir, options.dryrun)
         print("{0} Files successfully placed in {1}.  {2} Failures".format(g, inc_dir, b))
 
     
