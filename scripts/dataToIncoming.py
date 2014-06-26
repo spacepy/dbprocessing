@@ -13,6 +13,7 @@ import subprocess
 from optparse import OptionParser
 import os
 from operator import itemgetter, attrgetter
+import sys
 
 import dateutil.parser as dup
 import numpy as np
@@ -151,11 +152,52 @@ def copyFiles(files, incoming, dryrun=False):
             bad += 1
     return good, bad
 
+def filterConf(conf, filter_opt):
+    """
+    filter keys from conf based on input
+    """
+    conf_out = copy.copy(conf)
+    for k in conf:
+        if not k.startswith('sync'):
+            continue       
+        filter_count = 0
+        len_filter = 0
+        if filter_opt is not None:
+            len_filter = len(filter_opt.split(','))
+            for f in filter_opt.split(','):
+                if f in k:
+                    filter_count += 1
+        if filter_count != len_filter:
+            del conf_out[k]
+    return conf_out
+
+def printConf(conf, incoming):
+    """
+    print out the conf file
+    """
+    print("Mission: {0}".format(conf['settings']['mission']))
+    print("  Incomging directory: {0}".format(incoming))
+    for k in conf:
+        if not k.startswith('sync'):
+            continue
+        print(k)
+        if conf[k]['link']:
+            print("    Linking from {0} to incoming".format(os.path.join(conf[k]['source'], conf[k]['glob'])))
+        else:
+            print("    Copying from {0} to incoming".format(os.path.join(conf[k]['source'], conf[k]['glob'])))
+
+
 if __name__ == "__main__":
     usage = "usage: %prog [options] configfile"
     parser = OptionParser(usage=usage)
     parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
                       help="only do a dryrun of incoming", default=False)
+    parser.add_option("-f", "--filter",
+                      dest="filter", 
+                      help="Comma seperated list of strings that must be in the sync conf name (e.g. -f mag_l2)", default=None)
+    parser.add_option("-l", "--list",
+                      dest="list", action='store_true',
+                      help="Instead of processing list the sections of the conf file", default=False)
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
@@ -173,7 +215,13 @@ if __name__ == "__main__":
     dbu = DBUtils.DBUtils(conf['settings']['mission'])
 
     inc_dir = dbu.getIncomingPath()
-    
+
+    conf = filterConf(conf, options.filter)
+
+    if options.list:
+        printConf(conf, inc_dir)
+        sys.exit(0)
+
     for k in conf:
         if not k.startswith('sync'):
             continue # this is not a sync
