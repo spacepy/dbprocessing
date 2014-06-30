@@ -74,10 +74,16 @@ dbprocessing_log.log - the log file for processing that is appended to as the pr
     and is rolled over and saved for 5 backups
 DBqueue.py - class that implements a queue that the db uses to process from
 Diskfile.py - class that represents a file on disk, includes figure product and make output name
-Executor.py - class that performs execution of codes with various inputs as defined in the db
+RunMe.py - class that performs execution of codes with various inputs as defined in the db
 ProcessQueue.py - this is the main class, processes incoming and performs the above flow
 Version.py - class that represents a version code for a file, has gt, lt, eq, etc in it
-mk_all_l0.py - simple script to make L0 files that can then be put into incoming
+
+
+
+
+---------------------------------------------
+OLD OUT OF DATE STUFF
+
 
 
 Important Directories: (Test mission)

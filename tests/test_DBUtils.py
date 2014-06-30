@@ -317,7 +317,6 @@ class DBUtilsGetTests(TestSetup):
         val = self.dbu.getFilesByProductDate(187, [datetime.date(2013, 9, 10)]*2, newest_version=True)
         self.assertEqual(1, len(val))
         self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], [v.filename for v in val] )
-        self.assertRaises(ValueError, self.dbu.getFilesByProductDate, 187, [datetime.datetime(2013, 9, 10)]*2)
 
     def test_getFilesByDate(self):
         """getFilesByDate"""
@@ -332,14 +331,11 @@ class DBUtilsGetTests(TestSetup):
         filenames = sorted([v.filename for v in val])
         self.assertEqual(ans, filenames[:len(ans)])
         val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)]*2, newest_version=True)
-        self.assertEqual(56, len(val))
+        self.assertEqual(2, len(val))
         filenames = sorted([v.filename for v in val])
-        ans = [u'rbspa_int_ect-mageis-L2_20130910_v3.0.0.cdf',
-               u'rbspa_int_ect-mageisHIGH-L2_20130910_v3.0.0.cdf',
-               u'rbspa_int_ect-mageisHIGH-L3_20130910_v3.0.0.cdf',
-               u'rbspa_int_ect-mageisHIGH-de-L05_0377_v3.0.0.cdf']
+        ans = [u'rbsp-a_magnetometer_uvw_emfisis-Quick-Look_20130910_v1.3.1.cdf',
+               u'rbsp-b_magnetometer_uvw_emfisis-Quick-Look_20130910_v1.3.1.cdf']
         self.assertEqual(ans, filenames[:len(ans)] )
-        self.assertRaises(ValueError, self.dbu.getFilesByDate, [datetime.datetime(2013, 9, 10)]*2)
 
     def test_getFilesByProduct(self):
         """getFilesByProduct"""
