@@ -1582,6 +1582,7 @@ class DBUtils(object):
                 dates.append(d)
 
         if newest_version:
+            raise(NotImplementedError("There is an error in this query, do not use!"))
             # don't trust that the db has this correct
             # create a tabel populated with
             #   versionnum, file_id, utc_file_date
