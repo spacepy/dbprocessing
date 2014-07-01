@@ -76,8 +76,17 @@ def _processBool(conf):
     for k in conf:
         if 'link' in conf[k]:
             conf[k]['link'] = Utils.toBool(conf[k]['link'])
+        if 'error' in conf[k]:
+            conf[k]['error'] = Utils.toBool(conf[k]['error'])
     return conf
 
+
+def _processNone(conf):
+    for k in conf:
+        if 'ignore' in conf[k]:
+            conf[k]['ignore'] = Utils.toNone(conf[k]['ignore'])
+    return conf
+    
 
 def getFilesFromDisk(conf):
     """
@@ -106,6 +115,13 @@ def getFilesFromIncoming(conf, incoming):
     get current files form incoming and don't try and add them again
     """
     files = glob.glob(os.path.join(incoming, conf['glob']))
+    return [os.path.basename(v) for v in files]
+
+def getFilesFromError(conf, error):
+    """
+    get current files form error and don't try and add them again
+    """
+    files = glob.glob(os.path.join(error, conf['glob']))
     return [os.path.basename(v) for v in files]
  
 def basenameToFullname(diff, diskfiles):
@@ -187,6 +203,16 @@ def printConf(conf, incoming):
             print("    Copying from {0} to incoming".format(os.path.join(conf[k]['source'], conf[k]['glob'])))
 
 
+def processIgnore(conf, diskfiles):
+    count = 0
+    for v in conf['ignore'].split(','):
+        ignore = fnmatch.filter(diskfiles, v)
+        for i in ignore:
+            diskfiles.remove(i)
+            count += 1
+    return diskfiles, count    
+
+
 if __name__ == "__main__":
     usage = "usage: %prog [options] configfile"
     parser = OptionParser(usage=usage)
@@ -213,11 +239,13 @@ if __name__ == "__main__":
     conf = readconfig(conffile)
     conf = _processSubs(conf)
     conf = _processBool(conf)
+    conf = _processNone(conf)
     print('Read and parsed config file: {0}'.format(conffile))
 
     dbu = DBUtils.DBUtils(conf['settings']['mission'])
 
     inc_dir = dbu.getIncomingPath()
+    err_dir = dbu.getErrorPath()
 
     conf = filterConf(conf, options.filter)
 
@@ -231,11 +259,18 @@ if __name__ == "__main__":
         print("Section: {0}".format(k))
         diskfiles = getFilesFromDisk(conf[k])
         print(" Found {0} files on disk".format(len(diskfiles)))
+        diskfiles, ignorenum = processIgnore(conf[k], diskfiles)
+        print(" Ignored {0} files on disk, {1} left".format(ignorenum, len(diskfiles)))
+
         dbfiles = getFilesFromDB(conf[k], dbu)
         print(" Found {0} files in db".format(len(dbfiles)))
         len_tmp = len(dbfiles)
         dbfiles.extend(getFilesFromIncoming(conf[k], inc_dir))
         print("  Added {0} files from incoming".format(len(dbfiles)-len_tmp))
+        if conf[k]['error']:
+            dbfiles.extend(getFilesFromError(conf[k], err_dir))
+            print("  Added {0} files from error".format(len(dbfiles)-len_tmp))
+
 
         # the files that need to be linked or copied are the set difference
         df2 = set([os.path.basename(v) for v in diskfiles])
