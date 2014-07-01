@@ -198,6 +198,9 @@ if __name__ == "__main__":
     parser.add_option("-l", "--list",
                       dest="list", action='store_true',
                       help="Instead of processing list the sections of the conf file", default=False)
+    parser.add_option("-c", "--count",
+                      dest="count", action='store_true',
+                      help="Instead of copying or linking just print the counts", default=False)
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
@@ -225,24 +228,26 @@ if __name__ == "__main__":
     for k in conf:
         if not k.startswith('sync'):
             continue # this is not a sync
+        print("Section: {0}".format(k))
         diskfiles = getFilesFromDisk(conf[k])
-        print("Found {0} files on disk".format(len(diskfiles)))
+        print(" Found {0} files on disk".format(len(diskfiles)))
         dbfiles = getFilesFromDB(conf[k], dbu)
-        print("Found {0} files in db".format(len(dbfiles)))
+        print(" Found {0} files in db".format(len(dbfiles)))
         len_tmp = len(dbfiles)
         dbfiles.extend(getFilesFromIncoming(conf[k], inc_dir))
-        print("Added {0} files from incoming".format(len(dbfiles)-len_tmp))
+        print("  Added {0} files from incoming".format(len(dbfiles)-len_tmp))
 
         # the files that need to be linked or copied are the set difference
         df2 = set([os.path.basename(v) for v in diskfiles])
         diff = df2.difference(set(dbfiles))
         # the files in diff need to be found in the full path
         tocopy = basenameToFullname(diff, diskfiles)
-        if conf[k]['link']:
-            g, b = makeLinks(tocopy, inc_dir, options.dryrun)
-        else:
-            g, b = copyFiles(tocopy, inc_dir, options.dryrun)
-        print("{0} Files successfully placed in {1}.  {2} Failures".format(g, inc_dir, b))
+        if not options.count:
+            if conf[k]['link']:
+                g, b = makeLinks(tocopy, inc_dir, options.dryrun)
+            else:
+                g, b = copyFiles(tocopy, inc_dir, options.dryrun)
+            print("  {0} Files successfully placed in {1}.  {2} Failures".format(g, inc_dir, b))
 
     
 
