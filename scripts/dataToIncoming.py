@@ -205,6 +205,8 @@ def printConf(conf, incoming):
 
 def processIgnore(conf, diskfiles):
     count = 0
+    if conf['ignore'] is None:
+        return diskfiles, 0
     for v in conf['ignore'].split(','):
         ignore = fnmatch.filter(diskfiles, v)
         for i in ignore:
