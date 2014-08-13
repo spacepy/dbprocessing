@@ -78,7 +78,29 @@ if __name__ == '__main__':
                                                           dbu.getEntry('Code', c).filename,
                                                           sd.isoformat(),
                                                           ed.isoformat()))
-            
+    elif field == 'Code':
+        print("Header here")
+        codes = dbu.getAllCodes()
+        codes = [c['code'] for c in codes]
+        codes = sorted(codes, key=lambda x: x.code_id)
+        for c in codes:
+            ans = {}
+            ans['code_id'] = c.code_id
+            ans['filename'] = c.filename
+            ans['version'] = Version.Version(c.interface_version, c.quality_version, c.revision_version)
+            ans['path'] = os.path.join(basepath, c.relative_path)
+            ans['process_id'] = c.process_id
+            ans['process_name'] = dbu.getEntry('Process', ans['process_id']).process_name
+            ans['out_version'] = c.output_interface_version
+            ans['active_code'] = c.active_code
+            ans['newest_version'] = c.newest_version
+            ans['args'] = c.arguments
+            ans['ram'] = c.ram
+            ans['cpu'] = c.cpu
+            ans['date'] = c.date_written
+            ans['code_start_date'] = c.code_start_date
+            ans['code_stop_date'] = c.code_stop_date
+            print('{code_id:4} {filename:40} {version:10} ({out_version}.Y.Z)    {path:40} ({process_id:3}) {process_name:40} {active_code:1}-{newest_version:1} {ram:4}-{cpu:2}  {code_start_date} -> {code_stop_date}'.format(**ans))
 
     else:
         dbu._closeDB()        
