@@ -63,7 +63,7 @@ if __name__ == "__main__":
               u'date_written',
               # u'filename',
               #u'interface_version',
-              u'newest_version',
+              #u'newest_version',
               u'output_interface_version',
               u'process_id',
               #u'quality_version',
@@ -79,5 +79,8 @@ if __name__ == "__main__":
     code2.quality_version = version.quality
     code2.revision_version = version.revision
     code2.filename = newname
+    code2.newest_version = True
     dbu.session.add(code2)
+    code.newest_version = False
+    dbu.session.add(code)
     dbu.session.commit()
