@@ -214,14 +214,14 @@ if __name__ == '__main__':
 
     config2 = {}
     if options.filter is not None:
-        filters = options.filter.split(',').strip()
+        filters = options.filter.split(',')
         if options.verbose:
             print("Filters: {0}".format(filters))
         for c in config:
             num = 0 
             for f in filters:
                 print("Filter {0}".format(filters))
-                if f in c:
+                if f.strip() in c:
                     num += 1
             if num == len(filters):
                 config2[c] = config[c]
@@ -237,11 +237,11 @@ if __name__ == '__main__':
     for sec in config:
         print('Processing [{0}]'.format(sec))
         filter = config[sec]['filter']
-        for filt in filter.split(',').strip():
+        for filt in filter.split(','):
             files = []
             files_out = []
-            print filt
-            files_t, files_out_t = get_all_files(config[sec]['sourcedir'], config[sec]['destdir'], filt)
+            print filt.strip()
+            files_t, files_out_t = get_all_files(config[sec]['sourcedir'], config[sec]['destdir'], filt.strip())
             files.extend(files_t)
             files_out.extend(files_out_t)
             delete_unneeded(files, files_out, options)
