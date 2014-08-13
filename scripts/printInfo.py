@@ -79,7 +79,16 @@ if __name__ == '__main__':
                                                           sd.isoformat(),
                                                           ed.isoformat()))
     elif field == 'Code':
-        print("Header here")
+        print("{0:4} {1:40} {2:10} ({3})   {4:40}  {5} {6:40}   {7}-{8}  {9}  {10} {11:10} -> {12:10}".format('id',
+                                                                                                 'filename',
+                                                                                                 'version',
+                                                                                                 'outV',
+                                                                                                 'path',
+                                                                                                 'p_id',
+                                                                                                 'process',
+                                                                                                 'A','N',
+                                                                                                 'ram', 'cpu',
+                                                                                                 'start', 'stop'))
         codes = dbu.getAllCodes()
         codes = [c['code'] for c in codes]
         codes = sorted(codes, key=lambda x: x.code_id)
