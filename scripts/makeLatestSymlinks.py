@@ -215,9 +215,12 @@ if __name__ == '__main__':
     config2 = {}
     if options.filter is not None:
         filters = options.filter.split(',')
+        if options.verbose:
+            print("Filters: {0}".format(filters))
         for c in config:
             num = 0 
             for f in filters:
+                print("Filter: {0}".format(filters))
                 if f in c:
                     num += 1
             if num == len(filters):
