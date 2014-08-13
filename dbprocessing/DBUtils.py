@@ -594,7 +594,10 @@ class DBUtils(object):
         if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
             filename = [filename]
         for f in filename:
-            f = self.getFileID(f)
+            try:
+                f = self.getFileID(f)
+            except DBNoData:
+                pass            
             # we need to look in each table that could have a reference to this file and delete that
             ## processqueue
             try:
@@ -612,7 +615,10 @@ class DBUtils(object):
             except DBNoData:
                 pass
             ## file
-            self.session.delete(self.getEntry('File', f))
+            try:
+                self.session.delete(self.getEntry('File', f))
+            except DBNoData:
+                pass            
             DBlogging.dblogger.info( "File removed from db {0}".format(f) )
 
         self._commitDB()
@@ -634,6 +640,18 @@ class DBUtils(object):
         insts = self.session.query(self.Instrument).all()
         ans = map(lambda x: self.getTraceback('Instrument', x.instrument_id), insts)
         return ans
+
+    def getAllCodes(self, active=True):
+        """
+        return a list of all codes
+        """
+        ans = []
+        if active:
+            codes = self.session.query(self.Code).filter(and_(self.Code.newest_version, self.Code.active_code)).all()
+        else:
+            codes = self.session.query(self.Code).all()
+        ans = map(lambda x: self.getTraceback('Code', x.code_id), codes)
+        return ans        
 
     def getAllFilenames(self, fullPath=True, level=None, product=None):
         """
