@@ -220,7 +220,7 @@ if __name__ == '__main__':
         for c in config:
             num = 0 
             for f in filters:
-                print("Filter: {0}".format(filters))
+                print("Filter {0}".format(filters))
                 if f in c:
                     num += 1
             if num == len(filters):
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     for sec in config:
         print('Processing [{0}]'.format(sec))
         filter = config[sec]['filter']
-        for filt in filter.split(' '):
+        for filt in filter.split(','):
             files = []
             files_out = []
             print filt
