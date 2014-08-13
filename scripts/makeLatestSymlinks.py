@@ -214,7 +214,7 @@ if __name__ == '__main__':
 
     config2 = {}
     if options.filter is not None:
-        filters = options.filter.split(',')
+        filters = options.filter.split(',').strip()
         if options.verbose:
             print("Filters: {0}".format(filters))
         for c in config:
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     for sec in config:
         print('Processing [{0}]'.format(sec))
         filter = config[sec]['filter']
-        for filt in filter.split(','):
+        for filt in filter.split(',').strip():
             files = []
             files_out = []
             print filt
