@@ -74,7 +74,10 @@ if __name__ == "__main__":
 
     code2 = dbu.Code()
     for attr in attrs:
-        setattr(code2, attr, getattr(code, attr))
+        try:
+            setattr(code2, attr, getattr(code, attr))
+        except AttributeError:
+            print("Attribute {0} not found".format(attr))
     code2.interface_version = version.interface
     code2.quality_version = version.quality
     code2.revision_version = version.revision
