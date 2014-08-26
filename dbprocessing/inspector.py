@@ -227,18 +227,24 @@ def valid_YYYYMMDD(inval):
     if isinstance(ans, datetime.datetime):
         return True
 
-def extract_Version(filename):
+def extract_Version(filename, basename=False):
     """
     go through the filename and pull out the fist valid vX.Y.Z and return as a
     Version object
     """
     res = re.search("[vV]\d+\.\d+\.\d+\.", filename)
+    ver = None
+    base = None
     if res:
-        tmp = res.group().split('.')
+        verstring = res.group()
+        tmp = verstring.split('.')
         ver = Version.Version(tmp[0][1:], tmp[1], tmp[2])
+
+    if not basename:
         return ver
     else:
-        return None
+        base = filename.split(verstring)[0]
+        return ver, base
 
 
 
