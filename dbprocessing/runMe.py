@@ -18,6 +18,7 @@ import traceback
 import DBlogging
 import DBStrings
 import DBUtils
+from inspector import extract_Version
 import Utils
 import Version
 
@@ -190,8 +191,28 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 
     #print runme_list_uniq, runme_list
     #runme_list = runme_list_uniq
-                
 
+    #########################################
+    # 20140825 try another way of doing this
+    # 1) grab a collection of all the output files
+    # 2) make sure all are unique
+    # 3) drop all but one of the non-unique ones (maintain order)
+    # 4) grab a collection of all the input files (basename only)
+    # 5) make the output file collection basenames only
+    # 6) if there are any inputs in the outputs drop those processes
+    #########################################
+    print("len(runme_list)={0}".format(len(runme_list)))
+    # 1
+    outfiles = [os.path.basename(v.filename) for v in runme_list]
+    def remove_dups(seq, oval):
+        seen = set()
+        seen_add = seen.add
+        return [oval[i] for i in xrange(len(seq)) if not (seq[i] in seen or seen_add(seq[i]))]
+    # 2
+    runme_list = remove_dups(outfiles, runme_list)
+    print("len(runme_list)={0}".format(len(runme_list)))
+    
+    
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
     #    for some code here
