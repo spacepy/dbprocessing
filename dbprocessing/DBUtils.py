@@ -78,6 +78,7 @@ class DBUtils(object):
         self._openDB(db_var, echo=echo)
         self._createTableObjects()
         self._patchProcessQueue()
+        self.MissionDirectory = self.getMissionDirectory()
 
     def __del__(self):
         """
@@ -1354,27 +1355,23 @@ class DBUtils(object):
         return the full path to a file given the name or id
         (name or id is based on type)
 
+        TODO, this is really slow, this query made it a lot faster but I bet it can get better
+
         """
-        ftb = self.getTraceback('File', filename)
-        file_entry = ftb['file']
-        rel_path = ftb['product'].relative_path
-        if rel_path is None:
-            raise(DBError("product {0} does not have a relative_path set, fix the DB".format(ftb['product'].product_id)))
-        try:
-            root_dir = ftb['mission'].rootdir
-            if root_dir is None:
-                raise(KeyError())
-        except KeyError:
-            raise(DBError("Mission {0} root directory not set, fix the DB".format(ftb['mission'].mission_id)))
-        # perform any required subitutions
-        path = os.path.join(root_dir, rel_path, file_entry.filename)
-        path = Utils.dirSubs(path,
-                             file_entry.filename,
-                             file_entry.utc_file_date,
-                             file_entry.utc_start_time,
-                             self.getVersion(file_entry.file_id)
-                             )
+        if hasattr(filename, 'upper'):
+            filename = self.getFileID(filename)
+        sq = self.session.query(self.File.filename, self.Product.relative_path).filter(self.File.file_id == filename).join((self.Product, self.File.product_id == self.Product.product_id)).one()
+        path =  os.path.join(self.MissionDirectory, *sq[::-1])
+        if '{' in path:
+            file_entry = self.getEntry('File', filename)
+            path = Utils.dirSubs(path,
+                                 file_entry.filename,
+                                 file_entry.utc_file_date,
+                                 file_entry.utc_start_time,
+                                 self.getVersion(file_entry.file_id)
+                                 )
         return path
+
 
     def getProcessFromInputProduct(self, product):
         """

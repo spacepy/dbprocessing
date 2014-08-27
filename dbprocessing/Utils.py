@@ -7,10 +7,28 @@ import collections
 import datetime
 import re
 import os
+import sys
 
 import dateutil.rrule # do this long so where it is from is remembered
 
 import Version
+
+# from spacepy
+def progressbar(count, blocksize, totalsize, text='Download Progress'):
+    """
+    print a progress bar with urllib.urlretrieve reporthook functionality
+
+    Examples
+    ========
+    >>> import spacepy.toolbox as tb
+    >>> import urllib
+    >>> urllib.urlretrieve(config['psddata_url'], PSDdata_fname, reporthook=tb.progressbar)
+    """
+    percent = int(count*blocksize*100/totalsize)
+    sys.stdout.write("\r" + text + " " + "...%d%%" % percent)
+    if percent == 100: print('\n')
+    sys.stdout.flush()
+
 
 # from http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
 def chunker(seq, size):
