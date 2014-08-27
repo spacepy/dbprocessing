@@ -60,25 +60,21 @@ def cull_to_newest(files, options=None):
     """
     ans = []
     # make a set of all the file bases
-    bases = []
-    versions = []
-    for f in files:
-        tmp = getBaseVersion(f)
-        if tmp[1] is not None:
-            bases.append(tmp[0])
-            versions.append(tmp[1])
-        else:
-            if options.verbose: print("Skipped file {0}".format(f))
+    tmp = [getBaseVersion(f) for f in files]
+    bases = zip(*tmp)[0]
+    versions = zip(*tmp)[1]
     uniq_bases = list(set(bases))
-    for ub in uniq_bases:
-        if bases.count(ub) == 1: # there is only one
-            ans.append(files[bases.index(ub)])
-        else: # must be more than
-            indices = [i for i, x in enumerate(bases) if x == ub]
-            tmp = []
-            for i in indices:
-                tmp.append((bases[i], versions[i], files[i]))
-            ans.append(max(tmp, key=lambda x: x[1])[2])
+    while uniq_bases:
+        val = uniq_bases.pop(0)
+        tmp = [f for f in files if val in f ]
+        if len(tmp) > 1:
+            inds = [i for i in range(len(files)) if bases[i] == val]
+            vers = [versions[i] for i in inds]
+            maxver = max(vers)
+            maxfile = [files[i] for i in inds if versions[i] == maxver][0]
+            ans.append(maxfile)
+        else:
+            ans.append(tmp[0])
     return ans
 
 def cull_to_dates(files, startdate, enddate, nodate=False, options=None):
@@ -123,6 +119,8 @@ def make_symlinks(files, files_out, outdir, linkdirs, mode, options):
         if not os.path.isdir(outdir):
             os.makedirs(outdir, int(mode, 8))
         outf = os.path.join(outdir, os.path.basename(f))
+        #if options.verbose: print("  f:{0}:{1} outf:{2}:{3}".format(f, os.path.isfile(f),  outf,os.path.isfile(outf) ))
+
         try:
             if os.path.isfile(f) and not os.path.isfile(outf):
                 if options.verbose: print("linking1 {0}->{1}".format(f, outf))
@@ -220,7 +218,7 @@ if __name__ == '__main__':
         for c in config:
             num = 0 
             for f in filters:
-                print("Filter {0}".format(filters))
+                if options.verbose: print("Filter {0}".format(filters))
                 if f.strip() in c:
                     num += 1
             if num == len(filters):
@@ -242,6 +240,10 @@ if __name__ == '__main__':
             files_out = []
             print filt.strip()
             files_t, files_out_t = get_all_files(config[sec]['sourcedir'], config[sec]['destdir'], filt.strip())
+            #if options.verbose: print files_t
+            #if options.verbose: print files_out_t
+                        
+
             files.extend(files_t)
             files_out.extend(files_out_t)
             delete_unneeded(files, files_out, options)
@@ -258,6 +260,7 @@ if __name__ == '__main__':
                 print('   No files found for [{0}]'.format(sec))
                 delete_unneeded(files, files_out, options)
             delete_unneeded(files, files_out, options)
-
+            #if options.verbose: print files
+            #if options.verbose: print files_out
             make_symlinks(files, files_out, config[sec]['destdir'], config[sec]['linkdirs'], config[sec]['outmode'], options)
 
