@@ -205,19 +205,12 @@ if __name__ == "__main__":
                 #print  len(d), pnum, n_prods, product_id, len(files)
                 # cull the files list based on productN_glob
                 if 'product{0}_glob'.format(pn) in conf['plot{0}'.format(pnum)]:
-                    files_tmp = []
-                    for f in files:
-                        if fnmatch.fnmatch(f.filename,
-                                           conf['plot{0}'.format(pnum)]['product{0}_glob'.format(pn)]):
-                            files_tmp.append(f)
-                    files = files_tmp
+                    files = [f for f in files if fnmatch.fnmatch(f.filename,
+                                                                 conf['plot{0}'.format(pnum)]['product{0}_glob'.format(pn)])]
+
                 if 'product{0}_version'.format(pn) in conf['plot{0}'.format(pnum)]:
-                    files_tmp = []
-                    for f in files:
-                        if (dbu.getVersion(f.file_id) >=
-                            Utils.parseVersion(conf['plot{0}'.format(pnum)]['product{0}_version'.format(pn)])):
-                            files_tmp.append(f)
-                    files = files_tmp
+                    files = [f for f in files if (dbu.getVersion(f.file_id) >=
+                                                 Utils.parseVersion(conf['plot{0}'.format(pnum)]['product{0}_version'.format(pn)]))]
                 # now that we have all the files loop through and the the dates that we have to 1
                 f_dates = [f.utc_file_date for f in files]
                 for fd in f_dates:
