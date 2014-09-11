@@ -19,25 +19,31 @@ from dateutil.relativedelta import relativedelta
 
 import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
-from dbprocessing.Utils import progressbar
+try:
+    from dbprocessing.Utils import progressbar
+except ImportError:
+    def progressbar(*args, **kwargs):
+        pass
 
 if __name__ == "__main__":
     usage = "%prog -m mission"
     parser = OptionParser(usage=usage)
-#    parser.add_option("-s", "--startDate", dest="startDate", type="string",
-#                      help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
-#    parser.add_option("-e", "--endDate", dest="endDate", type="string",
-#                      help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
-#    parser.add_option("", "--force", dest="force", type="int",
-#                      help="Force the reprocessing, speicify which version number {0},{1},{2}", default=None)
+    parser.add_option("-s", "--startDate", dest="startDate", type="string",
+                      help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
+    parser.add_option("-e", "--endDate", dest="endDate", type="string",
+                      help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
+    parser.add_option("-f", "--fix", dest="fix", action='store_true',
+                      help="Fix the database exists_on_disk field ", default=False)
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission database", default=None)
     parser.add_option("", "--echo", dest="echo", action='store_true',
                       help="echo sql queries for debugging", default=False)
-#    parser.add_option("-n", "--newest", dest="newest", action='store_true',
-#                      help="Only check the newest files", default=False)
+    parser.add_option("-n", "--newest", dest="newest", action='store_true',
+                      help="Only check the newest files", default=False)
     parser.add_option("", "--startID", dest="startID", type="int",
                       help="The File id to start on", default=1)
+    parser.add_option("-v", "--verbose", dest="verbose", action='store_true',
+                      help="Print out each file as it is checked", default=False)
 
     
     (options, args) = parser.parse_args()
@@ -74,21 +80,30 @@ if __name__ == "__main__":
             fullpath = dbu.getFileFullPath(f)
             isfile = os.path.isfile(fullpath)
             if not exists and isfile:
-                ff.exists_on_disk = True
-                dbu.session.add(ff)
-                extra = 'Fixed1'
+                if options.fix:
+                    ff.exists_on_disk = True
+                    dbu.session.add(ff)
+                    extra = 'ff.exists_on_disk -> True'
+                else:
+                    extra = 'ff.exists_on_disk is False'                    
             elif exists and not isfile:
-                ff.exists_on_disk = True
-                dbu.session.add(ff)
-                extra = 'Fixed2'                
+                if options.fix:
+                    ff.exists_on_disk = False
+                    dbu.session.add(ff)
+                    extra = 'ff.exists_on_disk -> False'
+                else:
+                    extra = 'ff.exists_on_disk is True'                    
             else:
-                extra = ''
-            print("{0:6} {1:7} {2} {3}".format(f, str(isfile), fullpath, extra ))
-            if i % 100 == 0:
-                dbu._commitDB()
+                extra = None
+            if options.verbose or extra is not None:
+                print("{0:6} {1:7} {2} {3}".format(f, str(isfile), fullpath, extra ))
+            if options.fix:
+                if i % 100 == 0:
+                    dbu._commitDB()
 
     finally:
-        dbu._commitDB()
+        if options.fix:
+            dbu._commitDB()
         dbu._closeDB()
 
 
