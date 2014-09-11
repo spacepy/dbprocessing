@@ -100,6 +100,8 @@ if __name__ == "__main__":
             if options.fix:
                 if i % 100 == 0:
                     dbu._commitDB()
+            if i % 1000 == 0:
+                print("On file {0} of {1}".format(i, max(files)))
 
     finally:
         if options.fix:
