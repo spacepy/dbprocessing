@@ -13,6 +13,7 @@ import naif
 
 import dbprocessing.DBUtils as DBUtils
 import dbprocessing.DBlogging as DBlogging
+from dbprocessing import inspector
 
 """
 make a meta kernel each day that is dated 2 weeks out
@@ -65,11 +66,16 @@ allfiles = set(allfiles)
 
 files_to_make = allfiles.difference(dbfiles)
 
+files_to_make = sorted(list(files_to_make))
 for f in files_to_make:
+    date = inspector.extract_YYYYMMDD(f).strftime('%Y%m%d')
     cmd = [os.path.expanduser('~/.local/bin/newMetaKernel.py'), '-d',
-           os.path.join(g_inc_path, f)]
+           '-a', date, 'a', os.path.join(g_inc_path, f)]
     print(' '.join(cmd))
-    subprocess.check_call(cmd, shell=False)
+    try:
+        subprocess.check_call(cmd, shell=False)
+    except subprocess.CalledProcessError:
+        print('!! Command did not succeed')
 
 
 
@@ -111,11 +117,21 @@ allfiles = set(allfiles)
 
 files_to_make = allfiles.difference(dbfiles)
 
+files_to_make = sorted(list(files_to_make))
 for f in files_to_make:
+    date = inspector.extract_YYYYMMDD(f).strftime('%Y%m%d')
     cmd = [os.path.expanduser('~/.local/bin/newMetaKernel.py'), '-d',
-           os.path.join(g_inc_path, f)]
+           '-a', date, 'b', os.path.join(g_inc_path, f)]
     print(' '.join(cmd))
-    subprocess.check_call(cmd, shell=False)
+    try:
+        subprocess.check_call(cmd, shell=False)
+    except subprocess.CalledProcessError:
+        print('!! Command did not succeed')
+
+
+
+
+
     
 
 ##################################################################
