@@ -152,7 +152,7 @@ if __name__ == '__main__':
             # sort the files
             files = sorted(files, key=lambda x: x.filename)
             # get the file path:
-            filepath = os.path.dirname(dbu.getFileFullPath(files[0]))
+            filepath = os.path.dirname(dbu.getFileFullPath(files[0].file_id))
             print("{0:6} {1:4} {2:80} {3:40} {4:6}".format('f_id', 'p_id', 'full path', 'filename', 'newest'))
             for f in files:
                 print("{0:6} {1:4} {2:80} {3:40} {4:6}".format(f.file_id,
