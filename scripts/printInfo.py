@@ -28,8 +28,8 @@ def getProductString(p, basepath):
 if __name__ == '__main__':
     usage = "usage: %prog database field \n Field can be: Product, Mission (more to come)"
     parser = OptionParser(usage=usage)
-    parser.add_option("-p", "--product", dest="product", type="int",
-                    help='Product id to use, only used for "File"', default=None)
+    parser.add_option("-p", "--product", dest="product", 
+                    help='Product id (or name) to use, only used for "File"', default=None)
     parser.add_option("-s", "--startDate", dest="startDate", type="string",
                       help='Date to start printing, only used for "File"  (e.g. 2012-10-02)', default=None)
     parser.add_option("-e", "--endDate", dest="endDate", type="string",
@@ -125,6 +125,8 @@ if __name__ == '__main__':
         if options.product is None:
             parser.error("To print File info a product_id is required via -p,--product")
 
+        options.product = dbu.getProductID(options.product) # make sure the p_id is here or change name to p_id
+        
         if options.startDate is not None:
             startDate = dup.parse(options.startDate)
         else:
