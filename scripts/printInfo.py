@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.6
 
+import datetime
 import itertools
 import glob
 import os
@@ -9,6 +10,8 @@ import sys
 import traceback
 import warnings
 
+from dateutil import parser as dup
+from dateutil.relativedelta import relativedelta
 from spacepy import pycdf
 
 from dbprocessing import DBUtils
@@ -25,6 +28,13 @@ def getProductString(p, basepath):
 if __name__ == '__main__':
     usage = "usage: %prog database field \n Field can be: Product, Mission (more to come)"
     parser = OptionParser(usage=usage)
+    parser.add_option("-p", "--product", dest="product", type="int",
+                    help='Product id to use, only used for "File"', default=None)
+    parser.add_option("-s", "--startDate", dest="startDate", type="string",
+                      help='Date to start printing, only used for "File"  (e.g. 2012-10-02)', default=None)
+    parser.add_option("-e", "--endDate", dest="endDate", type="string",
+                      help='Date to end printing, only used for "File" (e.g. 2012-10-25)', default=None)
+
 
     (options, args) = parser.parse_args()
 
@@ -111,6 +121,53 @@ if __name__ == '__main__':
             ans['code_stop_date'] = c.code_stop_date
             print('{code_id:4} {filename:40} {version:10} ({out_version}.Y.Z)    {path:40} ({process_id:3}) {process_name:40} {active_code:1}-{newest_version:1} {ram:4}-{cpu:2}  {code_start_date} -> {code_stop_date}'.format(**ans))
 
+    elif field == 'File':
+        if options.product is None:
+            parser.error("To print File info a product_id is required via -p,--product")
+
+        if options.startDate is not None:
+            startDate = dup.parse(options.startDate)
+        else:
+            startDate = None
+        if options.endDate is not None:
+            try:
+                endDate = datetime.datetime.strptime(options.endDate, "%Y%m") # yyyymm
+                endDate += relativedelta(months=1)
+                endDate -= datetime.timedelta(days=1)
+            except ValueError:
+                endDate = dup.parse(options.endDate)
+        else:
+            endDate = None
+        if startDate is None and endDate is not None:
+            startDate = datetime.datetime(1957, 10, 4, 19, 28, 34)
+        if startDate is not None and endDate is None:
+            endDate = datetime.datetime(2100, 12, 31, 23, 59, 59)
+
+        if startDate is None:
+            files = dbu.getFilesByProduct(options.product)
+        else:
+            files = dbu.getFilesByProductDate(options.product, [startDate, endDate])
+
+        if files:
+            # sort the files
+            files = sorted(files, key=lambda x: x.filename)
+            # get the file path:
+            filepath = os.path.dirname(dbu.getFileFullPath(files[0]))
+            print("{0:6} {1:4} {2:80} {3:40} {4:6}".format('f_id', 'p_id', 'full path', 'filename', 'newest'))
+            for f in files:
+                print("{0:6} {1:4} {2:80} {3:40} {4:6}".format(f.file_id,
+                                                                options.product,
+                                                                os.path.join(filepath, f.filename),
+                                                                f.filename,
+                                                                f.newest_version))
+                
+
+            
+        else:
+            print("No files found for product {0} in date range".format(options.product))
+              
+                                    
+        
     else:
         dbu._closeDB()        
         raise(NotImplementedError('Attr: "{0}" not yet implemented'.format(field) ))
