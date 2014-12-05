@@ -1563,22 +1563,55 @@ class DBUtils(object):
             # don't trust that the db has this correct
             # create a tabel populated with
             #   versionnum, file_id, utc_file_date
-            version = (self.session.query( (self.File.interface_version*1000  
+
+
+            # BUG DISCOVERED 2014-12-6 BAL
+            # the logic in these queries does not use the max version for each utc_file_date
+            # independently but instead the max in a range
+            # this workaround fixes this but could be better
+
+            aa = (self.session.query( (self.File.interface_version*1000  
                                            + self.File.quality_version*100 
                                            + self.File.revision_version).label('versionnum'), 
                                           self.File.file_id,
+                                           self.File.filename, self.File, 
                                           self.File.utc_file_date )
                        .filter(self.File.utc_file_date.between(*dates))
                        .filter(self.File.product_id == product_id)
-                       .group_by(self.File.file_id).subquery())
+                       #.order_by(self.File.filename.asc())
+                       .group_by(self.File.utc_file_date, 'versionnum')).all()
 
-            subq = (self.session.query(func.max(version.c.versionnum))
-                  .group_by(version.c.utc_file_date)).subquery()
+            
+            sq = []
+            for ele in aa:
+                tmp = [v for v in aa if v[4] == ele[4]]
+                t2 = max(tmp, key=lambda x: x[0])
+                sq.append(t2[2])
+            sq = sorted(list(set(list(sq))))
 
-            sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
 
-            sq = list(map(itemgetter(0), sq))
-            sq = self.session.query(self.File).filter(self.File.file_id.in_(sq)).all()
+##             version = (self.session.query( (self.File.interface_version*1000  
+##                                            + self.File.quality_version*100 
+##                                            + self.File.revision_version).label('versionnum'), 
+##                                           self.File.file_id,
+##                                            self.File.filename,
+##                                           self.File.utc_file_date )
+##                        .filter(self.File.utc_file_date.between(*dates))
+##                        .filter(self.File.product_id == product_id)
+## #                       .group_by(self.File.file_id).subquery())
+##                        .order_by(self.File.filename.asc())
+##                        .group_by(self.File.utc_file_date)
+##                        .order_by(self.File.filename.asc())
+##                        .subquery())
+
+##             subq = (self.session.query(func.max(version.c.versionnum))
+##                   .group_by(version.c.utc_file_date)).order_by(version.c.utc_file_date).all()
+
+##             sq = [self.session.query(version.c.file_id).filter(version.c.versionnum == v[0]).all() for v in subq]
+##             sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
+
+##             sq = list(map(itemgetter(0), sq))
+##             sq = self.session.query(self.File).filter(self.File.file_id.in_(sq)).all()
            
         else: 
             sq = self.session.query(self.File).filter_by(product_id = product_id).\
