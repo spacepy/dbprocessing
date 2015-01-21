@@ -73,19 +73,32 @@ if __name__ == "__main__":
 
     lisfile = os.path.isfile
     lbasename = os.path.basename
+    ldirname  = os.path.dirname
+    ljoin = os.path.join
     lgetEntry = dbu.getEntry
+    lgetFileFullPath = dbu.getFileFullPath
     for ii, pid in enumerate(products):
-        print("Processing product {0} it is {1} of {2}".format(pid, ii+1, plen))
-        files = dbu.getAllFilenames(fullPath=True, product=pid)
-        print("    Found {0} files, checking".format(len(files)))
-        for f in files:
+        files = dbu.getAllFilenames(fullPath=False, product=pid)
+        if not files:
+            continue
+        one_file = dbu.session.query(dbu.File).filter_by(product_id = pid).first().filename
+        prod_path = ldirname(lgetFileFullPath(one_file))
+        print("Processing product {0} it is {1} of {2}  {3}".format(pid, ii+1, plen, prod_path))
+
+        diskfiles = os.listdir(prod_path)
+        
+        print("    Found {0} diskfiles and {1} dbfiles, checking".format(len(diskfiles), len(files)))
+        files = set(files)
+        diskfiles = set(diskfiles)
+        delfiles = files.difference(diskfiles)
+        for f in delfiles:
             if not lisfile(f):
                 print("    ** {0} not found on disk".format(f))
                 if options.fix:
                     fentry = lgetEntry('File', lbasename(f))
                     if fentry.exists_on_disk:
-                        dbu._purgeFileFromDB(lbasename(f))
-                        print("        ** {0} removed from DB".format(f))
+                        dbu._purgeFileFromDB(ljoin(prod_path, f))
+                        print("        ** {0} removed from DB".format(ljoin(prod_path, f)))
                     else:
                         print("        ** was already not marked exists_on_disk")
     
