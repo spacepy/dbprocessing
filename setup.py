@@ -30,7 +30,7 @@ scripts = ('scripts/ProcessQueue.py',
            'scripts/reprocessByDate.py', 'scripts/dbOnlyFiles.py',
            'scripts/coveragePlot.py', 'scripts/DBRunner.py',
            'scripts/dataToIncoming.py', 'scripts/updateCode.py', 
-           'scripts/purgeFileFromDB.py')
+           'scripts/purgeFileFromDB.py', 'scripts/deleteFromDBifNotOnDisk.py')
 
 scripts_dir = os.path.expanduser('~/dbUtils')
 
