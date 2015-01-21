@@ -91,15 +91,19 @@ if __name__ == "__main__":
         files = set(files)
         diskfiles = set(diskfiles)
         delfiles = files.difference(diskfiles)
+        rmfiles = []
         for f in delfiles:
             if not lisfile(f):
                 print("    ** {0} not found on disk".format(f))
                 if options.fix:
                     fentry = lgetEntry('File', lbasename(f))
                     if fentry.exists_on_disk:
-                        dbu._purgeFileFromDB(ljoin(prod_path, f))
-                        print("        ** {0} removed from DB".format(ljoin(prod_path, f)))
+                        #dbu._purgeFileFromDB(f)
+                        rmfiles.append(f)
+                        print("        ** {0} removed from DB".format(f))
                     else:
                         print("        ** was already not marked exists_on_disk")
+        if rmfiles:
+            dbu._purgeFileFromDB(rmfiles)
     
     dbu._closeDB()
