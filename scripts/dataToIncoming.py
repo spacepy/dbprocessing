@@ -144,7 +144,11 @@ def makeLinks(files, incoming, dryrun=False):
         newf = os.path.join(incoming, os.path.basename(f))
         try:
             if not dryrun:
-                os.symlink(f, newf)
+                try:
+                    os.symlink(f, newf)
+                except IOError as e:
+                    print "I/O error({0}): {1} : {2}".format(e.errno, e.strerror, f)
+                    continue
             print("Symlink: {0}->{1}".format(f, newf))
             good += 1
         except OSError:
@@ -161,7 +165,11 @@ def copyFiles(files, incoming, dryrun=False):
         newf = os.path.join(incoming, os.path.basename(f))
         try:
             if not dryrun:
-                shutil.copy(f, incoming)
+                try:
+                    shutil.copy(f, incoming)
+                except IOError as e:
+                    print "I/O error({0}): {1} : {2}".format(e.errno, e.strerror, f)
+                    continue                
             print("Copy: {0}->{1}".format(f, newf)) 
             good += 1
         except shutil.Error:
