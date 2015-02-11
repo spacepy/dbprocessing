@@ -1531,8 +1531,16 @@ class DBUtils(object):
         given a list of file objects clean out older versions of matching files
         matching is defined as same product_id and smae utc_file_date      
         """
-        newest = set((v for fe in invals
+        tmp = []
+        for i in invals:
+            if isinstance(i, (str, unicode)):
+                tmp.append(self.getEntry('File', i))
+            else:
+                tmp.append(i)
+        invals = tmp
+        newest = list((v for fe in invals
                       for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date]*2, newest_version=True)))
+        newest = set([self.getEntry('File', v) for v in newest])
         return list(newest.intersection(invals))
         
     def getInputProductID(self, process_id):
