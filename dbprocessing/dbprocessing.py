@@ -443,7 +443,8 @@ class ProcessQueue(object):
             elif endDate is None:
                 endDate = datetime.date(2100, 1, 1)
             files = self.dbu.getFilesByProductDate(prod_id, [startDate, endDate], newest_version=True)
-        file_ids = [f.file_id for f in files]
+        
+        file_ids = [self.dbu.getFileID(f) for f in files]
         added = self.dbu.Processqueue.push(file_ids, incVersion)
         if added is None:
             added = []
