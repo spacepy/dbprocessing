@@ -42,6 +42,9 @@ if __name__ == "__main__":
                       help="Number of processes to run in parallel", default=2)
     parser.add_option("", "--echo", dest="echo", action="store_true",
                       help="Start sqlalchemy with echo in place for debugging", default=False)
+    parser.add_option("", "--glb", dest="glob", type="string",
+                      help='Glob to use when reading files from incoming: defualt "*"', default="*")
+
 
     (options, args) = parser.parse_args()
     if len(args) != 0:
@@ -84,7 +87,7 @@ if __name__ == "__main__":
         try:
             start_len = pq.dbu.Processqueue.len()
             print("Currently {0} entries in process queue".format(start_len))
-            pq.checkIncoming() 
+            pq.checkIncoming(glb=options.glob) 
             if not options.dryrun:
                 while len(pq.queue) != 0:
                     pq.importFromIncoming()

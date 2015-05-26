@@ -1894,7 +1894,7 @@ class DBUtils(object):
         mission = self.getEntry('Mission',mission_id)
         return mission.rootdir
 
-    def _checkIncoming(self):
+    def _checkIncoming(self, glb='*'):
         """
         check the incoming directory for the current mission and add those files to the getting list
 
@@ -1903,7 +1903,7 @@ class DBUtils(object):
         """
         path = self.getIncomingPath()
         DBlogging.dblogger.debug("Looking for files in {0}".format(path))
-        files = glob.glob(os.path.join(path, '*'))
+        files = glob.glob(os.path.join(path, glb))
         return files
 
     def getIncomingPath(self, mission_id=None):

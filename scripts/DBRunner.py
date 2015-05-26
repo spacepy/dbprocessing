@@ -73,7 +73,7 @@ if __name__ == "__main__":
         # we need a file_id that goes into the process
         for p, opt in products:
             files = pq.dbu.getFilesByProductDate(p, [d]*2, newest_version=True)
-            files = [v.file_id for v in files]
+            #files = [v.file_id for v in files]
             if files:
                 break
         if not files:

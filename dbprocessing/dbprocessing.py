@@ -82,7 +82,7 @@ class ProcessQueue(object):
         """
         self.tempdir = tempfile.mkdtemp(suffix)
 
-    def checkIncoming(self):
+    def checkIncoming(self, glb='*'):
         """
         Goes out to incoming and grabs all files there adding them to self.queue
 
@@ -94,7 +94,7 @@ class ProcessQueue(object):
         """
         DBlogging.dblogger.debug("Entered checkIncoming:")
 
-        self.queue.extendleft(self.dbu._checkIncoming())
+        self.queue.extendleft(self.dbu._checkIncoming(glb=glb))
         # step through and remove duplicates
         # if python 2.7 deque has a .count() otherwise have to use
         #  this workaround
