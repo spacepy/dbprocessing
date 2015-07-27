@@ -53,6 +53,10 @@ if __name__ == "__main__":
     if options.force not in [None, 0, 1, 2]:
         parser.error("invalid force option [0,1,2]")
 
+    if startDate > endDate:
+        parser.error("startDate > endDate, nothing will be added")
+
+        
     db = dbprocessing.ProcessQueue(options.mission, echo=options.echo)
 
     print startDate, endDate
