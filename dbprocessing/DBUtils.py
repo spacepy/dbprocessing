@@ -1886,10 +1886,15 @@ class DBUtils(object):
         """
         if mission_id is None:
             mission_id = self.session.query(self.Mission.mission_id).all()
-            if len(mission_id) > 1:
+            if len(mission_id) == 0:
+                return None
+            elif len(mission_id) > 1:
                 raise(ValueError('No mission id specified and more than one mission present'))
             else:
-                mission_id = mission_id[0][0]
+                try:
+                    mission_id = mission_id[0][0]
+                except IndexError:
+                    pass
 
         mission = self.getEntry('Mission',mission_id)
         return mission.rootdir
