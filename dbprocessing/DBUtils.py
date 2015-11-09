@@ -580,7 +580,7 @@ class DBUtils(object):
 
         DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
-    def _purgeFileFromDB(self, filename=None, recursive=False):
+    def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False):
         """
         removes a file from the DB
 
@@ -594,11 +594,13 @@ class DBUtils(object):
         """
         if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
             filename = [filename]
-        for f in filename:
+        for ii, f in enumerate(filename):
             try:
                 f = self.getFileID(f)
             except DBNoData:
-                pass            
+                pass
+            if verbose:
+                print(ii, len(filename), f)
             # we need to look in each table that could have a reference to this file and delete that
             ## processqueue
             try:
@@ -1722,15 +1724,10 @@ class DBUtils(object):
         """
         given a level return all the file instances associated with it
         """
-        # get all the product ids of that level
-        p_ids = self.getProductsByLevel(level)
-        p_ids =  map(attrgetter('product_id'), p_ids)
-        ids = []
-        for p in p_ids:
-            ids.extend(self.getFilesByProduct(p, newest_version=newest_version))
+        sq = self.session.query(self.File).filter_by(data_level=level).all()
         if id_only:
-            ids = map(attrgetter('file_id'), ids)
-        return files
+            sq = map(attrgetter('file_id'), sq)
+        return sq
 
     def getAllFileIds(self, newest_version=False):
         """
@@ -2205,7 +2202,7 @@ class DBUtils(object):
         """
         get all the products for a given level
         """
-        sq = self.session.query(self.product).filter_by(level = level).all()
+        sq = self.session.query(self.Product).filter_by(level = level).all()
         if sq:
             return  map(itemgetter(0), sq)
         else:
