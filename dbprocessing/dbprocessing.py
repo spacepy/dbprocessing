@@ -319,14 +319,14 @@ class ProcessQueue(object):
         """
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
 
-        children = self.dbu.getChildrenProcesses(file_id) # returns process
-        daterange = self.dbu.getFileDates(file_id) # this is the dates that this file spans
+        children = self.dbu.getChildrenProcesses(file_id[0]) # returns process
+        daterange = self.dbu.getFileDates(file_id[0]) # this is the dates that this file spans
 
         for child_process in children:
 
             # iterate over all the days between the start and stop date from above (including stop date)
             for utc_file_date in Utils.expandDates(*daterange):
-                files, input_product_id = self._getRequiredProducts(child_process, file_id, utc_file_date)
+                files, input_product_id = self._getRequiredProducts(child_process, file_id[0], utc_file_date)
                 if not files:
                     # figure out the missing products
                     DBlogging.dblogger.debug("For file: {0} date: {1} required files not present {2}"
