@@ -87,6 +87,37 @@ class DBFormatterTests(unittest.TestCase):
         self.assertRaises(KeyError, self.fmtr.format,
                           '{hi} {there}', hi='hi')
 
+    def testHopeRegressions(self):
+        """Use input/outputs from HOPE processing to catch regressions"""
+        #each tuple of (format string, kwargs dict)
+        inputs = [
+            ('rbspa_ect-hope-hk-L05_0095_v{VERSION}.cdf',
+             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-hk-L05',
+              'datetime': datetime.date(2012, 12, 2)}),
+            ('rbspa_ect-hope-sci-L05_0091_v{VERSION}.cdf',
+             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-sci-L05',
+              'datetime': datetime.date(2012, 11, 28)}),
+            ('rbspa_ect-hope-hk-L1_{DATE}_v{VERSION}.cdf',
+             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-hk-L1',
+              'datetime': datetime.date(2012, 10, 3)}),
+            ('rbspa_ect-hope-sci-L1_{DATE}_v{VERSION}.cdf',
+             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-sci-L1',
+              'datetime': datetime.date(2012, 10, 3)}),
+            ]
+        #output string
+        outputs = [
+            'rbspa_ect-hope-hk-L05_0095_v2.0.0.cdf',
+            'rbspa_ect-hope-sci-L05_0091_v2.0.0.cdf',
+            'rbspa_ect-hope-hk-L1_20121003_v2.0.0.cdf',
+            'rbspa_ect-hope-sci-L1_20121003_v2.0.0.cdf',
+            ]
+        for i, o in zip(inputs, outputs):
+            self.assertEqual(o, self.fmtr.expand_format(i[0], i[1]))
+
 
 if __name__ == '__main__':
     unittest.main()
