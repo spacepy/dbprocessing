@@ -388,11 +388,13 @@ class runMe(object):
         # in this loop see if the file can be created i.e. ges not already exist in the db
         while True:
             # make the filename in the loop as output_version is manipulated below
-            self.filename = fmtr.expand_format(format_str, {'SATELLITE':ptb['satellite'].satellite_name,
-                                                         'PRODUCT':ptb['product'].product_name,
-                                                         'VERSION':str(self.output_version),
-                                                         'datetime':utc_file_date,
-                                                         'INSTRUMENT':ptb['instrument'].instrument_name})
+            self.filename = fmtr.format(
+                format_str,
+                SATELLITE=ptb['satellite'].satellite_name,
+                PRODUCT=ptb['product'].product_name,
+                VERSION=str(self.output_version),
+                datetime=utc_file_date,
+                INSTRUMENT=ptb['instrument'].instrument_name)
             DBlogging.dblogger.debug("Filename: %s created" % (self.filename))
             if not force:
                 f_id_db = self._fileInDB()
