@@ -252,7 +252,7 @@ class DBUtils(object):
                               pwd.getpwuid(os.getuid())[0],
                               socket.gethostname(),
                               pid = os.getpid() )
-        DBlogging.dblogger.info( "Logging started: %d: %s, PID: %s, M_id: %s, user: %s, hostmane: %s" %
+        DBlogging.dblogger.info( "Logging started: %d: %s, PID: %s, M_id: %s, user: %s, hostname: %s" %
                                  (self.__p1.logging_id, self.__p1.processing_start_time, self.__p1.pid,
                                   self.__p1.mission_id, self.__p1.user, self.__p1.hostname) )
 
@@ -542,7 +542,7 @@ class DBUtils(object):
         this is determined by product and utc_file_date
         """
         # TODO this might break with weekly input files
-        DBlogging.dblogger.debug("Entering in queueClean(), there are {0} entries".format(self.Processqueue.len()))
+        DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
         pqdata = self.Processqueue.getAll(version_bump=True)
 
         file_ids = list(map(itemgetter(0), pqdata))
@@ -578,7 +578,7 @@ class DBUtils(object):
         else:
             print('<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.Processqueue.len()))
 
-        DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
+        DBlogging.dblogger.debug("Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
     def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False):
         """
@@ -1763,7 +1763,7 @@ class DBUtils(object):
         """
         given a file ID return all the processes that use this as input
         """
-        DBlogging.dblogger.debug( "Entered findChildrenProducts():  file_id: {0}".format(file_id) )
+        DBlogging.dblogger.debug( "Entered getChildrenProcesses():  file_id: {0}".format(file_id) )
         product_id = self.getEntry('File', file_id).product_id
 
         # get all the process ids that have this product as an input
