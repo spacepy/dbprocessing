@@ -209,10 +209,10 @@ if __name__ == "__main__":
                                                                  conf['plot{0}'.format(pnum)]['product{0}_glob'.format(pn)])]
 
                 if 'product{0}_version'.format(pn) in conf['plot{0}'.format(pnum)]:
-                    files = [f for f in files if (dbu.getVersion(f.file_id) >=
+                    files = [f for f in files if (dbu.getVersion(dbu.getEntry('File', f).file_id) >=
                                                  Utils.parseVersion(conf['plot{0}'.format(pnum)]['product{0}_version'.format(pn)]))]
                 # now that we have all the files loop through and the the dates that we have to 1
-                f_dates = [f.utc_file_date for f in files]
+                f_dates = [dbu.getEntry('File', f).utc_file_date for f in files]
                 for fd in f_dates:
                     ans[ind_pnum][ind_d][ind_pn][1][ans[ind_pnum][ind_d][ind_pn][0].index(fd)] = 1
                 print("\tcollected {0} from {1} to {2}"

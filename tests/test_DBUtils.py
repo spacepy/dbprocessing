@@ -314,9 +314,10 @@ class DBUtilsGetTests(TestSetup):
                'ect_rbspb_0377_381_02.ptp.gz',
                'ect_rbspb_0377_381_01.ptp.gz']
         self.assertEqual(ans, [v.filename for v in val] )
+        #WARNING: calling newest_version=True returns FILENAME, not DBUtils.File
         val = self.dbu.getFilesByProductDate(187, [datetime.date(2013, 9, 10)]*2, newest_version=True)
         self.assertEqual(1, len(val))
-        self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], [v.filename for v in val] )
+        self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], val)
 
     def test_getFilesByDate(self):
         """getFilesByDate"""

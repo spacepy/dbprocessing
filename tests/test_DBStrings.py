@@ -34,7 +34,6 @@ class DBFormatterTests(unittest.TestCase):
 
     def testExpandFormat(self):
         """Add formatting codes to special fields"""
-        print '{Y:04d}',                         self.fmtr.expand_format('{Y}')
         self.assertEqual('{Y:04d}',
                          self.fmtr.expand_format('{Y}'))
         self.assertEqual(
@@ -86,6 +85,64 @@ class DBFormatterTests(unittest.TestCase):
         """Format strings with unspecified keys"""
         self.assertRaises(KeyError, self.fmtr.format,
                           '{hi} {there}', hi='hi')
+
+    def testHopeRegressExpandDatetime(self):
+        """Check on the datetime expansion for a simple HOPE regression"""
+        fmtstring = 'rbspa_ect-hope-hk-L05_0095_v{VERSION}.cdf'
+        fmtkeywords = {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+                       'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-hk-L05',
+                       'datetime': datetime.date(2012, 12, 2)}
+        self.fmtr.expand_datetime(fmtkeywords)
+        self.assertEqual({'DATE': '20121202',
+                          'INSTRUMENT': u'hope',
+                          'PRODUCT': u'rbsp_ect-hope-hk-L05',
+                          'SATELLITE': u'rbspa',
+                          'VERSION': '2.0.0',
+                          'Y': 2012,
+                          'b': 'Dec',
+                          'd': 2,
+                          'datetime': datetime.date(2012, 12, 2),
+                          'j': 337,
+                          'm': 12,
+                          'y': 12},
+                         fmtkeywords)
+
+    def testHopeRegressExpandFormat(self):
+        """Check on the basic format expansion for a simple HOPE regression"""
+        self.assertEqual('rbspa_ect-hope-hk-L05_0095_v{VERSION}.cdf',
+                         self.fmtr.expand_format(
+                             'rbspa_ect-hope-hk-L05_0095_v{VERSION}.cdf'))
+
+    def testHopeRegressions(self):
+        """Use input/outputs from HOPE processing to catch regressions"""
+        #each tuple of (format string, kwargs dict)
+        inputs = [
+            ('rbspa_ect-hope-hk-L05_0095_v{VERSION}.cdf',
+             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-hk-L05',
+              'datetime': datetime.date(2012, 12, 2)}),
+            ('rbspa_ect-hope-sci-L05_0091_v{VERSION}.cdf',
+             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-sci-L05',
+              'datetime': datetime.date(2012, 11, 28)}),
+            ('rbspa_ect-hope-hk-L1_{DATE}_v{VERSION}.cdf',
+             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-hk-L1',
+              'datetime': datetime.date(2012, 10, 3)}),
+            ('rbspa_ect-hope-sci-L1_{DATE}_v{VERSION}.cdf',
+             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-sci-L1',
+              'datetime': datetime.date(2012, 10, 3)}),
+            ]
+        #output string
+        outputs = [
+            'rbspa_ect-hope-hk-L05_0095_v2.0.0.cdf',
+            'rbspa_ect-hope-sci-L05_0091_v2.0.0.cdf',
+            'rbspa_ect-hope-hk-L1_20121003_v2.0.0.cdf',
+            'rbspa_ect-hope-sci-L1_20121003_v2.0.0.cdf',
+            ]
+        for i, o in zip(inputs, outputs):
+            self.assertEqual(o, self.fmtr.format(i[0], **i[1]))
 
 
 if __name__ == '__main__':

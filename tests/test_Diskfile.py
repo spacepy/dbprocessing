@@ -52,8 +52,8 @@ class DiskfileTests(TestSetup):
     """Tests for Diskfile class"""
     def test_read_error(self):
         """given a file input that is not readable raise ReadError:"""
-        self.assertRaises(Diskfile.ReadError, Diskfile.Diskfile, 'wrong input',
-                          self.dbu)
+        df = Diskfile.Diskfile('wrong input', self.dbu)
+        self.assertRaises(Diskfile.ReadError, df.checkAccess)
 
     def test_write_error(self):
         """given a file input that is not writeable WriteError"""
@@ -61,8 +61,8 @@ class DiskfileTests(TestSetup):
             with open('IamAfileThatExists.file', 'wb') as f:
                 f.write('I am some text in a file')
             os.chmod('IamAfileThatExists.file', stat.S_IRUSR)
-#            self.assertRaises(Diskfile.WriteError, Diskfile.Diskfile,
-#                              'IamAfileThatExists.file', self.dbu)
+            df = Diskfile.Diskfile('IamAfileThatExists.file', self.dbu)
+            self.assertRaises(Diskfile.WriteError, df.checkAccess)
 
             os.chmod('IamAfileThatExists.file', stat.S_IWUSR|stat.S_IRUSR)
         finally:
