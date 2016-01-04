@@ -8,6 +8,7 @@ from test_DBUtils import *
 from test_Diskfile import *
 from test_Version import *
 from test_DBStrings import *
+from test_Utils import *
 
 
 __version__ = '2.0.3'
