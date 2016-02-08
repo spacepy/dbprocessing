@@ -11,15 +11,30 @@ import sys
 
 import dateutil.rrule # do this long so where it is from is remembered
 
-import Version
+from . import Version
 
-# from spacepy
 def progressbar(count, blocksize, totalsize, text='Download Progress'):
     """
-    print a progress bar with urllib.urlretrieve reporthook functionality
+    print a progress bar with urllib.urlretrieve reporthook functionality, taken from spacepy
+
+    Parameters
+    ----------
+    count : float
+        The current count of the progressbar
+    blocksize : float
+        The size of each block (mostly useful for file downloads)
+    totalsize : float
+        The total size of the job, progress is count*blocksize*100/totalsize
+    text : str, optional
+        The text to print in the progressbar
+
+    Returns
+    -------
+    None
+        No return, but things are printed to the screen
 
     Examples
-    ========
+    --------
     >>> import spacepy.toolbox as tb
     >>> import urllib
     >>> urllib.urlretrieve(config['psddata_url'], PSDdata_fname, reporthook=tb.progressbar)
@@ -32,19 +47,76 @@ def progressbar(count, blocksize, totalsize, text='Download Progress'):
 
 # from http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
 def chunker(seq, size):
+    """
+    Return a long iterable in a tuple of shorter lists. Taken from from http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
+
+    Parameters
+    ----------
+    seq : iterable
+        Iterable to split up
+    size : int
+        Size of each split in the output, last one has the remaining elements of `seq`
+
+    Returns
+    -------
+    tuple
+        A tuple of lists of the iterable `seq` split into len(seq)/`size` segments
+
+    """
     return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
 
 def unique(seq):
+    """
+    Take a list and return only yhr unique elements in the same order
+
+    Parameters
+    ----------
+    seq : list
+        List to return the unique elements of
+
+    Returns
+    -------
+    list
+        List with only the unique elements
+
+    """
     seen = set()
     seen_add = seen.add
     return [ x for x in seq if x not in seen and not seen_add(x)]
 
 def expandDates(start_time, stop_time):
+    """
+    Given a start and a stop date make all the dates in between, inclusive on the ends
+
+    Parameters
+    ----------
+    start_time : datetime.datetime
+        Date to start the list
+    stop_time : datetime.datetime
+        Date to end the list, inclusive
+
+    Returns
+    -------
+    list
+        All the dates between `start_time` and `stop_time`
+
+    """
     return dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=start_time, until=stop_time)
 
 def daterange_to_dates(daterange):
     """
     given a daterange return the dat objects for all days in the range
+
+    Parameters
+    ----------
+    seq : iterable of datetime.datetime
+        Start and stop dates
+
+    Returns
+    -------
+    list
+        All the dates between `daterange`[0] and `daterange`[1]
+
     """
     return [daterange[0] + datetime.timedelta(days=val) for val in
             xrange((daterange[1]-daterange[0]).days+1)]
@@ -52,13 +124,37 @@ def daterange_to_dates(daterange):
 def parseDate(inval):
     """
     given a date of the for yyyy-mm-dd parse to a datetime
-    If the format is wrong ValueError is raised
+    If the format is wrong ValueError is raised. This is just
+    a wrapper around datetime.datetime.strptime
+
+    Parameters
+    ----------
+    inval : str
+        String date representation of the form YYYY-MM-DD
+
+    Returns
+    -------
+    datetime.datetime
+        datetime object parsed from the string
+
     """
     return datetime.datetime.strptime(inval, '%Y-%m-%d')
 
 def parseVersion(inval):
     """
-    given a format of the form x.y.z parse to a Version
+    given a format of the form x.y.z parse to a Version, this is a wrapper
+    around Version.Version.fromString()
+
+    Parameters
+    ----------
+    inval : str
+        String Version representation of the form xx.yy.zz
+
+    Returns
+    -------
+    Version.Version
+        Version object parsed form the string
+
     """
     return Version.Version.fromString(inval)
 
