@@ -203,7 +203,7 @@ def strargs_to_args(strargs):
         for val in strargs.split():
             tmp = val.split('=')
             kwargs[tmp[0]] = tmp[1]
-    except (AttributeError, KeyError): # it was None
+    except (AttributeError, KeyError, IndexError): # it was None
         pass
     return kwargs
 

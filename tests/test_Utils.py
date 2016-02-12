@@ -2,18 +2,14 @@
 
 import datetime
 import unittest
-import os
-import tempfile
-
 
 from dbprocessing import Utils
 from dbprocessing import Version
 
 
-
 class UtilsTests(unittest.TestCase):
     """Tests for DBfile class"""
-    
+
     def setUp(self):
         super(UtilsTests, self).setUp()
 
@@ -27,32 +23,31 @@ class UtilsTests(unittest.TestCase):
         utc_file_date = datetime.date(2012, 4, 12)
         utc_start_time = datetime.datetime(2012, 4, 12, 1, 2, 3)
         version = '1.2.3'
-        version2 = Version.Version(3,2,1)
+        version2 = Version.Version(3, 2, 1)
         self.assertEqual('20120412', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         path = '{DATE}'
         self.assertEqual('20120412', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         path = '{Y}{b}{d}'
-        self.assertEqual('2012Apr12',Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
+        self.assertEqual('2012Apr12', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         path = '{Y}{j}'
         self.assertEqual('2012103', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         path = '{VERSION}'
         self.assertEqual('1.2.3', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         self.assertEqual('3.2.1', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version2))
 
-
     def test_chunker(self):
         """chunker()"""
         self.assertEqual(list(Utils.chunker(range(10), 3)), [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]])
         self.assertEqual(list(Utils.chunker(range(10), 4)), [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9]])
         self.assertEqual(list(Utils.chunker(range(10), 4)), [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9]])
-        self.assertEqual(list(Utils.chunker(range(10), 10)),[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
-        self.assertEqual(list(Utils.chunker(range(10), 20)),[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
+        self.assertEqual(list(Utils.chunker(range(10), 10)), [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
+        self.assertEqual(list(Utils.chunker(range(10), 20)), [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
 
     def test_unique(self):
         """unique"""
         self.assertEqual(Utils.unique(range(5)), range(5))
-        self.assertEqual(Utils.unique([1,1,2,2,3]), [1,2,3])
-        self.assertEqual(Utils.unique([1,1,3,2,2,3]), [1,3,2])
+        self.assertEqual(Utils.unique([1, 1, 2, 2, 3]), [1, 2, 3])
+        self.assertEqual(Utils.unique([1, 1, 3, 2, 2, 3]), [1, 3, 2])
 
     def test_expandDates(self):
         """expandDates"""
@@ -71,13 +66,12 @@ class UtilsTests(unittest.TestCase):
 
     def test_parseVersion(self):
         """parseVersion"""
-        self.assertEqual(Version.Version(1,2,3), Utils.parseVersion('1.2.3'))
+        self.assertEqual(Version.Version(1, 2, 3), Utils.parseVersion('1.2.3'))
         self.assertRaises(TypeError, Utils.parseVersion, '1.2')
 
     def test_flatten(self):
         """flatten"""
-        self.assertEqual([1,2,3,4,5,6,7,8,9], list(Utils.flatten([[1,2], [3,4,5], [6,7], [8], [9]])))
-                
+        self.assertEqual([1, 2, 3, 4, 5, 6, 7, 8, 9], list(Utils.flatten([[1, 2], [3, 4, 5], [6, 7], [8], [9]])))
 
     def test_toBool(self):
         """toBool"""
@@ -96,7 +90,7 @@ class UtilsTests(unittest.TestCase):
         invals = ['sdg', 'false', False, 'sagdfa']
         for v in invals:
             self.assertFalse(Utils.toNone(v) is None)
-            
+
     def test_daterange_to_dates(self):
         """daterange_to_dates"""
         daterange = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 6)]
@@ -106,7 +100,25 @@ class UtilsTests(unittest.TestCase):
         expected = [datetime.datetime(2000, 1, 4), datetime.datetime(2000, 1, 5)]
         self.assertEqual(expected, Utils.daterange_to_dates(daterange))
 
+    def test_strargs_to_args1(self):
+        """strargs_to_args"""
+        self.assertTrue(Utils.strargs_to_args(None) is None)
 
+    def test_strargs_to_args2(self):
+        """strargs_to_args"""
+        self.assertEqual(Utils.strargs_to_args('--arg1=arg'), { '--arg1': 'arg' })
+
+    def test_strargs_to_args3(self):
+        """strargs_to_args"""
+        self.assertEqual(Utils.strargs_to_args(['--arg1=arg', '--arg2=arg2']), { '--arg1': 'arg', '--arg2': 'arg2' })
+
+    def test_strargs_to_args4(self):
+        """strargs_to_args"""
+        self.assertEqual(Utils.strargs_to_args(['--arg2=arg2']), { '--arg2': 'arg2' })
+
+    def test_strargs_to_args5(self):
+        """strargs_to_args"""
+        self.assertEqual(Utils.strargs_to_args('--arg'), { })
 
 
 if __name__ == "__main__":
