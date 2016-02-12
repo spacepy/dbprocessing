@@ -42,5 +42,6 @@ setup(name='dbprocessing',
       packages=['dbprocessing'],
       provides=['dbprocessing'],
       #package_data={'dbprocessing': ['rbsp_config.txt', 'xstartup']},
-      data_files=[ (scripts_dir, scripts) ]
+      # data_files=[ (scripts_dir, scripts) ]
+      scripts = scripts
       )
