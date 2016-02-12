@@ -371,7 +371,7 @@ class DBUtils(object):
         remove a file from the queue by name or number
         """
         # if the input is a filename need to handle that
-        if not hasattr(item, '__iter__'): 
+        if not hasattr(item, '__iter__'):
             item = [item]
         for ii, v in enumerate(item):
             try:
@@ -408,7 +408,7 @@ class DBUtils(object):
         DBlogging.dblogger.debug( "Entire Processqueue was read: {0} elements returned".format(len(ans)))
         return ans
 
-    def _processqueuePush(self, fileid, version_bump=None):
+    def _processqueuePush(self, fileid, version_bump=None, MAX_ADD=150):
         """
         push a file onto the process queue (onto the right)
 
@@ -426,17 +426,16 @@ class DBUtils(object):
             fileid = [fileid]
         else:
             # do this in chunks as too many entries breaks things
-            MAX_ADD = 150
             if len(fileid) > MAX_ADD:
                 outval = []
                 for v in Utils.chunker(fileid, MAX_ADD):
                     outval.extend(self._processqueuePush(v, version_bump=version_bump))
                 return outval
-        
+
         # first filter() takes care of putting in values that are not in the DB.  It is silent
         # second filter() takes care of not readding files that are alereadhy in the queue
         subq  = self.session.query(self.Processqueue.file_id).subquery()
-        
+
         fileid = (self.session.query(self.File.file_id)
                   .filter(self.File.file_id.in_(fileid))
                   .filter(~self.File.file_id.in_(subq))).all()
@@ -552,7 +551,7 @@ class DBUtils(object):
 
         file_ids = list(map(itemgetter(0), pqdata))
         version_bumps = list(map(itemgetter(1), pqdata))
-        
+
         # speed this up using a sql in_ call not looping over getEntry for each one
         # this gets all the file objects for the processqueue file_ids
         subq = self.session.query(self.Processqueue.file_id).subquery()
@@ -626,7 +625,7 @@ class DBUtils(object):
             try:
                 self.session.delete(self.getEntry('File', f))
             except DBNoData:
-                pass            
+                pass
             DBlogging.dblogger.info( "File removed from db {0}".format(f) )
 
         self._commitDB()
@@ -659,7 +658,7 @@ class DBUtils(object):
         else:
             codes = self.session.query(self.Code).all()
         ans = map(lambda x: self.getTraceback('Code', x.code_id), codes)
-        return ans        
+        return ans
 
     def getAllFilenames(self, fullPath=True, level=None, product=None):
         """
@@ -682,25 +681,6 @@ class DBUtils(object):
             names = map(self.getFileFullPath, names)
         return names
 
-    def getAllFileIds(self, newest_version=False):
-        """
-        return all the file ids in the database
-
-        the itemgetter method is a lot faster then zip(*) (x16)
-        """
-        if not newest:
-            ids = self.session.query(self.File.file_id).all()
-            ids =  map(itemgetter(0), ids)
-        else:
-            # get all the product ids
-            p_ids = self.getAllProducts()
-            p_ids =  map(attrgetter('product_id'), p_ids)
-            ids = []
-            for p in p_ids:
-                print p
-                ids.extend(self.getFilesByProduct(p, newest_version=True))
-            ids =  map(attrgetter('product_id'), ids)
-        return ids
 
     def addMission(self,
                     mission_name,
@@ -1453,6 +1433,7 @@ class DBUtils(object):
                 for v in sq:
                     if v.satellite_id == sat_id:
                         return v.instrument_id
+                # I do not believe this can be reached, BAL 2-12-2016
                 raise(ValueError("No matching instrument, satellite found. {0}:{1}".format(name, satellite_id)))
             return sq[0].instrument_id
 
@@ -1489,7 +1470,7 @@ class DBUtils(object):
                 raise(DBNoData("No file_id {0} found in the DB".format(filename)))
             return sq.file_id
         except TypeError: # came in as list or tuple
-            return map(self.getFileID, filename) 
+            return map(self.getFileID, filename)
         except ValueError:
             sq = self.session.query(self.File).filter_by(filename = filename).first()
             if sq is not None:
@@ -1549,7 +1530,7 @@ class DBUtils(object):
                       for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date]*2, newest_version=True)))
         newest = set([self.getEntry('File', v) for v in newest])
         return list(newest.intersection(invals))
-        
+
     def getInputProductID(self, process_id):
         """
         Return the fileID for the input filename
@@ -1585,18 +1566,18 @@ class DBUtils(object):
             # independently but instead the max in a range
             # this workaround fixes this but could be better
 
-            aa = (self.session.query( (self.File.interface_version*1000  
-                                           + self.File.quality_version*100 
-                                           + self.File.revision_version).label('versionnum'), 
+            aa = (self.session.query( (self.File.interface_version*1000
+                                           + self.File.quality_version*100
+                                           + self.File.revision_version).label('versionnum'),
                                           self.File.file_id,
-                                           self.File.filename, self.File, 
+                                           self.File.filename, self.File,
                                           self.File.utc_file_date )
                        .filter(self.File.utc_file_date.between(*dates))
                        .filter(self.File.product_id == product_id)
                        #.order_by(self.File.filename.asc())
                        .group_by(self.File.utc_file_date, 'versionnum')).all()
 
-            
+
             sq = []
             for ele in aa:
                 tmp = [v for v in aa if v[4] == ele[4]]
@@ -1605,9 +1586,9 @@ class DBUtils(object):
             sq = sorted(list(set(list(sq))))
 
 
-##             version = (self.session.query( (self.File.interface_version*1000  
-##                                            + self.File.quality_version*100 
-##                                            + self.File.revision_version).label('versionnum'), 
+##             version = (self.session.query( (self.File.interface_version*1000
+##                                            + self.File.quality_version*100
+##                                            + self.File.revision_version).label('versionnum'),
 ##                                           self.File.file_id,
 ##                                            self.File.filename,
 ##                                           self.File.utc_file_date )
@@ -1627,10 +1608,10 @@ class DBUtils(object):
 
 ##             sq = list(map(itemgetter(0), sq))
 ##             sq = self.session.query(self.File).filter(self.File.file_id.in_(sq)).all()
-           
-        else: 
+
+        else:
             sq = self.session.query(self.File).filter_by(product_id = product_id).\
-                filter(self.File.utc_file_date.between(dates[0], dates[1])).all()       
+                filter(self.File.utc_file_date.between(dates[0], dates[1])).all()
         return sq
 
     def getFilesByDate(self, daterange, newest_version=False):
@@ -1649,11 +1630,11 @@ class DBUtils(object):
             # don't trust that the db has this correct
             # create a tabel populated with
             #   versionnum, file_id, utc_file_date
-            version = (self.session.query( (self.File.interface_version*1000  
-                                           + self.File.quality_version*100 
-                                           + self.File.revision_version).label('versionnum'), 
+            version = (self.session.query( (self.File.interface_version*1000
+                                           + self.File.quality_version*100
+                                           + self.File.revision_version).label('versionnum'),
                                           self.File.file_id,
-                                          self.File.utc_file_date, 
+                                          self.File.utc_file_date,
                                            self.File.product_id)
                        .filter(self.File.utc_file_date.between(*dates))
                        .group_by(self.File.product_id)).subquery()
@@ -1665,10 +1646,10 @@ class DBUtils(object):
 
             sq = list(map(itemgetter(0), sq))
             sq = self.session.query(self.File).filter(self.File.file_id.in_(sq)).all()
-           
-        else: 
+
+        else:
             sq = self.session.query(self.File).\
-                filter(self.File.utc_file_date.between(dates[0], dates[1])).all()       
+                filter(self.File.utc_file_date.between(dates[0], dates[1])).all()
         return sq
 
     def getFilesByProduct(self, prod_id, newest_version=False):
@@ -1682,9 +1663,9 @@ class DBUtils(object):
             # don't trust that the db has this correct
             # create a tabel populated with
             #   versionnum, file_id, utc_file_date
-            version = (self.session.query( (self.File.interface_version*1000  
-                                           + self.File.quality_version*100 
-                                           + self.File.revision_version).label('versionnum'), 
+            version = (self.session.query( (self.File.interface_version*1000
+                                           + self.File.quality_version*100
+                                           + self.File.revision_version).label('versionnum'),
                                           self.File.file_id,
                                           self.File.utc_file_date )
                        .filter(self.File.product_id == prod_id)
@@ -1701,7 +1682,7 @@ class DBUtils(object):
         else:
             sq = self.session.query(self.File).filter_by(product_id = prod_id)
         return sq.all()
-    
+
     def getFilesByInstrument(self, inst_id, level=None, id_only=False):
         """
         given an instrument_if return all the file instances associated with it
@@ -1711,12 +1692,12 @@ class DBUtils(object):
                 .filter(self.Instrumentproductlink.instrument_id == inst_id).subquery())
 
         getme = (self.File.file_id if id_only else self.File)
-        
+
         if level is None:
             files = (self.session.query(getme)
                      .filter(self.File.product_id.in_(subq))
                      .all())
-        else:   
+        else:
             files = (self.session.query(getme)
                      .filter(self.File.data_level==level)
                      .filter(self.File.product_id.in_(subq))
@@ -1724,7 +1705,7 @@ class DBUtils(object):
         if id_only:
             files = map(itemgetter(0), files)
         return files
-    
+
     def getFilesByLevel(self, level, id_only=False, newest_version=False):
         """
         given a level return all the file instances associated with it
@@ -1744,16 +1725,16 @@ class DBUtils(object):
             ids = self.session.query(self.File.file_id).all()
             ids =  map(itemgetter(0), ids)
         else:
+            raise(NotImplementedError("There is an error in the query, do not use"))
             # get all the product ids
             p_ids = self.getAllProducts()
             p_ids =  map(attrgetter('product_id'), p_ids)
             ids = []
             for p in p_ids:
-                print p
                 ids.extend(self.getFilesByProduct(p, newest_version=True))
             ids =  map(attrgetter('product_id'), ids)
         return ids
-    
+
     def getActiveInspectors(self):
         """
         query the db and return a list of all the active inspector file names [(filename, arguments, product), ...]
@@ -2036,7 +2017,7 @@ class DBUtils(object):
         master routine for all the getXXXTraceback functions, this will make for less code
 
         this is some large select statements with joins in them, these are tested and do work
-        """       
+        """
         retval = {}
         if table.capitalize() == 'File':
             vars = ['file', 'product', 'inspector', 'instrument',
@@ -2055,10 +2036,10 @@ class DBUtils(object):
                   .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
                   .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
-            
+
             if not sq: # did not find a matchm this is a dberror
                 raise(DBError("file {0} did not have a traceback, this is a problem, fix it".format(in_id)))
-            
+
             if len(sq) > 1:
                 raise(DBError("Found multiple tracebacks for file {0}".format(in_id)))
             for ii, v in enumerate(vars):
@@ -2082,7 +2063,7 @@ class DBUtils(object):
                   .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
                   .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
-            
+
             if not sq: # did not find a match this is a dberror
                 raise(DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id)))
 
@@ -2112,10 +2093,10 @@ class DBUtils(object):
                   .join((self.Instrument, self.Instrumentproductlink.instrument_id==self.Instrument.instrument_id))
                   .join((self.Satellite, self.Instrument.satellite_id==self.Satellite.satellite_id))
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
-             
+
             if not sq: # did not find a match this is a dberror
                 raise(DBError("product {0} did not have a traceback, this is a problem, fix it".format(in_id)))
-                 
+
             if len(sq) > 1:
                 raise(DBError("Found multiple tracebacks for product {0}".format(in_id)))
             for ii, v in enumerate(vars):
@@ -2142,7 +2123,7 @@ class DBUtils(object):
 
             if not sq: # did not find a match this is a dberror
                 raise(DBError("process {0} did not have a traceback, this is a problem, fix it".format(in_id)))
-            
+
             if len(sq) > 1:
                 raise(DBError("Found multiple tracebacks for process {0}".format(in_id)))
             for ii, v in enumerate(vars):
@@ -2154,7 +2135,7 @@ class DBUtils(object):
 ##                 code_id = self.getCodeFromProcess(retval['process'].process_id, datetime.date.today())
 
             code_id = self.getCodeFromProcess(retval['process'].process_id, datetime.date.today())
- 
+
             retval['code'] = self.getEntry('Code', code_id)
             # input products
             retval['input_product'] = []
@@ -2217,7 +2198,7 @@ class DBUtils(object):
             return  map(itemgetter(0), sq)
         else:
             return None
-    
+
     def getAllProcesses(self, timebase='all'):
         """
         get all processes
@@ -2234,7 +2215,7 @@ class DBUtils(object):
         """
         # this is two queries but allows for name or id as input
         process_id = self.getProcessID(process_id)
-        return self.session.query(self.Process.output_timebase).get(process_id)[0] 
+        return self.session.query(self.Process.output_timebase).get(process_id)[0]
 
     def getAllProducts(self):
         """
