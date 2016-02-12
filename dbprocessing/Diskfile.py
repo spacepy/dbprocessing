@@ -11,13 +11,11 @@ import DBlogging
 
 __version__ = '2.0.3'
 
-
-# TODO look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isn't called
+# .. todo look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isn't called
 class ReadError(Exception):
     """
     Exception that a file is not readable by the script, probably doesn't exist
 
-    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         super(ReadError, self).__init__(*params)
@@ -28,7 +26,6 @@ class FilenameError(Exception):
     """
     Exception especially for created filenames showing that they are wrong
 
-    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         super(FilenameError, self).__init__(*params)
@@ -39,7 +36,6 @@ class WriteError(Exception):
     """
     Exception that a file is not write able by the script, probably doesn't exist or in a ro directory
 
-    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         super(WriteError, self).__init__(*params)
@@ -50,7 +46,6 @@ class InputError(Exception):
     """
     Exception that input is bad to the DiskFile class
 
-    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         super(InputError, self).__init__(*params)
@@ -61,12 +56,9 @@ class DigestError(Exception):
     """
     Exception that is thrown by calcDigest.
 
-    TODO
-    ====
-    maybe just combine this with ReadError for the current purpose
+    .. note: maybe just combine this with ReadError for the current purpose
 
 
-    `Author:` Brian Larsen, LANL
 
     """
     def __init__(self, *params):
@@ -80,19 +72,14 @@ class Diskfile(object):
     all parsing for what mission files belong to is continued in here
     to add a new mission code must be added here.
 
-    `Author:` Brian Larsen, LANL
 
 
     Parameters
     ==========
     infile : str
         a file to create a diskfile around
-    dbu :  DBUtils
-        pass in the current DBUtils session so that a new connection is not made
-
-    Attributes
-    ==========
-    params : ``dict`` dictionary to hold all the parameters of the file
+    dbu :  :class:`.DBUtils`
+        pass in the current :class:`.DBUtils` session so that a new connection is not made
 
     """
 
@@ -103,7 +90,6 @@ class Diskfile(object):
         setup a Diskfile class, takes in a filename and creates a params dict to hold information about the file
         then tests to see what mission the file is from
 
-        Author: Brian Larsen, LANL
         """
         self.infile = infile
         try:
@@ -174,7 +160,6 @@ class Diskfile(object):
 def calcDigest( infile):
     """Calculate the SHA1 digest from a file.
 
-    `Author:` Jon Niehof, LANL
 
     .. _file:
 
