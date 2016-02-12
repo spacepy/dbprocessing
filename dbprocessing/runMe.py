@@ -4,6 +4,7 @@ Created on Tue Oct 23 10:12:11 2012
 
 @author: balarsen
 """
+from __future__ import print_function
 from collections import namedtuple
 import datetime
 import glob
@@ -497,7 +498,7 @@ class runMe(object):
             proc_id = self.dbu.getProcessFromOutputProduct(tb['product'].product_id)
 
             code_id = self.dbu.getCodeFromProcess(proc_id, tb['file'].utc_file_date)
-            print "self.dbu.addFilecodelink(tb['file'].file_id, code_id)", tb['file'].file_id, code_id
+            print("self.dbu.addFilecodelink(tb['file'].file_id, code_id)", tb['file'].file_id, code_id)
             self.dbu.addFilecodelink(tb['file'].file_id, code_id)
             db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
             DBlogging.dblogger.info("added a file code link!!  f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))

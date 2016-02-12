@@ -320,7 +320,7 @@ if __name__ == "__main__":
     MISSION = conf['mission']['mission_name']
     SPACECRAFT = conf['satellite']['satellite_name'].replace('{MISSION}', MISSION)
     INSTRUMENT = conf['instrument']['instrument_name'].replace('{MISSION}', MISSION).replace('{SPACECRAFT}', SPACECRAFT)
-    print MISSION, SPACECRAFT, INSTRUMENT
+    print(MISSION, SPACECRAFT, INSTRUMENT)
     with open(filename, 'r') as fp:
         cfg = fp.readlines()
     for ii, l in enumerate(cfg):

@@ -5,6 +5,7 @@
 go through the DB and add all the files that are in a date range and put them into the
 processqueue so that the next ProcessQueue -p will run them
 """
+from __future__ import print_function
 
 
 
@@ -51,7 +52,7 @@ if __name__ == "__main__":
 
     db = dbprocessing.ProcessQueue(options.mission, echo=options.echo)
 
-    print startDate, endDate
+    print(startDate, endDate)
 
     num = db.reprocessByDate(startDate=startDate, endDate=endDate, incVersion=options.force)
     if num is None:

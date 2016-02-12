@@ -2,6 +2,7 @@
 class is meant as a wrapper for the modules script (http://modules.sourceforge.net)
 as used on the LANL scheme
 """
+from __future__ import print_function
 
 import os
 import re

@@ -1,5 +1,8 @@
 #!/usr/bin/env python2.6
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function
+
 from __future__ import division
 
 import ConfigParser
@@ -21,6 +24,8 @@ import spacepy.toolbox as tb
 
 from dbprocessing import Utils
 from dbprocessing import DBUtils
+
+
 
 def readconfig(config_filepath):
     # Create a ConfigParser object, to read the config file
@@ -147,7 +152,7 @@ def makeLinks(files, incoming, dryrun=False):
                 try:
                     os.symlink(f, newf)
                 except IOError as e:
-                    print "I/O error({0}): {1} : {2}".format(e.errno, e.strerror, f)
+                    print( "I/O error({0}): {1} : {2}".format(e.errno, e.strerror, f))
                     continue
             print("Symlink: {0}->{1}".format(f, newf))
             good += 1
@@ -168,7 +173,7 @@ def copyFiles(files, incoming, dryrun=False):
                 try:
                     shutil.copy(f, incoming)
                 except IOError as e:
-                    print "I/O error({0}): {1} : {2}".format(e.errno, e.strerror, f)
+                    print("I/O error({0}): {1} : {2}".format(e.errno, e.strerror, f))
                     continue                
             print("Copy: {0}->{1}".format(f, newf)) 
             good += 1

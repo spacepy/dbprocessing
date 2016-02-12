@@ -16,6 +16,7 @@
 ## prod level
 # <- add the prod
 # <- create the inst_prod link
+from __future__ import print_function
 
 import ConfigParser
 import sys
@@ -70,8 +71,8 @@ def usage():
     """
     print the usage messag out
     """
-    print "Usage: {0} <product name> <filename>".format(sys.argv[0])
-    print "   -> product name (or number) to write to config file"
+    print("Usage: {0} <product name> <filename>".format(sys.argv[0]))
+    print("   -> product name (or number) to write to config file")
     return
 
 

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from collections import namedtuple
 import datetime
 import glob
@@ -185,7 +187,7 @@ class DBUtils(object):
 ##     missions = Table('missions', metadata, autoload=True)
 ##     mapper(Missions, missions)
         for val in table_dict:
-            if verbose: print val
+            if verbose: print(val)
             if not hasattr(self, val):  # then make it
                 myclass = type(str(val), (object,), dict())
                 tableobj = Table(table_dict[val], self.metadata, autoload=True)

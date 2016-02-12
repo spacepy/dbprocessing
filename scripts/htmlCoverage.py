@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.6
+from __future__ import print_function
 
 import datetime
 import glob
@@ -27,7 +28,7 @@ def EventTimer(Event, Time1):
     nice for debugging and seeing that the code is progressing
     """
     Time2 = time.time()
-    print "%4.2f" % (Time2 - Time1), Event
+    print("%4.2f" % (Time2 - Time1), Event)
     return Time2
 
 class product(object):

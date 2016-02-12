@@ -2,6 +2,7 @@
 """
 Class to hold random utilities of use throughout this code
 """
+from __future__ import print_function
 
 import collections
 import datetime

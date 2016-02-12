@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.6
+from __future__ import print_function
 
 import datetime
 import sys
@@ -16,8 +17,8 @@ def usage():
     """
     print the usage messag out
     """
-    print "Usage: {0} <mission> <filename>".format(sys.argv[0])
-    print "   -> mission name to write to html"
+    print("Usage: {0} <mission> <filename>".format(sys.argv[0]))
+    print("   -> mission name to write to html")
     return
 
 

@@ -13,6 +13,7 @@
 ## prod level
 # <- add the prod
 # <- create the inst_prod link
+from __future__ import print_function
 
 import ConfigParser
 import datetime
@@ -92,8 +93,8 @@ def usage():
     """
     print the usage message out
     """
-    print "Usage: {0} <filename>".format(sys.argv[0])
-    print "   -> config file to update"
+    print("Usage: {0} <filename>".format(sys.argv[0]))
+    print("   -> config file to update")
     return
 
 

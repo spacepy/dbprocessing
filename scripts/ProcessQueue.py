@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.6
+from __future__ import print_function
 
 import datetime
 import os
@@ -99,7 +100,7 @@ if __name__ == "__main__":
             #they see an exception thrown.
             print('Error in running processing chain; debugging details follow:')
             tbstring = traceback.format_exc()
-            print tbstring
+            print(tbstring)
             print('This probably indicates a programming error. Please pass '
                   'this debugging\ninformation to the developer, along with '
                   'any information on what was\nhappening at the time.')
@@ -169,7 +170,7 @@ if __name__ == "__main__":
             #they see an exception thrown.
             print('Error in running processing chain; debugging details follow:')
             tbstring = traceback.format_exc()
-            print tbstring
+            print(tbstring)
             print('This probably indicates a programming error. Please pass '
                   'this debugging\ninformation to the developer, along with '
                   'any information on what was\nhappening at the time.')

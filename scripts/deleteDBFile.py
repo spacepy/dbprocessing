@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.6
 
+from __future__ import print_function
+
 import sys
 from optparse import OptionParser
 
@@ -27,6 +29,6 @@ if __name__ == "__main__":
             n_del += 1
         except DBUtils.DBNoData:
             print(' File {0} was not in the DB'.format(ff))
-    print 'deleted {0} files'.format(n_del)
+    print('deleted {0} files'.format(n_del))
 
 

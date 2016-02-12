@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.6
 
+from __future__ import print_function
+
 import sys
 
 from dbprocessing import DBUtils
@@ -12,5 +14,5 @@ if __name__ == "__main__":
     a = DBUtils.DBUtils(sys.argv[1])
     n_items = a.Processqueue.len()
     a.Processqueue.flush()
-    print 'Flushed {0} items from queue'.format(n_items)
+    print('Flushed {0} items from queue'.format(n_items))
 
