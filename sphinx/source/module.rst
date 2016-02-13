@@ -1,9 +1,9 @@
-inspector
-=========
+module
+======
 
-.. automodule:: dbprocessing.inspector
+.. automodule:: dbprocessing.module
 
-.. currentmodule:: dbprocessing.inspector
+.. currentmodule:: dbprocessing.module
 
 .. rubric:: Classes
 
@@ -11,7 +11,7 @@ inspector
 .. autosummary::
     :toctree: autosummary
 
-    inspector
+    module
 
 .. rubric:: Exceptions
 
@@ -21,8 +21,3 @@ inspector
 .. autosummary::
     :toctree: autosummary
 
-    extract_YYYYMM
-    extract_YYYYMMDD
-    extract_Version
-    valid_YYYYMMDD
-    EphemeralCallable

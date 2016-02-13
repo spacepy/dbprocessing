@@ -1,25 +1,25 @@
-Diskfile
+DBfile
 ========
-Provides the interface to a file on disk
 
-.. automodule:: dbprocessing.Diskfile
+.. automodule:: dbprocessing.DBfile
 
-.. currentmodule:: dbprocessing.Diskfile
+.. currentmodule:: dbprocessing.DBfile
 
 .. rubric:: Classes
-
 
 
 .. autosummary::
     :toctree: autosummary
 
-    Diskfile
+    DBfile
 
+.. rubric:: Exceptions
+
+.. autoexception:: DBfileError
 
 .. rubric:: Functions
 
 .. autosummary::
     :toctree: autosummary
 
-    calcDigest
 

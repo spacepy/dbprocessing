@@ -11,8 +11,20 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
+    DBfile
+    DBlogging
+    dbprocessing
+    DBqueue
+    DBStrings
+    DBUtils
     Diskfile
+    inspector
+    module
+    reports
+    runMe
+    Utils
     Version
+
 
 
 Indices and tables

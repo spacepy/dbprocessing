@@ -1,9 +1,9 @@
-runMe
+Utils
 =====
 
-.. automodule:: dbprocessing.runMe
+.. automodule:: dbprocessing.Utils
 
-.. currentmodule:: dbprocessing.runMe
+.. currentmodule:: dbprocessing.Utils
 
 .. rubric:: Classes
 
@@ -11,11 +11,9 @@ runMe
 .. autosummary::
     :toctree: autosummary
 
-    runMe
 
 .. rubric:: Exceptions
 
-    ProcessException
 
 
 .. rubric:: Functions
@@ -23,7 +21,19 @@ runMe
 .. autosummary::
     :toctree: autosummary
 
-    mk_tempdir
-    rm_tempdir
-    runner
+    chunker
+    daterange_to_dates
+    dirSubs
+    expandDates
+    flatten
+    unique
+    parseDate
+    parseVersion
+    processRunning
+    progressbar
+    split_code_args
+    strargs_to_args
+    toBool
+    toNone
+
 

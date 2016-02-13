@@ -1,25 +1,14 @@
-DBUtils
-=======
+DBlogging
+=========
 
-.. automodule:: dbprocessing.DBUtils
+.. automodule:: dbprocessing.DBlogging
 
-.. currentmodule:: dbprocessing.DBUtils
+.. currentmodule:: dbprocessing.DBlogging
 
 .. rubric:: Classes
 
 
-.. autosummary::
-    :toctree: autosummary
-
-    DBUtils
-
 .. rubric:: Exceptions
-
-.. autoexception:: DBError
-.. autoexception:: DBProcessingError
-.. autoexception:: FilenameParse
-.. autoexception:: DBNoData
-.. autoexception:: DBError
 
 .. rubric:: Functions
 

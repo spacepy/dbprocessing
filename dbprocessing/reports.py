@@ -28,9 +28,6 @@ import numpy as np
 
 from dbprocessing import DBUtils
 
-dbu = DBUtils.DBUtils('~/RBSP_processing.sqlite')
-dbu._openDB()
-dbu._createTableObjects()
 
 class logfile(object):
     """

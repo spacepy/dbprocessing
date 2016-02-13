@@ -1,9 +1,9 @@
-DBUtils
-=======
+dbprocessing
+============
 
-.. automodule:: dbprocessing.DBUtils
+.. automodule:: dbprocessing.dbprocessing
 
-.. currentmodule:: dbprocessing.DBUtils
+.. currentmodule:: dbprocessing.dbprocessing
 
 .. rubric:: Classes
 
@@ -11,15 +11,10 @@ DBUtils
 .. autosummary::
     :toctree: autosummary
 
-    DBUtils
+    ProcessQueue
 
 .. rubric:: Exceptions
 
-.. autoexception:: DBError
-.. autoexception:: DBProcessingError
-.. autoexception:: FilenameParse
-.. autoexception:: DBNoData
-.. autoexception:: DBError
 
 .. rubric:: Functions
 

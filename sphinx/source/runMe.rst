@@ -1,9 +1,9 @@
-DBStrings
-=========
+runMe
+=====
 
-.. automodule:: dbprocessing.DBStrings
+.. automodule:: dbprocessing.runMe
 
-.. currentmodule:: dbprocessing.DBStrings
+.. currentmodule:: dbprocessing.runMe
 
 .. rubric:: Classes
 
@@ -11,9 +11,12 @@ DBStrings
 .. autosummary::
     :toctree: autosummary
 
-    DBFormatter
+    runMe
 
 .. rubric:: Exceptions
+
+.. autoexception::
+    ProcessException
 
 
 .. rubric:: Functions
@@ -21,4 +24,7 @@ DBStrings
 .. autosummary::
     :toctree: autosummary
 
+    mk_tempdir
+    rm_tempdir
+    runner
 

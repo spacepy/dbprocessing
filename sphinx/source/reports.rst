@@ -1,9 +1,9 @@
-module
-======
+reports
+=======
 
-.. automodule:: dbprocessing.module
+.. automodule:: dbprocessing.reports
 
-.. currentmodule:: dbprocessing.module
+.. currentmodule:: dbprocessing.reports
 
 .. rubric:: Classes
 
@@ -11,7 +11,12 @@ module
 .. autosummary::
     :toctree: autosummary
 
-    module
+    commandsRun
+    errors
+    ingested
+    HTMLbase
+    movedToError
+    logfile
 
 .. rubric:: Exceptions
 

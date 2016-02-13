@@ -1,9 +1,9 @@
-DBqueue
-=======
+DBStrings
+=========
 
-.. automodule:: dbprocessing.DBqueue
+.. automodule:: dbprocessing.DBStrings
 
-.. currentmodule:: dbprocessing.DBqueue
+.. currentmodule:: dbprocessing.DBStrings
 
 .. rubric:: Classes
 
@@ -11,7 +11,7 @@ DBqueue
 .. autosummary::
     :toctree: autosummary
 
-    DBqueue
+    DBFormatter
 
 .. rubric:: Exceptions
 
