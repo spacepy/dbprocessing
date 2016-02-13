@@ -1,8 +1,14 @@
 
-Welcome to dbprocessing's documentation!
-========================================
+dbprocessing
+============
 
-Contents:
+Scripts to control chain
+------------------------
+:doc:`scripts`
+
+
+API documentation
+-----------------
 
 .. toctree::
     :maxdepth: 2
