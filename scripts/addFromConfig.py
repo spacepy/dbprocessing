@@ -4,9 +4,9 @@
 # following the recipe in the document I wrote
 
 
-#==============================================================================
+# ==============================================================================
 # INPUTS
-#==============================================================================
+# ==============================================================================
 # mission name
 # satellite name
 # product name
@@ -17,19 +17,20 @@
 # <- add the prod
 # <- create the inst_prod link
 
-import itertools
-from optparse import OptionParser
-import tempfile
 import ConfigParser
+import itertools
 import os
 import shutil
 import sys
+import tempfile
+from optparse import OptionParser
 
-from dbprocessing import DBUtils
 from sqlalchemy.orm.exc import NoResultFound
 
+from dbprocessing import DBUtils
+
 expected = ['mission', 'satellite', 'instrument', 'product', 'process']
-expected_keyword = {}
+expected_keyword = { }
 expected_keyword['mission'] = ['incoming_dir', 'mission_name', 'rootdir']
 expected_keyword['satellite'] = ['satellite_name']
 expected_keyword['instrument'] = ['instrument_name']
@@ -53,14 +54,15 @@ expected_keyword['process'] = ['process_name', 'output_product',
 
 def readconfig(config_filepath):
     # Create a ConfigParser object, to read the config file
-    cfg=ConfigParser.SafeConfigParser()
+    cfg = ConfigParser.SafeConfigParser()
     cfg.read(config_filepath)
     sections = cfg.sections()
     # Read each parameter in turn
-    ans = {}
+    ans = { }
     for section in sections:
         ans[section] = dict(cfg.items(section))
     return ans
+
 
 def _sectionCheck(conf):
     """
@@ -76,14 +78,15 @@ def _sectionCheck(conf):
     if keys:
         for k in keys:
             if k == 'default':
-                raise(ValueError('Found section: {0}, it must be {1}'.format('default', 'DEFAULT')))
-            if k == 'DEFAULT': #default is ok
+                raise (ValueError('Found section: {0}, it must be {1}'.format('default', 'DEFAULT')))
+            if k == 'DEFAULT':  # default is ok
                 continue
-            raise(ValueError('Section error, {0} was not understood'.format(keys)))
+            raise (ValueError('Section error, {0} was not understood'.format(keys)))
     # check that all the required sections are there
     for req in expected[:-2]:
         if not req in conf:
-            raise(ValueError('Required section: "{0}" was not found'.format(req)))
+            raise (ValueError('Required section: "{0}" was not found'.format(req)))
+
 
 def _keysCheck(conf, section):
     """
@@ -101,7 +104,8 @@ def _keysCheck(conf, section):
             continue
         else:
             if k not in conf[section]:
-                raise(ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section) ))
+                raise (ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section)))
+
 
 def _keysRemoveExtra(conf, section):
     """
@@ -124,6 +128,7 @@ def _keysRemoveExtra(conf, section):
                 del conf[section][k]
     return conf[section]
 
+
 def _keysPresentCheck(conf):
     """
     loop over each key looking for cross-references and complain if they are not there
@@ -133,10 +138,11 @@ def _keysPresentCheck(conf):
             for k2 in conf[k]:
                 if 'input' in k2:
                     if conf[k][k2] not in conf:
-                        raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
+                        raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
                 elif 'output_product' in k2:
                     if conf[k][k2] not in conf:
-                        raise(ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
+                        raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
+
 
 def configCheck(conf):
     """
@@ -163,13 +169,15 @@ def configCheck(conf):
 
     _keysPresentCheck(conf)
 
+
 def _fileTest(filename):
     """
     open up the file as txt and do a check that there are no repeated section headers
     """
+
     def rep_list(inval):
         seen = set()
-        seen_twice = set( x for x in inval if x in seen or seen.add(x) )
+        seen_twice = set(x for x in inval if x in seen or seen.add(x))
         return list(seen_twice)
 
     with open(filename, 'r') as fp:
@@ -177,14 +185,15 @@ def _fileTest(filename):
     data = [v.strip() for v in data if v[0] == '[']
     seen_twice = rep_list(data)
     if seen_twice:
-        raise(ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice) ))
+        raise (ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice)))
+
 
 def addStuff(cfg, options):
     # setup the db
     dbu = DBUtils.DBUtils(options.mission)
 
     # is the mission in the DB?  If not add it
-    if cfg['mission']['mission_name'] not in dbu.getMissions(): # was it there?
+    if cfg['mission']['mission_name'] not in dbu.getMissions():  # was it there?
         # add it
         mission_id = dbu.addMission(**cfg['mission'])
         print('Added Mission: {0} {1}'.format(mission_id, dbu.getEntry('Mission', mission_id).mission_name))
@@ -195,24 +204,28 @@ def addStuff(cfg, options):
     # is the satellite in the DB?  If not add it
     try:
         satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name']).satellite_id
-        print('Found Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite',satellite_id).satellite_name ))
+        print('Found Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite', satellite_id).satellite_name))
     except (DBUtils.DBNoData, NoResultFound):
         # add it
         satellite_id = dbu.addSatellite(mission_id=mission_id, **cfg['satellite'])
-        print('Added Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite',satellite_id).satellite_name))
+        print('Added Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite', satellite_id).satellite_name))
 
     # is the instrument in the DB?  If not add it
     try:
         inst_id = dbu.getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)
         instrument = dbu.session.query(dbu.Instrument).get(inst_id)
         if instrument.satellite_id != satellite_id:
-            raise(ValueError()) # this means it is the same name on a different sat, need to add
+            raise (ValueError())  # this means it is the same name on a different sat, need to add
         instrument_id = instrument.instrument_id
-        print('Found Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
+        print(
+            'Found Instrument: {0} {1}'.format(instrument_id,
+                                               dbu.getEntry('Instrument', instrument_id).instrument_name))
     except (DBUtils.DBNoData, ValueError, NoResultFound):
         # add it
         instrument_id = dbu.addInstrument(satellite_id=satellite_id, **cfg['instrument'])
-        print('Added Instrument: {0} {1}'.format(instrument_id, dbu.getEntry('Instrument',instrument_id).instrument_name))
+        print(
+            'Added Instrument: {0} {1}'.format(instrument_id,
+                                               dbu.getEntry('Instrument', instrument_id).instrument_name))
 
     # loop over all the products, check if they are there and add them if not
     products = [k for k in cfg if k.startswith('product')]
@@ -222,11 +235,11 @@ def addStuff(cfg, options):
         if cfg[p]['product_name'] in db_products:
             p_id = dbu.getEntry('Product', cfg[p]['product_name']).product_id
             cfg[p]['product_id'] = p_id
-            print('Found Product: {0} {1}'.format(p_id, dbu.getEntry('Product',p_id).product_name))
+            print('Found Product: {0} {1}'.format(p_id, dbu.getEntry('Product', p_id).product_name))
         else:
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('inspector'))
             p_id = dbu.addProduct(instrument_id=instrument_id, **tmp)
-            print('Added Product: {0} {1}'.format(p_id, dbu.getEntry('Product',p_id).product_name))
+            print('Added Product: {0} {1}'.format(p_id, dbu.getEntry('Product', p_id).product_name))
             cfg[p]['product_id'] = p_id
             ippl = dbu.addInstrumentproductlink(instrument_id, p_id)
             print('Added Instrumentproductlink: {0}'.format(ippl))
@@ -235,19 +248,19 @@ def addStuff(cfg, options):
             # if the product was not there we will assume the inspector is not either (requires a product_id)
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if k.startswith('inspector'))
 
-            replace_dict = {'inspector_output_interface':'output_interface_version',
-                            'inspector_version':'version',
-                            'inspector_arguments': 'arguments',
-                            'inspector_description':'description',
-                            'inspector_newest_version':'newest_version',
-                            'inspector_relative_path':'relative_path',
-                            'inspector_date_written':'date_written',
-                            'inspector_filename':'filename',
-                            'inspector_active': 'active_code'}
+            replace_dict = { 'inspector_output_interface': 'output_interface_version',
+                             'inspector_version': 'version',
+                             'inspector_arguments': 'arguments',
+                             'inspector_description': 'description',
+                             'inspector_newest_version': 'newest_version',
+                             'inspector_relative_path': 'relative_path',
+                             'inspector_date_written': 'date_written',
+                             'inspector_filename': 'filename',
+                             'inspector_active': 'active_code' }
             for rd in replace_dict:
                 tmp[replace_dict[rd]] = tmp.pop(rd)
             insp_id = dbu.addInspector(product=p_id, **tmp)
-            print('Added Inspector: {0} {1}'.format(insp_id, dbu.getEntry('Inspector',insp_id).filename))
+            print('Added Inspector: {0} {1}'.format(insp_id, dbu.getEntry('Inspector', insp_id).filename))
             dbu.updateInspectorSubs(insp_id)
 
     # loop over all the processes, check if they are there and add them if not
@@ -257,14 +270,14 @@ def addStuff(cfg, options):
         # is the process in the DB?  If not add it
         if cfg[p]['process_name'] in db_processes:
             p_id = dbu.getEntry('Process', cfg[p]['process_name']).process_id
-            print('Found Process: {0} {1}'.format(p_id, dbu.getEntry('Process',p_id).process_name))
+            print('Found Process: {0} {1}'.format(p_id, dbu.getEntry('Process', p_id).process_name))
         else:
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('code') and 'input' not in k)
             # need to replace the output product with the right ID
             # if it is a key then have to get the name from cfg, or it is a name itself
             tmp['output_product'] = cfg[tmp['output_product']]['product_id']
             p_id = dbu.addProcess(**tmp)
-            print('Added Process: {0} {1}'.format(p_id, dbu.getEntry('Process',p_id).process_name))
+            print('Added Process: {0} {1}'.format(p_id, dbu.getEntry('Process', p_id).process_name))
 
             # now add the productprocesslink
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if 'input' in k)
@@ -275,28 +288,27 @@ def addStuff(cfg, options):
             # if the process was not there we will assume the code is not either (requires a process_id)
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if k.startswith('code'))
 
-            replace_dict = {'code_filename':'filename',
-                            'code_arguments':'arguments',
-                            'code_relative_path': 'relative_path',
-                            'code_version':'version',
-                            'code_output_interface':'output_interface_version',
-                            'code_newest_version':'newest_version',
-                            'code_date_written':'date_written',
-                            'code_active':'active_code',
-                            'code_ram':'ram',
-                            'code_cpu':'cpu'}
+            replace_dict = { 'code_filename': 'filename',
+                             'code_arguments': 'arguments',
+                             'code_relative_path': 'relative_path',
+                             'code_version': 'version',
+                             'code_output_interface': 'output_interface_version',
+                             'code_newest_version': 'newest_version',
+                             'code_date_written': 'date_written',
+                             'code_active': 'active_code',
+                             'code_ram': 'ram',
+                             'code_cpu': 'cpu' }
             for rd in replace_dict:
                 tmp[replace_dict[rd]] = tmp.pop(rd)
             code_id = dbu.addCode(process_id=p_id, **tmp)
-            print('Added Code: {0} {1}'.format(code_id, dbu.getEntry('Code',code_id).filename))
-
+            print('Added Code: {0} {1}'.format(code_id, dbu.getEntry('Code', code_id).filename))
 
 
 if __name__ == "__main__":
     usage = "usage: %prog [options] -m mission_db filename"
     parser = OptionParser(usage=usage)
     parser.add_option("-m", "--mission", dest="mission", type="string",
-                      help="mission to connect to", default='~ectsoc/RBSP_processing.sqlite')
+                      help="mission to connect to", default='')
     parser.add_option("-v", "--verify", dest="verify", action='store_true',
                       help="Don't do anything other than verify the config file", default=False)
 
@@ -313,7 +325,7 @@ if __name__ == "__main__":
 
     conf = readconfig(filename)
     configCheck(conf)
-    if options.verify: # we are done here if --verify is set
+    if options.verify:  # we are done here if --verify is set
         sys.exit(0)
 
     # do substitutions and use a tempfile for the processing
@@ -350,6 +362,3 @@ if __name__ == "__main__":
             os.remove(tmp_db.name)
     finally:
         os.remove(tmpf.name)
-
-
-
