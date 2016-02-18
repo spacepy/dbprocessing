@@ -26,3 +26,35 @@ format and capability.
 .. option:: -v, --verify  Verify the config file then stop
 
 
+addVerboseProvenance.py
+-----------------------
+
+go into the database and get the verbose provencoe for a file
+then add that to the global attrs for the file
+either putout to the same file or a different file
+
+This code has not been fully tested or used.
+
+clearProcessingFlag.py
+----------------------
+
+Clear a processing flag (lock) on a database that has crashed.
+
+.. option:: database The name of the database to unlock
+.. option:: message Log message to insert into the database
+
+configFromDB.py
+---------------
+
+Build a config file from an existing database. This is untested and not
+fully useful yet.
+
+.. option:: The filename to save the config
+.. option:: -m,--mission The basebase to to connect to
+.. option:: -f,--force Force the creation of the config file, allows overwrite
+.. option:: -s,--satellite The name of the satellite for the config file
+.. option:: -i,--instrument The name of the instrument for the config file
+.. option:: -c,--nocomments Make the config file without a comment header block on top
+
+
+

@@ -6,7 +6,7 @@ from dbprocessing import DBUtils
 
 if len(sys.argv) != 3:
     print("Usage: {0} database message".format(sys.argv[0]))
-    print("    clears the processing flag from a processingthat has crashed")
+    print("    clears the processing flag from a processing that has crashed")
     sys.exit(-1)
 
 if __name__ == "__main__":

@@ -635,6 +635,10 @@ class DBUtils(object):
     def getAllSatellites(self):
         """
         return dictionaries of satellite, mission objects
+
+        Returns
+        -------
+        dict : dictionaries of satellite, mission objects
         """
         ans = []
         sats = self.session.query(self.Satellite).all()

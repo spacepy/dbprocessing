@@ -1,14 +1,13 @@
 #!/usr/bin/env python2.6
 
 
-from optparse import OptionParser
 import ConfigParser
 import os
+from optparse import OptionParser
 
 from dbprocessing import DBUtils
 from dbprocessing import Utils
 from dbprocessing import Version
-
 
 header_comments = """
 ###############################################################################
@@ -102,7 +101,6 @@ header_comments = """
 
 """
 
-
 if __name__ == "__main__":
     usage = "usage: %prog [options] -m mission_db filename"
     parser = OptionParser(usage=usage)
@@ -133,9 +131,9 @@ if __name__ == "__main__":
 
     dbu = DBUtils.DBUtils(options.mission)
 
-#==============================================================================
-#     This will make a configparser of the needed parts then write to file
-#==============================================================================
+    # ==============================================================================
+    #     This will make a configparser of the needed parts then write to file
+    # ==============================================================================
 
     out = ConfigParser.SafeConfigParser()  # safe is py >= 2.3
 
@@ -143,9 +141,9 @@ if __name__ == "__main__":
     out.add_section('mission')
     missions = dbu.getMissions()
     if not missions:
-        raise(ValueError("No mission in DB, this must be an empty db"))
+        raise (ValueError("No mission in DB, this must be an empty db"))
     if len(missions) > 1:
-        raise(NotImplementedError("Can't yet handle multi mission db"))
+        raise (NotImplementedError("Can't yet handle multi mission db"))
     mission = missions[0]
     mission = dbu.getEntry('Mission', mission)
     for d in dir(mission):
@@ -157,10 +155,11 @@ if __name__ == "__main__":
     sats = dbu.getAllSatellites()
     for v in sats:
         if v['mission'].mission_id != mission.mission_id:
-            raise(NotImplementedError("Can't yet handle multi mission db"))
+            raise (NotImplementedError("Can't yet handle multi mission db"))
     nsats = len(Utils.unique([v['satellite'].satellite_id for v in sats]))
     if nsats > 1 and options.satellite is None:
-        raise(ValueError("More than one sat in db and no --satellite set\n    {0}".format([v['satellite'].satellite_name for v in sats])))
+        raise (ValueError("More than one sat in db and no --satellite set\n    {0}".format(
+            [v['satellite'].satellite_name for v in sats])))
     elif nsats == 1 and options.satellite is None:
         options.satellite = sats['satellite'].satellite_name
     for s in sats:
@@ -175,12 +174,14 @@ if __name__ == "__main__":
     insts = dbu.getAllInstruments()
     for v in insts:
         if v['mission'].mission_id != mission.mission_id:
-            raise(NotImplementedError("Can't yet handle multi mission db"))
-#        if v['satellite'].satellite_name != options.satellite:
-#            raise(ValueError("More than one sat in db and no --satellite set\n    {0}".format([v['satellite'].satellite_name for v in sats])))
-    ninsts = len(Utils.unique([v['instrument'].instrument_id for v in insts if v['satellite'].satellite_name == options.satellite]))
+            raise (NotImplementedError("Can't yet handle multi mission db"))
+        #        if v['satellite'].satellite_name != options.satellite:
+        #            raise(ValueError("More than one sat in db and no --satellite set\n    {0}".format([v['satellite'].satellite_name for v in sats])))
+    ninsts = len(Utils.unique(
+        [v['instrument'].instrument_id for v in insts if v['satellite'].satellite_name == options.satellite]))
     if ninsts > 1 and options.instrument is None:
-        raise(ValueError("More than one instrument in db and no --instrument set\n    {0}".format([v['instrument'].instrument_name for v in insts])))
+        raise (ValueError("More than one instrument in db and no --instrument set\n    {0}".format(
+            [v['instrument'].instrument_name for v in insts])))
     elif ninsts == 1 and options.instrument is None:
         # find the inst related to the right sat
         for i in insts:
@@ -213,10 +214,10 @@ if __name__ == "__main__":
             if d[0] == '_': continue
             out.set(pname, d, str(getattr(p['product'], d)))
         for d2 in dir(p['inspector']):
-            if d2[0] =='_': continue
-            if d2 == 'output_interface_version': # annoying special case
+            if d2[0] == '_': continue
+            if d2 == 'output_interface_version':  # annoying special case
                 out.set(pname, 'inspector_output_interface', str(getattr(p['inspector'], d2)))
-            elif d2 == 'active_code': # annoying special case
+            elif d2 == 'active_code':  # annoying special case
                 out.set(pname, 'inspector_active', str(getattr(p['inspector'], d2)))
             elif not d2.startswith('inspector'):
                 out.set(pname, 'inspector_' + d2, str(getattr(p['inspector'], d2)))
@@ -252,10 +253,10 @@ if __name__ == "__main__":
                 out.set(pname, 'optional_input{0}'.format(ip_opt_counter), 'product_' + str(ip[0].product_name))
                 ip_opt_counter += 1
         for d2 in dir(p['code']):
-            if d2[0] =='_': continue
-            if d2 == 'output_interface_version': # annoying special case
+            if d2[0] == '_': continue
+            if d2 == 'output_interface_version':  # annoying special case
                 out.set(pname, 'code_output_interface', str(getattr(p['code'], d2)))
-            elif d2 == 'active_code': # annoying special case
+            elif d2 == 'active_code':  # annoying special case
                 out.set(pname, 'code_active', str(getattr(p['code'], d2)))
             elif not d2.startswith('code'):
                 val = str(getattr(p['code'], d2))
@@ -284,14 +285,8 @@ if __name__ == "__main__":
         if interface_version is not None:
             out.set(sec, name + '_version', str(Version.Version(interface_version, quality_version, revision_version)))
 
-
-
     # write out the conf file
     with open(filename, 'wb') as configfile:
         if not options.nocomments:
             configfile.writelines(header_comments)
         out.write(configfile)
-
-
-
-
