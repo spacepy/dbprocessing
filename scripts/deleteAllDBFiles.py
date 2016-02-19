@@ -7,7 +7,7 @@ from __future__ import print_function
 
 if __name__ == "__main__":
     a = DBUtils.DBUtils('rbsp')
-    a._openDB()
+    a.openDB()
     a._createTableObjects()
     f = a.getAllFilenames()
     for ff in f:

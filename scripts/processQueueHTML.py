@@ -59,7 +59,7 @@ def makeHTML(mission, filename):
     """
 
     dbu = DBUtils.DBUtils(mission) # TODO don't assume RBSP later
-    dbu._openDB()
+    dbu.openDB()
     dbu._createTableObjects()
 
     output = open(filename, 'w')

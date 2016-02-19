@@ -60,7 +60,7 @@ def _updateSections(conf):
     go through each section and update the db is there is a change
     """
     dbu = DBUtils.DBUtils('rbsp') # TODO don't assume RBSP later
-    dbu._openDB()
+    dbu.openDB()
     dbu._createTableObjects()
 
     sections = ['mission', 'satellite', 'instrument', 'product',

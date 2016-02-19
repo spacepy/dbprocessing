@@ -10,7 +10,7 @@ if len(sys.argv) != 2:
 
 if __name__ == "__main__":
     a = DBUtils.DBUtils(sys.argv[1])
-    a._openDB()
+    a.openDB()
     a._createTableObjects()
     n_items = a.Processqueue.len()
     items = a.Processqueue.getAll()

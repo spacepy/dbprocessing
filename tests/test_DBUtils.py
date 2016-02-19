@@ -300,7 +300,7 @@ class DBUtilsGetTests(TestSetup):
 
     def test_openDB5(self):
         """__init__ already open"""
-        self.assertTrue(self.dbu._openDB('sqlite') is None)
+        self.assertTrue(self.dbu.openDB('sqlite') is None)
 
     def test_getRunProcess(self):
         """getRunProcess"""

@@ -7,7 +7,7 @@ from dbprocessing import DBUtils
 
 if __name__ == "__main__":
     a = DBUtils.DBUtils('rbsp')
-    a._openDB()
+    a.openDB()
     a._createTableObjects()
     prod_ids = zip(*a.getProductNames())[4]
 

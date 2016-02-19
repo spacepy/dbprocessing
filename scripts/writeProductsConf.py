@@ -43,7 +43,7 @@ def writeconfig(my_cfg, config_filepath):
 def getStuff(prod_name, filename):
     cfg = {}
     dbu = DBUtils.DBUtils('rbsp') # TODO don't assume RBSP later
-    dbu._openDB()
+    dbu.openDB()
     dbu._createTableObjects()
     # are we trying to write files for all the products?
     if prod_name.lower() == 'all':

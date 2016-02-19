@@ -79,7 +79,7 @@ class DBUtils(object):
         fmtr = DBStrings.DBFormatter()
         self.format = fmtr.format
         self.re = fmtr.re
-        self._openDB(db_var=db_var, engine=engine, echo=echo)
+        self.openDB(db_var=db_var, engine=engine, echo=echo)
         self._createTableObjects()
         try:
             self._patchProcessQueue()
@@ -132,7 +132,7 @@ class DBUtils(object):
 ###### DB and Tables ###############
 ####################################
 
-    def _openDB(self, engine, db_var=None, verbose=False, echo=False):
+    def openDB(self, engine, db_var=None, verbose=False, echo=False):
         """
         setup python to talk to the database, this is where it is, name and password.
         """
