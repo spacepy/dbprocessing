@@ -753,6 +753,10 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(118, len(pr))
         self.assertTrue(self.dbu.getProductsByLevel(10) is None)
 
+    def test_getProcessTimebase(self):
+        """getProcessTimebase"""
+        self.assertEqual("DAILY", self.dbu.getProcessTimebase(1))
+
     def test_getFilesByCode(self):
         """getFilesByCode"""
         f = self.dbu.getFilesByCode(2)

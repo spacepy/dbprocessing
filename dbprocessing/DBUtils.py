@@ -2227,7 +2227,7 @@ class DBUtils(object):
         """
         # this is two queries but allows for name or id as input
         process_id = self.getProcessID(process_id)
-        return self.session.query(self.Process.output_timebase).get(process_id)[0]
+        return self.getEntry('Process', process_id).output_timebase
 
     def getAllProducts(self):
         """
