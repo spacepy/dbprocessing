@@ -586,7 +586,7 @@ class DBUtils(object):
 
         DBlogging.dblogger.debug("Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
-    def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False):
+    def purgeFileFromDB(self, filename=None, recursive=False, verbose=False):
         """
         removes a file from the DB
 
@@ -595,7 +595,7 @@ class DBUtils(object):
 
         if recursive then it removes all files that depend on the one to remove
 
-        >>>  pnl._purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
+        >>>  pnl.purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
 
         """
         if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
@@ -608,23 +608,19 @@ class DBUtils(object):
             if verbose:
                 print(ii, len(filename), f)
             # we need to look in each table that could have a reference to this file and delete that
-            ## processqueue
-            try:
+            try: ## processqueue
                 self.Processqueue.remove(f)
             except DBNoData:
                 pass
-            ## filefilelink
-            try:
+            try: ## filefilelink
                 self.delFilefilelink(f)
             except DBNoData:
                 pass
-            ## filecodelink
-            try:
+            try: ## filecodelink
                 self.delFilecodelink(f)
             except DBNoData:
                 pass
-            ## file
-            try:
+            try: ## file
                 self.session.delete(self.getEntry('File', f))
             except DBNoData:
                 pass

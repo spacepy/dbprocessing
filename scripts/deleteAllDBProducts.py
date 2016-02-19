@@ -12,6 +12,6 @@ if __name__ == "__main__":
     prod_ids = zip(*a.getProductNames())[4]
 
     for ff in f:
-        a._purgeFileFromDB(ff[0])
+        a.purgeFileFromDB(ff[0])
     print('deleted {0} files'.format(len(f)))
 

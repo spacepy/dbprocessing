@@ -98,12 +98,12 @@ if __name__ == "__main__":
                 if options.fix:
                     fentry = lgetEntry('File', lbasename(f))
                     if fentry.exists_on_disk:
-                        #dbu._purgeFileFromDB(f)
+                        #dbu.purgeFileFromDB(f)
                         rmfiles.append(f)
                         print("        ** {0} removed from DB".format(f))
                     else:
                         print("        ** was already not marked exists_on_disk")
         if rmfiles:
-            dbu._purgeFileFromDB(rmfiles)
+            dbu.purgeFileFromDB(rmfiles)
     
     dbu._closeDB()

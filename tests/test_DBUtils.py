@@ -137,19 +137,19 @@ class DBUtilsOtherTests(TestSetup):
                          'DBProcessing class instance for mission /Users/blarsen/git/dbprocessing/tests/working.sqlite, version: 2.0.3')
 
     def test_purgeFileFromDB(self):
-        """_purgeFileFromDB"""
+        """purgeFileFromDB"""
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6681)
         file_id = self.dbu.getFileID(123)
-        self.dbu._purgeFileFromDB(file_id)
+        self.dbu.purgeFileFromDB(file_id)
         self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, file_id)
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6680)
 
     def test_purgeFileFromDB(self):
-        """_purgeFileFromDB"""
+        """purgeFileFromDB"""
         # file_id = self.dbu.getFileID(123356)
         file_id = 123356
         self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, file_id)
-        self.dbu._purgeFileFromDB(file_id)
+        self.dbu.purgeFileFromDB(file_id)
 
     def test_nameSubProduct(self):
         """_nameSubProduct"""

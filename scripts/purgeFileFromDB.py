@@ -40,7 +40,7 @@ if __name__ == '__main__':
         except DBUtils.DBNoData:
             print("WARNING: File {1} not in db".format(f), file=sys.stderr)
         else:
-            dbu._purgeFileFromDB(f)
+            dbu.purgeFileFromDB(f)
             print("  File {0}:{1} removed from DB".format(f_id, f))
 
     

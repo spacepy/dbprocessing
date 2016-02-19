@@ -11,6 +11,6 @@ if __name__ == "__main__":
     a._createTableObjects()
     f = a.getAllFilenames()
     for ff in f:
-        a._purgeFileFromDB(ff[0])
+        a.purgeFileFromDB(ff[0])
     print('deleted {0} files'.format(len(f)))
 
