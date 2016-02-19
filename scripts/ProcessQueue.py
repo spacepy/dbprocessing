@@ -72,12 +72,12 @@ if __name__ == "__main__":
         # check if the PID is running
         if Utils.processRunning(curr_proc):
             # we still have an instance processing, don't start another
-            pq.dbu._closeDB()
+            pq.dbu.closeDB()
             DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
             raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
         else:
             # There is a processing flag set but it died, don't start another
-            pq.dbu._closeDB()
+            pq.dbu.closeDB()
             DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
             raise(ProcessException("There is a processing flag set but it died, don't start another"))
     # start logging as a lock
@@ -108,7 +108,7 @@ if __name__ == "__main__":
             pq.dbu._stopLogging('Abnormal exit on exception')
         else:
             pq.dbu._stopLogging('Nominal Exit')
-        pq.dbu._closeDB()
+        pq.dbu.closeDB()
         print("Import finished: {0} files added".format(pq.dbu.Processqueue.len()-start_len))
 
     if options.p: # process selected
@@ -179,5 +179,5 @@ if __name__ == "__main__":
         else:
             pq.dbu._stopLogging('Nominal Exit')
         finally: 
-            pq.dbu._closeDB()
+            pq.dbu.closeDB()
         del pq

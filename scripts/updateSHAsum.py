@@ -72,5 +72,5 @@ if __name__ == '__main__':
 
     updateSHA(options, dbu, filename)
 
-    dbu._closeDB()
+    dbu.closeDB()
         

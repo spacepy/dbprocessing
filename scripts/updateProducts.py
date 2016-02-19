@@ -84,7 +84,7 @@ def _updateSections(conf):
                     print('{0}[{1}]  {2} ==> {3}'.format(section, attrs[i], obj.__getattribute__(attrs[i]), conf[section][attrs[i]]))
                     obj.__setattr__(attrs[i], conf[section][attrs[i]])
                     dbu.session.add(obj)
-            dbu._commitDB()
+            dbu.commitDB()
     if succ == 0:
         raise(ValueError('using {0} on a product that is not in the DB'.format(sys.argv[0])))
 

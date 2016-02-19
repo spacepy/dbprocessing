@@ -44,5 +44,5 @@ if __name__ == '__main__':
             print("  File {0}:{1} removed from DB".format(f_id, f))
 
     
-    dbu._closeDB()
+    dbu.closeDB()
         

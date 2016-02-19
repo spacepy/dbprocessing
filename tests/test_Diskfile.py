@@ -27,7 +27,7 @@ class TestSetup(unittest.TestCase):
 
     def tearDown(self):
         super(TestSetup, self).tearDown()
-        self.dbu._closeDB()
+        self.dbu.closeDB()
         del self.dbu
         os.remove(self.sqlworking)
 

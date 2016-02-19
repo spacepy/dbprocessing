@@ -99,14 +99,14 @@ if __name__ == "__main__":
                 print("{0:6} {1:7} {2} {3}".format(f, str(isfile), fullpath, extra ))
             if options.fix:
                 if i % 100 == 0:
-                    dbu._commitDB()
+                    dbu.commitDB()
             if i % 1000 == 0:
                 print("On file {0} of {1}".format(i, max(files)))
 
     finally:
         if options.fix:
-            dbu._commitDB()
-        dbu._closeDB()
+            dbu.commitDB()
+        dbu.closeDB()
 
 
 

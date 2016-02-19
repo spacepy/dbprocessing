@@ -74,7 +74,7 @@ if __name__ == '__main__':
     dbu = DBUtils.DBUtils(options.mission)
 
     vp = getVP(options, dbu, infile)
-    dbu._closeDB()
+    dbu.closeDB()
     
     if not vp: # is ''
         sys.exit(0) # we are done

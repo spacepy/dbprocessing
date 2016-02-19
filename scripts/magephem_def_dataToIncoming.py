@@ -38,7 +38,7 @@ g_inc_path = dbu.getIncomingPath()
 
 files = dbu.getFilesByProduct('rbspa-def_kernel')
 #files = sorted(files, key=lambda x: x.utc_file_date)[-1]
-dbu._closeDB()
+dbu.closeDB()
 
 dbfiles = set(v.filename for v in files)
 
@@ -89,7 +89,7 @@ g_inc_path = dbu.getIncomingPath()
 
 files = dbu.getFilesByProduct('rbspb-def_kernel')
 #files = sorted(files, key=lambda x: x.utc_file_date)[-1]
-dbu._closeDB()
+dbu.closeDB()
 
 dbfiles = set(v.filename for v in files)
 
@@ -148,7 +148,7 @@ for f in files_to_make:
 ## files = dbu.getFilesByProduct('QinDenton_NRT')
 ## NRT_dbfiles = set(v.filename for v in files)
 
-## dbu._closeDB()
+## dbu.closeDB()
 
 
 ## Virbo_files = glob.glob('/n/space_data/MagModelInputs/QinDenton/201[23456789]/QinDenton_*_1min.txt')

@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     basepath = dbu.session.query(dbu.Mission).filter_by(mission_name=dbu.getMissions()[0]).all()[0].rootdir
     if not hasattr(dbu, field):
-        dbu._closeDB()
+        dbu.closeDB()
         parser.error('Field: "{0}" not found in database: "{1}"'.format(field, mission))
 
     if field == 'Product':
@@ -171,9 +171,9 @@ if __name__ == '__main__':
                                     
         
     else:
-        dbu._closeDB()        
+        dbu.closeDB()
         raise(NotImplementedError('Attr: "{0}" not yet implemented'.format(field) ))
 
 
-    dbu._closeDB()
+    dbu.closeDB()
         

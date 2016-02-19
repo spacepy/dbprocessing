@@ -26,7 +26,7 @@ g_inc_path = dbu.getIncomingPath()
 
 files = dbu.getFilesByProduct('rbsp_pre_kernel')
 #files = sorted(files, key=lambda x: x.utc_file_date)[-1]
-dbu._closeDB()
+dbu.closeDB()
 
 files = set(v.filename for v in files)
 

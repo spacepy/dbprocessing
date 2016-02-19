@@ -91,7 +91,7 @@ class DBUtils(object):
         """
         try and clean up a little bit
         """
-        self._closeDB()
+        self.closeDB()
 
     def __repr__(self):
         """
@@ -240,7 +240,7 @@ class DBUtils(object):
             DBlogging.dblogger.error( "Logging lock overridden: %s" % ('Overridden:' + comment + ':' + __version__) )
             self.session.add(val)
         if sq2:
-            self._commitDB()
+            self.commitDB()
 
     def _startLogging(self):
         """
@@ -307,7 +307,7 @@ class DBUtils(object):
         l1.processing_end_time = processing_end_time
         l1.comment = comment
         self.session.add(l1)
-        self._commitDB()
+        self.commitDB()
         return l1    # so we can use the same session to stop the logging
 
     def _stopLogging(self, comment):
@@ -328,7 +328,7 @@ class DBUtils(object):
         self.__p1.currently_processing = False
         self.__p1.comment = comment+':' + __version__
         self.session.add(self.__p1)
-        self._commitDB()
+        self.commitDB()
         DBlogging.dblogger.info( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) )
         del self.__p1
 
@@ -348,7 +348,7 @@ class DBUtils(object):
                 if fix:
                     sq.exists_on_disk = False
                     self.session.add(sq)
-                    self._commitDB()
+                    self.commitDB()
                     return self._checkDiskForFile(file_id) # call again to get the True
                 else:
                     return False
@@ -364,7 +364,7 @@ class DBUtils(object):
         """
         length = self.Processqueue.len()
         self.session.query(self.Processqueue).delete()
-        self._commitDB()
+        self.commitDB()
         DBlogging.dblogger.info( "Processqueue was cleared")
         return length
 
@@ -384,7 +384,7 @@ class DBUtils(object):
         for v in sq:
             self.session.delete(v)
         if sq:
-            self._commitDB()
+            self.commitDB()
 
     def _processqueueGetAll(self, version_bump=None):
         """
@@ -458,7 +458,7 @@ class DBUtils(object):
         DBlogging.dblogger.debug( "File added to process queue {0}:{1}".format(fileid, '---'))
         if fileid:
             self.session.add_all(objs)
-            self._commitDB()
+            self.commitDB()
 #        pqid = self.session.query(self.Processqueue.file_id).all()
         return outval
 
@@ -495,7 +495,7 @@ class DBUtils(object):
                 pq1.file_id = f
                 self.session.add(pq1)
                 DBlogging.dblogger.debug( "File added to process queue {0}:{1}".format(fileid, '---'))
-            self._commitDB() # commit once for all the adds
+            self.commitDB() # commit once for all the adds
         return  len(files_to_add)
 
     def _processqueueLen(self):
@@ -520,7 +520,7 @@ class DBUtils(object):
         """
         val = self._processqueueGet(index=index, version_bump=version_bump, instance=True)
         self.session.delete(val)
-        self._commitDB()
+        self.commitDB()
         return (val.file_id, val.version_bump)
 
     def _processqueueGet(self, index=0, version_bump=None, instance=False):
@@ -626,7 +626,7 @@ class DBUtils(object):
                 pass
             DBlogging.dblogger.info( "File removed from db {0}".format(f) )
 
-        self._commitDB()
+        self.commitDB()
 
     def getAllSatellites(self):
         """
@@ -720,7 +720,7 @@ class DBUtils(object):
         m1.rootdir = rootdir.replace('{MISSION}', mission_name)
         m1.incoming_dir = incoming_dir.replace('{MISSION}', mission_name)
         self.session.add(m1)
-        self._commitDB()
+        self.commitDB()
         return m1.mission_id
 
     def addSatellite(self,
@@ -736,7 +736,7 @@ class DBUtils(object):
         s1.mission_id = mission_id
         s1.satellite_name = satellite_name.replace('{MISSION}', self.getEntry('Mission', mission_id).mission_name)
         self.session.add(s1)
-        self._commitDB()
+        self.commitDB()
         return s1.satellite_id
 
     def addProcess(self,
@@ -762,7 +762,7 @@ class DBUtils(object):
         p1.extra_params = Utils.toNone(extra_params)
         p1.output_timebase = output_timebase
         self.session.add(p1)
-        self._commitDB()
+        self.commitDB()
         # self.updateProcessSubs(p1.process_id)
         return p1.process_id
 
@@ -792,7 +792,7 @@ class DBUtils(object):
         p1.level = level
         p1.product_description = product_description
         self.session.add(p1)
-        self._commitDB()
+        self.commitDB()
         return p1.product_id
 
     def updateProductSubs(self, product_id):
@@ -810,7 +810,7 @@ class DBUtils(object):
         fmt = self._nameSubProduct(p1.format, product_id)
         p1.format = fmt
         self.session.add(p1)
-        self._commitDB()
+        self.commitDB()
 
     def updateInspectorSubs(self, insp_id):
         """
@@ -823,7 +823,7 @@ class DBUtils(object):
         relative_path = self._nameSubInspector(p1.relative_path, insp_id)
         p1.relative_path = relative_path
         self.session.add(p1)
-        self._commitDB()
+        self.commitDB()
 
     def updateProcessSubs(self, proc_id):
         """
@@ -837,7 +837,7 @@ class DBUtils(object):
         extra_params = self._nameSubProcess(p1.extra_params, proc_id)
         p1.extra_params = extra_params
         self.session.add(p1)
-        self._commitDB()
+        self.commitDB()
 
     def addproductprocesslink(self,
                     input_product_id,
@@ -856,7 +856,7 @@ class DBUtils(object):
         ppl1.process_id = self.getProcessID(process_id)
         ppl1.optional = optional
         self.session.add(ppl1)
-        self._commitDB()
+        self.commitDB()
         return ppl1.input_product_id, ppl1.process_id
 
     def addFilecodelink(self,
@@ -874,7 +874,7 @@ class DBUtils(object):
         fcl1.resulting_file = resulting_file_id
         fcl1.source_code = source_code
         self.session.add(fcl1)
-        self._commitDB()
+        self.commitDB()
         return fcl1.resulting_file, fcl1.source_code
 
     def delInspector(self, i):
@@ -883,7 +883,7 @@ class DBUtils(object):
         """
         insp = self.getEntry('Inspector', i)
         self.session.delete(insp)
-        self._commitDB()
+        self.commitDB()
 
     def delFilefilelink(self, f):
         """
@@ -895,7 +895,7 @@ class DBUtils(object):
         if n1+n2 == 0:
             raise(DBNoData("No entry for ID={0} found".format(f)))
         else:
-            self._commitDB()
+            self.commitDB()
 
     def delFilecodelink(self, f):
         """
@@ -906,7 +906,7 @@ class DBUtils(object):
         if n2 == 0:
             raise(DBNoData("No entry for ID={0} found".format(f)))
         else:
-            self._commitDB()
+            self.commitDB()
 
     def addFilefilelink(self,
                      resulting_file_id,
@@ -923,7 +923,7 @@ class DBUtils(object):
         ffl1.source_file = source_file
         ffl1.resulting_file = resulting_file_id
         self.session.add(ffl1)
-        self._commitDB()
+        self.commitDB()
         return ffl1.source_file, ffl1.resulting_file
 
     def addInstrumentproductlink(self,
@@ -940,7 +940,7 @@ class DBUtils(object):
         ipl1.instrument_id = instrument_id
         ipl1.product_id = product_id
         self.session.add(ipl1)
-        self._commitDB()
+        self.commitDB()
         return ipl1.instrument_id, ipl1.product_id
 
     def addInstrument(self,
@@ -966,7 +966,7 @@ class DBUtils(object):
 
         i1.instrument_name = instrument_name
         self.session.add(i1)
-        self._commitDB()
+        self.commitDB()
         return i1.instrument_id
 
     def addCode(self,
@@ -1035,7 +1035,7 @@ class DBUtils(object):
         c1.cpu = cpu
 
         self.session.add(c1)
-        self._commitDB()
+        self.commitDB()
         return c1.code_id
 
     def addInspector(self,
@@ -1094,7 +1094,7 @@ class DBUtils(object):
         c1.arguments = Utils.toNone(self._nameSubProduct(arguments, product))
 
         self.session.add(c1)
-        self._commitDB()
+        self.commitDB()
         return c1.inspector_id
 
     def _nameSubProduct(self, inStr, product_id):
@@ -1212,7 +1212,7 @@ class DBUtils(object):
             inStr = inStr.replace('{ROOTDIR}', str(ftb['mission'].rootdir))
         return inStr
 
-    def _commitDB(self):
+    def commitDB(self):
         """
         do the commit to the DB
         """
@@ -1222,13 +1222,13 @@ class DBUtils(object):
             self.session.rollback()
             raise(DBError(IE))
 
-    def _closeDB(self):
+    def closeDB(self):
         """
         Close the database connection
 
         @keyword verbose: (optional) print information out to the command line
 
-        >>>  pnl._closeDB()
+        >>>  pnl.closeDB()
         """
         if self.dbIsOpen == False:
             return
@@ -1319,7 +1319,7 @@ class DBUtils(object):
         d1.shasum = shasum
         d1.process_keywords = process_keywords
         self.session.add(d1)
-        self._commitDB()
+        self.commitDB()
         return d1.file_id
 
     def _codeIsActive(self, ec_id, date):
@@ -1463,7 +1463,7 @@ class DBUtils(object):
         f = self.getEntry('File', filename)
         f.filename = newname
         self.session.add(f)
-        self._commitDB()
+        self.commitDB()
 
     def getFileID(self, filename):
         """
@@ -1966,7 +1966,7 @@ class DBUtils(object):
 
         for f in newest_files:
             self.addRelease(f, rel_num, commit=False)
-        self._commitDB()
+        self.commitDB()
         return len(newest_files)
 
     def addRelease(self, filename, release, commit=False):
@@ -1979,7 +1979,7 @@ class DBUtils(object):
         rel.release_num = release
         self.session.add(rel)
         if commit: # so that if we are doing a lot it is faster
-            self._commitDB()
+            self.commitDB()
 
     def list_release(self, rel_num, fullpath=True):
         """

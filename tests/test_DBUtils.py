@@ -49,7 +49,7 @@ class TestSetup(unittest.TestCase):
 
     def tearDown(self):
         super(TestSetup, self).tearDown()
-        self.dbu._closeDB()
+        self.dbu.closeDB()
         del self.dbu
         os.remove(self.sqlworking)
 
@@ -77,7 +77,7 @@ class DBUtilsOtherTests(TestSetup):
         e = self.dbu.getEntry('Mission', 1)
         e.incoming_dir = os.path.abspath(os.path.dirname(__file__))
         self.dbu.session.add(e)
-        self.dbu._commitDB()
+        self.dbu.commitDB()
         inc_files = self.dbu._checkIncoming()
         self.assertTrue(inc_files)
         self.assertTrue(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test_DBUtils.py') in inc_files)
@@ -93,7 +93,7 @@ class DBUtilsOtherTests(TestSetup):
         log.user = 'user'
         log.hostname = 'hostname'
         self.dbu.session.add(log)
-        self.dbu._commitDB()
+        self.dbu.commitDB()
         self.assertEqual(123, self.dbu._currentlyProcessing())
         log = self.dbu.Logging()
         log.currently_processing = True
@@ -103,7 +103,7 @@ class DBUtilsOtherTests(TestSetup):
         log.hostname = 'hostname'
         log.pid = 1234
         self.dbu.session.add(log)
-        self.dbu._commitDB()
+        self.dbu.commitDB()
         self.assertRaises(DBUtils.DBError, self.dbu._currentlyProcessing)
 
     def test_startLogging(self):
@@ -216,7 +216,7 @@ class DBUtilsOtherTests(TestSetup):
         self.assertTrue(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
         c.active_code = False
         self.dbu.session.add(c)
-        self.dbu._commitDB()
+        self.dbu.commitDB()
         self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
 
     def test_codeIsActive3(self):
@@ -225,7 +225,7 @@ class DBUtilsOtherTests(TestSetup):
         self.assertTrue(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
         c.newest_version = False
         self.dbu.session.add(c)
-        self.dbu._commitDB()
+        self.dbu.commitDB()
         self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
 
     def test_renameFile(self):
@@ -428,20 +428,20 @@ class DBUtilsGetTests(TestSetup):
         codes = self.dbu.getAllCodes(active=False)
         codes[0]['code'].newest_version = False
         self.dbu.session.add(codes[0]['code'])
-        self.dbu._commitDB()
+        self.dbu.commitDB()
         codes = self.dbu.getAllCodes()
         self.assertEqual(len(codes), 65)
         codes = self.dbu.getAllCodes(active=False)
         self.assertEqual(len(codes), 66)
 
     def test_commitDB1(self):
-        """_commitDB"""
+        """commitDB"""
         f = self.dbu.session.query(self.dbu.File).first()
         f.filename += '_test'
         tmp = f.filename
         id = f.file_id
         self.dbu.session.add(f)
-        self.dbu._commitDB()
+        self.dbu.commitDB()
         self.assertEqual(id, self.dbu.getFileID(tmp))
 
     def test_getFileFullPath(self):
@@ -673,7 +673,7 @@ class DBUtilsGetTests(TestSetup):
         cd = self.dbu.getEntry('Code', 1)
         cd.active_code = False
         self.dbu.session.add(cd)
-        self.dbu._commitDB()
+        self.dbu.commitDB()
         self.assertTrue(self.dbu.getCodePath(1) is None)
 
     def test_getAllCodesFromProcess(self):
