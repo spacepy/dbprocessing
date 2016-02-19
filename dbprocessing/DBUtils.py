@@ -332,7 +332,7 @@ class DBUtils(object):
         DBlogging.dblogger.info( "Logging stopped: %s comment '%s' " % (self.__p1.processing_end, self.__p1.comment) )
         del self.__p1
 
-    def _checkDiskForFile(self, file_id, fix=False):
+    def checkDiskForFile(self, file_id, fix=False):
         """
         Check the filesystem to see if the file exits or not as it says in the db
 
@@ -349,7 +349,7 @@ class DBUtils(object):
                     sq.exists_on_disk = False
                     self.session.add(sq)
                     self.commitDB()
-                    return self._checkDiskForFile(file_id) # call again to get the True
+                    return self.checkDiskForFile(file_id) # call again to get the True
                 else:
                     return False
             else:
