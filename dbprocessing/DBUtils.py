@@ -2297,7 +2297,7 @@ class DBUtils(object):
 
     def getProductParentTree(self):
         """
-        go through the db and return a tree of all products are thier parents
+        go through the db and return a tree of all products and their parents
 
         This will allow for a run all the non done files script
         """
@@ -2307,5 +2307,5 @@ class DBUtils(object):
         # for each of the level 0 products add a base tree then iterate through them with dbu.getProcessFromInputProduct
         #  then get the output for that process
         for p in prods:
-            tree.append( [p.product_id, self._childTree(p.product_id)] )
+            tree.append( [p.product_id, self.getChildTree(p.product_id)] )
         return tree

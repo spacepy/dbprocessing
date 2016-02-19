@@ -768,20 +768,14 @@ class DBUtilsGetTests(TestSetup):
 
     def test_getVersion(self):
         """getVersion"""
-        self.assertEqual(Version.Version(1,0,0), self.dbu.getVersion(1))
-        self.assertEqual(Version.Version(1,1,0), self.dbu.getVersion(123))
+        self.assertEqual(Version.Version(1, 0, 0), self.dbu.getVersion(1))
+        self.assertEqual(Version.Version(1, 1, 0), self.dbu.getVersion(123))
 
     def test_getChildTree(self):
         """getChildTree"""
         tmp = self.dbu.getChildTree(1)
-        print(tmp)
         ans = set([10, 8, 39, 76])
         self.assertFalse(set(tmp).difference(ans))
-
-
-
-
-
 
     def test_getFileParents(self):
         """getFileParents"""
@@ -792,6 +786,12 @@ class DBUtilsGetTests(TestSetup):
         for vv in files:
             self.assertTrue(self.dbu.getFileID(vv) in ids)
         self.assertEqual([1846, 1802, 1873], ids)
+
+    def test_getProductParentTree(self):
+        """getProductParentTree"""
+        tmp = self.dbu.getProductParentTree()
+        self.assertEqual(190, len(tmp))
+        self.assertTrue([1, [10, 8, 39, 76]] in tmp)
 
 
 class ProcessqueueTests(TestSetup):
