@@ -201,14 +201,14 @@ class DBUtils(object):
 ####  Do processing and input to DB
 #####################################
 
-    def _currentlyProcessing(self):
+    def currentlyProcessing(self):
         """
         Checks the db to see if it is currently processing, don't want to do 2 at the same time
 
         @return: false or the pid
         @rtype: (bool, long)
 
-        >>>  pnl._currentlyProcessing()
+        >>>  pnl.currentlyProcessing()
         """
         DBlogging.dblogger.info("Checking currently_processing")
 
@@ -222,7 +222,7 @@ class DBUtils(object):
             DBlogging.dblogger.error("More than one currently_processing flag set, fix the DB" )
             raise(DBError("More than one currently_processing flag set, fix the DB"))
 
-    def _resetProcessingFlag(self, comment=None):
+    def resetProcessingFlag(self, comment=None):
         """
         Query the db and reset a processing flag
 
@@ -248,7 +248,7 @@ class DBUtils(object):
         """
         # this is the logging of the processing, no real use for it yet but maybe we will in the future
         # helps to know is the process ran and if it succeeded
-        if self._currentlyProcessing():
+        if self.currentlyProcessing():
             raise(DBError('A Currently Processing flag is still set, cannot process now'))
         # save this class instance so that we can finish the logging later
         self.__p1 = self._addLogging(True,

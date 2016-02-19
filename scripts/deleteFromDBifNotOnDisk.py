@@ -51,7 +51,7 @@ if __name__ == "__main__":
     # If we will be editing the DB we have to have lock
     if options.fix:
         # check currently processing
-        curr_proc = dbu._currentlyProcessing()
+        curr_proc = dbu.currentlyProcessing()
         if curr_proc:  # returns False or the PID
             # check if the PID is running
             if Utils.processRunning(curr_proc):

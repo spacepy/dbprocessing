@@ -11,5 +11,5 @@ if len(sys.argv) != 3:
 
 if __name__ == "__main__":
     a = DBUtils.DBUtils(sys.argv[1])
-    a._resetProcessingFlag(sys.argv[2])
+    a.resetProcessingFlag(sys.argv[2])
     print('Database lock removed')

@@ -83,8 +83,8 @@ class DBUtilsOtherTests(TestSetup):
         self.assertTrue(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test_DBUtils.py') in inc_files)
 
     def test_currentlyProcessing(self):
-        """_currentlyProcessing"""
-        self.assertFalse(self.dbu._currentlyProcessing())
+        """currentlyProcessing"""
+        self.assertFalse(self.dbu.currentlyProcessing())
         log = self.dbu.Logging()
         log.currently_processing = True
         log.pid = 123
@@ -94,7 +94,7 @@ class DBUtilsOtherTests(TestSetup):
         log.hostname = 'hostname'
         self.dbu.session.add(log)
         self.dbu.commitDB()
-        self.assertEqual(123, self.dbu._currentlyProcessing())
+        self.assertEqual(123, self.dbu.currentlyProcessing())
         log = self.dbu.Logging()
         log.currently_processing = True
         log.processing_start_time = datetime.datetime.now()
@@ -104,32 +104,32 @@ class DBUtilsOtherTests(TestSetup):
         log.pid = 1234
         self.dbu.session.add(log)
         self.dbu.commitDB()
-        self.assertRaises(DBUtils.DBError, self.dbu._currentlyProcessing)
+        self.assertRaises(DBUtils.DBError, self.dbu.currentlyProcessing)
 
     def test_startLogging(self):
         """_startLogging"""
-        self.assertFalse(self.dbu._currentlyProcessing())
+        self.assertFalse(self.dbu.currentlyProcessing())
         self.dbu._startLogging()
-        self.assertTrue(self.dbu._currentlyProcessing())
+        self.assertTrue(self.dbu.currentlyProcessing())
         self.assertRaises(DBUtils.DBError, self.dbu._startLogging)
-        self.assertTrue(self.dbu._currentlyProcessing())
+        self.assertTrue(self.dbu.currentlyProcessing())
 
     def test_stopLogging(self):
         """stopLogging"""
-        self.assertFalse(self.dbu._currentlyProcessing())
+        self.assertFalse(self.dbu.currentlyProcessing())
         self.assertRaises(DBUtils.DBProcessingError, self.dbu._stopLogging, 'comment')
         self.dbu._startLogging()
-        self.assertTrue(self.dbu._currentlyProcessing())
+        self.assertTrue(self.dbu.currentlyProcessing())
         self.dbu._stopLogging('comment')
-        self.assertFalse(self.dbu._currentlyProcessing())
+        self.assertFalse(self.dbu.currentlyProcessing())
 
     def test_resetProcessingFlag(self):
-        """_resetProcessingFlag"""
+        """resetProcessingFlag"""
         self.dbu._startLogging()
-        self.assertTrue(self.dbu._currentlyProcessing())
-        self.assertRaises(ValueError, self.dbu._resetProcessingFlag)  # no comment
-        self.dbu._resetProcessingFlag('testing comment')
-        self.assertFalse(self.dbu._currentlyProcessing())
+        self.assertTrue(self.dbu.currentlyProcessing())
+        self.assertRaises(ValueError, self.dbu.resetProcessingFlag)  # no comment
+        self.dbu.resetProcessingFlag('testing comment')
+        self.assertFalse(self.dbu.currentlyProcessing())
 
     def test_repr(self):
         """repr"""

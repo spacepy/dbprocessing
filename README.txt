@@ -126,7 +126,7 @@ Other things:
 -------------
 If the PorcessQueue dies then you are locked out:
 - run ProcessQueue  <<dies will not run>>
-- pq.dbu._resetProcessingFlag('Some comment')
+- pq.dbu.resetProcessingFlag('Some comment')
 
 
 

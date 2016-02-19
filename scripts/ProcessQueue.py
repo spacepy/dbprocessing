@@ -67,7 +67,7 @@ if __name__ == "__main__":
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
 
     # check currently processing
-    curr_proc = pq.dbu._currentlyProcessing()
+    curr_proc = pq.dbu.currentlyProcessing()
     if curr_proc:  # returns False or the PID
         # check if the PID is running
         if Utils.processRunning(curr_proc):
