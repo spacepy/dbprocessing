@@ -71,14 +71,14 @@ class DBUtilsOtherTests(TestSetup):
         self.assertFalse(set(self.dbu.checkFiles(limit=3)).difference(ans))
 
     def test_checkIncoming(self):
-        """_checkIncoming"""
-        """_checkIncoming"""
-        self.assertFalse(self.dbu._checkIncoming())
+        """checkIncoming"""
+        """checkIncoming"""
+        self.assertFalse(self.dbu.checkIncoming())
         e = self.dbu.getEntry('Mission', 1)
         e.incoming_dir = os.path.abspath(os.path.dirname(__file__))
         self.dbu.session.add(e)
         self.dbu.commitDB()
-        inc_files = self.dbu._checkIncoming()
+        inc_files = self.dbu.checkIncoming()
         self.assertTrue(inc_files)
         self.assertTrue(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test_DBUtils.py') in inc_files)
 

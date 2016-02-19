@@ -95,7 +95,7 @@ class ProcessQueue(object):
         """
         DBlogging.dblogger.debug("Entered checkIncoming:")
 
-        self.queue.extendleft(self.dbu._checkIncoming(glb=glb))
+        self.queue.extendleft(self.dbu.checkIncoming(glb=glb))
         # step through and remove duplicates
         # if python 2.7 deque has a .count() otherwise have to use
         #  this workaround

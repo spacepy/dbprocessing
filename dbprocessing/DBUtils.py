@@ -1890,7 +1890,7 @@ class DBUtils(object):
         mission = self.getEntry('Mission',mission_id)
         return mission.rootdir
 
-    def _checkIncoming(self, glb='*'):
+    def checkIncoming(self, glb='*'):
         """
         check the incoming directory for the current mission and add those files to the getting list
 
