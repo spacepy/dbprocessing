@@ -1322,7 +1322,7 @@ class DBUtils(object):
         self.commitDB()
         return d1.file_id
 
-    def _codeIsActive(self, ec_id, date):
+    def codeIsActive(self, ec_id, date):
         """
         Given a ec_id and a date is that code active for that date and is newest version
 

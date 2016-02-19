@@ -202,31 +202,31 @@ class DBUtilsOtherTests(TestSetup):
         self.assertEqual('/n/space_data/cda/rbsp', self.dbu._nameSubFile('{ROOTDIR}', 1))
 
     def test_codeIsActive(self):
-        """_codeIsActive"""
-        self.assertTrue(self.dbu._codeIsActive(1, datetime.date(2013, 1, 1)))
-        self.assertFalse(self.dbu._codeIsActive(1, datetime.date(1900, 1, 1)))
-        self.assertFalse(self.dbu._codeIsActive(1, datetime.date(2100, 1, 1)))
-        self.assertTrue(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
-        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(1900, 1, 1)))
-        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2100, 1, 1)))
+        """codeIsActive"""
+        self.assertTrue(self.dbu.codeIsActive(1, datetime.date(2013, 1, 1)))
+        self.assertFalse(self.dbu.codeIsActive(1, datetime.date(1900, 1, 1)))
+        self.assertFalse(self.dbu.codeIsActive(1, datetime.date(2100, 1, 1)))
+        self.assertTrue(self.dbu.codeIsActive(1, datetime.datetime(2013, 1, 1)))
+        self.assertFalse(self.dbu.codeIsActive(1, datetime.datetime(1900, 1, 1)))
+        self.assertFalse(self.dbu.codeIsActive(1, datetime.datetime(2100, 1, 1)))
 
     def test_codeIsActive2(self):
-        """_codeIsActive"""
+        """codeIsActive"""
         c = self.dbu.getEntry('Code', 1)
-        self.assertTrue(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
+        self.assertTrue(self.dbu.codeIsActive(1, datetime.datetime(2013, 1, 1)))
         c.active_code = False
         self.dbu.session.add(c)
         self.dbu.commitDB()
-        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
+        self.assertFalse(self.dbu.codeIsActive(1, datetime.datetime(2013, 1, 1)))
 
     def test_codeIsActive3(self):
-        """_codeIsActive"""
+        """codeIsActive"""
         c = self.dbu.getEntry('Code', 1)
-        self.assertTrue(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
+        self.assertTrue(self.dbu.codeIsActive(1, datetime.datetime(2013, 1, 1)))
         c.newest_version = False
         self.dbu.session.add(c)
         self.dbu.commitDB()
-        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
+        self.assertFalse(self.dbu.codeIsActive(1, datetime.datetime(2013, 1, 1)))
 
     def test_renameFile(self):
         """renameFile"""
