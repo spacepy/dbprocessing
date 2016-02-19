@@ -32,8 +32,8 @@ class DBfile(object):
 
         @param diskfile: a diskfile instance to create a DBfile from
         @type infile: Diskfile
-        @param dbu: pass in the current DBUtils session so that a new connection is not made
-        @type dbu: DBUtils
+        @param dbu: pass in the current DButils session so that a new connection is not made
+        @type dbu: DButils
         """
         if makeDiskFile == True:
             diskfile = Diskfile.Diskfile(diskfile)
@@ -61,7 +61,7 @@ class DBfile(object):
 
     def addFileToDB(self):
         """
-        wrapper around DBUtils.addFile to take params dict to keywords
+        wrapper around DButils.addFile to take params dict to keywords
 
         @return: the file_id of the newly added file
         @rtype: long

@@ -19,7 +19,7 @@ from dbprocessing import inspector
 
 import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 """
 go into the database and update the shasum entry for a file that is changed after ingestion
@@ -32,7 +32,7 @@ def getSHA(options, dbu, filename):
     """
     try:
         sha = dbu.getEntry('File', dbu.getFileID(os.path.basename(filename))).shasum
-    except DBUtils.DBNoData:
+    except DButils.DBNoData:
         sha = 'NOFILE'
     return sha
 
@@ -41,7 +41,7 @@ def updateSHA(options, dbu, filename):
     update the shasum in the db
     """
     file = dbu.getEntry('File', dbu.getFileID(os.path.basename(filename)))
-    file.shasum = DBUtils.calcDigest(filename)
+    file.shasum = DButils.calcDigest(filename)
     dbu.session.commit()
 
     
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     if not os.path.isfile(options.mission):
         parser.error("Mission database {0} did not exist".format(options.mission))
 
-    dbu = DBUtils.DBUtils(options.mission)
+    dbu = DButils.DButils(options.mission)
 
     dbsha = getSHA(options, dbu, infile)
     if dbsha == 'NOFILE': # file not in db we are done

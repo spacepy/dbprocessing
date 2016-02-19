@@ -26,7 +26,7 @@ import numpy as np
 import spacepy.toolbox as tb
 
 from dbprocessing import Utils
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 echo = False
 
@@ -186,7 +186,7 @@ if __name__ == "__main__":
     dates = list(Utils.chunker(dates, int(conf['panel']['daysperplot'])))
 
     # make the arrays that hold the files
-    dbu = DBUtils.DBUtils(conf['settings']['mission'], echo=echo)
+    dbu = DButils.DButils(conf['settings']['mission'], echo=echo)
 
     # go through the panel and see how many plots there are
     nplots = _get_nplots(conf)

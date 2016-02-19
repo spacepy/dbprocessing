@@ -5,7 +5,7 @@ import ConfigParser
 import os
 from optparse import OptionParser
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import Utils
 from dbprocessing import Version
 
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     if os.path.isfile(filename) and not options.force:
         parser.error("file: {0} exists and will not be overwritten (use --force)".format(filename))
 
-    dbu = DBUtils.DBUtils(options.mission)
+    dbu = DButils.DButils(options.mission)
 
     # ==============================================================================
     #     This will make a configparser of the needed parts then write to file

@@ -27,7 +27,7 @@ from optparse import OptionParser
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 expected = ['mission', 'satellite', 'instrument', 'product', 'process']
 expected_keyword = { }
@@ -190,7 +190,7 @@ def _fileTest(filename):
 
 def addStuff(cfg, options):
     # setup the db
-    dbu = DBUtils.DBUtils(options.mission)
+    dbu = DButils.DButils(options.mission)
 
     # is the mission in the DB?  If not add it
     if cfg['mission']['mission_name'] not in dbu.getMissions():  # was it there?
@@ -205,7 +205,7 @@ def addStuff(cfg, options):
     try:
         satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name']).satellite_id
         print('Found Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite', satellite_id).satellite_name))
-    except (DBUtils.DBNoData, NoResultFound):
+    except (DButils.DBNoData, NoResultFound):
         # add it
         satellite_id = dbu.addSatellite(mission_id=mission_id, **cfg['satellite'])
         print('Added Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite', satellite_id).satellite_name))
@@ -220,7 +220,7 @@ def addStuff(cfg, options):
         print(
             'Found Instrument: {0} {1}'.format(instrument_id,
                                                dbu.getEntry('Instrument', instrument_id).instrument_name))
-    except (DBUtils.DBNoData, ValueError, NoResultFound):
+    except (DButils.DBNoData, ValueError, NoResultFound):
         # add it
         instrument_id = dbu.addInstrument(satellite_id=satellite_id, **cfg['instrument'])
         print(

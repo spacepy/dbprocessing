@@ -8,7 +8,7 @@ import tempfile
 
 
 from dbprocessing import DBfile
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import Diskfile
 
 filename = 'test_file.txt'

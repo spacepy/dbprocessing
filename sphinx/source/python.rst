@@ -3,7 +3,7 @@ Undocumented Python objects
 dbprocessing.DBStrings
 ----------------------
 Classes:
- * DBFormatter -- missing methods:
+ * DBformatter -- missing methods:
 
    - assemble
    - expand_datetime
@@ -11,10 +11,10 @@ Classes:
    - format
    - re
 
-dbprocessing.DBUtils
+dbprocessing.DButils
 --------------------
 Classes:
- * DBUtils -- missing methods:
+ * DButils -- missing methods:
 
    - addCode
    - addFile

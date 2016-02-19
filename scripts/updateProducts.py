@@ -19,7 +19,7 @@ import ConfigParser
 import datetime
 import sys
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing.Utils import toBool, toNone
 
 sections = ['base', 'product', 'inspector',]
@@ -59,7 +59,7 @@ def _updateSections(conf):
     """
     go through each section and update the db is there is a change
     """
-    dbu = DBUtils.DBUtils('rbsp') # TODO don't assume RBSP later
+    dbu = DButils.DButils('rbsp') # TODO don't assume RBSP later
     dbu.openDB()
     dbu._createTableObjects()
 

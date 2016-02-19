@@ -18,7 +18,7 @@ API documentation
     dbprocessing
     DBqueue
     DBStrings
-    DBUtils
+    DButils
     Diskfile
     inspector
     module

@@ -19,7 +19,7 @@ from sqlalchemy import func
 
 import rbsp #rbsp.mission_day_to_UTC
 
-from dbprocessing import DBUtils, Utils, Version, inspector
+from dbprocessing import DButils, Utils, Version, inspector
 from dbprocessing.runMe import ProcessException
 from rbsp import Version
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         parser.error("-m must be specified")
 
                 
-    dbu = DBUtils.DBUtils(options.mission, echo=options.echo)
+    dbu = DButils.DButils(options.mission, echo=options.echo)
 
     # If we will be editing the DB we have to have lock
     if options.fix:

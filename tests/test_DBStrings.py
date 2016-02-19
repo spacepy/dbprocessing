@@ -9,20 +9,20 @@ __version__ = '0.3'
 import datetime
 import unittest
 
-from dbprocessing import DBStrings
+from dbprocessing import DBstrings
 
 
 class DBFormatterTests(unittest.TestCase):
     """Tests of the revised Formatter class
 
     @ivar fmtr: instance of the revised formatter
-    @type fmtr: DBStrings.DBFormatter
+    @type fmtr: DBstrings.DBformatter
     """
 
     def __init__(self, *args, **kwargs):
         """Create a formatter"""
         super(DBFormatterTests, self).__init__(*args, **kwargs)
-        self.fmtr = DBStrings.DBFormatter()
+        self.fmtr = DBstrings.DBformatter()
 
     def testNormalFormatting(self):
         """Format some strings that are same as normal formatter"""

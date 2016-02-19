@@ -11,7 +11,7 @@ DBStrings
 .. autosummary::
     :toctree: autosummary
 
-    DBFormatter
+    DBformatter
 
 .. rubric:: Exceptions
 

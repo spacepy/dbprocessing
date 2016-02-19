@@ -18,7 +18,7 @@ except ImportError:
     from sqlalchemy.exc import ArgumentError
     from sqlalchemy.orm.exc import NoResultFound
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import Version
 
 __version__ = '2.0.3'
@@ -45,7 +45,7 @@ class TestSetup(unittest.TestCase):
         self.sqlworking = sqpath.replace('RBSP_MAGEIS.sqlite', 'working.sqlite')
         shutil.copy(sqpath, self.sqlworking)
         os.chmod(self.sqlworking, stat.S_IRUSR | stat.S_IWUSR)
-        self.dbu = DBUtils.DBUtils(self.sqlworking)
+        self.dbu = DButils.DButils(self.sqlworking)
 
     def tearDown(self):
         super(TestSetup, self).tearDown()
@@ -56,8 +56,8 @@ class TestSetup(unittest.TestCase):
 
 class DBUtilsStaticTests(unittest.TestCase):
     def test_test_SQLAlchemy_version(self):
-        self.assertRaises(DBUtils.DBError, DBUtils.DBUtils._test_SQLAlchemy_version, '1.0.11')
-        self.assertTrue(DBUtils.DBUtils._test_SQLAlchemy_version('0.7'))
+        self.assertRaises(DButils.DBError, DButils.DButils._test_SQLAlchemy_version, '1.0.11')
+        self.assertTrue(DButils.DButils._test_SQLAlchemy_version('0.7'))
 
 
 class DBUtilsOtherTests(TestSetup):
@@ -80,7 +80,7 @@ class DBUtilsOtherTests(TestSetup):
         self.dbu.commitDB()
         inc_files = self.dbu.checkIncoming()
         self.assertTrue(inc_files)
-        self.assertTrue(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test_DBUtils.py') in inc_files)
+        self.assertTrue(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test_DButils.py') in inc_files)
 
     def test_currentlyProcessing(self):
         """currentlyProcessing"""
@@ -104,20 +104,20 @@ class DBUtilsOtherTests(TestSetup):
         log.pid = 1234
         self.dbu.session.add(log)
         self.dbu.commitDB()
-        self.assertRaises(DBUtils.DBError, self.dbu.currentlyProcessing)
+        self.assertRaises(DButils.DBError, self.dbu.currentlyProcessing)
 
     def test_startLogging(self):
         """startLogging"""
         self.assertFalse(self.dbu.currentlyProcessing())
         self.dbu.startLogging()
         self.assertTrue(self.dbu.currentlyProcessing())
-        self.assertRaises(DBUtils.DBError, self.dbu.startLogging)
+        self.assertRaises(DButils.DBError, self.dbu.startLogging)
         self.assertTrue(self.dbu.currentlyProcessing())
 
     def test_stopLogging(self):
         """stopLogging"""
         self.assertFalse(self.dbu.currentlyProcessing())
-        self.assertRaises(DBUtils.DBProcessingError, self.dbu.stopLogging, 'comment')
+        self.assertRaises(DButils.DBProcessingError, self.dbu.stopLogging, 'comment')
         self.dbu.startLogging()
         self.assertTrue(self.dbu.currentlyProcessing())
         self.dbu.stopLogging('comment')
@@ -141,14 +141,14 @@ class DBUtilsOtherTests(TestSetup):
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6681)
         file_id = self.dbu.getFileID(123)
         self.dbu.purgeFileFromDB(file_id)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, file_id)
+        self.assertRaises(DButils.DBNoData, self.dbu.getFileID, file_id)
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6680)
 
     def test_purgeFileFromDB(self):
         """purgeFileFromDB"""
         # file_id = self.dbu.getFileID(123356)
         file_id = 123356
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, file_id)
+        self.assertRaises(DButils.DBNoData, self.dbu.getFileID, file_id)
         self.dbu.purgeFileFromDB(file_id)
 
     def test_nameSubProduct(self):
@@ -239,7 +239,7 @@ class DBUtilsOtherTests(TestSetup):
 
 
 class DBUtilsAddTests(TestSetup):
-    """Tests for database adds through DBUtils"""
+    """Tests for database adds through DButils"""
 
     def test_addMission(self):
         """addMission"""
@@ -261,29 +261,29 @@ class DBUtilsAddTests(TestSetup):
 
 
 class DBUtilsGetTests(TestSetup):
-    """Tests for database gets through DBUtils"""
+    """Tests for database gets through DButils"""
 
     def test_init(self):
         """__init__ has an exception to test"""
-        self.assertRaises(DBUtils.DBError, DBUtils.DBUtils, None)
+        self.assertRaises(DButils.DBError, DButils.DButils, None)
 
     def test_openDB1(self):
         """__init__ has an exception to test"""
-        self.assertRaises(ValueError, DBUtils.DBUtils, 'i do not exist')
+        self.assertRaises(ValueError, DButils.DButils, 'i do not exist')
 
     def test_openDB2(self):
         """__init__ bad engine"""
-        self.assertRaises(DBUtils.DBError, DBUtils.DBUtils, self.sqlworking, engine='i am bogus')
+        self.assertRaises(DButils.DBError, DButils.DButils, self.sqlworking, engine='i am bogus')
 
     def test_openDB3(self):
         """__init__ bad engine"""
-        self.assertRaises(DBUtils.DBError, DBUtils.DBUtils, self.sqlworking, engine='i am bogus')
+        self.assertRaises(DButils.DBError, DButils.DButils, self.sqlworking, engine='i am bogus')
 
     def test_openDB4(self):
         """__init__ bad engine"""
         tfile = make_tmpfile()
         try:
-            self.assertRaises(AttributeError, DBUtils.DBUtils, tfile),
+            self.assertRaises(AttributeError, DButils.DButils, tfile),
         finally:
             remove_tmpfile(tfile)
 
@@ -468,7 +468,7 @@ class DBUtilsGetTests(TestSetup):
         self.assertFalse(self.dbu.getProcessFromOutputProduct(1))
         self.assertEqual(None, self.dbu.getProcessFromOutputProduct(1))
         self.assertEqual(1, self.dbu.getProcessFromOutputProduct(4))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProcessFromOutputProduct, 40043)
+        self.assertRaises(DButils.DBNoData, self.dbu.getProcessFromOutputProduct, 40043)
 
     def test_getProcessID(self):
         """getProcessID"""
@@ -502,7 +502,7 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(1, self.dbu.getInstrumentID('mageis', 'rbspa'))
         self.assertEqual(2, self.dbu.getInstrumentID('mageis', 'rbspb'))
         self.assertRaises(NoResultFound, self.dbu.getInstrumentID, 'mageis', satellite_id='badval')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getInstrumentID, 'badval')
+        self.assertRaises(DButils.DBNoData, self.dbu.getInstrumentID, 'badval')
 
     def test_getMissions(self):
         """getMissions"""
@@ -513,8 +513,8 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(1, self.dbu.getFileID(1))
         self.assertEqual(2, self.dbu.getFileID(2))
         self.assertEqual(11, self.dbu.getFileID('rbspa_pre_MagEphem_OP77Q_20130907_v1.0.0.txt'))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, 'badval')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, 343423)
+        self.assertRaises(DButils.DBNoData, self.dbu.getFileID, 'badval')
+        self.assertRaises(DButils.DBNoData, self.dbu.getFileID, 343423)
         f = self.dbu.getFileID(2)
         self.assertEqual(2, self.dbu.getFileID(f))
 
@@ -526,14 +526,14 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual([1, 4, 10, 16, 17, 20, 21, 24, 25, 29, 30, 33, 34, 37,
                           43, 49, 50, 53, 54, 57, 58, 62, 63, 66],
                          self.dbu.getCodeID('l05_to_l1.py'))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodeID, 'badval')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodeID, 343423)
+        self.assertRaises(DButils.DBNoData, self.dbu.getCodeID, 'badval')
+        self.assertRaises(DButils.DBNoData, self.dbu.getCodeID, 343423)
 
     def test_getFileDates(self):
         """getFileDates"""
         self.assertEqual([datetime.date(2013, 9, 9), datetime.date(2013, 9, 9)],
                          self.dbu.getFileDates(1))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileDates, 343423)
+        self.assertRaises(DButils.DBNoData, self.dbu.getFileDates, 343423)
         self.assertEqual([datetime.date(2013, 9, 8), datetime.date(2013, 9, 8)],
                          self.dbu.getFileDates(2))
 
@@ -556,7 +556,7 @@ class DBUtilsGetTests(TestSetup):
                'ect_rbspb_0377_381_02.ptp.gz',
                'ect_rbspb_0377_381_01.ptp.gz']
         self.assertEqual(ans, [v.filename for v in val])
-        # WARNING: calling newest_version=True returns FILENAME, not DBUtils.File
+        # WARNING: calling newest_version=True returns FILENAME, not DButils.File
         val = self.dbu.getFilesByProductDate(187, [datetime.date(2013, 9, 10)] * 2, newest_version=True)
         self.assertEqual(1, len(val))
         self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], val)
@@ -584,7 +584,7 @@ class DBUtilsGetTests(TestSetup):
         """getFilesByProduct"""
         self.assertFalse(self.dbu.getFilesByProduct(2))
         self.assertEqual([], self.dbu.getFilesByProduct(2))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilesByProduct, 343423)
+        self.assertRaises(DButils.DBNoData, self.dbu.getFilesByProduct, 343423)
         val = self.dbu.getFilesByProduct(1)
         self.assertEqual(30, len(val))
         val = self.dbu.getFilesByProduct(187)
@@ -610,8 +610,8 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(94, len(files))
         self.assertTrue(5880 in files)
         self.assertFalse(self.dbu.getFilesByInstrument(1, id_only=True, level=6))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilesByInstrument, 'badval')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFilesByInstrument, 100)
+        self.assertRaises(DButils.DBNoData, self.dbu.getFilesByInstrument, 'badval')
+        self.assertRaises(DButils.DBNoData, self.dbu.getFilesByInstrument, 100)
         ids = [int(v) for v in files]
 
     def test_getActiveInspectors(self):
@@ -636,15 +636,15 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual([44], self.dbu.getChildrenProcesses(123))
         self.assertFalse(self.dbu.getChildrenProcesses(5998))
         self.assertEqual([], self.dbu.getChildrenProcesses(5998))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getChildrenProcesses, 59498)
+        self.assertRaises(DButils.DBNoData, self.dbu.getChildrenProcesses, 59498)
 
     def test_getProductID(self):
         """getProductID"""
         self.assertEqual(1, self.dbu.getProductID(1))
         self.assertEqual(2, self.dbu.getProductID(2))
         self.assertEqual(163, self.dbu.getProductID('rbspb_mageis-M75-sp-hg-L0'))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProductID, 'badval')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getProductID, 343423)
+        self.assertRaises(DButils.DBNoData, self.dbu.getProductID, 'badval')
+        self.assertRaises(DButils.DBNoData, self.dbu.getProductID, 343423)
 
     def test_getProductID2(self):
         """getProductID"""
@@ -666,7 +666,7 @@ class DBUtilsGetTests(TestSetup):
         """getCodePath"""
         self.assertEqual('/n/space_data/cda/rbsp/codes/l05_to_l1.py',
                          self.dbu.getCodePath(1))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodePath, 'badval')
+        self.assertRaises(DButils.DBNoData, self.dbu.getCodePath, 'badval')
 
     def test_getCodePath2(self):
         """getCodePath"""
@@ -686,7 +686,7 @@ class DBUtilsGetTests(TestSetup):
     def test_getCodeVersion(self):
         """getCodeVersion"""
         self.assertEqual(Version.Version(3, 0, 0), self.dbu.getCodeVersion(1))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getCodeVersion, 'badval')
+        self.assertRaises(DButils.DBNoData, self.dbu.getCodeVersion, 'badval')
 
     def test_getCodeFromProcess(self):
         """getCodeFromProcess"""
@@ -698,13 +698,13 @@ class DBUtilsGetTests(TestSetup):
         """getMissionDirectory"""
         self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory(1))
         self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory())
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getMissionDirectory, 3)
+        self.assertRaises(DButils.DBNoData, self.dbu.getMissionDirectory, 3)
 
     def test_getIncomingPath(self):
         """getIncomingPath"""
         self.assertEqual('/n/space_data/cda/rbsp/mageis_incoming', self.dbu.getIncomingPath(1))
         self.assertEqual('/n/space_data/cda/rbsp/mageis_incoming', self.dbu.getIncomingPath())
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getIncomingPath, 3)
+        self.assertRaises(DButils.DBNoData, self.dbu.getIncomingPath, 3)
 
     def test_getErrorPath(self):
         """getErrorPath"""
@@ -721,8 +721,8 @@ class DBUtilsGetTests(TestSetup):
         """getMissionID"""
         self.assertEqual(1, self.dbu.getMissionID(1))
         self.assertEqual(1, self.dbu.getMissionID('rbsp'))
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getMissionID, 'badval')
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getMissionID, 343423)
+        self.assertRaises(DButils.DBNoData, self.dbu.getMissionID, 'badval')
+        self.assertRaises(DButils.DBNoData, self.dbu.getMissionID, 343423)
 
     def test_getProductsByInstrument(self):
         """getProductsByInstrument"""
@@ -929,7 +929,7 @@ class ProcessqueueTests(TestSetup):
         self.assertTrue(20 in pq)
         self.dbu.Processqueue.rawadd(20000)
         pq = self.dbu.Processqueue.pop(1)
-        self.assertRaises(DBUtils.DBNoData, self.dbu.getFileID, pq)
+        self.assertRaises(DButils.DBNoData, self.dbu.getFileID, pq)
 
 
 if __name__ == "__main__":

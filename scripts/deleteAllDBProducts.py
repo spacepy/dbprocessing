@@ -2,11 +2,11 @@
 
 from __future__ import print_function
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 
 if __name__ == "__main__":
-    a = DBUtils.DBUtils('rbsp')
+    a = DButils.DButils('rbsp')
     a.openDB()
     a._createTableObjects()
     prod_ids = zip(*a.getProductNames())[4]

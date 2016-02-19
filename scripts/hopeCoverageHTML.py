@@ -11,7 +11,7 @@ import re
 
 import rbsp #rbsp.mission_day_to_UTC
 
-from dbprocessing import DBUtils, Utils, inspector
+from dbprocessing import DButils, Utils, inspector
 from rbsp import Version
 
 
@@ -96,7 +96,7 @@ def makeHTML(mission, filename):
     </body></html>
     """
 
-    dbu = DBUtils.DBUtils(mission)
+    dbu = DButils.DButils(mission)
     a, b, = gather_files()
 
     output = open(filename, 'w')

@@ -5,7 +5,7 @@ from __future__ import print_function
 import sys
 from optparse import OptionParser
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 if __name__ == "__main__":
     usage = '%prog file_id [file_id[file_id[...]]]'
@@ -20,14 +20,14 @@ if __name__ == "__main__":
     if options.mission is None:
         parser.error("No mission specified")
 
-    a = DBUtils.DBUtils(options.mission)
+    a = DButils.DButils(options.mission)
     n_del = 0
     for ff in args:
         try:
             a.purgeFileFromDB(ff)
             print(' File {0} was removed from DB'.format(ff))
             n_del += 1
-        except DBUtils.DBNoData:
+        except DButils.DBNoData:
             print(' File {0} was not in the DB'.format(ff))
     print('deleted {0} files'.format(n_del))
 

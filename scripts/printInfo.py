@@ -14,7 +14,7 @@ from dateutil import parser as dup
 from dateutil.relativedelta import relativedelta
 from spacepy import pycdf
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import Version
 
 
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     mission = args[0]
     field = args[1].capitalize()
 
-    dbu = DBUtils.DBUtils(mission)
+    dbu = DButils.DButils(mission)
 
     basepath = dbu.session.query(dbu.Mission).filter_by(mission_name=dbu.getMissions()[0]).all()[0].rootdir
     if not hasattr(dbu, field):

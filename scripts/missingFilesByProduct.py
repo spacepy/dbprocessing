@@ -17,7 +17,7 @@ from dateutil import parser as dup
 
 import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import inspector
 
 usage = "%prog -m mission product_id [-s startDate] [-e endDate] [-f filter] [-p] [--parent=parent_id]"
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     db = dbprocessing.ProcessQueue(options.mission,)
 
-    dbu = DBUtils.DBUtils(options.mission, echo=options.echo)
+    dbu = DButils.DButils(options.mission, echo=options.echo)
 
     dates = [startDate + datetime.timedelta(days=v) for v in range((endDate-startDate).days +1)]
     if not dates: # only one day

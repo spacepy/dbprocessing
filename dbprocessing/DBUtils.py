@@ -31,10 +31,10 @@ from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 
 from Diskfile import calcDigest, DigestError
-import DBlogging
-import DBStrings
-import Version
-import Utils
+from . import DBlogging
+from . import DBstrings
+from . import Version
+from . import Utils
 
 ## This goes in the processing comment field in the DB, do update it
 __version__ = '2.0.3'
@@ -61,22 +61,22 @@ class DBNoData(Exception):
     pass
 
 
-class DBUtils(object):
+class DButils(object):
     """
-    @summary: DBUtils - utility routines for the DBProcessing class, all of these may be user called but are meant to
+    @summary: DButils - utility routines for the DBProcessing class, all of these may be user called but are meant to
     be internal routines for DBProcessing
     """
 
     def __init__(self, mission='Test', db_var=None, echo=False, engine='sqlite'):
         """
-        @summary: Initialize the DBUtils class, default mission is 'Test'
+        @summary: Initialize the DButils class, default mission is 'Test'
         """
         self.dbIsOpen = False
         if mission is None:
-            raise(DBError("Must input database name to create DBUtils instance"))
+            raise(DBError("Must input database name to create DButils instance"))
         self.mission = mission
-        #Expose the format/regex routines of DBFormatter
-        fmtr = DBStrings.DBFormatter()
+        #Expose the format/regex routines of DBformatter
+        fmtr = DBstrings.DBformatter()
         self.format = fmtr.format
         self.re = fmtr.re
         self.openDB(db_var=db_var, engine=engine, echo=echo)

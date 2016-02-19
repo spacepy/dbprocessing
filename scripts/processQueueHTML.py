@@ -4,7 +4,7 @@ from __future__ import print_function
 import datetime
 import sys
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 
 def _unicodeListToStrList(lst):
@@ -58,7 +58,7 @@ def makeHTML(mission, filename):
     </body></html>
     """
 
-    dbu = DBUtils.DBUtils(mission) # TODO don't assume RBSP later
+    dbu = DButils.DButils(mission) # TODO don't assume RBSP later
     dbu.openDB()
     dbu._createTableObjects()
 

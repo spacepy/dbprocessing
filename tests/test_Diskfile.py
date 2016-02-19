@@ -8,7 +8,7 @@ import shutil
 import stat
 import unittest
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import Diskfile
 from dbprocessing import Version
 
@@ -23,7 +23,7 @@ class TestSetup(unittest.TestCase):
         self.sqlworking = sqpath.replace('RBSP_MAGEIS.sqlite', 'working.sqlite')
         shutil.copy(sqpath, self.sqlworking)
         os.chmod(self.sqlworking, stat.S_IRUSR|stat.S_IWUSR)
-        self.dbu = DBUtils.DBUtils(self.sqlworking)
+        self.dbu = DButils.DButils(self.sqlworking)
 
     def tearDown(self):
         super(TestSetup, self).tearDown()

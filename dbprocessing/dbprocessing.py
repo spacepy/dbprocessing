@@ -14,7 +14,7 @@ import traceback
 import DBfile
 import DBlogging
 import DBqueue
-import DBUtils
+import DButils
 import runMe
 import Utils
 from Utils import strargs_to_args
@@ -44,7 +44,7 @@ class ProcessQueue(object):
         self.dryrun = dryrun
         self.mission = mission
         self.tempdir = None
-        dbu = DBUtils.DBUtils(self.mission, echo=echo)
+        dbu = DButils.DButils(self.mission, echo=echo)
         self.runme_list = []
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()
@@ -147,7 +147,7 @@ class ProcessQueue(object):
                 DBlogging.dblogger.info("File {0} entered in DB, f_id={1}".format(df.filename, f_id))
             else:
                 print('<dryrun> File {0} entered in DB'.format(df.filename))
-        except (ValueError, DBUtils.DBError) as errmsg:
+        except (ValueError, DButils.DBError) as errmsg:
             if not self.dryrun:
                 DBlogging.dblogger.warning("Except adding file to db so" + \
                                            " moving to error: %s" % (errmsg))
@@ -185,7 +185,7 @@ class ProcessQueue(object):
                 self.dbu.session.commit()
             except IntegrityError as IE:
                 self.session.rollback()
-                raise(DBUtils.DBError(IE))
+                raise(DButils.DBError(IE))
             # add to processqueue for later processing
             self.dbu.Processqueue.push(f.file_id)
             return f_id
@@ -256,7 +256,7 @@ class ProcessQueue(object):
             return None
         if len(claimed) > 1:
             DBlogging.dblogger.error("File {0} matched more than one product, there is a DB error".format(filename))
-            raise(DBUtils.DBError("File {0} matched more than one product, there is a DB error".format(filename)))
+            raise(DButils.DBError("File {0} matched more than one product, there is a DB error".format(filename)))
 
         return claimed[0]  # return the diskfile
 
@@ -433,7 +433,7 @@ class ProcessQueue(object):
             endDate = endDate.date()
         try:
             prod_id = self.dbu.getProductID(id_in)
-        except DBUtils.DBNoData:
+        except DButils.DBNoData:
             print('No product_id {0} found in the DB'.format(id_in))
             return None
 

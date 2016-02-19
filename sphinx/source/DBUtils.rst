@@ -1,9 +1,9 @@
-DBUtils
+DButils
 =======
 
-.. automodule:: dbprocessing.DBUtils
+.. automodule:: dbprocessing.DButils
 
-.. currentmodule:: dbprocessing.DBUtils
+.. currentmodule:: dbprocessing.DButils
 
 .. rubric:: Classes
 
@@ -11,7 +11,7 @@ DBUtils
 .. autosummary::
     :toctree: autosummary
 
-    DBUtils
+    DButils
 
 .. rubric:: Exceptions
 

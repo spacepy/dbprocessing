@@ -11,7 +11,7 @@ import tempfile
 
 import naif
 
-import dbprocessing.DBUtils as DBUtils
+import dbprocessing.DButils as DBUtils
 import dbprocessing.DBlogging as DBlogging
 from dbprocessing import inspector
 
@@ -31,7 +31,7 @@ def perdelta(start, end, delta):
         curr += delta
 
 
-dbu = DBUtils.DBUtils(os.path.expanduser('~ectsoc/RBSP_MAGEPHEM_def.sqlite'))
+dbu = DBUtils.DButils(os.path.expanduser('~ectsoc/RBSP_MAGEPHEM_def.sqlite'))
 
 mission_path = dbu.getMissionDirectory()
 g_inc_path = dbu.getIncomingPath()
@@ -82,7 +82,7 @@ for f in files_to_make:
 ####################################################################################################
 
 
-dbu = DBUtils.DBUtils(os.path.expanduser('~ectsoc/RBSP_MAGEPHEM_def.sqlite'))
+dbu = DBUtils.DButils(os.path.expanduser('~ectsoc/RBSP_MAGEPHEM_def.sqlite'))
 
 mission_path = dbu.getMissionDirectory()
 g_inc_path = dbu.getIncomingPath()
@@ -137,7 +137,7 @@ for f in files_to_make:
 ##################################################################
 ## # Also need to do the same thing making QinDenton inputs
 ## ##################################################################
-## dbu = DBUtils.DBUtils(os.path.expanduser('~ectsoc/MagEphem_def_processing.sqlite'))
+## dbu = DButils.DButils(os.path.expanduser('~ectsoc/MagEphem_def_processing.sqlite'))
 
 ## mission_path = dbu.getMissionDirectory()
 ## g_inc_path = dbu.getIncomingPath()

@@ -13,8 +13,8 @@ __version__ = '0.3'
 import string
 
 
-class DBFormatter(string.Formatter):
-    """String formatter extended/modified for DBUtils
+class DBformatter(string.Formatter):
+    """String formatter extended/modified for DButils
 
     @cvar SPECIAL_FIELDS: indexed by field name; each element contains
                           a fully-formatted representation of the field
@@ -61,13 +61,13 @@ class DBFormatter(string.Formatter):
         This is the top-level function to call.
         """
         self.expand_datetime(kwargs)
-        return super(DBFormatter, self).format(
+        return super(DBformatter, self).format(
             self.expand_format(format_string), *args, **kwargs)
 
     def re(self, format_string, *args, **kwargs):
         """Like L{format}, but substitute regexp for unspecified fields"""
         self.expand_datetime(kwargs)
-        return super(DBFormatter, self).format(
+        return super(DBformatter, self).format(
             self.expand_format(format_string, kwargs), *args, **kwargs)
 
     def expand_datetime(self, kwargs):

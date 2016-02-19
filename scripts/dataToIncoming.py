@@ -23,7 +23,7 @@ import numpy as np
 import spacepy.toolbox as tb
 
 from dbprocessing import Utils
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 
 
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     conf = _processNone(conf)
     print('Read and parsed config file: {0}'.format(conffile))
 
-    dbu = DBUtils.DBUtils(conf['settings']['mission'])
+    dbu = DButils.DButils(conf['settings']['mission'])
 
     inc_dir = dbu.getIncomingPath()
     err_dir = dbu.getErrorPath()

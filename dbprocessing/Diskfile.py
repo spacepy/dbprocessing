@@ -78,8 +78,8 @@ class Diskfile(object):
     ==========
     infile : str
         a file to create a diskfile around
-    dbu :  :class:`.DBUtils`
-        pass in the current :class:`.DBUtils` session so that a new connection is not made
+    dbu :  :class:`.DButils`
+        pass in the current :class:`.DButils` session so that a new connection is not made
 
     """
 

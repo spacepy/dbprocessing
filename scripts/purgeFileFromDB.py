@@ -13,7 +13,7 @@ import warnings
 
 from spacepy import pycdf
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import Version
 
 
@@ -30,14 +30,14 @@ if __name__ == '__main__':
         parser.error("incorrect number of arguments")
 
     if options.recursive:
-        raise(NotImplementedError("Recursive removal not implemented in DBUtils yet"))
+        raise(NotImplementedError("Recursive removal not implemented in DButils yet"))
         
-    dbu = DBUtils.DBUtils(options.mission)
+    dbu = DButils.DButils(options.mission)
 
     for f in args:
         try:
             f_id = dbu.getFileID(f)
-        except DBUtils.DBNoData:
+        except DButils.DBNoData:
             print("WARNING: File {1} not in db".format(f), file=sys.stderr)
         else:
             dbu.purgeFileFromDB(f)

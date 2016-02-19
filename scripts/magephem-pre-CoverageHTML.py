@@ -14,9 +14,9 @@ import rbsp #rbsp.mission_day_to_UTC
 from dbprocessing import Utils, inspector
 from rbsp import Version
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
-dbu = DBUtils.DBUtils('~ectsoc/MagEphem_processing.sqlite')
+dbu = DButils.DButils('~ectsoc/MagEphem_processing.sqlite')
 
 prods = dbu.getAllProducts()
 ids = [v.product_id for v in prods]

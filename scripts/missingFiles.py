@@ -16,7 +16,7 @@ from dateutil import parser as dup
 
 import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import inspector
 
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     if endDate < startDate:
         parser.error("endDate must be >= to startDate")
 
-    dbu = DBUtils.DBUtils(options.mission)
+    dbu = DButils.DButils(options.mission)
 
     # get the product tree:
     tree = dbu.getProductParentTree()

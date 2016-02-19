@@ -64,7 +64,7 @@ if __name__ == "__main__":
     else:
         endDate = None
 
-    dbu = dbprocessing.DBUtils.DBUtils(options.mission, echo=options.echo)
+    dbu = dbprocessing.DButils.DButils(options.mission, echo=options.echo)
 
     # getFileFullPath is really slow
 

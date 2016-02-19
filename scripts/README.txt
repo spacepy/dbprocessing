@@ -101,8 +101,8 @@ Other info
 ==========
 Totally clean out the DB:  (leaves mission, instrument, satellite)
 run these commands (done this way so it is hard to do)
-from dbprocessing import DBUtils
-a = DBUtils.DBUtils('rbsp')
+from dbprocessing import DButils
+a = DButils.DButils('rbsp')
 a.deleteAllEntries()
 
 

@@ -20,7 +20,7 @@ import rbsp #rbsp.mission_day_to_UTC
 from dbprocessing import Utils, inspector
 from rbsp import Version
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 def EventTimer(Event, Time1):
     """
@@ -65,7 +65,7 @@ def getInfo(mission):
 
     info = {}
 
-    dbu = DBUtils.DBUtils(mission)
+    dbu = DButils.DButils(mission)
     # get all the products then break them by spacecraft
     prods = dbu.getAllProducts()
 

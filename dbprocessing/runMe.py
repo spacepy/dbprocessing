@@ -17,8 +17,8 @@ import time
 import traceback
 
 import DBlogging
-import DBStrings
-import DBUtils
+import DBstrings
+import DButils
 from inspector import extract_Version
 import Utils
 import Version
@@ -242,7 +242,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
             try:
                 #force = False if rundir is None else True
                 if force:
-                    raise(DBUtils.DBNoData)
+                    raise(DButils.DBNoData)
 
                 tmp = dbu.getEntry('File', os.path.basename(runme.cmdline[-1])) # output is last
                 if tmp is not None: # we are not going to run
@@ -252,7 +252,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                         rm_tempdir(runme.tempdir) # delete the tempdir
                     except AttributeError:
                         pass
-            except DBUtils.DBNoData:
+            except DButils.DBNoData:
                 print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
                 if rundir is None:
                     prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
@@ -328,7 +328,7 @@ class runMe(object):
     """
     class holds all the info it takes to run a process
 
-    dbu - DBUtils instance
+    dbu - DButils instance
     utc_file_date - datetime.date
     process_id - process to run (int)
     input_files - the files that exist to run with (list of int)
@@ -379,7 +379,7 @@ class runMe(object):
         code_version = code_entry.code_id
         output_interface_version = code_entry.output_interface_version
 
-        fmtr = DBStrings.DBFormatter()
+        fmtr = DBstrings.DBformatter()
         # set the default version for the output file
         self.output_version = Version.Version(output_interface_version, 0, 0)
 
@@ -478,7 +478,7 @@ class runMe(object):
             f_id_db = self.dbu.getFileID(self.filename)
             DBlogging.dblogger.info("Filename: {0} is in the DB, have to make different version".format(self.filename))
             return f_id_db
-        except (DBUtils.DBError, DBUtils.DBNoData):
+        except (DButils.DBError, DButils.DBNoData):
             #DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(self.filename))
             return False
 
@@ -509,7 +509,7 @@ class runMe(object):
             ver_diff = (self.dbu.getCodeVersion(self.code_id) - self.dbu.getCodeVersion(db_code_id))
             if ver_diff == [0,0,0]:
                 DBlogging.dblogger.error("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id))
-                raise(DBUtils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id)))
+                raise(DButils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id)))
             self._incVersion(ver_diff)
             return True
         else:
@@ -672,7 +672,7 @@ class runMe(object):
                 DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(self.filename))
                 self.ableToRun = False
                 return
-            except DBUtils.DBNoData:
+            except DButils.DBNoData:
                 pass # we can process this
 
         # build the command line we are to run

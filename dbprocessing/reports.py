@@ -26,7 +26,7 @@ import re
 import dateutil.parser as dup
 import numpy as np
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 
 class logfile(object):

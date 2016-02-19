@@ -16,7 +16,7 @@ from optparse import OptionParser
 from sqlalchemy import schema, types
 from sqlalchemy.engine import create_engine
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 
 class dbprocessing_db(object):
@@ -283,7 +283,7 @@ class dbprocessing_db(object):
 
     def addMission(self, filename):
         """utility to add a mission"""
-        self.dbu = DBUtils.DBUtils(filename)
+        self.dbu = DButils.DButils(filename)
         self.mission = self.dbu.addMission('rbsp', os.path.join('/', 'n', 'space_data', 'cda', 'rbsp'))
 
     def addSatellite(self):

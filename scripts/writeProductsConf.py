@@ -21,7 +21,7 @@ from __future__ import print_function
 import ConfigParser
 import sys
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 sections = ['base', 'product', 'inspector',]
 
@@ -42,7 +42,7 @@ def writeconfig(my_cfg, config_filepath):
 
 def getStuff(prod_name, filename):
     cfg = {}
-    dbu = DBUtils.DBUtils('rbsp') # TODO don't assume RBSP later
+    dbu = DButils.DButils('rbsp') # TODO don't assume RBSP later
     dbu.openDB()
     dbu._createTableObjects()
     # are we trying to write files for all the products?

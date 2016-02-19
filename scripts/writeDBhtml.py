@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 
 def makeHTML(mission, filename):
@@ -45,7 +45,7 @@ def makeHTML(mission, filename):
     </body></html>
     """
 
-    dbu = DBUtils.DBUtils(mission) # TODO don't assume RBSP later
+    dbu = DButils.DButils(mission) # TODO don't assume RBSP later
     dbu.openDB()
     dbu._createTableObjects()
 

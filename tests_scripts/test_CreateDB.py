@@ -7,7 +7,7 @@ import unittest
 import subprocess
 
 from dbprocessing import DBfile
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from ..scripts import CreateDB
 
 filename = 'test_file.txt'
@@ -36,7 +36,7 @@ class CreateDB(unittest.TestCase):
 
     def test1(self):
         print('111111111')
-        dbu = DBUtils.DBUtils(self.tfile)
+        dbu = DButils.DButils(self.tfile)
         print('222222222')
         del dbu
         print('333333333')

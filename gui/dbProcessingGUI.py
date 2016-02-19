@@ -8,14 +8,14 @@ from PySide import QtCore, QtGui
 
 from MainUI import Ui_MainWindow
 
-import dbprocessing.DBUtils as DBUtils
+import dbprocessing.DButils as DBUtils
 
 
 class MyMainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(MyMainWindow, self).__init__(parent)
 
-        self.dbu = DBUtils.DBUtils(sys.argv[1])
+        self.dbu = DBUtils.DButils(sys.argv[1])
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
