@@ -8,8 +8,6 @@ import time
 
 __version__ = '2.0.3'
 
-
-
 """
 Setup routines to log information from the dbprocessing chain
 
@@ -35,18 +33,17 @@ dblogger = logging.getLogger('DBLogger')
 dblogger.setLevel(logging.INFO)
 
 # Add the log message handler to the logger
-#handler = logging.handlers.TimedRotatingFileHandler(
+# handler = logging.handlers.TimedRotatingFileHandler(
 #              LOG_FILENAME, maxBytes=20000000, backupCount=0) # keep them all
 ## TODO this doesn't work so hardcode the name above, so break the rotation here
 handler = logging.handlers.TimedRotatingFileHandler(
-              LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True) # keep them all
+    LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True)  # keep them all
 
-LEVELS = {'debug': logging.DEBUG,
-          'info': logging.INFO,
-          'warning': logging.WARNING,
-          'error': logging.ERROR,
-          'critical': logging.CRITICAL}
-
+LEVELS = { 'debug': logging.DEBUG,
+           'info': logging.INFO,
+           'warning': logging.WARNING,
+           'error': logging.ERROR,
+           'critical': logging.CRITICAL }
 
 # create formatter
 formatter = \
@@ -62,6 +59,7 @@ dblogger.addHandler(handler)
 
 dblogger.info("DBLogger initialized")
 
+
 def change_logfile(logname=None):
     global LOG_FILENAME, handler, formatter, dblogger
     basename = 'dbprocessing_{0}'.format(logname if logname else 'log')
@@ -70,7 +68,7 @@ def change_logfile(logname=None):
         basename, utctoday)))
     dblogger.info("Logging file switched from {0} to {1}".format(old_filename, LOG_FILENAME))
     new_handler = logging.handlers.TimedRotatingFileHandler(
-              LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True) # keep them all
+        LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True)  # keep them all
     new_handler.setFormatter(formatter)
     dblogger.removeHandler(handler)
     dblogger.addHandler(new_handler)

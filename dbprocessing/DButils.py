@@ -1365,12 +1365,8 @@ class DButils(object):
         path =  os.path.join(self.MissionDirectory, *sq[::-1])
         if '{' in path:
             file_entry = self.getEntry('File', filename)
-            path = Utils.dirSubs(path,
-                                 file_entry.filename,
-                                 file_entry.utc_file_date,
-                                 file_entry.utc_start_time,
-                                 self.getVersion(file_entry.file_id)
-                                 )
+            path = Utils.dirSubs(path, file_entry.filename, file_entry.utc_file_date, file_entry.utc_start_time,
+                                 self.getVersion(file_entry.file_id))
         return path
 
 

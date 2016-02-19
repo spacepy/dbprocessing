@@ -116,11 +116,8 @@ class DBfile(object):
         """
         path = self.getDirectory()
         ## need to do path replacements
-        path = Utils.dirSubs(path,
-                             self.diskfile.params['filename'],
-                             self.diskfile.params['utc_file_date'],
-                             self.diskfile.params['utc_start_time'],
-                             '{0}'.format(str(self.diskfile.params['version'])))
+        path = Utils.dirSubs(path, self.diskfile.params['filename'], self.diskfile.params['utc_file_date'],
+                             self.diskfile.params['utc_start_time'], '{0}'.format(str(self.diskfile.params['version'])))
                                                                           
         # if the file is a link just remove the link and pretend we moved it, this means
         # that this file is tracked only as a dependency
