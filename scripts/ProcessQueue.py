@@ -14,7 +14,7 @@ from dbprocessing import DBlogging, dbprocessing
 from dbprocessing.runMe import ProcessException
 from dbprocessing import runMe, Utils
 
-__version__ = '2.0.3'
+from dbprocessing import __version__
 
 
 if __name__ == "__main__":

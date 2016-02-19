@@ -7,8 +7,6 @@ import unittest
 from dbprocessing import inspector
 from dbprocessing import Version
 
-__version__ = '2.0.3'
-
 
 class InspectorFunctions(unittest.TestCase):
     """Tests of the inspector functions"""

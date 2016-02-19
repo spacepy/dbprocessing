@@ -35,11 +35,7 @@ from . import DBlogging
 from . import DBstrings
 from . import Version
 from . import Utils
-
-## This goes in the processing comment field in the DB, do update it
-__version__ = '2.0.3'
-
-
+from . import __version__
 
 #########################################################
 ## NOTES, read these if new to this module

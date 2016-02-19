@@ -6,8 +6,6 @@ import unittest
 from dbprocessing import DBqueue
 
 
-__version__ = '2.0.3'
-
 
 class DBqueueTests(unittest.TestCase):
     """Tests for DBqueue class"""

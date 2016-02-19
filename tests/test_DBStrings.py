@@ -4,7 +4,6 @@ from __future__ import print_function
 """Unit tests for string handling for dbprocessing"""
 
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
-__version__ = '0.3'
 
 import datetime
 import unittest

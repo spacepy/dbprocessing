@@ -17,8 +17,6 @@ The interface version starts at 1
 
 """
 
-__version__ = '2.0.3'
-
 
 class VersionError(Exception):
     """Error class for Version that calls out that an invalid version has been specified"""

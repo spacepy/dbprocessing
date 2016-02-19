@@ -6,8 +6,6 @@ import unittest
 from dbprocessing import Version
 
 
-__version__ = '2.0.3'
-
 
 class VersionTests(unittest.TestCase):
     """Tests of the Version class"""

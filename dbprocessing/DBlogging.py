@@ -6,8 +6,6 @@ import logging.handlers
 import os
 import time
 
-__version__ = '2.0.3'
-
 """
 Setup routines to log information from the dbprocessing chain
 

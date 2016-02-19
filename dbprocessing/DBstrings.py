@@ -8,7 +8,6 @@ dbprocessing: parsing, formatting, etc.
 """
 
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
-__version__ = '0.3'
 
 import string
 
@@ -47,13 +46,13 @@ class DBformatter(string.Formatter):
         'QACODE': ('{QACODE}', 'ok|ignore|problem'),
         'VERSION': ('{VERSION}', '\d\.\d\.\d'),
         'DATE': ('{DATE}', '(19|2\d)\d\d(0\d|1[0-2])[0-3]\d'),
-        '??': ( '{??}', '..' ),
-        '???': ( '{???}', '...' ),
-        '????': ( '{????}', '....' ),
-        'nn': ( '{nn}', '\d\d' ),
-        'nnn': ( '{nnn}', '\d\d\d' ),
-        'nnnn': ( '{nnnn}', '\d\d\d\d' ),
-        }
+        '??': ('{??}', '..'),
+        '???': ('{???}', '...'),
+        '????': ('{????}', '....'),
+        'nn': ('{nn}', '\d\d'),
+        'nnn': ('{nnn}', '\d\d\d'),
+        'nnnn': ('{nnnn}', '\d\d\d\d'),
+    }
 
     def format(self, format_string, *args, **kwargs):
         """Expand base format to handle datetime and special dbp keywords
@@ -141,15 +140,15 @@ class DBformatter(string.Formatter):
             orig = self.assemble('', field, format, conversion)
             if field in self.SPECIAL_FIELDS:
                 if kwargs == None or field in kwargs:
-                    #assume field is provided
+                    # assume field is provided
                     if (not format) and (not conversion):
                         result.append(self.SPECIAL_FIELDS[field][0])
                     else:
                         result.append(orig)
                 else:
-                    #field not provided, put in regex instead
+                    # field not provided, put in regex instead
                     if (not format and not conversion) \
-                       or self.SPECIAL_FIELDS[field][0] == orig:
+                            or self.SPECIAL_FIELDS[field][0] == orig:
                         new_re = '(' + self.SPECIAL_FIELDS[field][1].replace(
                             '{', '{{').replace('}', '}}') + ')'
                         result.append(new_re)

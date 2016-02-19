@@ -21,8 +21,6 @@ except ImportError:
 from dbprocessing import DButils
 from dbprocessing import Version
 
-__version__ = '2.0.3'
-
 
 def make_tmpfile():
     tf = tempfile.NamedTemporaryFile(delete=False)
@@ -133,8 +131,7 @@ class DBUtilsOtherTests(TestSetup):
 
     def test_repr(self):
         """repr"""
-        self.assertEqual(self.dbu.__repr__(),
-                         'DBProcessing class instance for mission /Users/blarsen/git/dbprocessing/tests/working.sqlite, version: 2.0.3')
+        self.assertTrue(self.dbu.__repr__().startswith('DBProcessing class instance for mission /Users/blarsen/git/dbprocessing/tests/working.sqlite, version:'))
 
     def test_purgeFileFromDB(self):
         """purgeFileFromDB"""

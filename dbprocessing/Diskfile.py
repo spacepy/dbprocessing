@@ -9,8 +9,6 @@ import os.path
 
 import DBlogging
 
-__version__ = '2.0.3'
-
 # .. todo look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isn't called
 class ReadError(Exception):
     """

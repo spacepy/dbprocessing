@@ -11,8 +11,6 @@ from test_DBstrings import *
 from test_Utils import *
 
 
-__version__ = '2.0.3'
-
 
 if __name__ == "__main__":
     unittest.main()
