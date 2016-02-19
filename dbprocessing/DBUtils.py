@@ -1724,15 +1724,6 @@ class DBUtils(object):
             files = map(itemgetter(0), files)
         return files
 
-    def getFilesByLevel(self, level, id_only=False, newest_version=False):
-        """
-        given a level return all the file instances associated with it
-        """
-        sq = self.session.query(self.File).filter_by(data_level=level).all()
-        if id_only:
-            sq = map(attrgetter('file_id'), sq)
-        return sq
-
     def getAllFileIds(self, newest_version=False, limit=None):
         """
         return all the file ids in the database
