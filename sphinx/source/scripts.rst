@@ -1,15 +1,6 @@
 Scripts
 =======
 
-CreateDB.py
------------
-
-Create an empty sqlite database for use in dbprocessing.
-(currently creates a RBSP database, this should be updated as an option).
-
-This is the first step in the setup of a new processing chain.
-
-.. option:: dbname The name of the database to create
 
 
 addFromConfig.py
@@ -56,5 +47,25 @@ fully useful yet.
 .. option:: -i,--instrument The name of the instrument for the config file
 .. option:: -c,--nocomments Make the config file without a comment header block on top
 
+coveragePlot.py
+---------------
 
+Creates a coverage plots based on config file input. This script is useful for
+determining which files may be missing from a procesing chain.
+
+.. option:: configfile The config file to read.
+
+See :doc:`ConfigurationFiles` for a full description of the config file
+format and capability.
+
+
+CreateDB.py
+-----------
+
+Create an empty sqlite database for use in dbprocessing.
+(currently creates a RBSP database, this should be updated as an option).
+
+This is the first step in the setup of a new processing chain.
+
+.. option:: dbname The name of the database to create
 
