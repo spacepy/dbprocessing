@@ -666,7 +666,7 @@ class DBUtils(object):
         ans = map(lambda x: self.getTraceback('Code', x.code_id), codes)
         return ans
 
-    def getAllFilenames(self, fullPath=True, level=None, product=None):
+    def getAllFilenames(self, fullPath=True, level=None, product=None, limit=None):
         """
         return all the file names in the database
 
@@ -675,13 +675,25 @@ class DBUtils(object):
         I worked this for speed the zip(*names) is way too slow (this is about x18 faster)
         """
         if level is None and product is None:
-            names = self.session.query(self.File.filename).all()
+            if limit is None:
+                names = self.session.query(self.File.filename).all()
+            else:
+                names = self.session.query(self.File.filename).limit(limit)
         elif product is None:
-            names = self.session.query(self.File.filename).filter_by(data_level=level).all()
+            if limit is None:
+                names = self.session.query(self.File.filename).filter_by(data_level=level).all()
+            else:
+                names = self.session.query(self.File.filename).filter_by(data_level=level).limit(limit)
         elif level is None:
-            names = self.session.query(self.File.filename).filter_by(product_id=product).all()
+            if limit is None:
+                names = self.session.query(self.File.filename).filter_by(product_id=product).all()
+            else:
+                names = self.session.query(self.File.filename).filter_by(product_id=product).limit(limit)
         else: # both specified
-            names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).all()
+            if limit is None:
+                names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).all()
+            else:
+                names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).limit(limit)
         names = map(itemgetter(0), names)
         if fullPath:
             names = map(self.getFileFullPath, names)
@@ -1523,7 +1535,7 @@ class DBUtils(object):
     def file_id_Clean(self, invals):
         """
         given a list of file objects clean out older versions of matching files
-        matching is defined as same product_id and smae utc_file_date      
+        matching is defined as same product_id and same utc_file_date
         """
         tmp = []
         for i in invals:
@@ -1721,14 +1733,17 @@ class DBUtils(object):
             sq = map(attrgetter('file_id'), sq)
         return sq
 
-    def getAllFileIds(self, newest_version=False):
+    def getAllFileIds(self, newest_version=False, limit=None):
         """
         return all the file ids in the database
 
         the itemgetter method is a lot faster then zip(*) (x16)
         """
         if not newest_version:
-            ids = self.session.query(self.File.file_id).all()
+            if limit is None:
+                ids = self.session.query(self.File.file_id).all()
+            else:
+                ids = self.session.query(self.File.file_id).limit(limit)
             ids =  map(itemgetter(0), ids)
         else:
             raise(NotImplementedError("There is an error in the query, do not use"))
@@ -2003,16 +2018,16 @@ class DBUtils(object):
         else:
             return False
 
-    def checkFiles(self):
+    def checkFiles(self, limit=None):
         """
         check files in the DB, return inconsistent files and why
         """
-        files = self.getAllFilenames(fullPath=True)
+        files = self.getAllFilenames(fullPath=False, limit=limit)
         ## check of existence and checksum
         bad_list = []
         for f in files:
             try:
-                if not self.checkFileSMA(f):
+                if not self.checkFileSHA(f):
                     bad_list.append((f, '(100) bad checksum'))
             except DigestError:
                 bad_list.append((f, '(200) file not found'))

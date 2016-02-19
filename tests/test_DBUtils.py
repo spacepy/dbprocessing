@@ -63,7 +63,15 @@ class DBUtilsStaticTests(unittest.TestCase):
 class DBUtilsOtherTests(TestSetup):
     """Tests that are not processqueue or get or add"""
 
+    def test_checkFiles(self):
+        """checkFiles"""
+        ans = set([(u'ect_rbspa_0220_344_01.ptp.gz', '(200) file not found'),
+                   (u'ect_rbspa_0220_344_02.ptp.gz', '(200) file not found'),
+                   (u'ect_rbspa_0220_345_01.ptp.gz', '(200) file not found')])
+        self.assertFalse(set(self.dbu.checkFiles(limit=3)).difference(ans))
+
     def test_checkIncoming(self):
+        """_checkIncoming"""
         """_checkIncoming"""
         self.assertFalse(self.dbu._checkIncoming())
         e = self.dbu.getEntry('Mission', 1)
@@ -202,6 +210,24 @@ class DBUtilsOtherTests(TestSetup):
         self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(1900, 1, 1)))
         self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2100, 1, 1)))
 
+    def test_codeIsActive2(self):
+        """_codeIsActive"""
+        c = self.dbu.getEntry('Code', 1)
+        self.assertTrue(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
+        c.active_code = False
+        self.dbu.session.add(c)
+        self.dbu._commitDB()
+        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
+
+    def test_codeIsActive3(self):
+        """_codeIsActive"""
+        c = self.dbu.getEntry('Code', 1)
+        self.assertTrue(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
+        c.newest_version = False
+        self.dbu.session.add(c)
+        self.dbu._commitDB()
+        self.assertFalse(self.dbu._codeIsActive(1, datetime.datetime(2013, 1, 1)))
+
     def test_renameFile(self):
         """renameFile"""
         self.dbu.renameFile('ect_rbspb_0388_34c_01.ptp.gz', 'ect_rbspb_0388_34c_01.ptp.gz_newname')
@@ -224,6 +250,14 @@ class DBUtilsAddTests(TestSetup):
         """addMission"""
         self.assertEqual(self.dbu.addSatellite('name', 1), 3)
         self.assertEqual(self.dbu.getEntry('Satellite', 3).satellite_id, 3)
+
+    def test_addProcess1(self):
+        """addProcess"""
+        self.assertRaises(ValueError, self.dbu.addProcess, 'proc_name', 1, 'bad_base')
+
+    def test_addProcess2(self):
+        """addProcess"""
+        self.assertEqual(67, self.dbu.addProcess('proc_name', 1, 'DAILY'))
 
 
 class DBUtilsGetTests(TestSetup):
@@ -267,6 +301,10 @@ class DBUtilsGetTests(TestSetup):
     def test_openDB5(self):
         """__init__ already open"""
         self.assertTrue(self.dbu._openDB('sqlite') is None)
+
+    def test_getRunProcess(self):
+        """getRunProcess"""
+        self.assertEqual([], self.dbu.getRunProcess())
 
     def test_getAllSatellites(self):
         """getAllSatellites"""
@@ -317,15 +355,40 @@ class DBUtilsGetTests(TestSetup):
                    u'rbspb_int_ect-mageis-L2_20130911_v3.0.0.cdf'])
         self.assertFalse(ans.difference(set(files)))
 
+    def test_getAllFilenames_limit(self):
+        """getAllFilenames"""
+        files = self.dbu.getAllFilenames(fullPath=False, limit=10)
+        self.assertEqual(10, len(files))
+        files = self.dbu.getAllFilenames(fullPath=False, level=2, limit=10)
+        self.assertEqual(10, len(files))
+        files = self.dbu.getAllFilenames(fullPath=False, level=2, product=190, limit=4)
+        self.assertEqual(4, len(files))
+        ans = set([u'rbspb_int_ect-mageis-L2_20130907_v3.0.0.cdf',
+                   u'rbspb_int_ect-mageis-L2_20130909_v3.0.0.cdf',
+                   u'rbspb_int_ect-mageis-L2_20130908_v3.0.0.cdf',
+                   u'rbspb_int_ect-mageis-L2_20130910_v3.0.0.cdf'])
+        self.assertFalse(ans.difference(set(files)))
+
     def test_getAllFilenames_level(self):
         """getAllFilenames"""
         files = self.dbu.getAllFilenames(fullPath=False, product=1)
         self.assertEqual(len(files), 30)
 
+    def test_getAllFilenames_level_limit(self):
+        """getAllFilenames"""
+        files = self.dbu.getAllFilenames(fullPath=False, product=1, limit=10)
+        self.assertEqual(len(files), 10)
+
     def test_getAllFilenames_fullpath(self):
         """getAllFilenames"""
         files = self.dbu.getAllFilenames(fullPath=True, product=1)
         self.assertEqual(len(files), 30)
+        self.assertTrue(all(['/n/space_data' in v for v in files]))
+
+    def test_getAllFilenames_fullpath_limit(self):
+        """getAllFilenames"""
+        files = self.dbu.getAllFilenames(fullPath=True, product=1, limit=10)
+        self.assertEqual(len(files), 10)
         self.assertTrue(all(['/n/space_data' in v for v in files]))
 
     def test_getAllFileIds(self):
@@ -338,6 +401,18 @@ class DBUtilsGetTests(TestSetup):
         """getAllFileIds"""
         files = self.dbu.getAllFileIds(newest_version=True)
         self.assertEqual(2752, len(files))
+        self.assertEqual(len(files), len(set(files)))
+
+    def test_getAllFileIds_limit(self):
+        """getAllFileIds"""
+        files = self.dbu.getAllFileIds(limit=10)
+        self.assertEqual(10, len(files))
+        self.assertEqual(range(1, 11), sorted(files))
+
+    def test_getAllFileIds2_limit(self):
+        """getAllFileIds"""
+        files = self.dbu.getAllFileIds(newest_version=True, limit=10)
+        self.assertEqual(10, len(files))
         self.assertEqual(len(files), len(set(files)))
 
     def test_getAllCodes(self):
@@ -358,6 +433,16 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(len(codes), 65)
         codes = self.dbu.getAllCodes(active=False)
         self.assertEqual(len(codes), 66)
+
+    def test_commitDB1(self):
+        """_commitDB"""
+        f = self.dbu.session.query(self.dbu.File).first()
+        f.filename += '_test'
+        tmp = f.filename
+        id = f.file_id
+        self.dbu.session.add(f)
+        self.dbu._commitDB()
+        self.assertEqual(id, self.dbu.getFileID(tmp))
 
     def test_getFileFullPath(self):
         """getFileFullPath"""
