@@ -242,7 +242,7 @@ class DBUtils(object):
         if sq2:
             self.commitDB()
 
-    def _startLogging(self):
+    def startLogging(self):
         """
         Add an entry to the logging table in the DB, logging
         """
@@ -251,27 +251,27 @@ class DBUtils(object):
         if self.currentlyProcessing():
             raise(DBError('A Currently Processing flag is still set, cannot process now'))
         # save this class instance so that we can finish the logging later
-        self.__p1 = self._addLogging(True,
-                              datetime.datetime.utcnow(),
-                              ## for now there is one mission only per DB
+        self.__p1 = self.addLogging(True,
+                                    datetime.datetime.utcnow(),
+                                    ## for now there is one mission only per DB
                               # self.getMissionID(self.mission),
                               self.session.query(self.Mission.mission_id).first()[0],
-                              pwd.getpwuid(os.getuid())[0],
-                              socket.gethostname(),
-                              pid = os.getpid() )
+                                    pwd.getpwuid(os.getuid())[0],
+                                    socket.gethostname(),
+                                    pid = os.getpid())
         DBlogging.dblogger.info( "Logging started: %d: %s, PID: %s, M_id: %s, user: %s, hostname: %s" %
                                  (self.__p1.logging_id, self.__p1.processing_start_time, self.__p1.pid,
                                   self.__p1.mission_id, self.__p1.user, self.__p1.hostname) )
 
-    def _addLogging(self,
-                    currently_processing,
-                    processing_start_time,
-                    mission_id,
-                    user,
-                    hostname,
-                    pid=None,
-                    processing_end_time= None,
-                    comment=None):
+    def addLogging(self,
+                   currently_processing,
+                   processing_start_time,
+                   mission_id,
+                   user,
+                   hostname,
+                   pid=None,
+                   processing_end_time= None,
+                   comment=None):
         """
         add an entry to the logging table
 
@@ -310,7 +310,7 @@ class DBUtils(object):
         self.commitDB()
         return l1    # so we can use the same session to stop the logging
 
-    def _stopLogging(self, comment):
+    def stopLogging(self, comment):
         """
         Finish the entry to the processing table in the DB, logging
 

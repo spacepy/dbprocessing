@@ -107,25 +107,25 @@ class DBUtilsOtherTests(TestSetup):
         self.assertRaises(DBUtils.DBError, self.dbu.currentlyProcessing)
 
     def test_startLogging(self):
-        """_startLogging"""
+        """startLogging"""
         self.assertFalse(self.dbu.currentlyProcessing())
-        self.dbu._startLogging()
+        self.dbu.startLogging()
         self.assertTrue(self.dbu.currentlyProcessing())
-        self.assertRaises(DBUtils.DBError, self.dbu._startLogging)
+        self.assertRaises(DBUtils.DBError, self.dbu.startLogging)
         self.assertTrue(self.dbu.currentlyProcessing())
 
     def test_stopLogging(self):
         """stopLogging"""
         self.assertFalse(self.dbu.currentlyProcessing())
-        self.assertRaises(DBUtils.DBProcessingError, self.dbu._stopLogging, 'comment')
-        self.dbu._startLogging()
+        self.assertRaises(DBUtils.DBProcessingError, self.dbu.stopLogging, 'comment')
+        self.dbu.startLogging()
         self.assertTrue(self.dbu.currentlyProcessing())
-        self.dbu._stopLogging('comment')
+        self.dbu.stopLogging('comment')
         self.assertFalse(self.dbu.currentlyProcessing())
 
     def test_resetProcessingFlag(self):
         """resetProcessingFlag"""
-        self.dbu._startLogging()
+        self.dbu.startLogging()
         self.assertTrue(self.dbu.currentlyProcessing())
         self.assertRaises(ValueError, self.dbu.resetProcessingFlag)  # no comment
         self.dbu.resetProcessingFlag('testing comment')

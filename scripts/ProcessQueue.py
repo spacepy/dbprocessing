@@ -81,7 +81,7 @@ if __name__ == "__main__":
             DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
             raise(ProcessException("There is a processing flag set but it died, don't start another"))
     # start logging as a lock
-    pq.dbu._startLogging()
+    pq.dbu.startLogging()
 
 
     if options.i: # import selected
@@ -105,9 +105,9 @@ if __name__ == "__main__":
                   'this debugging\ninformation to the developer, along with '
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
-            pq.dbu._stopLogging('Abnormal exit on exception')
+            pq.dbu.stopLogging('Abnormal exit on exception')
         else:
-            pq.dbu._stopLogging('Nominal Exit')
+            pq.dbu.stopLogging('Nominal Exit')
         pq.dbu.closeDB()
         print("Import finished: {0} files added".format(pq.dbu.Processqueue.len()-start_len))
 
@@ -175,9 +175,9 @@ if __name__ == "__main__":
                   'this debugging\ninformation to the developer, along with '
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
-            pq.dbu._stopLogging('Abnormal exit on exception')
+            pq.dbu.stopLogging('Abnormal exit on exception')
         else:
-            pq.dbu._stopLogging('Nominal Exit')
+            pq.dbu.stopLogging('Nominal Exit')
         finally: 
             pq.dbu.closeDB()
         del pq
