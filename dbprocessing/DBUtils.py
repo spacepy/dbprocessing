@@ -2288,9 +2288,9 @@ class DBUtils(object):
                                fileid.quality_version,
                                fileid.revision_version)
 
-    def _childTree(self, inprod):
+    def getChildTree(self, inprod):
         """
-        given an input product return a dict of its output prods
+        given an input product return a list of its output product ids
         """
         out_proc = self.getProcessFromInputProduct(inprod)
         return [self.getEntry('Process', op).output_product for op in out_proc]

@@ -766,6 +766,23 @@ class DBUtilsGetTests(TestSetup):
                               5824, 5831, 5834, 5838, 5842, 5845, 5849, 5855, 5858,
                               5861, 5865]), set(ids))
 
+    def test_getVersion(self):
+        """getVersion"""
+        self.assertEqual(Version.Version(1,0,0), self.dbu.getVersion(1))
+        self.assertEqual(Version.Version(1,1,0), self.dbu.getVersion(123))
+
+    def test_getChildTree(self):
+        """getChildTree"""
+        tmp = self.dbu.getChildTree(1)
+        print(tmp)
+        ans = set([10, 8, 39, 76])
+        self.assertFalse(set(tmp).difference(ans))
+
+
+
+
+
+
     def test_getFileParents(self):
         """getFileParents"""
         ids = self.dbu.getFileParents(1879, id_only=True)
