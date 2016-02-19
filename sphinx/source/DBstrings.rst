@@ -1,9 +1,9 @@
 DBStrings
 =========
 
-.. automodule:: dbprocessing.DBStrings
+.. automodule:: dbprocessing.DBstrings
 
-.. currentmodule:: dbprocessing.DBStrings
+.. currentmodule:: dbprocessing.DBstrings
 
 .. rubric:: Classes
 

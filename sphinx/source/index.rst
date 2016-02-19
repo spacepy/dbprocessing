@@ -17,7 +17,7 @@ API documentation
     DBlogging
     dbprocessing
     DBqueue
-    DBStrings
+    DBstrings
     DButils
     Diskfile
     inspector
