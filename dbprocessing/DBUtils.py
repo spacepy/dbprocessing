@@ -2205,7 +2205,7 @@ class DBUtils(object):
         """
         get all the products for a given level
         """
-        sq = self.session.query(self.Product).filter_by(level = level).all()
+        sq = self.session.query(self.Product.product_id).filter_by(level = level).all()
         if sq:
             return  map(itemgetter(0), sq)
         else:

@@ -269,7 +269,8 @@ class ProcessQueue(object):
         DBlogging.dblogger.debug("Finding input files for file_id:{0} process_id:{1} date:{2}".format(file_id, process_id, utc_file_date))
 
         ## here decide how we build output and do it.
-        timebase = self.dbu.session.query(self.dbu.Process.output_timebase).get(process_id)[0] 
+
+        timebase = self.dbu.getProcessTimebase(process_id)
         if timebase in ['FILE', 'DAILY']: # taking one file to the next file
             # for file based processing we are going to look to the "process_keywords" and cull the
             #   retuned files based on making sure they are all the same

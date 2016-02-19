@@ -732,6 +732,11 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(95, len(p2))
         self.assertFalse(set(p1).intersection(p2))
 
+    def test_getProductsByInstrument2(self):
+        """getProductsByInstrument"""
+        id = self.dbu.addInstrument('Inst_name', 1)
+        self.assertTrue(self.dbu.getProductsByInstrument(id) is None)
+
     def test_getAllProcesses(self):
         """getAllProcesses"""
         self.assertEqual(66, len(self.dbu.getAllProcesses()))
@@ -741,6 +746,12 @@ class DBUtilsGetTests(TestSetup):
     def test_getAllProducts(self):
         """getAllProducts"""
         self.assertEqual(95 + 95, len(self.dbu.getAllProducts()))
+
+    def test_getProductsByLevel(self):
+        """getProductsByLevel"""
+        pr = self.dbu.getProductsByLevel(0)
+        self.assertEqual(118, len(pr))
+        self.assertTrue(self.dbu.getProductsByLevel(10) is None)
 
     def test_getFilesByCode(self):
         """getFilesByCode"""
