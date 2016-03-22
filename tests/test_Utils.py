@@ -107,20 +107,58 @@ class UtilsTests(unittest.TestCase):
 
     def test_strargs_to_args2(self):
         """strargs_to_args"""
-        self.assertEqual(Utils.strargs_to_args('--arg1=arg'), { '--arg1': 'arg' })
+        self.assertEqual(Utils.strargs_to_args('--arg1=arg'), {'--arg1': 'arg'})
 
     def test_strargs_to_args3(self):
         """strargs_to_args"""
-        self.assertEqual(Utils.strargs_to_args(['--arg1=arg', '--arg2=arg2']), { '--arg1': 'arg', '--arg2': 'arg2' })
+        self.assertEqual(Utils.strargs_to_args(['--arg1=arg', '--arg2=arg2']), {'--arg1': 'arg', '--arg2': 'arg2'})
 
     def test_strargs_to_args4(self):
         """strargs_to_args"""
-        self.assertEqual(Utils.strargs_to_args(['--arg2=arg2']), { '--arg2': 'arg2' })
+        self.assertEqual(Utils.strargs_to_args(['--arg2=arg2']), {'--arg2': 'arg2'})
 
     def test_strargs_to_args5(self):
         """strargs_to_args"""
-        self.assertEqual(Utils.strargs_to_args('--arg'), { })
+        self.assertEqual(Utils.strargs_to_args('--arg'), {})
+
+    def test_dateForPrinting(self):
+        """dateForPrinting"""
+        dt = datetime.datetime(2012, 8, 30, 8, 5)
+        ans1 = '[2012-08-30T08:05:00]'
+        self.assertEqual(ans1, Utils.dateForPrinting(dt))
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
+    """
+    Return a string of the date format for printing on the screen, if dt is None return now.
+
+    Parameters
+    ----------
+    dt : datetime.datetime, optional
+        The datetime object to format, defaults to now()
+    microseconds : bool, optional
+        Should the microseconds be included, default False
+    brackets : str, optional
+        Which brackets to encase the time in, default ('[', ']')
+
+    Returns
+    -------
+    str
+       Iso formatted string
+
+    Examples
+    --------
+    >>> from dbprocessing.Utils import dateForPrinting
+    >>> print("{0} Something occurred".format(dateForPrinting()))
+    [2016-03-22T10:51:45]  Something occurred
+    """
+    if dt is None:
+        dt = datetime.datetime.now()
+    if not microseconds:
+        dt = dt.replace(microsecond=0)
+    out = brackets[0] + dt.isoformat() + brackets[1]
+    return out

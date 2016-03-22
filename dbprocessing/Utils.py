@@ -15,6 +15,38 @@ import dateutil.rrule  # do this long so where it is from is remembered
 from . import Version
 
 
+def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
+    """
+    Return a string of the date format for printing on the screen, if dt is None return now.
+
+    Parameters
+    ----------
+    dt : datetime.datetime, optional
+        The datetime object to format, defaults to now()
+    microseconds : bool, optional
+        Should the microseconds be included, default False
+    brackets : str, optional
+        Which brackets to encase the time in, default ('[', ']')
+
+    Returns
+    -------
+    str
+       Iso formatted string
+
+    Examples
+    --------
+    >>> from dbprocessing.Utils import dateForPrinting
+    >>> print("{0} Something occurred".format(dateForPrinting()))
+    [2016-03-22T10:51:45]  Something occurred
+    """
+    if dt is None:
+        dt = datetime.datetime.now()
+    if not microseconds:
+        dt = dt.replace(microsecond=0)
+    out = brackets[0] + dt.isoformat() + brackets[1]
+    return out
+
+
 def progressbar(count, blocksize, totalsize, text='Download Progress'):
     """
     print a progress bar with urllib.urlretrieve reporthook functionality, taken from spacepy
@@ -199,7 +231,7 @@ def strargs_to_args(strargs):
     """
     if strargs is None:
         return None
-    kwargs = { }
+    kwargs = {}
     if isinstance(strargs, (list, tuple)):  # we have multiple to deal with
         # TODO why was this needed?
         if len(strargs) == 1:
@@ -259,8 +291,8 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
     if '{d}' in path:
         path = path.replace('{d}', utc_file_date.strftime('%d'))
     if '{b}' in path:
-        months = { 1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct',
-                   11: 'Nov', 12: 'Dec' }
+        months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct',
+                  11: 'Nov', 12: 'Dec'}
         path = path.replace('{b}', months[utc_file_date.month])
     if '{y}' in path:
         path = path.replace('{y}', utc_file_date.strftime('%y'))
