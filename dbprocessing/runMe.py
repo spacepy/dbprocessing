@@ -21,6 +21,7 @@ import DBstrings
 import DButils
 from inspector import extract_Version
 import Utils
+from Utils import dateForPrinting as DFP
 import Version
 
 
@@ -123,7 +124,7 @@ def _start_a_run(runme):
             DBlogging.dblogger.debug("Command line referenced a file opened fine {0}.  {1}"
                                      .format(f, runme.cmdline))
         else:
-            print("Count not have gotten here")
+            print("Could not have gotten here")
             raise(RuntimeError("Should not have gotten here"))
 
 
@@ -202,7 +203,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     # 5) make the output file collection basenames only
     # 6) if there are any inputs in the outputs drop those processes
     #########################################
-    print("len(runme_list)={0}".format(len(runme_list)))
+    print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
     # 1
     outfiles = [os.path.basename(v.filename) for v in runme_list]
     def remove_dups(seq, oval):
@@ -211,7 +212,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
         return [oval[i] for i in xrange(len(seq)) if not (seq[i] in seen or seen_add(seq[i]))]
     # 2
     runme_list = remove_dups(outfiles, runme_list)
-    print("len(runme_list)={0}".format(len(runme_list)))
+    print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
     
     
     # TODO For a future revision think on adding a timeout ability to the subprocess
@@ -253,7 +254,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                     except AttributeError:
                         pass
             except DButils.DBNoData:
-                print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
+                print("{0} Process starting ({2}): {1}".format(DFP(), ' '.join(runme.cmdline), len(runme_list)))
                 if rundir is None:
                     prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
                 else:
@@ -287,7 +288,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
             if p.returncode != 0: # non zero return code FAILED
                 DBlogging.dblogger.error("Command returned a non-zero return code ({1}): {0}"
                                          .format(' '.join(rm.cmdline), p.returncode))
-                print("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
+                print("{0} Command returned a non-zero return code: {1}\n\t{2}".format(DFP(), ' '.join(rm.cmdline), p.returncode))
                 fp.flush(); fp.close()
                 #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
                 #rm.moveToError(os.path.join(rm.tempdir, fp.name))
@@ -303,7 +304,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 fp.flush(); fp.close()
                 # this is not a perfect time since all the adding occurs before the next poll
                 DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
-                print("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
+                print("{0} Command: {1} took {2} seconds".format(DFP(), os.path.basename(rm.cmdline[0]), time.time()-t))
                 if rundir is None: # if rundir then this is a test
                     try:
                         rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
@@ -313,7 +314,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                             rm.moveToIncoming(glb[0])
                     rm_tempdir(rm.tempdir) # delete the temp directory
                     rm._add_links(rm.cmdline)
-                print("Process {0} FINISHED".format(' '.join(rm.cmdline)))
+                print("{0} Process {1} FINISHED".format(DFP(), ' '.join(rm.cmdline)))
                 n_good += 1
             else:
                 raise(ValueError("Should not have gotten here"))
