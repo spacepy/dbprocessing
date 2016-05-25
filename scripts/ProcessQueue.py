@@ -164,7 +164,7 @@ if __name__ == "__main__":
                 n_good_t, n_bad_t = runMe.runner(pq.runme_list, pq.dbu, options.numproc)
                 n_good += n_good_t
                 n_bad  += n_bad_t
-                print("{0} {1} of {2} processes were successful".format(DFP, n_good, n_bad+n_good))
+                print("{0} {1} of {2} processes were successful".format(DFP(), n_good, n_bad+n_good))
                 DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
 
         except RuntimeError:

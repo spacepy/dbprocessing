@@ -130,35 +130,3 @@ class UtilsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
-    """
-    Return a string of the date format for printing on the screen, if dt is None return now.
-
-    Parameters
-    ----------
-    dt : datetime.datetime, optional
-        The datetime object to format, defaults to now()
-    microseconds : bool, optional
-        Should the microseconds be included, default False
-    brackets : str, optional
-        Which brackets to encase the time in, default ('[', ']')
-
-    Returns
-    -------
-    str
-       Iso formatted string
-
-    Examples
-    --------
-    >>> from dbprocessing.Utils import dateForPrinting
-    >>> print("{0} Something occurred".format(dateForPrinting()))
-    [2016-03-22T10:51:45]  Something occurred
-    """
-    if dt is None:
-        dt = datetime.datetime.now()
-    if not microseconds:
-        dt = dt.replace(microsecond=0)
-    out = brackets[0] + dt.isoformat() + brackets[1]
-    return out
