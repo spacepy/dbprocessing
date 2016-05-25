@@ -141,13 +141,6 @@ class DBUtilsOtherTests(TestSetup):
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, file_id)
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6680)
 
-    def test_purgeFileFromDB(self):
-        """purgeFileFromDB"""
-        # file_id = self.dbu.getFileID(123356)
-        file_id = 123356
-        self.assertRaises(DButils.DBNoData, self.dbu.getFileID, file_id)
-        self.dbu.purgeFileFromDB(file_id)
-
     def test_nameSubProduct(self):
         """_nameSubProduct"""
         self.assertTrue(self.dbu._nameSubProduct(None, 1) is None)
