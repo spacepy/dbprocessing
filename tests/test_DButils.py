@@ -474,14 +474,6 @@ class DBUtilsGetTests(TestSetup):
         self.assertRaises(NoResultFound, self.dbu.getProcessID, 'badval')
         self.assertRaises(NoResultFound, self.dbu.getProcessID, 10000)
 
-    def test_getSatelliteID(self):
-        """getSatelliteID"""
-        self.assertEqual(1, self.dbu.getSatelliteID(1))
-        self.assertEqual(1, self.dbu.getSatelliteID('rbspa'))
-        self.assertEqual(2, self.dbu.getSatelliteID('rbspb'))
-        self.assertRaises(NoResultFound, self.dbu.getSatelliteID, 'badval')
-        self.assertRaises(NoResultFound, self.dbu.getSatelliteID, 3)
-
     def test_getSatelliteMission(self):
         """getSatelliteMission"""
         val = self.dbu.getSatelliteMission(1)
