@@ -97,16 +97,6 @@ class DButils(object):
         """
         return 'DBProcessing class instance for mission ' + self.mission + ', version: ' + __version__
 
-    @staticmethod
-    def _test_SQLAlchemy_version(version= sqlalchemy.__version__):
-        """This tests the version to be sure that it is compatible"""
-        expected = '0.7'
-        if version[0:len(expected)] != expected:
-            raise DBError(
-                "SQLAlchemy version %s was not expected, expected %s.x" %
-                (version, expected))
-        return True
-
     def _patchProcessQueue(self):
         self.Processqueue.flush = self._processqueueFlush
         self.Processqueue.remove = self._processqueueRemoveItem
@@ -582,17 +572,18 @@ class DButils(object):
 
         DBlogging.dblogger.debug("Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
-    def purgeFileFromDB(self, filename=None, recursive=False, verbose=False):
+    def purgeFileFromDB(self, filename=None, recursive=False):
         """
         removes a file from the DB
 
-        @keyword filename: name of the file to remove (or a list of names)
-        @return: True - Success, False - Failure
+        @param filename: name of the file to remove (or a list of names)
+        @param recursive: remove all files that depend on the given(unimplemented)
 
         if recursive then it removes all files that depend on the one to remove
 
         >>>  pnl.purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
 
+        # TODO: make the recurive parameter actually do anything
         """
         if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
             filename = [filename]
@@ -601,25 +592,28 @@ class DButils(object):
                 f = self.getFileID(f)
             except DBNoData:
                 pass
-            if verbose:
-                print(ii, len(filename), f)
+
             # we need to look in each table that could have a reference to this file and delete that
             try: ## processqueue
                 self.Processqueue.remove(f)
             except DBNoData:
                 pass
+
             try: ## filefilelink
                 self.delFilefilelink(f)
             except DBNoData:
                 pass
+
             try: ## filecodelink
                 self.delFilecodelink(f)
             except DBNoData:
                 pass
+
             try: ## file
                 self.session.delete(self.getEntry('File', f))
             except DBNoData:
                 pass
+
             DBlogging.dblogger.info( "File removed from db {0}".format(f) )
 
         self.commitDB()
@@ -1992,10 +1986,8 @@ class DButils(object):
         """
         db_sha = self.getEntry('File', file_id).shasum
         disk_sha = calcDigest(self.getFileFullPath(file_id))
-        if str(disk_sha) == str(db_sha):
-            return True
-        else:
-            return False
+
+        return disk_sha == db_sha
 
     def checkFiles(self, limit=None):
         """

@@ -69,11 +69,8 @@ class DiskfileTests(TestSetup):
 
             os.chmod('IamAfileThatExists.file', stat.S_IWUSR|stat.S_IRUSR)
         finally:
-            try:
-                os.remove('IamAfileThatExists.file')
-            except OSError:
-                pass
-
+            os.remove('IamAfileThatExists.file')
+            
     def test_init(self):
         """init does some checking"""
         with open('IamAfileThatExists.file', 'wb') as f:

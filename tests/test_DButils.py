@@ -51,13 +51,6 @@ class TestSetup(unittest.TestCase):
         del self.dbu
         os.remove(self.sqlworking)
 
-
-class DBUtilsStaticTests(unittest.TestCase):
-    def test_test_SQLAlchemy_version(self):
-        self.assertRaises(DButils.DBError, DButils.DButils._test_SQLAlchemy_version, '1.0.11')
-        self.assertTrue(DButils.DButils._test_SQLAlchemy_version('0.7'))
-
-
 class DBUtilsOtherTests(TestSetup):
     """Tests that are not processqueue or get or add"""
 
@@ -131,7 +124,7 @@ class DBUtilsOtherTests(TestSetup):
 
     def test_repr(self):
         """repr"""
-        self.assertTrue(self.dbu.__repr__().startswith('DBProcessing class instance for mission /Users/blarsen/git/dbprocessing/tests/working.sqlite, version:'))
+        self.assertIn('DBProcessing class instance for mission', self.dbu.__repr__())
 
     def test_purgeFileFromDB(self):
         """purgeFileFromDB"""
@@ -224,13 +217,17 @@ class DBUtilsOtherTests(TestSetup):
         self.assertEqual(2051, self.dbu.getFileID('ect_rbspb_0388_34c_01.ptp.gz_newname'))
 
     def test_checkDiskForFile1(self):
-        """checkDiskForFile"""
+        """checkDiskForFile1"""
         self.assertFalse(self.dbu.checkDiskForFile(123))
 
-    def test_checkDiskForFile1(self):
-        """checkDiskForFile"""
-        self.assertFalse(self.dbu.checkDiskForFile(123))
+    def test_checkDiskForFile2(self):
+        """checkDiskForFile2"""
+        self.assertTrue(self.dbu.checkDiskForFile(123, True))
 
+    @unittest.skip("Unimplemented")
+    def test_checkFileSHA(self):
+        #TODO, figure out how to do the filesystem
+        self.assertTrue(self.dbu.checkFileSHA(123))
 
 class DBUtilsAddTests(TestSetup):
     """Tests for database adds through DButils"""
