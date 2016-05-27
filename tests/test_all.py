@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 
 """Combined unit test suite for all dbprocessing classes"""
 
@@ -9,7 +9,7 @@ from test_Diskfile import *
 from test_Version import *
 from test_DBstrings import *
 from test_Utils import *
-
+from test_Inspector import *
 
 
 if __name__ == "__main__":

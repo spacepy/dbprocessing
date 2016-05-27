@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 from __future__ import print_function
 
 import datetime
@@ -223,7 +223,11 @@ class DBUtilsOtherTests(TestSetup):
         self.dbu.renameFile('ect_rbspb_0388_34c_01.ptp.gz', 'ect_rbspb_0388_34c_01.ptp.gz_newname')
         self.assertEqual(2051, self.dbu.getFileID('ect_rbspb_0388_34c_01.ptp.gz_newname'))
 
-    def test_checkDiskForFile(self):
+    def test_checkDiskForFile1(self):
+        """checkDiskForFile"""
+        self.assertFalse(self.dbu.checkDiskForFile(123))
+
+    def test_checkDiskForFile1(self):
         """checkDiskForFile"""
         self.assertFalse(self.dbu.checkDiskForFile(123))
 
