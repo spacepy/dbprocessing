@@ -315,7 +315,7 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
 
 def split_code_args(args):
     """
-    split a string with a bunch of commadn line arguments into a list
+    split a string with a bunch of command line arguments into a list
     as needed by Popen
 
     This is different thatn just split() since we have to keep options
@@ -327,7 +327,10 @@ def split_code_args(args):
     # loop through and see if an index has just a -x (any letter)
     for ii, v in enumerate(ans):
         if re.match(r'\-\S', v):  # found a single letter option
-            pass
+            ans[ii] = ans[ii] + " " + ans[ii+1]
+            del ans[ii+1]
+
+    return ans
 
 
 def processRunning(pid):

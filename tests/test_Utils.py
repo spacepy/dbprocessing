@@ -127,6 +127,18 @@ class UtilsTests(unittest.TestCase):
         ans1 = '[2012-08-30T08:05:00]'
         self.assertEqual(ans1, Utils.dateForPrinting(dt))
 
+    def test_split_code_args1(self):
+        """split_code_args"""
+        self.assertEqual(["code", "hello", "outfile"], Utils.split_code_args("code hello outfile") )
+
+    def test_split_code_args2(self):
+        """split_code_args"""
+        self.assertEqual(["code", "-n hello", "outfile"], Utils.split_code_args("code -n hello outfile") )
+
+    def test_split_code_args3(self):
+        """split_code_args"""
+        self.assertEqual(["code", "infile", "--flag hello", "outfile"], Utils.split_code_args("code infile --flag hello outfile") )
+
 
 if __name__ == "__main__":
     unittest.main()
