@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import datetime
 import unittest
+import os
 
 from dbprocessing import Utils
 from dbprocessing import Version
@@ -30,11 +31,13 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual('20120412', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         path = '{Y}{b}{d}'
         self.assertEqual('2012Apr12', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
-        path = '{Y}{j}'
-        self.assertEqual('2012103', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
+        path = '{y}{j}'
+        self.assertEqual('12103', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         path = '{VERSION}'
         self.assertEqual('1.2.3', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         self.assertEqual('3.2.1', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version2))
+        path = '{H}{M}{S}'
+        self.assertEqual('010203', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
 
     def test_chunker(self):
         """chunker()"""
@@ -126,19 +129,18 @@ class UtilsTests(unittest.TestCase):
         dt = datetime.datetime(2012, 8, 30, 8, 5)
         ans1 = '[2012-08-30T08:05:00]'
         self.assertEqual(ans1, Utils.dateForPrinting(dt))
+        self.assertEqual('['+datetime.datetime.now().replace(microsecond=0).isoformat()+']', Utils.dateForPrinting())
 
-    def test_split_code_args1(self):
+    def test_split_code_args(self):
         """split_code_args"""
         self.assertEqual(["code", "hello", "outfile"], Utils.split_code_args("code hello outfile") )
-
-    def test_split_code_args2(self):
-        """split_code_args"""
         self.assertEqual(["code", "-n hello", "outfile"], Utils.split_code_args("code -n hello outfile") )
-
-    def test_split_code_args3(self):
-        """split_code_args"""
         self.assertEqual(["code", "infile", "--flag hello", "outfile"], Utils.split_code_args("code infile --flag hello outfile") )
 
+    def test_processRunnin1(self):
+        """processRunning"""
+        self.assertTrue( Utils.processRunning( os.getpid() ) )
+        self.assertFalse( Utils.processRunning( 44565 ) )
 
 if __name__ == "__main__":
     unittest.main()

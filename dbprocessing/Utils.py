@@ -43,8 +43,7 @@ def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
         dt = datetime.datetime.now()
     if not microseconds:
         dt = dt.replace(microsecond=0)
-    out = brackets[0] + dt.isoformat() + brackets[1]
-    return out
+    return brackets[0] + dt.isoformat() + brackets[1]
 
 
 def progressbar(count, blocksize, totalsize, text='Download Progress'):
@@ -266,9 +265,9 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
     #	S: 2 digit second
     #	VERSION: version string, interface.quality.revision
     #	DATE: the UTC date from a file, same as Ymd
-    #	MISSION: the mission name from the db
-    #	SPACECRAFT: the spacecraft name from the db
-    #	PRODUCT: the product name from the db
+    #   MISSION: the mission name from the db
+    #   SPACECRAFT: the spacecraft name from the db
+    #   PRODUCT: the product name from the db
     @param dbu:
     """
     if '{INSTRUMENT}' in path or '{SATELLITE}' in path or '{SPACECRAFT}' in path or '{MISSION}' in path or '{PRODUCT}' in path:

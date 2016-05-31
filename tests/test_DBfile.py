@@ -38,6 +38,5 @@ class DBfileTests(unittest.TestCase):
         super(DBfileTests, self).tearDown()
         os.remove(filename)
 
-
 if __name__ == "__main__":
     unittest.main()
