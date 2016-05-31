@@ -90,7 +90,12 @@ class Diskfile(object):
 
         """
         self.infile = infile
-        self.checkAccess()
+        try:
+            self.checkAccess()
+        except WriteError:
+            print("!!!No write access on {0}!!!".format(self.infile))
+        except ReadError:
+            print("!!!No read access on {0}!!!".format(self.infile))
 
 
         self.path = os.path.dirname(self.infile)
