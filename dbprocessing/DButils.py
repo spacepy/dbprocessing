@@ -572,7 +572,7 @@ class DButils(object):
 
         DBlogging.dblogger.debug("Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
-    def purgeFileFromDB(self, filename=None, recursive=False):
+    def purgeFileFromDB(self, filename=None, recursive=False, verbose=False):
         """
         removes a file from the DB
 
@@ -593,6 +593,9 @@ class DButils(object):
             except DBNoData:
                 pass
 
+            if verbose:
+                print(ii, len(fillname), f)
+                
             # we need to look in each table that could have a reference to this file and delete that
             try: ## processqueue
                 self.Processqueue.remove(f)
