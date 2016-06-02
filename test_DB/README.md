@@ -14,11 +14,8 @@ testDB_{set}.rot format.
 How to run this:
 ----------------
 Eventually, this will be a full unittest suite and will simply be run that way,
-but for now scripts/makeDB.sh will make a testDB.sqlite.bak file with the needed
-things added to the database, and scripts/runThisThing.sh will excute the needed
-scripts to run the entire dbprocessing chain. makeDB.sh will not need to be run
-more than once, as runThisThing.sh will make a copy of the database to work on,
-and will not change the orignal db every time it is run.
+but for now scripts/runThisThing.sh will excute the needed scripts to run the
+entire dbprocessing chain.
 
 
 Revisions:
