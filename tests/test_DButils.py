@@ -224,11 +224,6 @@ class DBUtilsOtherTests(TestSetup):
         """checkDiskForFile2"""
         self.assertTrue(self.dbu.checkDiskForFile(123, True))
 
-    @unittest.skip("Unimplemented")
-    def test_checkFileSHA(self):
-        #TODO, figure out how to do the filesystem
-        self.assertTrue(self.dbu.checkFileSHA(123))
-
 class DBUtilsAddTests(TestSetup):
     """Tests for database adds through DButils"""
 
