@@ -15,6 +15,6 @@ class Inspector(inspector.inspector):
         self.diskfile.params['utc_start_time'] = datetime.datetime(2016, 1, 1) + datetime.timedelta(days=int(m.group(1)))
         self.diskfile.params['utc_stop_time'] = self.diskfile.params['utc_start_time'] + datetime.timedelta(days=1)
         self.diskfile.params['utc_file_date'] = self.diskfile.params['utc_start_time'].date()
-        self.diskfile.params['version'] = Version.Version(1, 0, 0)
+        self.diskfile.params['version'] = Version.Version.fromString('1.0.0')#"Cheating" for coverage testing
         self.diskfile.params['process_keywords'] = 'nnn=' + m.group(1)
         return True
