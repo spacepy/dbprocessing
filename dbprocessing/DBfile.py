@@ -10,7 +10,7 @@ import Utils
 
 
 class DBfileError(Exception):
-    """Exception that is raised by DBfile class    """
+    """Exception that is raised by DBfile class"""
     pass
 
 
@@ -33,10 +33,10 @@ class DBfile(object):
         @param dbu: pass in the current DButils session so that a new connection is not made
         @type dbu: DButils
         """
-        if makeDiskFile == True:
-            diskfile = Diskfile.Diskfile(diskfile)
+        if makeDiskFile:
+            diskfile = Diskfile.Diskfile(diskfile, dbu)
         if not isinstance(diskfile, Diskfile.Diskfile):
-            raise (DBfileError('Wrong input, must input a Diskfile object'))
+            raise DBfileError('Wrong input, must input a Diskfile object')
 
         self.dbu = dbu
         self.diskfile = diskfile
@@ -54,6 +54,8 @@ class DBfile(object):
         @return: True the file is newest, False it is not
         @rtype: bool
         """
+        #TODO: This makes no sense.
+
         self.diskfile.params['newest_version'] = True
         return True
 
@@ -94,9 +96,9 @@ class DBfile(object):
         relative_path = self.dbu.session.query(self.dbu.Product.relative_path).filter_by(
             product_id=self.diskfile.params['product_id'])
         if relative_path.count() > 1:
-            raise (DBfileError('more than one rel path found'))
+            raise DBfileError('more than one rel path found')
         if relative_path.count() == 0:
-            raise (DBfileError('zero rel path found'))
+            raise DBfileError('zero rel path found')
         relative_path = relative_path.all()[0][0]
         basepath = self.dbu.getMissionDirectory()
         path = os.path.join(str(basepath), str(relative_path))
