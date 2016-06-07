@@ -22,6 +22,7 @@ class InspectorFunctions(unittest.TestCase):
         """extract_YYYYMM works"""
         self.assertEqual( datetime.date(2013, 2, 1), inspector.extract_YYYYMM('rbspa_pre_ect-hope-L1_20130214_v1.0.0.cdf') )
         self.assertEqual( datetime.date(2013, 2, 1), inspector.extract_YYYYMM('rbspa_pre_ect-hope-L1_20130231_v1.0.0.cdf') )
+        self.assertEqual( None, inspector.extract_YYYYMM('rbspa_pre_ect-hope-L1_2013_v1.0.0.cdf') )
         self.assertEqual( None, inspector.extract_YYYYMM('rbspa_pre_ect-hope-L1_19520201_v1.0.0.cdf') )
         self.assertEqual( None, inspector.extract_YYYYMM('rbspa_pre_ect-hope-L1_20510201_v1.0.0.cdf') )
 
