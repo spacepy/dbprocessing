@@ -18,11 +18,9 @@ class DBfileTests(unittest.TestCase):
     def setUp(self):
         super(DBfileTests, self).setUp()
         self.tempD = tempfile.mkdtemp()
-
         copy_tree('testDB/', self.tempD)
 
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
-
         #Update the mission path to the tmp dir
         self.dbu.getEntry('Mission', 1).rootdir = self.tempD
         self.dbu.commitDB()
@@ -57,6 +55,7 @@ class DBfileTests(unittest.TestCase):
     def test_getDirectory(self):
         dbf = DBfile.DBfile(self.tempD + '/L0/testDB_000_first.raw', self.dbu, makeDiskFile=True)
         
+        #Fails because product_id is not set
         self.assertRaises(DBfile.DBfileError, dbf.getDirectory )
 
         dbf.diskfile.params['product_id'] = 4
@@ -69,7 +68,7 @@ class DBfileTests(unittest.TestCase):
 
         self.assertTrue(dbf.addFileToDB())
 
-    def test_move1(self):
+    def test_move_NormalFile(self):
         with open(self.tempD + '/file.file', 'w') as fp:
             fp.write('I am some test data\n')
         dbf = self.createDummyDBF('/file.file')
@@ -77,7 +76,7 @@ class DBfileTests(unittest.TestCase):
         real_ans = (self.tempD + '/file.file', self.tempD + '/L1/file.file')
         self.assertEqual(real_ans, dbf.move())
 
-    def test_move2(self):
+    def test_move_SymLink(self):
         with open(self.tempD + '/file.file', 'w') as fp:
             fp.write('I am some test data\n')
         os.symlink(self.tempD + '/file.file', self.tempD + '/sym.file')
@@ -87,8 +86,9 @@ class DBfileTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(self.tempD + '/sym.file'))
         self.assertEqual(real_ans, dbf.move())
         self.assertFalse(os.path.isfile(self.tempD + '/sym.file'))
+        self.assertFalse(os.path.isfile(self.tempD + '/L1/sym.file'))
 
-    def test_move3(self):
+    def test_move_NormalFileTargetDoesntExist(self):
         with open(self.tempD + '/file.file', 'w') as fp:
             fp.write('I am some test data\n')
         dbf = self.createDummyDBF('/file.file')
