@@ -211,10 +211,10 @@ def extract_YYYYMM(filename):
     except (ValueError, AttributeError): # there is not one
         return None
     if dt < datetime.datetime(1957, 10, 4, 19, 28, 34): # Sputnik 1 launch datetime
-        dt = None
+        return None
     # better not still be using this... present to help with random numbers combinations
     elif dt > datetime.datetime(2050, 1, 1):
-        dt = None
+        return None
     return dt.date()
 
 def valid_YYYYMMDD(inval):
