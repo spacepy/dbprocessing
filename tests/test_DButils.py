@@ -944,27 +944,214 @@ class TestWithtestDB(unittest.TestCase):
             ('testDB_001_first.raw', '(200) file not found')]
         self.assertEqual(ans, self.dbu.checkFiles())
 
-    def test_updateProductSubs(self):
-        pass
-        # pID = self.dbu.addProduct(product_name = "testing_{INSTRUMENT}",
-        #                          instrument_id = 1,
-        #                          relative_path = "L0",
-        #                          format = "testing_{SPACECRAFT}_{SATELLITE}_{MISSION}_{PRODUCT}_{LEVEL}",
-        #                          level = 0,
-        #                          product_description = "Desc"
-        #                         )
-        # ftb = self.dbu.getTraceback('Product', pID)
-        # print(ftp)
-        # self.dbu.updateProductSubs(pID)
+    def addGenericCode(self):
+        """Creates a dummy code."""
+        cID = self.dbu.addCode(filename = "run_test.py",
+             relative_path = "scripts",
+             code_start_date = "2010-09-01",
+             code_stop_date = "2020-01-01",
+             code_description = "Desc",
+             process_id = 1,
+             version = "1.2.3",
+             active_code = 1,
+             date_written = "2016-06-08",
+             output_interface_version = 1,
+             newest_version = 1
+            )
+        return cID
 
-        # p = self.dbu.getEntry('Product', pID) 
-        # self.assertEqual("", p.product_name)
+    def addGenericInspector(self, productID):
+        """Creates a dummy inspector. productID is the index of the associated product"""
+        iID = self.dbu.addInspector(filename = "testing_L0.py", 
+         relative_path = "codes/inspectors", 
+         description = "Level 0", 
+         version = "1.2.3", 
+         active_code = 1, 
+         date_written = "2016-06-08", 
+         output_interface_version = 1, 
+         newest_version = 1, 
+         product = productID,
+         arguments = "-q"
+        )
+        return iID
+
+    def addGenericProduct(self):
+        """Creates a dummy product."""
+        pID = self.dbu.addProduct(product_name = "testing_Product",
+             instrument_id = 1,
+             relative_path = "L0",
+             format = "testing_frmt",
+             level = 0,
+             product_description = None
+            )
+        return pID
+
+    def addGenericFile(self, productID):
+        fID = self.dbu.addFile(filename = "testing_file.file", 
+             data_level = 0, 
+             version = Version.Version(1, 2, 3), 
+             file_create_date = datetime.date(2010, 1, 1), 
+             exists_on_disk = 1, 
+             utc_file_date = datetime.date(2010, 1, 1), 
+             utc_start_time = datetime.datetime(2010, 1, 1, 0, 0, 0), 
+             utc_stop_time = datetime.datetime(2010, 1, 2, 0, 0, 0),  
+             product_id = productID, 
+             newest_version = 1, 
+             shasum = '0', 
+            )
+        return fID
+
+    def test_addCode(self):
+        cID = self.addGenericCode()
+        c = self.dbu.getEntry('Code', cID)
+
+        self.assertEqual("run_test.py", c.filename)
+        self.assertEqual("scripts", c.relative_path)
+        self.assertEqual(datetime.date(2010, 9, 1), c.code_start_date)
+        self.assertEqual(datetime.date(2020, 1, 1), c.code_stop_date)
+        self.assertEqual("Desc", c.code_description)
+        self.assertEqual(1, c.process_id)
+        self.assertEqual(1, c.interface_version)
+        self.assertEqual(2, c.quality_version)
+        self.assertEqual(3, c.revision_version)
+        self.assertEqual(1, c.active_code)
+        self.assertEqual(datetime.date(2016, 6, 8), c.date_written)
+        self.assertEqual(1, c.output_interface_version)
+        self.assertEqual(1, c.newest_version)
+
+    def test_addInspector(self):
+        iID = self.addGenericInspector(1)
+        i = self.dbu.getEntry('Inspector', iID) 
+
+        self.assertEqual("testing_L0.py", i.filename)
+        self.assertEqual("codes/inspectors", i.relative_path)
+        self.assertEqual("Level 0", i.description)
+        self.assertEqual(1, i.interface_version)
+        self.assertEqual(2, i.quality_version)
+        self.assertEqual(3, i.revision_version)
+        self.assertEqual(1, i.active_code)
+        self.assertEqual(datetime.date(2016, 6, 8), i.date_written)
+        self.assertEqual(1, i.output_interface_version)
+        self.assertEqual(1, i.newest_version)
+        self.assertEqual(1, i.product)
+        self.assertEqual("-q", i.arguments)
+    
+    def test_delInspector(self ):
+        iID = self.addGenericInspector(1)
+        i = self.dbu.getEntry('Inspector', iID)
+        #Make sure the add worked
+        self.assertEqual("testing_L0.py", i.filename)
+
+
+        self.dbu.delInspector(iID)
+        self.assertEqual(None, self.dbu.getEntry('Inspector', iID))
+
+    def test_addFile(self):
+        fID = self.addGenericFile(1)
+
+        i = self.dbu.getEntry('File', fID)
+        self.assertEqual("testing_file.file", i.filename)
+        self.assertEqual(0, i.data_level)
+        self.assertEqual(1, i.interface_version)
+        self.assertEqual(2, i.quality_version)
+        self.assertEqual(3, i.revision_version)
+        self.assertEqual(datetime.datetime(2010, 1, 1, 0, 0), i.file_create_date)
+        self.assertEqual(1, i.exists_on_disk)
+        self.assertEqual(datetime.date(2010, 1, 1), i.utc_file_date)
+        self.assertEqual(datetime.datetime(2010, 1, 1, 0, 0), i.utc_start_time)
+        self.assertEqual(datetime.datetime(2010, 1, 2, 0, 0), i.utc_stop_time)
+        self.assertEqual(1, i.product_id)
+        self.assertEqual(1, i.newest_version)
+        self.assertEqual('0', i.shasum)
+    
+    def test_addInstrumentproductlink(self):
+        pID = self.addGenericProduct()
+        self.addGenericInspector(pID)
+        ID = self.dbu.addInstrumentproductlink(instrument_id = 1, 
+                     product_id = pID)
+
+        i = self.dbu.getEntry('Instrumentproductlink', ID) 
+        self.assertEqual(1, i.instrument_id)
+        self.assertEqual(pID, i.product_id)
+
+    def test_addproductprocesslink(self):
+        pID = self.addGenericProduct()
+        self.addGenericInspector(pID)
+        ID = self.dbu.addproductprocesslink(input_product_id = pID,
+             process_id = 1,
+             optional = 0 
+            )
+
+        #getEntry doesn't work for this? Myles 6/8/16
+        i = self.dbu.session.query(self.dbu.Productprocesslink).filter_by(input_product_id = pID).first()
+        self.assertEqual(pID, i.input_product_id)
+        self.assertEqual(1, i.process_id)
+        self.assertEqual(0, i.optional)
+
+    def test_addFilecodelink(self):
+        cID = self.addGenericCode()
+        fID = self.addGenericFile(1)
+        self.dbu.addFilecodelink(resulting_file_id = fID, 
+             source_code = cID
+            )
+
+        #getEntry doesn't work for this? Myles 6/8/16
+        i = self.dbu.session.query(self.dbu.Filecodelink).filter_by(resulting_file = fID).first()
+        self.assertEqual(fID, i.resulting_file)
+        self.assertEqual(cID, i.source_code)
+
+    def test_delFilecodelink(self):
+        pass
+
+    def test_addFilefilelink(self):
+        pass
 
     def test_updateInspectorSubs(self):
-        pass
+        pID = self.addGenericProduct()
+
+        iID = self.dbu.addInspector(filename = "testing_L0.py", 
+                 relative_path = "codes/{SPACECRAFT}_{SATELLITE}_{MISSION}_{PRODUCT}_{LEVEL}", 
+                 description = "Level 0", 
+                 version = Version.Version(1, 0, 0), 
+                 active_code = 1, 
+                 date_written = "2016-06-08", 
+                 output_interface_version = 1, 
+                 newest_version = 1, 
+                 product = pID,
+                 arguments = "-q"
+                )
+        self.dbu.addInstrumentproductlink(instrument_id = 1, 
+                 product_id = pID
+                )
+
+        self.dbu.updateInspectorSubs(iID)
+        i = self.dbu.getEntry('Inspector', iID) 
+        self.assertEqual('codes/testDB-a_testDB-a_testDB_testing_Product_0.0', i.relative_path)
+
+    def test_updateProductSubs(self):
+        pID = self.dbu.addProduct(product_name = "testing_{INSTRUMENT}",
+                 instrument_id = 1,
+                 relative_path = "L0",
+                 format = "testing_{SPACECRAFT}_{SATELLITE}_{MISSION}_{PRODUCT}_{LEVEL}",
+                 level = 0,
+                 product_description = None
+                )
+
+        self.addGenericInspector(pID)
+        self.dbu.addInstrumentproductlink(instrument_id = 1, 
+                 product_id = pID
+                )
+        
+
+        self.dbu.updateProductSubs(pID)
+        p = self.dbu.getEntry('Product', pID) 
+        self.assertEqual('testing_rot13', p.product_name)
+        self.assertEqual('testing_testDB-a_testDB-a_testDB_testing_rot13_0.0', p.format)
+
 
     def test_updateProcessSubs(self):
         pass
+
 
 if __name__ == "__main__":
     unittest.main()
