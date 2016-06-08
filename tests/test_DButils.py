@@ -8,6 +8,7 @@ import shutil
 import stat
 import tempfile
 import unittest
+from distutils.dir_util import copy_tree, remove_tree
 
 try:  # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
@@ -53,13 +54,6 @@ class TestSetup(unittest.TestCase):
 
 class DBUtilsOtherTests(TestSetup):
     """Tests that are not processqueue or get or add"""
-
-    def test_checkFiles(self):
-        """checkFiles"""
-        ans = set([(u'ect_rbspa_0220_344_01.ptp.gz', '(200) file not found'),
-                   (u'ect_rbspa_0220_344_02.ptp.gz', '(200) file not found'),
-                   (u'ect_rbspa_0220_345_01.ptp.gz', '(200) file not found')])
-        self.assertFalse(set(self.dbu.checkFiles(limit=3)).difference(ans))
 
     def test_checkIncoming(self):
         """checkIncoming"""
@@ -215,14 +209,6 @@ class DBUtilsOtherTests(TestSetup):
         """renameFile"""
         self.dbu.renameFile('ect_rbspb_0388_34c_01.ptp.gz', 'ect_rbspb_0388_34c_01.ptp.gz_newname')
         self.assertEqual(2051, self.dbu.getFileID('ect_rbspb_0388_34c_01.ptp.gz_newname'))
-
-    def test_checkDiskForFile1(self):
-        """checkDiskForFile1"""
-        self.assertFalse(self.dbu.checkDiskForFile(123))
-
-    def test_checkDiskForFile2(self):
-        """checkDiskForFile2"""
-        self.assertTrue(self.dbu.checkDiskForFile(123, True))
 
 class DBUtilsAddTests(TestSetup):
     """Tests for database adds through DButils"""
@@ -909,6 +895,76 @@ class ProcessqueueTests(TestSetup):
         pq = self.dbu.Processqueue.pop(1)
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, pq)
 
+class TestWithtestDB(unittest.TestCase):
+    #Tests that require(or were written after the creation of) the new testDB.
+    def setUp(self):
+        super(TestWithtestDB, self).setUp()
+        self.tempD = tempfile.mkdtemp()
+
+        copy_tree('testDB/', self.tempD)
+        self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
+        self.dbu.getEntry('Mission', 1).rootdir = self.tempD#Set the mission's dir to the tmp so we can work with it
+        self.dbu.commitDB()
+        self.dbu.MissionDirectory = self.dbu.getMissionDirectory()
+
+    def tearDown(self):
+        super(TestWithtestDB, self).tearDown()
+        self.dbu.closeDB()
+        #print(self.tempD)
+        remove_tree(self.tempD)
+
+    def test_checkDiskForFile_DBTrue_FileTrue(self):
+        self.assertTrue(self.dbu.checkDiskForFile(1))
+
+    def test_checkDiskForFile_DBTrue_FileFalse_FixTrue(self):
+        os.remove(self.tempD+'/L0/testDB_001_first.raw')
+        self.assertTrue(self.dbu.checkDiskForFile(1, True))
+
+    def test_checkDiskForFile_DBTrue_FileFalse(self):
+        os.remove(self.tempD+'/L0/testDB_001_first.raw')
+        self.assertFalse(self.dbu.checkDiskForFile(1))
+
+    def test_checkDiskForFile_DBFalse_FileTrue(self):
+        self.dbu.getEntry('File', 1).exists_on_disk = False
+        self.assertTrue(self.dbu.checkDiskForFile(1))
+
+    def test_checkFileSHA(self):
+        self.assertTrue(self.dbu.checkFileSHA(1))
+
+        with open(self.tempD + '/L0/testDB_001_first.raw', 'w') as fp:
+            fp.write('I am some text that will change the SHA\n')
+        self.assertFalse(self.dbu.checkFileSHA(1))
+
+    def test_checkFiles(self):
+        with open(self.tempD + '/L0/testDB_000_first.raw', 'w') as fp:
+            fp.write('I am some text that will change the SHA\n')
+        os.remove(self.tempD + '/L0/testDB_001_first.raw')
+
+        ans = [('testDB_000_first.raw', '(100) bad checksum'),
+            ('testDB_001_first.raw', '(200) file not found')]
+        self.assertEqual(ans, self.dbu.checkFiles())
+
+    def test_updateProductSubs(self):
+        pass
+        # pID = self.dbu.addProduct(product_name = "testing_{INSTRUMENT}",
+        #                          instrument_id = 1,
+        #                          relative_path = "L0",
+        #                          format = "testing_{SPACECRAFT}_{SATELLITE}_{MISSION}_{PRODUCT}_{LEVEL}",
+        #                          level = 0,
+        #                          product_description = "Desc"
+        #                         )
+        # ftb = self.dbu.getTraceback('Product', pID)
+        # print(ftp)
+        # self.dbu.updateProductSubs(pID)
+
+        # p = self.dbu.getEntry('Product', pID) 
+        # self.assertEqual("", p.product_name)
+
+    def test_updateInspectorSubs(self):
+        pass
+
+    def test_updateProcessSubs(self):
+        pass
 
 if __name__ == "__main__":
     unittest.main()
