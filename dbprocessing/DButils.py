@@ -950,8 +950,7 @@ class DButils(object):
 
         i1.satellite_id = satellite_id
         if '{MISSION}' in instrument_name:
-            mission_id = self.getSatelliteMission(satellite_id)
-            mission_name = self.getEntry('Mission', mission_id).mission_name
+            mission_name = self.getSatelliteMission(satellite_id).mission_name
             instrument_name = instrument_name.replace('{MISSION}', mission_name)
         if '{SPACECRAFT}' in instrument_name:
             satellite_name = self.getEntry('Satellite', satellite_id).satellite_name
