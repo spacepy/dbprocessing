@@ -469,12 +469,11 @@ class ProcessQueue(object):
 
         files = self.dbu.getFilesByDate([startDate, endDate], newest_version=False)
         file_ids = [f.file_id for f in files]
+
         # we can rawadd here as we know all the ids are valid since they came from the db
-        added = self.dbu.Processqueue.rawadd(file_ids) # incVersion doesn't work anyway now 6-Jun-2016 BAL
+        nadded = self.dbu.Processqueue.rawadd(file_ids) # incVersion doesn't work anyway now 6-Jun-2016 BAL
         # added = self.dbu.Processqueue.push(file_ids, incVersion)
-        if added is None:
-            added = []
-        return len(added)
+        return nadded
 
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=None):
         files = self.dbu.getFilesByInstrument(id_in, level=level, id_only=False)
