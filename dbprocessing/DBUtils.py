@@ -580,7 +580,7 @@ class DBUtils(object):
 
         DBlogging.dblogger.debug("Done in queueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
-    def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False):
+    def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False, trust_id=False):
         """
         removes a file from the DB
 
@@ -595,10 +595,13 @@ class DBUtils(object):
         if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
             filename = [filename]
         for ii, f in enumerate(filename):
-            try:
-                f = self.getFileID(f)
-            except DBNoData:
-                pass
+            if not trust_id:
+                try:
+                    f = self.getFileID(f)
+                except DBNoData:
+                    pass
+            else:
+                pass # just use the id without a lookup
             if verbose:
                 print(ii, len(filename), f)
             # we need to look in each table that could have a reference to this file and delete that
