@@ -1232,14 +1232,13 @@ class TestWithtestDB(unittest.TestCase):
         p = self.dbu.getEntry('Process', prID)
         self.assertEqual('testing_process_testDB_rot13_L1_rot13_testDB-a_testDB', p.process_name)
 
-    def test_tag_release(self):
-        pass
-
-    def test_addRelease(self):
-        pass
-
     def test_list_release(self):
-        pass
+        """This tests all of the release stuff, it's all intertwined anyway"""
+        self.dbu.tag_release(1)
+
+        ans = ['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw', 'testDB_000_sec.raw',
+            'testDB_001.rot', 'testDB_000.rot', 'testDB_001_first.raw', 'testDB_000_first.raw']
+        self.assertEqual(ans, self.dbu.list_release(1, fullpath=False))
 
 
 if __name__ == "__main__":

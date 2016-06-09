@@ -1949,8 +1949,8 @@ class DButils(object):
         """
         newest_files = []
         prod_ids = [v.product_id for v in self.getAllProducts()]
-        for prod in prods:
-            newest_files.extend(self.getFilesByProduct(prod_ids, newest_version=True))
+        for prod in prod_ids:
+            newest_files.extend(self.getFilesByProduct(prod, newest_version=True))
 
         for f in newest_files:
             self.addRelease(f, rel_num, commit=False)
