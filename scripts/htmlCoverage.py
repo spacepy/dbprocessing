@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.6
+from __future__ import print_function
 
 import datetime
 import glob
@@ -19,7 +20,7 @@ import rbsp #rbsp.mission_day_to_UTC
 from dbprocessing import Utils, inspector
 from rbsp import Version
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 def EventTimer(Event, Time1):
     """
@@ -27,7 +28,7 @@ def EventTimer(Event, Time1):
     nice for debugging and seeing that the code is progressing
     """
     Time2 = time.time()
-    print "%4.2f" % (Time2 - Time1), Event
+    print("%4.2f" % (Time2 - Time1), Event)
     return Time2
 
 class product(object):
@@ -64,7 +65,7 @@ def getInfo(mission):
 
     info = {}
 
-    dbu = DBUtils.DBUtils(mission)
+    dbu = DButils.DButils(mission)
     # get all the products then break them by spacecraft
     prods = dbu.getAllProducts()
 

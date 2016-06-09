@@ -5,6 +5,7 @@
 go through the DB and add all the files that are a certain product and put then onto the
 processqueue so that the next ProcessQueue -p will run them
 """
+from __future__ import print_function
 
 
 
@@ -59,7 +60,7 @@ if __name__ == "__main__":
         
     db = dbprocessing.ProcessQueue(options.mission, echo=options.echo)
 
-    print startDate, endDate
+    print(startDate, endDate)
 
     for prod in args:
         num = db.reprocessByProduct(prod, startDate=startDate, endDate=endDate, incVersion=options.force)

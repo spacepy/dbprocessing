@@ -1,5 +1,8 @@
 #!/usr/bin/env python2.6
 
+from __future__ import print_function
+
+
 import datetime
 import glob
 import os
@@ -8,7 +11,7 @@ import re
 
 import rbsp #rbsp.mission_day_to_UTC
 
-from dbprocessing import DBUtils, Utils, inspector
+from dbprocessing import DButils, Utils, inspector
 from rbsp import Version
 
 
@@ -51,8 +54,8 @@ def usage():
     """
     print the usage message out
     """
-    print "Usage: {0} <mission> <filename>".format(sys.argv[0])
-    print "   -> mission db file to write to html"
+    print("Usage: {0} <mission> <filename>".format(sys.argv[0]))
+    print("   -> mission db file to write to html")
     return
 
 
@@ -93,7 +96,7 @@ def makeHTML(mission, filename):
     </body></html>
     """
 
-    dbu = DBUtils.DBUtils(mission)
+    dbu = DButils.DButils(mission)
     a, b, = gather_files()
 
     output = open(filename, 'w')

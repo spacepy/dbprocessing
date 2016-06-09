@@ -19,7 +19,7 @@ from sqlalchemy import func
 
 import rbsp #rbsp.mission_day_to_UTC
 
-from dbprocessing import DBUtils, Utils, Version, inspector
+from dbprocessing import DButils, Utils, Version, inspector
 from dbprocessing.runMe import ProcessException
 from rbsp import Version
 
@@ -46,22 +46,22 @@ if __name__ == "__main__":
         parser.error("-m must be specified")
 
                 
-    dbu = DBUtils.DBUtils(options.mission, echo=options.echo)
+    dbu = DButils.DButils(options.mission, echo=options.echo)
 
     # If we will be editing the DB we have to have lock
     if options.fix:
         # check currently processing
-        curr_proc = dbu._currentlyProcessing()
+        curr_proc = dbu.currentlyProcessing()
         if curr_proc:  # returns False or the PID
             # check if the PID is running
             if Utils.processRunning(curr_proc):
                 # we still have an instance processing, don't start another
-                dbu._closeDB()
+                dbu.closeDB()
                 DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
                 raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
             else:
                 # There is a processing flag set but it died, don't start another
-                dbu._closeDB()
+                dbu.closeDB()
                 DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
                 raise(ProcessException("There is a processing flag set but it died, don't start another"))
         
@@ -98,12 +98,12 @@ if __name__ == "__main__":
                 if options.fix:
                     fentry = lgetEntry('File', lbasename(f))
                     if fentry.exists_on_disk:
-                        #dbu._purgeFileFromDB(f)
+                        #dbu.purgeFileFromDB(f)
                         rmfiles.append(f)
                         print("        ** {0} removed from DB".format(f))
                     else:
                         print("        ** was already not marked exists_on_disk")
         if rmfiles:
-            dbu._purgeFileFromDB(rmfiles)
+            dbu.purgeFileFromDB(rmfiles)
     
-    dbu._closeDB()
+    dbu.closeDB()

@@ -1,11 +1,10 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
+from __future__ import print_function
 
 import unittest
 
 from dbprocessing import DBqueue
 
-
-__version__ = '2.0.3'
 
 
 class DBqueueTests(unittest.TestCase):

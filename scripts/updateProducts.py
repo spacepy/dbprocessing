@@ -13,12 +13,13 @@
 ## prod level
 # <- add the prod
 # <- create the inst_prod link
+from __future__ import print_function
 
 import ConfigParser
 import datetime
 import sys
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing.Utils import toBool, toNone
 
 sections = ['base', 'product', 'inspector',]
@@ -58,8 +59,8 @@ def _updateSections(conf):
     """
     go through each section and update the db is there is a change
     """
-    dbu = DBUtils.DBUtils('rbsp') # TODO don't assume RBSP later
-    dbu._openDB()
+    dbu = DButils.DButils('rbsp') # TODO don't assume RBSP later
+    dbu.openDB()
     dbu._createTableObjects()
 
     sections = ['mission', 'satellite', 'instrument', 'product',
@@ -83,7 +84,7 @@ def _updateSections(conf):
                     print('{0}[{1}]  {2} ==> {3}'.format(section, attrs[i], obj.__getattribute__(attrs[i]), conf[section][attrs[i]]))
                     obj.__setattr__(attrs[i], conf[section][attrs[i]])
                     dbu.session.add(obj)
-            dbu._commitDB()
+            dbu.commitDB()
     if succ == 0:
         raise(ValueError('using {0} on a product that is not in the DB'.format(sys.argv[0])))
 
@@ -92,8 +93,8 @@ def usage():
     """
     print the usage message out
     """
-    print "Usage: {0} <filename>".format(sys.argv[0])
-    print "   -> config file to update"
+    print("Usage: {0} <filename>".format(sys.argv[0]))
+    print("   -> config file to update")
     return
 
 

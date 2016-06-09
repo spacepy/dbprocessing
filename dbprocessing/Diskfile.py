@@ -1,22 +1,18 @@
 #!/usr/bin/env python2.6
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 import glob
 import hashlib
 import os
-import os.path
 
 import DBlogging
 
-__version__ = '2.0.3'
-
-
-# TODO look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isn't called
+# .. todo look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isn't called
 class ReadError(Exception):
     """
     Exception that a file is not readable by the script, probably doesn't exist
 
-    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         super(ReadError, self).__init__(*params)
@@ -27,7 +23,6 @@ class FilenameError(Exception):
     """
     Exception especially for created filenames showing that they are wrong
 
-    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         super(FilenameError, self).__init__(*params)
@@ -38,7 +33,6 @@ class WriteError(Exception):
     """
     Exception that a file is not write able by the script, probably doesn't exist or in a ro directory
 
-    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         super(WriteError, self).__init__(*params)
@@ -49,7 +43,6 @@ class InputError(Exception):
     """
     Exception that input is bad to the DiskFile class
 
-    `Author:` Brian Larsen, LANL
     """
     def __init__(self, *params):
         super(InputError, self).__init__(*params)
@@ -60,12 +53,9 @@ class DigestError(Exception):
     """
     Exception that is thrown by calcDigest.
 
-    TODO
-    ====
-    maybe just combine this with ReadError for the current purpose
+    .. note: maybe just combine this with ReadError for the current purpose
 
 
-    `Author:` Brian Larsen, LANL
 
     """
     def __init__(self, *params):
@@ -79,19 +69,14 @@ class Diskfile(object):
     all parsing for what mission files belong to is continued in here
     to add a new mission code must be added here.
 
-    `Author:` Brian Larsen, LANL
 
 
     Parameters
     ==========
     infile : str
         a file to create a diskfile around
-    dbu :  DBUtils
-        pass in the current DBUtils session so that a new connection is not made
-
-    Attributes
-    ==========
-    params : ``dict`` dictionary to hold all the parameters of the file
+    dbu :  :class:`.DButils`
+        pass in the current :class:`.DButils` session so that a new connection is not made
 
     """
 
@@ -102,7 +87,6 @@ class Diskfile(object):
         setup a Diskfile class, takes in a filename and creates a params dict to hold information about the file
         then tests to see what mission the file is from
 
-        Author: Brian Larsen, LANL
         """
         self.infile = infile
         try:
@@ -161,10 +145,11 @@ class Diskfile(object):
 #            if len(glb) == 1:
 #                self.infile = glb[0]
 #            else:
+            DBlogging.dblogger.debug("{0} read access denied!".format(self.infile))
             raise(ReadError("file is not readable, does it exist? {0}".format(self.infile)))
         self.WRITE_ACCESS = os.access(self.infile, os.W_OK) | os.path.islink(self.infile)
         if not self.WRITE_ACCESS:
-            DBlogging.dblogger.debug("{0} Access denied!".format(self.infile))
+            DBlogging.dblogger.debug("{0} write access denied!".format(self.infile))
             raise(WriteError("file is not writeable, won't be able to move it to proper location: {0}".format(self.infile)))
 #        DBlogging.dblogger.debug("{0} Access Checked out OK".format(self.infile))
 
@@ -172,7 +157,6 @@ class Diskfile(object):
 def calcDigest( infile):
     """Calculate the SHA1 digest from a file.
 
-    `Author:` Jon Niehof, LANL
 
     .. _file:
 

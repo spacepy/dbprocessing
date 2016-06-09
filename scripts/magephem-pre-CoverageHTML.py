@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.6
+from __future__ import print_function
 
 import datetime
 import glob
@@ -13,9 +14,9 @@ import rbsp #rbsp.mission_day_to_UTC
 from dbprocessing import Utils, inspector
 from rbsp import Version
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
-dbu = DBUtils.DBUtils('~ectsoc/MagEphem_processing.sqlite')
+dbu = DButils.DButils('~ectsoc/MagEphem_processing.sqlite')
 
 prods = dbu.getAllProducts()
 ids = [v.product_id for v in prods]
@@ -76,8 +77,8 @@ def usage():
     """
     print the usage message out
     """
-    print "Usage: {0} <filename>".format(sys.argv[0])
-    print "   -> mission db file to write to html"
+    print("Usage: {0} <filename>".format(sys.argv[0]))
+    print("   -> mission db file to write to html")
     return
 
 

@@ -11,7 +11,7 @@ import os
 import shutil
 import sys
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import Version
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -40,11 +40,11 @@ if __name__ == "__main__":
 
     newname = args[2]
     
-    dbu = DBUtils.DBUtils(os.path.expanduser(options.mission))
+    dbu = DButils.DButils(os.path.expanduser(options.mission))
 
     try:
         code = dbu.getEntry('Code', code_id)
-    except DBUtils.DBNoData:
+    except DButils.DBNoData:
         parser.error("Invalid code_id: {0}, must be in the database".format(code_id))
 
     old_version = Version.Version(code.interface_version, code.quality_version, code.revision_version)

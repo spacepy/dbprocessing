@@ -16,11 +16,12 @@
 ## prod level
 # <- add the prod
 # <- create the inst_prod link
+from __future__ import print_function
 
 import ConfigParser
 import sys
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing.Utils import toBool, toNone
 
 
@@ -39,8 +40,8 @@ def writeconfig(my_cfg, config_filepath):
 
 def getStuff(dbname, proc_name, filename):
     cfg = {}
-    dbu = DBUtils.DBUtils(dbname) # TODO don't assume RBSP later
-    dbu._openDB()
+    dbu = DButils.DButils(dbname) # TODO don't assume RBSP later
+    dbu.openDB()
     dbu._createTableObjects()
     # are we trying to write files for all the products?
 #    if prod_name.lower() == 'all':
@@ -72,8 +73,8 @@ def usage():
     """
     print the usage messag out
     """
-    print "Usage: {0} <database> <process name> <filename>".format(sys.argv[0])
-    print "   -> process name (or number) to write to config file"
+    print("Usage: {0} <database> <process name> <filename>".format(sys.argv[0]))
+    print("   -> process name (or number) to write to config file")
     return
 
 

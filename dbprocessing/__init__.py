@@ -1,4 +1,6 @@
-__version__ = '2.0.3'
+from __future__ import print_function
 
-#__all__ = ['CreateDB', 'DBStrings', 'DBUtils', 'DBfile', 'DBlogging',
+__version__ = 'NMC_1'
+
+#__all__ = ['CreateDB', 'DBStrings', 'DButils', 'DBfile', 'DBlogging',
 #           'DBqueue', 'Diskfile', 'Version', 'dbprocessing', 'inspector', 'module', 'Utils']

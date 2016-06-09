@@ -1,11 +1,12 @@
 #!/usr/bin/env python2.6
+from __future__ import print_function
 
 import datetime
 import sys
 
 import numpy as np
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 
 def makeHTML(mission, filename):
@@ -44,8 +45,8 @@ def makeHTML(mission, filename):
     </body></html>
     """
 
-    dbu = DBUtils.DBUtils(mission) # TODO don't assume RBSP later
-    dbu._openDB()
+    dbu = DButils.DButils(mission) # TODO don't assume RBSP later
+    dbu.openDB()
     dbu._createTableObjects()
 
     output = open(filename, 'w')
@@ -212,8 +213,8 @@ def usage():
     """
     print the usage messag out
     """
-    print "Usage: {0} <mission> <filename>".format(sys.argv[0])
-    print "   -> mission name to write to html"
+    print("Usage: {0} <mission> <filename>".format(sys.argv[0]))
+    print("   -> mission name to write to html")
     return
 
 

@@ -1,4 +1,6 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
+from __future__ import print_function
+
 
 import datetime
 import os
@@ -6,7 +8,7 @@ import shutil
 import stat
 import unittest
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 from dbprocessing import Diskfile
 from dbprocessing import Version
 
@@ -21,11 +23,11 @@ class TestSetup(unittest.TestCase):
         self.sqlworking = sqpath.replace('RBSP_MAGEIS.sqlite', 'working.sqlite')
         shutil.copy(sqpath, self.sqlworking)
         os.chmod(self.sqlworking, stat.S_IRUSR|stat.S_IWUSR)
-        self.dbu = DBUtils.DBUtils(self.sqlworking)
+        self.dbu = DButils.DButils(self.sqlworking)
 
     def tearDown(self):
         super(TestSetup, self).tearDown()
-        self.dbu._closeDB()
+        self.dbu.closeDB()
         del self.dbu
         os.remove(self.sqlworking)
 
@@ -52,8 +54,8 @@ class DiskfileTests(TestSetup):
     """Tests for Diskfile class"""
     def test_read_error(self):
         """given a file input that is not readable raise ReadError:"""
-        self.assertRaises(Diskfile.ReadError, Diskfile.Diskfile, 'wrong input',
-                          self.dbu)
+        df = Diskfile.Diskfile('wrong input', self.dbu)
+        self.assertRaises(Diskfile.ReadError, df.checkAccess)
 
     def test_write_error(self):
         """given a file input that is not writeable WriteError"""
@@ -61,16 +63,13 @@ class DiskfileTests(TestSetup):
             with open('IamAfileThatExists.file', 'wb') as f:
                 f.write('I am some text in a file')
             os.chmod('IamAfileThatExists.file', stat.S_IRUSR)
-#            self.assertRaises(Diskfile.WriteError, Diskfile.Diskfile,
-#                              'IamAfileThatExists.file', self.dbu)
+            df = Diskfile.Diskfile('IamAfileThatExists.file', self.dbu)
+            self.assertRaises(Diskfile.WriteError, df.checkAccess)
 
             os.chmod('IamAfileThatExists.file', stat.S_IWUSR|stat.S_IRUSR)
         finally:
-            try:
-                os.remove('IamAfileThatExists.file')
-            except OSError:
-                pass
-
+            os.remove('IamAfileThatExists.file')
+            
     def test_init(self):
         """init does some checking"""
         with open('IamAfileThatExists.file', 'wb') as f:

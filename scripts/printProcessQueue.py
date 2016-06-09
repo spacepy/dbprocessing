@@ -2,15 +2,15 @@
 
 import sys
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 if len(sys.argv) != 2:
     print('Usage: {0} database'.format(sys.argv[0]))
     sys.exit(-1)
 
 if __name__ == "__main__":
-    a = DBUtils.DBUtils(sys.argv[1])
-    a._openDB()
+    a = DButils.DButils(sys.argv[1])
+    a.openDB()
     a._createTableObjects()
     n_items = a.Processqueue.len()
     items = a.Processqueue.getAll()

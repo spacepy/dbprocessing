@@ -4,6 +4,8 @@
 in a given directory make symlinks to all the newest versions of files into another directory
 """
 
+from __future__ import print_function
+
 import ConfigParser
 import datetime
 import itertools
@@ -230,7 +232,7 @@ if __name__ == '__main__':
         for c in config:
             print(c)
         sys.exit(0)
-    print config
+    print(config)
 
     for sec in config:
         print('Processing [{0}]'.format(sec))
@@ -238,7 +240,7 @@ if __name__ == '__main__':
         for filt in filter.split(','):
             files = []
             files_out = []
-            print filt.strip()
+            print(filt.strip())
             files_t, files_out_t = get_all_files(config[sec]['sourcedir'], config[sec]['destdir'], filt.strip())
             #if options.verbose: print files_t
             #if options.verbose: print files_out_t

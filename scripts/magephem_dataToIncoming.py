@@ -7,7 +7,7 @@ import re
 import shutil
 import subprocess
 
-import dbprocessing.DBUtils as DBUtils
+import dbprocessing.DButils as DBUtils
 import dbprocessing.DBlogging as DBlogging
 
 """
@@ -19,14 +19,14 @@ make a meta kernel each day that is dated 2 weeks out
   - if yes, done, if no runnewMetaKernel.py and drop in incoming
 """
 
-dbu = DBUtils.DBUtils(os.path.expanduser('~ectsoc/MagEphem_processing.sqlite'))
+dbu = DBUtils.DButils(os.path.expanduser('~ectsoc/MagEphem_processing.sqlite'))
 
 mission_path = dbu.getMissionDirectory()
 g_inc_path = dbu.getIncomingPath()
 
 files = dbu.getFilesByProduct('rbsp_pre_kernel')
 #files = sorted(files, key=lambda x: x.utc_file_date)[-1]
-dbu._closeDB()
+dbu.closeDB()
 
 files = set(v.filename for v in files)
 

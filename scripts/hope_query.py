@@ -4,7 +4,7 @@ import datetime
 import sys
 from optparse import OptionParser
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 import dateutil.parser as dup
 
 if __name__ == "__main__":
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     dt = dup.parse(args[0])
 
 
-    a = DBUtils.DBUtils(options.mission)
+    a = DButils.DButils(options.mission)
 
     file_ids = []
     for p in prod:

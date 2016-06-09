@@ -9,3 +9,7 @@ htmlcov/
 logfile.txt
 old/
 Test-Test_R0_evinst_20000111_v1.0.0.cdf
+.idea
+build/
+test_DB/L1/*
+test_DB/L2/*

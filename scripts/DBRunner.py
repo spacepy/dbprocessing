@@ -12,7 +12,7 @@ import spacepy.toolbox as tb
 
 from dbprocessing import dbprocessing
 from dbprocessing.runMe import ProcessException
-from dbprocessing import runMe, Utils, DBUtils
+from dbprocessing import runMe, Utils, DButils
 
 """
 This code, Runner.py, is used to demo run codes for certain dates out of the database

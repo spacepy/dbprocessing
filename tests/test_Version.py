@@ -1,11 +1,10 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
+from __future__ import print_function
 
 import unittest
 
 from dbprocessing import Version
 
-
-__version__ = '2.0.3'
 
 
 class VersionTests(unittest.TestCase):
@@ -32,16 +31,6 @@ class VersionTests(unittest.TestCase):
         answers = ( '1.0.1', '5.0.1', '1.3.1' )
         for i, val in enumerate(invals):
             self.assertEqual(answers[i], str(val))
-
-    def test_Version_eq(self):
-        """__eq__ should work"""
-        invals = (  (Version.Version(1, 0, 0), Version.Version(1, 0, 0)),
-                        (Version.Version(1, 2, 0), Version.Version(1, 0, 0)),
-                        (Version.Version(1, 0, 4), Version.Version(1, 0, 0)),
-                        (Version.Version(4, 2, 1), Version.Version(1, 0, 0)) )
-        real_ans = (True, False, False, False)
-        for i, val in enumerate(invals):
-            self.assertEqual(real_ans[i], val[0] == val[1])
 
     def test_Version_le(self):
         """__le__ should work"""

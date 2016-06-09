@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.6
+from __future__ import print_function
 
 
 """
@@ -25,11 +26,8 @@ import re
 import dateutil.parser as dup
 import numpy as np
 
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
-dbu = DBUtils.DBUtils('~/RBSP_processing.sqlite')
-dbu._openDB()
-dbu._createTableObjects()
 
 class logfile(object):
     """

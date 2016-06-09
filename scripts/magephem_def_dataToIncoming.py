@@ -11,7 +11,7 @@ import tempfile
 
 import naif
 
-import dbprocessing.DBUtils as DBUtils
+import dbprocessing.DButils as DBUtils
 import dbprocessing.DBlogging as DBlogging
 from dbprocessing import inspector
 
@@ -31,14 +31,14 @@ def perdelta(start, end, delta):
         curr += delta
 
 
-dbu = DBUtils.DBUtils(os.path.expanduser('~ectsoc/RBSP_MAGEPHEM_def.sqlite'))
+dbu = DBUtils.DButils(os.path.expanduser('~ectsoc/RBSP_MAGEPHEM_def.sqlite'))
 
 mission_path = dbu.getMissionDirectory()
 g_inc_path = dbu.getIncomingPath()
 
 files = dbu.getFilesByProduct('rbspa-def_kernel')
 #files = sorted(files, key=lambda x: x.utc_file_date)[-1]
-dbu._closeDB()
+dbu.closeDB()
 
 dbfiles = set(v.filename for v in files)
 
@@ -82,14 +82,14 @@ for f in files_to_make:
 ####################################################################################################
 
 
-dbu = DBUtils.DBUtils(os.path.expanduser('~ectsoc/RBSP_MAGEPHEM_def.sqlite'))
+dbu = DBUtils.DButils(os.path.expanduser('~ectsoc/RBSP_MAGEPHEM_def.sqlite'))
 
 mission_path = dbu.getMissionDirectory()
 g_inc_path = dbu.getIncomingPath()
 
 files = dbu.getFilesByProduct('rbspb-def_kernel')
 #files = sorted(files, key=lambda x: x.utc_file_date)[-1]
-dbu._closeDB()
+dbu.closeDB()
 
 dbfiles = set(v.filename for v in files)
 
@@ -137,7 +137,7 @@ for f in files_to_make:
 ##################################################################
 ## # Also need to do the same thing making QinDenton inputs
 ## ##################################################################
-## dbu = DBUtils.DBUtils(os.path.expanduser('~ectsoc/MagEphem_def_processing.sqlite'))
+## dbu = DButils.DButils(os.path.expanduser('~ectsoc/MagEphem_def_processing.sqlite'))
 
 ## mission_path = dbu.getMissionDirectory()
 ## g_inc_path = dbu.getIncomingPath()
@@ -148,7 +148,7 @@ for f in files_to_make:
 ## files = dbu.getFilesByProduct('QinDenton_NRT')
 ## NRT_dbfiles = set(v.filename for v in files)
 
-## dbu._closeDB()
+## dbu.closeDB()
 
 
 ## Virbo_files = glob.glob('/n/space_data/MagModelInputs/QinDenton/201[23456789]/QinDenton_*_1min.txt')

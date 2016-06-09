@@ -18,7 +18,7 @@ from sqlalchemy import func
 
 import rbsp #rbsp.mission_day_to_UTC
 
-from dbprocessing import DBUtils, Utils, Version, inspector
+from dbprocessing import DButils, Utils, Version, inspector
 from dbprocessing.runMe import ProcessException
 from rbsp import Version
 
@@ -100,7 +100,7 @@ def wrongNewestVersion(dbu, fix=False):
                         dbu.session.add(f)
                         commit = True
             if commit:
-                dbu._commitDB()
+                dbu.commitDB()
 
 
 
@@ -131,7 +131,7 @@ def noNewestVersion(dbu, fix=False):
                     fixes[-1].newest_version = 1
                     print(' ** Changed {0} to be newest version'.format(fixes[-1].filename))
                     dbu.session.add(fixes[-1])
-            dbu._commitDB() # commit for each product
+            dbu.commitDB() # commit for each product
 
 
 
@@ -154,22 +154,22 @@ if __name__ == "__main__":
         parser.error("-m must be specified")
 
                 
-    dbu = DBUtils.DBUtils(options.mission, echo=options.echo)
+    dbu = DButils.DButils(options.mission, echo=options.echo)
 
     # If we will be editing the DB we have to have lock
     if options.fix:
         # check currently processing
-        curr_proc = dbu._currentlyProcessing()
+        curr_proc = dbu.currentlyProcessing()
         if curr_proc:  # returns False or the PID
             # check if the PID is running
             if Utils.processRunning(curr_proc):
                 # we still have an instance processing, don't start another
-                dbu._closeDB()
+                dbu.closeDB()
                 DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
                 raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
             else:
                 # There is a processing flag set but it died, don't start another
-                dbu._closeDB()
+                dbu.closeDB()
                 DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
                 raise(ProcessException("There is a processing flag set but it died, don't start another"))
         

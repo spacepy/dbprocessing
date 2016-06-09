@@ -19,7 +19,7 @@ from dbprocessing import inspector
 
 import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
-from dbprocessing import DBUtils
+from dbprocessing import DButils
 
 """
 go into the database and get the verbose provencoe for a file
@@ -34,7 +34,7 @@ def getVP(options, dbu, filename):
     """
     try:
         vp = dbu.getEntry('File', dbu.getFileID(os.path.basename(filename))).verbose_provenance
-    except DBUtils.DBNoData:
+    except DButils.DBNoData:
         return ''
     return vp
 
@@ -71,10 +71,10 @@ if __name__ == '__main__':
     if not os.path.isfile(options.mission):
         parser.error("Mission database {0} did not exist".format(options.mission))
 
-    dbu = DBUtils.DBUtils(options.mission)
+    dbu = DButils.DButils(options.mission)
 
     vp = getVP(options, dbu, infile)
-    dbu._closeDB()
+    dbu.closeDB()
     
     if not vp: # is ''
         sys.exit(0) # we are done

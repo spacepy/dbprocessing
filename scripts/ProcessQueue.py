@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.6
+from __future__ import print_function
 
 import datetime
 import os
@@ -12,8 +13,10 @@ import spacepy.toolbox as tb
 from dbprocessing import DBlogging, dbprocessing
 from dbprocessing.runMe import ProcessException
 from dbprocessing import runMe, Utils
+from dbprocessing.Utils import dateForPrinting as DFP
 
-__version__ = '2.0.3'
+
+from dbprocessing import __version__
 
 
 if __name__ == "__main__":
@@ -66,27 +69,27 @@ if __name__ == "__main__":
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
 
     # check currently processing
-    curr_proc = pq.dbu._currentlyProcessing()
+    curr_proc = pq.dbu.currentlyProcessing()
     if curr_proc:  # returns False or the PID
         # check if the PID is running
         if Utils.processRunning(curr_proc):
             # we still have an instance processing, don't start another
-            pq.dbu._closeDB()
+            pq.dbu.closeDB()
             DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
             raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
         else:
             # There is a processing flag set but it died, don't start another
-            pq.dbu._closeDB()
+            pq.dbu.closeDB()
             DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
             raise(ProcessException("There is a processing flag set but it died, don't start another"))
     # start logging as a lock
-    pq.dbu._startLogging()
+    pq.dbu.startLogging()
 
 
     if options.i: # import selected
         try:
             start_len = pq.dbu.Processqueue.len()
-            print("Currently {0} entries in process queue".format(start_len))
+            print("{0} Currently {1} entries in process queue".format(DFP(), start_len))
             pq.checkIncoming(glb=options.glob) 
             if not options.dryrun:
                 while len(pq.queue) != 0:
@@ -97,18 +100,18 @@ if __name__ == "__main__":
         except RuntimeError:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
-            print('Error in running processing chain; debugging details follow:')
+            print('{0} Error in running processing chain; debugging details follow:'.format(DFP()))
             tbstring = traceback.format_exc()
-            print tbstring
+            print(tbstring)
             print('This probably indicates a programming error. Please pass '
                   'this debugging\ninformation to the developer, along with '
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
-            pq.dbu._stopLogging('Abnormal exit on exception')
+            pq.dbu.stopLogging('Abnormal exit on exception')
         else:
-            pq.dbu._stopLogging('Nominal Exit')
-        pq.dbu._closeDB()
-        print("Import finished: {0} files added".format(pq.dbu.Processqueue.len()-start_len))
+            pq.dbu.stopLogging('Nominal Exit')
+        pq.dbu.closeDB()
+        print("{0} Import finished: {1} files added".format(DFP(), pq.dbu.Processqueue.len()-start_len))
 
     if options.p: # process selected
         number_proc = 0
@@ -118,11 +121,11 @@ if __name__ == "__main__":
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
             while pq.dbu.Processqueue.len() > 0:
-                print('Cleaning Processes queue')
+                print('{0} Cleaning Processes queue'.format(DFP()))
                 # clean the queue
                 pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates and sort
                 if not pq.dbu.Processqueue.len():
-                    print("Process queue is empty")
+                    print("{0} Process queue is empty".format(DFP()))
                     break
                 # this loop makes all the runMe objects for all the files in the processqueue
 
@@ -130,7 +133,7 @@ if __name__ == "__main__":
                 n_good  = 0
                 n_bad   = 0
                 
-                print('Building commands for {0} items in the queue'.format(pq.dbu.Processqueue.len()))
+                print('{0} Building commands for {1} items in the queue'.format(DFP(), pq.dbu.Processqueue.len()))
          
                 # make the cpommand lines for all the files in tehj processqueue
                 totalsize = pq.dbu.Processqueue.len()
@@ -161,22 +164,22 @@ if __name__ == "__main__":
                 n_good_t, n_bad_t = runMe.runner(pq.runme_list, pq.dbu, options.numproc)
                 n_good += n_good_t
                 n_bad  += n_bad_t
-                print("{0} of {1} processes were successful".format(n_good, n_bad+n_good))
+                print("{0} {1} of {2} processes were successful".format(DFP(), n_good, n_bad+n_good))
                 DBlogging.dblogger.info("{0} of {1} processes were successful".format(n_good, n_good+n_bad))
 
         except RuntimeError:
             #Generic top-level error handler, because otherwise people freak if
             #they see an exception thrown.
-            print('Error in running processing chain; debugging details follow:')
+            print('{0} Error in running processing chain; debugging details follow:'.format(DFP()))
             tbstring = traceback.format_exc()
-            print tbstring
+            print(tbstring)
             print('This probably indicates a programming error. Please pass '
                   'this debugging\ninformation to the developer, along with '
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
-            pq.dbu._stopLogging('Abnormal exit on exception')
+            pq.dbu.stopLogging('Abnormal exit on exception')
         else:
-            pq.dbu._stopLogging('Nominal Exit')
+            pq.dbu.stopLogging('Nominal Exit')
         finally: 
-            pq.dbu._closeDB()
+            pq.dbu.closeDB()
         del pq

@@ -4,6 +4,7 @@ Created on Tue Oct 23 10:12:11 2012
 
 @author: balarsen
 """
+from __future__ import print_function
 from collections import namedtuple
 import datetime
 import glob
@@ -16,10 +17,11 @@ import time
 import traceback
 
 import DBlogging
-import DBStrings
-import DBUtils
+import DBstrings
+import DButils
 from inspector import extract_Version
 import Utils
+from Utils import dateForPrinting as DFP
 import Version
 
 
@@ -122,7 +124,7 @@ def _start_a_run(runme):
             DBlogging.dblogger.debug("Command line referenced a file opened fine {0}.  {1}"
                                      .format(f, runme.cmdline))
         else:
-            print("Count not have gotten here")
+            print("Could not have gotten here")
             raise(RuntimeError("Should not have gotten here"))
 
 
@@ -201,7 +203,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     # 5) make the output file collection basenames only
     # 6) if there are any inputs in the outputs drop those processes
     #########################################
-    print("len(runme_list)={0}".format(len(runme_list)))
+    print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
     # 1
     outfiles = [os.path.basename(v.filename) for v in runme_list]
     def remove_dups(seq, oval):
@@ -210,7 +212,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
         return [oval[i] for i in xrange(len(seq)) if not (seq[i] in seen or seen_add(seq[i]))]
     # 2
     runme_list = remove_dups(outfiles, runme_list)
-    print("len(runme_list)={0}".format(len(runme_list)))
+    print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
     
     
     # TODO For a future revision think on adding a timeout ability to the subprocess
@@ -241,7 +243,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
             try:
                 #force = False if rundir is None else True
                 if force:
-                    raise(DBUtils.DBNoData)
+                    raise(DButils.DBNoData)
 
                 tmp = dbu.getEntry('File', os.path.basename(runme.cmdline[-1])) # output is last
                 if tmp is not None: # we are not going to run
@@ -251,8 +253,8 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                         rm_tempdir(runme.tempdir) # delete the tempdir
                     except AttributeError:
                         pass
-            except DBUtils.DBNoData:
-                print("Process starting ({1}): {0}".format(' '.join(runme.cmdline), len(runme_list)))
+            except DButils.DBNoData:
+                print("{0} Process starting ({2}): {1}".format(DFP(), ' '.join(runme.cmdline), len(runme_list)))
                 if rundir is None:
                     prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
                 else:
@@ -286,7 +288,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
             if p.returncode != 0: # non zero return code FAILED
                 DBlogging.dblogger.error("Command returned a non-zero return code ({1}): {0}"
                                          .format(' '.join(rm.cmdline), p.returncode))
-                print("Command returned a non-zero return code: {0}\n\t{1}".format(' '.join(rm.cmdline), p.returncode))
+                print("{0} Command returned a non-zero return code: {1}\n\t{2}".format(DFP(), ' '.join(rm.cmdline), p.returncode))
                 fp.flush(); fp.close()
                 #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
                 #rm.moveToError(os.path.join(rm.tempdir, fp.name))
@@ -302,7 +304,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 fp.flush(); fp.close()
                 # this is not a perfect time since all the adding occurs before the next poll
                 DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
-                print("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
+                print("{0} Command: {1} took {2} seconds".format(DFP(), os.path.basename(rm.cmdline[0]), time.time()-t))
                 if rundir is None: # if rundir then this is a test
                     try:
                         rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
@@ -312,7 +314,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                             rm.moveToIncoming(glb[0])
                     rm_tempdir(rm.tempdir) # delete the temp directory
                     rm._add_links(rm.cmdline)
-                print("Process {0} FINISHED".format(' '.join(rm.cmdline)))
+                print("{0} Process {1} FINISHED".format(DFP(), ' '.join(rm.cmdline)))
                 n_good += 1
             else:
                 raise(ValueError("Should not have gotten here"))
@@ -327,7 +329,7 @@ class runMe(object):
     """
     class holds all the info it takes to run a process
 
-    dbu - DBUtils instance
+    dbu - DButils instance
     utc_file_date - datetime.date
     process_id - process to run (int)
     input_files - the files that exist to run with (list of int)
@@ -378,7 +380,7 @@ class runMe(object):
         code_version = code_entry.code_id
         output_interface_version = code_entry.output_interface_version
 
-        fmtr = DBStrings.DBFormatter()
+        fmtr = DBstrings.DBformatter()
         # set the default version for the output file
         self.output_version = Version.Version(output_interface_version, 0, 0)
 
@@ -388,11 +390,13 @@ class runMe(object):
         # in this loop see if the file can be created i.e. ges not already exist in the db
         while True:
             # make the filename in the loop as output_version is manipulated below
-            self.filename = fmtr.expand_format(format_str, {'SATELLITE':ptb['satellite'].satellite_name,
-                                                         'PRODUCT':ptb['product'].product_name,
-                                                         'VERSION':str(self.output_version),
-                                                         'datetime':utc_file_date,
-                                                         'INSTRUMENT':ptb['instrument'].instrument_name})
+            self.filename = fmtr.format(
+                format_str,
+                SATELLITE=ptb['satellite'].satellite_name,
+                PRODUCT=ptb['product'].product_name,
+                VERSION=str(self.output_version),
+                datetime=utc_file_date,
+                INSTRUMENT=ptb['instrument'].instrument_name)
             DBlogging.dblogger.debug("Filename: %s created" % (self.filename))
             if not force:
                 f_id_db = self._fileInDB()
@@ -475,7 +479,7 @@ class runMe(object):
             f_id_db = self.dbu.getFileID(self.filename)
             DBlogging.dblogger.info("Filename: {0} is in the DB, have to make different version".format(self.filename))
             return f_id_db
-        except (DBUtils.DBError, DBUtils.DBNoData):
+        except (DButils.DBError, DButils.DBNoData):
             #DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(self.filename))
             return False
 
@@ -495,7 +499,7 @@ class runMe(object):
             proc_id = self.dbu.getProcessFromOutputProduct(tb['product'].product_id)
 
             code_id = self.dbu.getCodeFromProcess(proc_id, tb['file'].utc_file_date)
-            print "self.dbu.addFilecodelink(tb['file'].file_id, code_id)", tb['file'].file_id, code_id
+            #print("self.dbu.addFilecodelink(tb['file'].file_id, code_id)", tb['file'].file_id, code_id)
             self.dbu.addFilecodelink(tb['file'].file_id, code_id)
             db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
             DBlogging.dblogger.info("added a file code link!!  f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
@@ -506,7 +510,7 @@ class runMe(object):
             ver_diff = (self.dbu.getCodeVersion(self.code_id) - self.dbu.getCodeVersion(db_code_id))
             if ver_diff == [0,0,0]:
                 DBlogging.dblogger.error("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id))
-                raise(DBUtils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id)))
+                raise(DButils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id)))
             self._incVersion(ver_diff)
             return True
         else:
@@ -669,7 +673,7 @@ class runMe(object):
                 DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(self.filename))
                 self.ableToRun = False
                 return
-            except DBUtils.DBNoData:
+            except DButils.DBNoData:
                 pass # we can process this
 
         # build the command line we are to run
