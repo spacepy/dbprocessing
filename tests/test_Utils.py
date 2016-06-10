@@ -3,9 +3,12 @@ from __future__ import print_function
 
 import datetime
 import unittest
+from distutils.dir_util import copy_tree, remove_tree
 import os
+import tempfile
 
 from dbprocessing import Utils
+from dbprocessing import DButils
 from dbprocessing import Version
 
 
@@ -14,9 +17,17 @@ class UtilsTests(unittest.TestCase):
 
     def setUp(self):
         super(UtilsTests, self).setUp()
+        # Not changing the DB now but use a copy anyway
+        # Would need to at least update DB path if we wanted to
+        # do more than vanilla dirSubs
+        self.tempD = tempfile.mkdtemp()
+        copy_tree('testDB/', self.tempD)
+
+        self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
 
     def tearDown(self):
         super(UtilsTests, self).tearDown()
+        remove_tree(self.tempD)
 
     def test_dirSubs(self):
         """dirSubs substitutions should work"""
@@ -38,6 +49,21 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual('3.2.1', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version2))
         path = '{H}{M}{S}'
         self.assertEqual('010203', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
+        # Substitutions that require referring to the DB...
+        filename = 'testDB_001_first.raw'
+        path = '{INSTRUMENT}'
+        self.assertEqual('rot13', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        path = '{SATELLITE}'
+        self.assertEqual('testDB-a', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        path = '{SPACECRAFT}'
+        self.assertEqual('testDB-a', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        path = '{MISSION}'
+        self.assertEqual('testDB', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        path = '{PRODUCT}'
+        self.assertEqual('testDB_rot13_L0_first', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        # Verify that unknown values are ignored
+        path = '{xxx}'
+        self.assertEqual('{xxx}', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
 
     def test_chunker(self):
         """chunker()"""
