@@ -35,7 +35,7 @@ QCEmailer_conf.txt: quality control loop stuff
 README.txt: whatever
 reprocessByAll.py: should work, probably doesn't
 reprocessByCode.py: ""
-reprocessByDate.py: ""
+reprocessByDate.py: This code works and is likely the one that shoulod be used most of the time for reprocessing files.
 reprocessByInstrument.py: ""
 reprocessByProduct.py: does work, used all the time, beaten it to a pulp to make it work but haven't done that on the others
 updateCode.py: new version of code, rerun based on that, better done through config files (although can't be done that way) and then run reprocessByCode
