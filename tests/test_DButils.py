@@ -898,7 +898,7 @@ class ProcessqueueTests(TestSetup):
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, pq)
 
 class TestWithtestDB(unittest.TestCase):
-    #Tests that require(or were written after the creation of) the new testDB.
+    """Tests that require(or were written after the creation of) the new testDB are here."""
     def setUp(self):
         super(TestWithtestDB, self).setUp()
         self.tempD = tempfile.mkdtemp()
@@ -916,21 +916,26 @@ class TestWithtestDB(unittest.TestCase):
         remove_tree(self.tempD)
 
     def test_checkDiskForFile_DBTrue_FileTrue(self):
+        """Checks if checkDiskForFile returns true if the file exists and the DB says it does"""
         self.assertTrue(self.dbu.checkDiskForFile(1))
 
     def test_checkDiskForFile_DBTrue_FileFalse_FixTrue(self):
+        """Checks if checkDiskForFile will succesfully fix if the file does not exist and the DB says it does"""
         os.remove(self.tempD+'/L0/testDB_001_first.raw')
         self.assertTrue(self.dbu.checkDiskForFile(1, True))
 
     def test_checkDiskForFile_DBTrue_FileFalse(self):
+        """Checks if checkDiskForFile returns false if the file does not exist and the DB says it does"""
         os.remove(self.tempD+'/L0/testDB_001_first.raw')
         self.assertFalse(self.dbu.checkDiskForFile(1))
 
     def test_checkDiskForFile_DBFalse_FileTrue(self):
+        """Checks if checkDiskForFile returns true if the DB says it doesn't exist"""        
         self.dbu.getEntry('File', 1).exists_on_disk = False
         self.assertTrue(self.dbu.checkDiskForFile(1))
 
     def test_checkFileSHA(self):
+        """Checks if checkFileSHA works"""
         self.assertTrue(self.dbu.checkFileSHA(1))
 
         with open(self.tempD + '/L0/testDB_001_first.raw', 'w') as fp:
@@ -938,6 +943,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertFalse(self.dbu.checkFileSHA(1))
 
     def test_checkFiles(self):
+        """Checks if checkFiles will detect both missing files and bad checksums"""
         with open(self.tempD + '/L0/testDB_000_first.raw', 'w') as fp:
             fp.write('I am some text that will change the SHA\n')
         os.remove(self.tempD + '/L0/testDB_001_first.raw')
@@ -947,7 +953,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(ans, self.dbu.checkFiles())
 
     def addGenericCode(self, processID=1):
-        """Creates a dummy code."""
+        """Adds a dummy code."""
         cID = self.dbu.addCode(filename = "run_test.py",
              relative_path = "scripts",
              code_start_date = "2010-09-01",
@@ -963,7 +969,7 @@ class TestWithtestDB(unittest.TestCase):
         return cID
 
     def addGenericInspector(self, productID):
-        """Creates a dummy inspector. productID is the index of the associated product"""
+        """Adds a dummy inspector. productID is the index of the associated product"""
         iID = self.dbu.addInspector(filename = "testing_L0.py", 
              relative_path = "codes/inspectors", 
              description = "Level 0", 
@@ -978,7 +984,7 @@ class TestWithtestDB(unittest.TestCase):
         return iID
 
     def addGenericProduct(self):
-        """Creates a dummy product."""
+        """Adds a dummy product."""
         pID = self.dbu.addProduct(product_name = "testing_Product",
              instrument_id = 1,
              relative_path = "L0",
@@ -988,28 +994,31 @@ class TestWithtestDB(unittest.TestCase):
             )
         return pID
 
-    def addGenericFile(self, productID, date = datetime.date(2010, 1, 1)):
+    def addGenericFile(self, productID):
+        """Adds a dummy file"""
         fID = self.dbu.addFile(filename = "testing_file.file", 
              data_level = 0, 
-             version = Version.Version(1, 2, 3), #
+             version = Version.Version(1, 2, 3),
              file_create_date = datetime.date(2010, 1, 1), 
              exists_on_disk = 1, 
-             utc_file_date = date, #
+             utc_file_date = datetime.date(2010, 1, 1),
              utc_start_time = datetime.datetime(2010, 1, 1, 0, 0, 0), 
              utc_stop_time = datetime.datetime(2010, 1, 2, 0, 0, 0),  
-             product_id = productID, #
+             product_id = productID,
              newest_version = 1, 
              shasum = '0'
             )
         return fID
 
     def addGenericInstrument(self):
+        """Adds a dummy instrument"""
         iID = self.dbu.addInstrument(instrument_name = "testing_Instrument",
              satellite_id = 1
             )
         return iID
 
     def test_addCode(self):
+        """Tests if addCode is succesful"""
         cID = self.addGenericCode()
         c = self.dbu.getEntry('Code', cID)
 
@@ -1028,6 +1037,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(1, c.newest_version)
 
     def test_addInspector(self):
+        """Tests if addInspector is succesful"""
         iID = self.addGenericInspector(1)
         i = self.dbu.getEntry('Inspector', iID) 
 
@@ -1045,6 +1055,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual("-q", i.arguments)
 
     def test_addFile(self):
+        """Tests if addFile is succesful"""
         fID = self.addGenericFile(1)
 
         i = self.dbu.getEntry('File', fID)
@@ -1063,7 +1074,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual('0', i.shasum)
     
     def test_addInstrument(self):
-        #iID = self.addGenericInstrument() #Can't use this and be able to test substituions
+        """Tests if addInstrument is succesful"""
         iID = self.dbu.addInstrument(instrument_name = "testing_{MISSION}_{SPACECRAFT}_Instrument",
                  satellite_id = 1
                 )
@@ -1072,6 +1083,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual('testing_testDB_testDB-a_Instrument', i.instrument_name)
 
     def test_addProduct(self):
+        """Tests if addProduct is succesful"""
         pID = self.addGenericProduct()
 
         i = self.dbu.getEntry('Product', pID)
@@ -1083,6 +1095,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual('desc', i.product_description)
 
     def test_addInstrumentproductlink(self):
+        """Tests if addInstrumentproductlink is succesful"""
         pID = self.addGenericProduct()
         self.addGenericInspector(pID)
         ID = self.dbu.addInstrumentproductlink(instrument_id = 1, 
@@ -1094,6 +1107,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(pID, i.product_id)
 
     def test_addproductprocesslink(self):
+        """Tests if addproductprocesslink is succesful"""
         pID = self.addGenericProduct()
         self.addGenericInspector(pID)
         ID = self.dbu.addproductprocesslink(input_product_id = pID,
@@ -1107,6 +1121,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(0, i.optional)
 
     def test_addFilecodelink(self):
+        """Tests if addFilecodelink is succesful"""
         cID = self.addGenericCode()
         fID = self.addGenericFile(1)
         self.dbu.addFilecodelink(resulting_file_id = fID, 
@@ -1119,8 +1134,8 @@ class TestWithtestDB(unittest.TestCase):
 
 
     def test_addFilefilelink(self):
+        """Tests if addFilefilelink is succesful"""
         f1ID = self.addGenericFile(1)
-        #f2ID = self.addGenericFile(2, datetime.date(2010, 1, 2))
         self.dbu.addFilefilelink(resulting_file_id = f1ID, 
                  source_file = f1ID-1
                 )
@@ -1129,7 +1144,8 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(f1ID, i.resulting_file)
         self.assertEqual(f1ID-1, i.source_file)
 
-    def test_delInspector(self ):
+    def test_delInspector(self):
+        """Tests if delInspector is succesful"""
         iID = self.addGenericInspector(1)
         i = self.dbu.getEntry('Inspector', iID)
         #Make sure the add worked
@@ -1140,6 +1156,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(None, self.dbu.getEntry('Inspector', iID))
 
     def test_delFilecodelink(self):
+        """Tests if delFilecodelink is succesful"""
         cID = self.addGenericCode()
         fID = self.addGenericFile(1)
         self.dbu.addFilecodelink(resulting_file_id = fID, 
@@ -1156,6 +1173,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(None, i)
 
     def test_delFilefilelink(self):
+        """Tests if delFilefilelink is succesful"""
         f1ID = self.addGenericFile(1)
         #f2ID = self.addGenericFile(2, datetime.date(2010, 1, 2))
         self.dbu.addFilefilelink(resulting_file_id = f1ID, 
@@ -1171,6 +1189,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(None, i)
 
     def test_updateInspectorSubs(self):
+        """Tests if updateInspectorSubs is succesful"""
         pID = self.addGenericProduct()
 
         iID = self.dbu.addInspector(filename = "testing_L0.py", 
@@ -1193,6 +1212,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual('codes/testDB-a_testDB-a_testDB_testing_Product_0.0', i.relative_path)
 
     def test_updateProductSubs(self):
+        """Tests if updateProductSubs is succesful"""
         pID = self.dbu.addProduct(product_name = "testing_{INSTRUMENT}",
                  instrument_id = 1,
                  relative_path = "L0",
@@ -1214,6 +1234,7 @@ class TestWithtestDB(unittest.TestCase):
 
 
     def test_updateProcessSubs(self):
+        """Tests if updateProcessSubs is succesful"""
         pID = self.addGenericProduct()
         self.addGenericInspector(pID)
         self.dbu.addInstrumentproductlink(instrument_id = 1, 
@@ -1233,7 +1254,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual('testing_process_testDB_rot13_L1_rot13_testDB-a_testDB', p.process_name)
 
     def test_list_release(self):
-        """This tests all of the release stuff, it's all intertwined anyway"""
+        """Tests all of the release stuff, it's all intertwined anyway"""
         self.dbu.tag_release(1)
 
         ans = ['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw', 'testDB_000_sec.raw',
