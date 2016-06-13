@@ -20,6 +20,8 @@ comment, while # does not.)
 
 coveragePlot.py
 ---------------
+test
+
     #############################
     # sample config file
     #############################
@@ -91,11 +93,6 @@ coveragePlot.py
     yticklabel5 = FULL
 
 
-
 TODO
-====
+----
 Add in an example and describe it
-
-
-
-

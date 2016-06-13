@@ -146,7 +146,7 @@ class DButils(object):
             self.dbIsOpen = True
             if verbose: print("DB is open: %s" % (engineInsR))
             return
-        except Exception, msg:
+        except Exception as msg:
             raise(DBError('Error opening database: %s'% (msg)))
 
     def _createTableObjects(self, verbose = False):

@@ -227,7 +227,7 @@ class ProcessQueue(object):
         for code, arg, product in act_insp:
             try:
                 inspect = imp.load_source('inspect', code)
-            except IOError, msg:
+            except IOError as msg:
                 DBlogging.dblogger.error('Inspector: "{0}" not found: {1}'.format(code, msg))
                 if os.path.isfile(code + ' '):
                     DBlogging.dblogger.info('---> However inspector: "{0}" was found'.format(code + ' '))

@@ -120,13 +120,13 @@ class DBUtilsOtherTests(TestSetup):
 
     def test_repr(self):
         """repr"""
-        self.assertIn('DBProcessing class instance for mission', self.dbu.__repr__())
+        self.assertTrue('DBProcessing class instance for mission' in self.dbu.__repr__())
 
     def test_purgeFileFromDB(self):
         """purgeFileFromDB"""
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6681)
         file_id = self.dbu.getFileID(123)
-        self.dbu.purgeFileFromDB(file_id)
+        self.dbu._purgeFileFromDB(file_id)
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, file_id)
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6680)
 
@@ -1225,23 +1225,21 @@ class TestWithtestDB(unittest.TestCase):
         self.dbu.addInstrumentproductlink(instrument_id = 1, 
                  product_id = pID
                 )
-        
 
         self.dbu.updateProductSubs(pID)
         p = self.dbu.getEntry('Product', pID) 
         self.assertEqual('testing_rot13', p.product_name)
         self.assertEqual('testing_testDB-a_testDB-a_testDB_testing_rot13_0.0', p.format)
 
-
     def test_updateProcessSubs(self):
         """Tests if updateProcessSubs is succesful"""
         pID = self.addGenericProduct()
         self.addGenericInspector(pID)
-        self.dbu.addInstrumentproductlink(instrument_id = 1, 
+        self.dbu.addInstrumentproductlink(instrument_id = 1,
                  product_id = pID
                 )
         prID = self.dbu.addProcess(process_name = "testing_process_{PRODUCT}_{INSTRUMENT}_{SATELLITE}_{MISSION}",
-                    output_product = pID, 
+                    output_product = pID,
                     output_timebase = "FILE")
         self.addGenericCode(prID)
         self.dbu.addproductprocesslink(input_product_id = 1,
