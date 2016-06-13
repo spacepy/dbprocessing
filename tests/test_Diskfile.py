@@ -79,7 +79,17 @@ class DiskfileTests(TestSetup):
         finally:
             os.remove('IamAfileThatExists.file')
 
+    def test_repr(self):
+        """Test repr"""
+        # File must exist...
+        reprfile = 'reprtest.txt'
+        with open(reprfile, 'wb') as f:
+            f.write('I am some text in a file')
 
+        df = Diskfile.Diskfile(reprfile, self.dbu)
+
+        self.assertTrue(repr(df) == '<Diskfile.Diskfile object: ' + reprfile + '>')
+        os.remove(reprfile)
 
 if __name__ == "__main__":
     unittest.main()
