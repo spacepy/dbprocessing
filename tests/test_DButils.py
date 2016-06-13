@@ -120,13 +120,13 @@ class DBUtilsOtherTests(TestSetup):
 
     def test_repr(self):
         """repr"""
-        self.assertIn('DBProcessing class instance for mission', self.dbu.__repr__())
+        self.assertTrue('DBProcessing class instance for mission' in self.dbu.__repr__())
 
     def test_purgeFileFromDB(self):
         """purgeFileFromDB"""
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6681)
         file_id = self.dbu.getFileID(123)
-        self.dbu.purgeFileFromDB(file_id)
+        self.dbu._purgeFileFromDB(file_id)
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, file_id)
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6680)
 
