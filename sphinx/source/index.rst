@@ -1,17 +1,17 @@
-
 dbprocessing
 ============
+.. toctree::
+   :maxdepth: 1
 
-Scripts to control chain
-------------------------
-:doc:`scripts`
-
+   developer
+   scripts
+   ConfigurationFiles
 
 API documentation
 -----------------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     DBfile
     DBlogging
@@ -30,12 +30,3 @@ API documentation
 Undocumented Python objects
 ---------------------------
 :doc:`python`
-
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

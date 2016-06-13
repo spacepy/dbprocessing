@@ -13,13 +13,17 @@
 # serve to show the default.
 
 import sys
+import sysconfig
 import os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
-
+sys.path.insert(
+    0, os.path.abspath(
+        os.path.join('..', '..', 'build', 'lib.{0}-{1}.{2}'.format(
+            sysconfig.get_platform(), *sys.version_info[:2]))))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -36,14 +40,14 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.pngmath',
     'sphinx.ext.viewcode',
-    'numpydoc',
+    #'numpydoc',
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
 ]
 
 autosummary_generate = True
-numpydoc_show_class_members = False
+#numpydoc_show_class_members = False
 
 # # make it so TODOs will work
 # todo_include_todos = True
@@ -126,7 +130,7 @@ todo_include_todos = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

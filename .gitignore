@@ -13,3 +13,5 @@ Test-Test_R0_evinst_20000111_v1.0.0.cdf
 build/
 test_DB/L1/*
 test_DB/L2/*
+sphinx/build/
+sphinx/source/autosummary/
