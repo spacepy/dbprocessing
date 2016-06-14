@@ -68,25 +68,17 @@ class Diskfile(object):
     Diskfile class contains methods for dealing with files on disk,
     all parsing for what mission files belong to is continued in here
     to add a new mission code must be added here.
-
-
-
-    Parameters
-    ==========
-    infile : str
-        a file to create a diskfile around
-    dbu :  :class:`.DButils`
-        pass in the current :class:`.DButils` session so that a new connection is not made
-
     """
 
-    def __init__(self,
-                 infile,
-                 dbu):
+    def __init__(self, infile, dbu):
         """
         setup a Diskfile class, takes in a filename and creates a params dict to hold information about the file
         then tests to see what mission the file is from
-
+        
+        :param infile: a file to create a Diskfile around
+        :type infile: str
+        :param dbu: pass in the current session so that a new connection is not made
+        :type dbu: :class:`.DButils`
         """
         self.infile = infile
         try:
