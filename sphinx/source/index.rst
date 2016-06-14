@@ -14,7 +14,6 @@ API documentation
     :maxdepth: 1
 
     DBfile
-    DBlogging
     dbprocessing
     DBqueue
     DBstrings

@@ -18,8 +18,6 @@ class Version(object):
 
     .. note:: The interface version starts at 1
 
-    .. Author:: Brian Larsen, LANL
-
     :attribute interface: The interface version for the object
     :attribute quality: The quality version for the object
     :attribute revision: The revision version for the object
@@ -69,6 +67,7 @@ class Version(object):
     def fromString(inval):
         """
         Given a string of the form x.y.z return a Version object
+        
         :param inval: String in the form x.y.z 
         :type inval: str
         """

@@ -171,23 +171,23 @@ class DButils(object):
         """
         DBlogging.dblogger.debug("Entered _createTableObjects()")
 
-## ask for the table names form the database (does not grab views)
+        ## ask for the table names form the database (does not grab views)
         table_names = self.engine.table_names()
 
-## create a dictionary of all the table names that will be used as class names.
-## this uses the db table name as the table name and a cap 1st letter as the class
-## when interacting using python use the class
+        ## create a dictionary of all the table names that will be used as class names.
+        ## this uses the db table name as the table name and a cap 1st letter as the class
+        ## when interacting using python use the class
         table_dict = {}
         for val in table_names:
             table_dict[val.title()] = val
-##  dynamically create all the classes (c1)
-##  dynamically create all the tables in the db (c2)
-##  dynamically create all the mapping between class and table (c3)
-## this just saves a lot of typing and is equivalent to:
-##     class Missions(object):
-##         pass
-##     missions = Table('missions', metadata, autoload=True)
-##     mapper(Missions, missions)
+        ##  dynamically create all the classes (c1)
+        ##  dynamically create all the tables in the db (c2)
+        ##  dynamically create all the mapping between class and table (c3)
+        ## this just saves a lot of typing and is equivalent to:
+        ##     class Missions(object):
+        ##         pass
+        ##     missions = Table('missions', metadata, autoload=True)
+        ##     mapper(Missions, missions)
         for val in table_dict:
             if verbose: print(val)
             if not hasattr(self, val):  # then make it
@@ -277,7 +277,7 @@ class DButils(object):
                    processing_end_time= None,
                    comment=None):
         """
-        add an entry to the logging table
+        Add an entry to the logging table
 
         :param currently_processing: is the db currently processing?
         :type currently_processing: bool
@@ -340,10 +340,15 @@ class DButils(object):
         """
         Check the filesystem to see if the file exits or not as it says in the db
 
-        return true is consistent, False otherwise
+        :param file_id: id of the file to check
+        :type file_id: int
 
         :keyword fix: (optional) set to have the DB fixed to match the filesystem
            this is **NOT** sure to be safe
+        :type fix: bool
+
+        :returns: Return true is consistent, False otherwise
+        :rtype: bool
         """
         sq = self.getEntry('File', file_id)
         if sq.exists_on_disk:
@@ -416,7 +421,7 @@ class DButils(object):
 
     def _processqueuePush(self, fileid, version_bump=None, MAX_ADD=150):
         """
-        push a file onto the process queue (onto the right)
+        Push a file onto the process queue (onto the right)
 
         Parameters
         ==========
@@ -643,11 +648,12 @@ class DButils(object):
 
     def getAllSatellites(self):
         """
-        return dictionaries of satellite, mission objects
+        Return dictionaries of satellite, mission objects
 
         Returns
         -------
         dict : dictionaries of satellite, mission objects
+        :rtype: dict
         """
         ans = []
         sats = self.session.query(self.Satellite).all()

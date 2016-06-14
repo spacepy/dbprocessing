@@ -15,20 +15,22 @@ import string
 class DBformatter(string.Formatter):
     """String formatter extended/modified for DButils
 
-    @cvar SPECIAL_FIELDS: indexed by field name; each element contains
+    :cvar SPECIAL_FIELDS: indexed by field name; each element contains
                           a fully-formatted representation of the field
                           and a regular expression that should match it.
-    @type SPECIAL_FIELDS: dict
-    @note: As this is currently implemented, L{regex} may not handle
-           {{ and }} properly, since regex expansion is applied I{after}
-           the basic formatting is done, and thus {{ and }} are already
-           replaced with { and }. In this case, {{Y}} would be replaced
-           with the {Y} regex. One solution to this may be to put a
-           callback in L{QuietFormatter} to allow other handling of
-           unmatched fields. Callback would have to be specified at
-           class construction time and be same for the life of the formatter
-           Also, it might make more sense to let the exception throw if fields
-           aren't filled.
+    :type SPECIAL_FIELDS: dict
+    
+    .. note:: As this is currently implemented, L{regex} may not handle
+       {{ and }} properly, since regex expansion is applied I{after}
+       the basic formatting is done, and thus {{ and }} are already
+       replaced with { and }. In this case, {{Y}} would be replaced
+       with the {Y} regex. One solution to this may be to put a
+       callback in L{QuietFormatter} to allow other handling of
+       unmatched fields. Callback would have to be specified at
+       class construction time and be same for the life of the formatter
+       Also, it might make more sense to let the exception throw if fields
+       aren't filled.
+
     """
 
     SPECIAL_FIELDS = {
@@ -77,8 +79,8 @@ class DBformatter(string.Formatter):
         may be provided by the datetime object and inserts those keywords
         into L{kwargs}.
 
-        @param kwargs: list of keywords passed to L{format}
-        @type kwargs: dict.
+        :param kwargs: list of keywords passed to L{format}
+        :type kwargs: dict.
         """
         if 'datetime' in kwargs:
             dt = kwargs['datetime']
@@ -124,15 +126,15 @@ class DBformatter(string.Formatter):
 
         Everything else is returned verbatim.
 
-        @param format_string: the format string to convert
-        @type format_string: str
-        @param kwargs: provided keywords to check for existence. If not
+        :param format_string: the format string to convert
+        :type format_string: str
+        :param kwargs: provided keywords to check for existence. If not
                        supplied, do no regex substitution.
-        @type kwargs: dict
-        @return: L{format_string} with the fields defined in L{SPECIAL_FIELDS}
+        :type kwargs: dict
+        :return: L{format_string} with the fields defined in L{SPECIAL_FIELDS}
                  expanded to full format specifiers and replaced by
                  regular expressions, as desired.
-        @rtype: str
+        :rtype: str
         """
         result = []
         for literal, field, format, conversion in self.parse(format_string):
@@ -164,17 +166,17 @@ class DBformatter(string.Formatter):
         Converse of parse. Takes literal text, field name, format spec,
         and conversion and assembles into a full field spec.
 
-        @param literal: any literal text preceding the field definition
-        @type literal: str
-        @param field: name of the field
-        @type field: str
-        @param format: format specification to apply to L{field}
-        @type format: str
-        @param conversion: conversion to apply to L{field}
-        @type conversion: str
-        @return: a full format spec that will parse into L{literal},
+        :param literal: any literal text preceding the field definition
+        :type literal: str
+        :param field: name of the field
+        :type field: str
+        :param format: format specification to apply to L{field}
+        :type format: str
+        :param conversion: conversion to apply to L{field}
+        :type conversion: str
+        :return: a full format spec that will parse into L{literal},
                  L{field}, L{format}, L{conversion}
-        @rtype: str
+        :rtype: str
         """
         if not field and not conversion and not format:
             return literal

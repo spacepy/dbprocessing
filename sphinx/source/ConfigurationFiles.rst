@@ -20,7 +20,7 @@ comment, while # does not.)
 
 coveragePlot.py
 ---------------
-test
+::
 
     #############################
     # sample config file

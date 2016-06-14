@@ -55,8 +55,6 @@ class DigestError(Exception):
 
     .. note: maybe just combine this with ReadError for the current purpose
 
-
-
     """
     def __init__(self, *params):
         super(DigestError, self).__init__(*params)
@@ -146,21 +144,14 @@ class Diskfile(object):
 #        DBlogging.dblogger.debug("{0} Access Checked out OK".format(self.infile))
 
 
-def calcDigest( infile):
+def calcDigest(infile):
     """Calculate the SHA1 digest from a file.
 
+    :param infile: Path to the file
+    :type infile: str
 
-    .. _file:
-
-    Parameters
-    ==========
-    file : str
-        path to the file
-
-    Returns
-    =======
-    out : str
-        hex digits of the file, SHA1 (40 bytes)
+    :return: Hex digits of the file, SHA1 (40 bytes)
+    :rtype: str
 
     """
     m = hashlib.sha1()

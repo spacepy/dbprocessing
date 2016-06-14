@@ -53,6 +53,7 @@ class DBfile(object):
         Checks the DBfile to see if it is the newest version
 
         .. todo:: This makes no sense.
+        
         :return: True the file is newest, False it is not
         :rtype: bool
         """
