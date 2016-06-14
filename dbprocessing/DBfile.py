@@ -27,9 +27,9 @@ class DBfile(object):
 
         .. todo:: Do we need this keyword or the functionality?
 
-        :param diskfile: a file name or diskfile instance to create a DBfile from
+        :param diskfile: A file name or diskfile instance to create a DBfile from
         :type diskfile: str or :class:`.Diskfile`
-        :param dbu: pass in the current :class:`.DButils` session so that a new connection is not made
+        :param dbu: Pass in the current :class:`.DButils` session so that a new connection is not made
         :type dbu: :class:`.DButils`
         :param makeDiskFile: If true, diskfile is a filename and needs a Diskfile made.
         :type makeDiskFile: bool
@@ -64,7 +64,7 @@ class DBfile(object):
         """
         Wrapper around DButils.addFile to take params dict to keywords
 
-        :return: the file_id of the newly added file
+        :return: The file_id of the newly added file
         :rtype: long
         """
         f_id = self.dbu.addFile(filename=self.diskfile.params['filename'],
@@ -91,7 +91,7 @@ class DBfile(object):
         """
         Query the DB and get the directory that the file should exist in
 
-        :return: the full path for the DBfile
+        :return: The full path for the DBfile
         :rtype: str
         """
         relative_path = self.dbu.session.query(self.dbu.Product.relative_path).filter_by(
@@ -112,8 +112,8 @@ class DBfile(object):
         If the file is a symbolic link it is assumed already in the target directory and not
         moved, the link is just removed
 
-        :return: the from and to arguments to move with full path info
-        :rtype: list
+        :return: The from and to arguments to move with full path info
+        :rtype: tuple(str, str)
 
         """
         path = self.getDirectory()

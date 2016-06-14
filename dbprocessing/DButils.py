@@ -101,7 +101,7 @@ class DButils(object):
         """
         @summary: Print out something useful when one prints the class instance
 
-        @return: DBProcessing class instance for mission <mission name>
+        :return: DBProcessing class instance for mission <mission name>
         """
         return 'DBProcessing class instance for mission ' + self.mission + ', version: ' + __version__
 
@@ -128,7 +128,15 @@ class DButils(object):
 
     def openDB(self, engine, db_var=None, verbose=False, echo=False):
         """
-        setup python to talk to the database, this is where it is, name and password.
+        Setup python to talk to the database, this is where it is, name and password.
+
+        :param engine: DB engine to connect to
+        :type engine: str
+        :param db_var: Does nothing.
+        :param echo: if True, the Engine will log all statements as well as a repr() of their parameter lists to the logger
+        :type echo: bool
+        :param verbose: if True, will print out extra debugging
+        :type verbose: bool
         """
         if self.dbIsOpen == True:
             return
@@ -199,8 +207,8 @@ class DButils(object):
         """
         Checks the db to see if it is currently processing, don't want to do 2 at the same time
 
-        @return: false or the pid
-        @rtype: (bool, long)
+        :return: false or the pid
+        :rtype: bool or long
 
         >>>  pnl.currentlyProcessing()
         """
@@ -216,12 +224,14 @@ class DButils(object):
             DBlogging.dblogger.error("More than one currently_processing flag set, fix the DB" )
             raise(DBError("More than one currently_processing flag set, fix the DB"))
 
-    def resetProcessingFlag(self, comment=None):
+    def resetProcessingFlag(self, comment):
         """
         Query the db and reset a processing flag
 
-        @keyword comment: the comment to enter into the processing log DB
-        @return: True - Success, False - Failure
+        :param comment: the comment to enter into the processing log DB
+        :type comment: str
+        :return: True - Success, False - Failure
+        :rtype: bool
         """
         sq2 = self.session.query(self.Logging).filter_by(currently_processing = True).count()
         if sq2 and comment is None:
@@ -269,26 +279,26 @@ class DButils(object):
         """
         add an entry to the logging table
 
-        @param currently_processing: is the db currently processing?
-        @type currently_processing: bool
-        @param processing_start_time: the time the processing started
-        @type processing_start_time: datetime.datetime
-        @param mission_id: the mission id the processing if for
-        @type mission_id: int
-        @param user: the user doing the processing
-        @type user: str
-        @param hostname: the hostname that initiated the processing
-        @type hostname: str
+        :param currently_processing: is the db currently processing?
+        :type currently_processing: bool
+        :param processing_start_time: the time the processing started
+        :type processing_start_time: datetime.datetime
+        :param mission_id: the mission id the processing if for
+        :type mission_id: int
+        :param user: the user doing the processing
+        :type user: str
+        :param hostname: the hostname that initiated the processing
+        :type hostname: str
 
-        @keyword pid: the process id that id the processing
-        @type pid: int
-        @keyword processing_end_time: the time the processing stopped
-        @type processing_end_time: datetime.datetime
-        @keyword comment: comment about the processing run
-        @type comment: str
+        :keyword pid: the process id that id the processing
+        :type pid: int
+        :keyword processing_end_time: the time the processing stopped
+        :type processing_end_time: datetime.datetime
+        :keyword comment: comment about the processing run
+        :type comment: str
 
-        @return: instance of the Logging class
-        @rtype: Logging
+        :return: instance of the Logging class
+        :rtype: Logging
 
         """
         l1 = self.Logging()
@@ -308,8 +318,8 @@ class DButils(object):
         """
         Finish the entry to the processing table in the DB, logging
 
-        @param comment: (optional) a comment to insert into he DB
-        @type param: str
+        :param comment: (optional) a comment to insert into he DB
+        :type param: str
         """
         try: self.__p1
         except:
@@ -332,7 +342,7 @@ class DButils(object):
 
         return true is consistent, False otherwise
 
-        @keyword fix: (optional) set to have the DB fixed to match the filesystem
+        :keyword fix: (optional) set to have the DB fixed to match the filesystem
            this is **NOT** sure to be safe
         """
         sq = self.getEntry('File', file_id)
@@ -584,8 +594,8 @@ class DButils(object):
         """
         removes a file from the DB
 
-        @param filename: name of the file to remove (or a list of names)
-        @param recursive: remove all files that depend on the given(unimplemented)
+        :param filename: name of the file to remove (or a list of names)
+        :param recursive: remove all files that depend on the given(unimplemented)
 
         if recursive then it removes all files that depend on the one to remove
 
@@ -706,10 +716,10 @@ class DButils(object):
         """
         add a mission to the database
 
-        @param mission_name: the name of the mission
-        @type mission_name: str
-        @param rootdir: the root directory of the mission
-        @type rootdir: str
+        :param mission_name: the name of the mission
+        :type mission_name: str
+        :param rootdir: the root directory of the mission
+        :type rootdir: str
 
         """
         mission_name = str(mission_name)
@@ -730,8 +740,8 @@ class DButils(object):
                     satellite_name, mission_id):
         """ add a satellite to the database
 
-        @param satellite_name: the name of the mission
-        @type satellite_name: str
+        :param satellite_name: the name of the mission
+        :type satellite_name: str
         """
         satellite_name = str(satellite_name)
         s1 = self.Satellite()
@@ -749,12 +759,12 @@ class DButils(object):
                     extra_params=None):
         """ add a process to the database
 
-        @param process_name: the name of the process
-        @type process_name: str
-        @param output_product: the output product id
-        @type output_product: int
-        @keyword extra_params: extra parameters to pass to the code
-        @type extra_params: str
+        :param process_name: the name of the process
+        :type process_name: str
+        :param output_product: the output product id
+        :type output_product: int
+        :keyword extra_params: extra parameters to pass to the code
+        :type extra_params: str
         """
         if output_timebase not in ['RUN', 'ORBIT', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'FILE']:
             raise(ValueError("output_timebase invalid choice"))
@@ -778,14 +788,14 @@ class DButils(object):
                     product_description):
         """ add a product to the database
 
-        @param product_name: the name of the product
-        @type product_name: str
-        @param instrument_id: the instrument   the product is from
-        @type instrument_id: int
-        @param relative_path:relative path for the product
-        @type relative_path: str
-        @param format: the format of the product files
-        @type format: str
+        :param product_name: the name of the product
+        :type product_name: str
+        :param instrument_id: the instrument   the product is from
+        :type instrument_id: int
+        :param relative_path: relative path for the product
+        :type relative_path: str
+        :param format: the format of the product files
+        :type format: str
         """
         p1 = self.Product()
         p1.instrument_id = instrument_id
@@ -849,10 +859,10 @@ class DButils(object):
         """
         add a product process link to the database
 
-        @param input_product_id: id of the product to link
-        @type input_product_id: int
-        @param process_id: id of the process to link
-        @type process_id: int
+        :param input_product_id: id of the product to link
+        :type input_product_id: int
+        :param process_id: id of the process to link
+        :type process_id: int
         """
         ppl1 = self.Productprocesslink()
         ppl1.input_product_id = self.getProductID(input_product_id)
@@ -868,10 +878,10 @@ class DButils(object):
         """
         add a file code  link to the database
 
-        @param resulting_file_id: id of the product to link
-        @type resulting_file_id: int
-        @param source_code: id of the code
-        @type source_code: int
+        :param resulting_file_id: id of the product to link
+        :type resulting_file_id: int
+        :param source_code: id of the code
+        :type source_code: int
         """
         fcl1 = self.Filecodelink()
         fcl1.resulting_file = resulting_file_id
@@ -916,10 +926,10 @@ class DButils(object):
                      source_file,):
         """ add a file file  link to the database
 
-        @param source_file: id of the product to link
-        @type source_file: int
-        @param resulting_file_id: id of the process to link
-        @type resulting_file_id: int
+        :param source_file: id of the product to link
+        :type source_file: int
+        :param resulting_file_id: id of the process to link
+        :type resulting_file_id: int
 
         """
         ffl1 = self.Filefilelink()
@@ -934,10 +944,10 @@ class DButils(object):
                      product_id):
         """ add a instrument product  link to the database
 
-        @param instrument_id: id of the instrument to link
-        @type instrument_id: int
-        @param product_id: id of the product to link
-        @type product_id: int
+        :param instrument_id: id of the instrument to link
+        :type instrument_id: int
+        :param product_id: id of the product to link
+        :type product_id: int
         """
         ipl1 = self.Instrumentproductlink()
         ipl1.instrument_id = instrument_id
@@ -951,10 +961,10 @@ class DButils(object):
                     satellite_id):
         """ add a Instrument to the database
 
-        @param instrument_name: the name of the mission
-        @type instrument_name: str
-        @param satellite_id: the root directory of the mission
-        @type satellite_id: int
+        :param instrument_name: the name of the mission
+        :type instrument_name: str
+        :param satellite_id: the root directory of the mission
+        :type satellite_id: int
         """
         i1 = self.Instrument()
 
@@ -989,31 +999,31 @@ class DButils(object):
         """
         Add an executable code to the DB
 
-        @param filename: the filename of the code
-        @type filename: str
-        @param relative_path: the relative path (relative to mission base dir)
-        @type relative_path: str
-        @param code_start_date: start of validity of the code (datetime)
-        @type code_start_date: datetime
-        @param code_stop_date: end of validity of the code (datetime)
-        @type code_stop_date: datetime
-        @param code_description: description of the code (50 char)
-        @type code_description: str
-        @param process_id: the id of the process this code is part of
-        @type process_id: int
-        @param version: the version of the code
-        @type version: Version.Version
-        @param active_code: Boolean True means the code is active
-        @type active_code: Boolean
-        @param date_written: the date the cod was written
-        @type date_written: date
-        @param output_interface_version: the interface version of the output (effects the data file names)
-        @type output_interface_version: int
-        @param newest_version: is this code the newest version in the DB?
-        @type newest_version: bool
+        :param filename: the filename of the code
+        :type filename: str
+        :param relative_path: the relative path (relative to mission base dir)
+        :type relative_path: str
+        :param code_start_date: start of validity of the code (datetime)
+        :type code_start_date: datetime
+        :param code_stop_date: end of validity of the code (datetime)
+        :type code_stop_date: datetime
+        :param code_description: description of the code (50 char)
+        :type code_description: str
+        :param process_id: the id of the process this code is part of
+        :type process_id: int
+        :param version: the version of the code
+        :type version: Version.Version
+        :param active_code: Boolean True means the code is active
+        :type active_code: Boolean
+        :param date_written: the date the cod was written
+        :type date_written: date
+        :param output_interface_version: the interface version of the output (effects the data file names)
+        :type output_interface_version: int
+        :param newest_version: is this code the newest version in the DB?
+        :type newest_version: bool
 
-        @return: the code_id of the newly inserted code
-        @rtype: long
+        :return: the code_id of the newly inserted code
+        :rtype: long
         """
         if isinstance(version, (str, unicode)):
             version = Version.Version.fromString(version)
@@ -1054,27 +1064,27 @@ class DButils(object):
         """
         Add an executable code to the DB
 
-        @param filename: the filename of the code
-        @type filename: str
-        @param relative_path: the relative path (relative to mission base dir)
-        @type relative_path: str
-        @param description: description of the code (50 char)
-        @type description: str
-        @param product: the id of the product this inspector finds
-        @type product: int
-        @param version: the version of the code
-        @type version: Version.Version
-        @param active_code: Boolean True means the code is active
-        @type active_code: Boolean
-        @param date_written: the date the cod was written
-        @type date_written: date
-        @param output_interface_version: the interface version of the output (effects the data file names)
-        @type output_interface_version: int
-        @param newest_version: is this code the newest version in the DB?
-        @type newest_version: bool
+        :param filename: the filename of the code
+        :type filename: str
+        :param relative_path: the relative path (relative to mission base dir)
+        :type relative_path: str
+        :param description: description of the code (50 char)
+        :type description: str
+        :param product: the id of the product this inspector finds
+        :type product: int
+        :param version: the version of the code
+        :type version: Version.Version
+        :param active_code: Boolean True means the code is active
+        :type active_code: Boolean
+        :param date_written: the date the cod was written
+        :type date_written: date
+        :param output_interface_version: the interface version of the output (effects the data file names)
+        :type output_interface_version: int
+        :param newest_version: is this code the newest version in the DB?
+        :type newest_version: bool
 
-        @return: the inspector_id of the newly inserted code
-        @rtype: long
+        :return: the inspector_id of the newly inserted code
+        :rtype: long
 
         """
         if isinstance(version, (str, unicode)):
@@ -1228,7 +1238,7 @@ class DButils(object):
         """
         Close the database connection
 
-        @keyword verbose: (optional) print information out to the command line
+        :keyword verbose: (optional) print information out to the command line
 
         >>>  pnl.closeDB()
         """
@@ -1264,40 +1274,40 @@ class DButils(object):
         """
         add a datafile to the database
 
-        @param filename: filename to add
-        @type filename: str
-        @param data_level: the data level of the file
-        @type data_level: float
-        @param version: the version of te file to create
-        @type version: Version.Version
-        @param file_create_date: date the fie was created
-        @type file_create_date: datetime.datetime
-        @param exists_on_disk: does the file exist on disk?
-        @type exists_on_disk: bool
-        @param product_id: the product id of he product he file belongs to
-        @type product_id: int
+        :param filename: filename to add
+        :type filename: str
+        :param data_level: the data level of the file
+        :type data_level: float
+        :param version: the version of te file to create
+        :type version: Version.Version
+        :param file_create_date: date the fie was created
+        :type file_create_date: datetime.datetime
+        :param exists_on_disk: does the file exist on disk?
+        :type exists_on_disk: bool
+        :param product_id: the product id of he product he file belongs to
+        :type product_id: int
 
-        @keyword utc_file_date: The UTC date of the file
-        @type utc_file_date: datetime.date
-        @keyword utc_start_time: utc start time of the file
-        @type utc_start_time: datetime.datetime
-        @keyword utc_end_time: utc end time of the file
-        @type utc_end_time: datetime.datetime
-        @keyword check_date: the date the file was quality checked
-        @type check_date: datetime.datetime
-        @keyword verbose_provenance: Verbose provenance of the file
-        @type verbose_provenance: str
-        @keyword quality_comment: comment on quality from quality check
-        @type quality_comment: str
-        @keyword caveats: caveats associated with the file
-        @type caveates: str
-        @keyword met_start_time: met start time of the file
-        @type met_start_time: long
-        @keyword met_stop_time: met stop time of the file
-        @type met_stop_time: long
+        :keyword utc_file_date: The UTC date of the file
+        :type utc_file_date: datetime.date
+        :keyword utc_start_time: utc start time of the file
+        :type utc_start_time: datetime.datetime
+        :keyword utc_end_time: utc end time of the file
+        :type utc_end_time: datetime.datetime
+        :keyword check_date: the date the file was quality checked
+        :type check_date: datetime.datetime
+        :keyword verbose_provenance: Verbose provenance of the file
+        :type verbose_provenance: str
+        :keyword quality_comment: comment on quality from quality check
+        :type quality_comment: str
+        :keyword caveats: caveats associated with the file
+        :type caveates: str
+        :keyword met_start_time: met start time of the file
+        :type met_start_time: long
+        :keyword met_stop_time: met stop time of the file
+        :type met_stop_time: long
 
         @ return: file_id of the newly inserted file
-        @rtype: long
+        :rtype: long
         """
         d1 = self.File()
         d1.filename = filename
@@ -1328,10 +1338,10 @@ class DButils(object):
         """
         Given a ec_id and a date is that code active for that date and is newest version
 
-        @param ec_id: executable code id to see if is active
-        @param date: date object to use when checking
+        :param ec_id: executable code id to see if is active
+        :param date: date object to use when checking
 
-        @return: True - the code is active for that date, False otherwise
+        :return: True - the code is active for that date, False otherwise
 
         """
         # can only be one here (sq)
@@ -1426,7 +1436,7 @@ class DButils(object):
         """
         Return the instrument_id for a given instrument
 
-        @return: instrument_id - the instrument ID
+        :return: instrument_id - the instrument ID
         """
         try:
             i_id = long(name)
@@ -1467,11 +1477,11 @@ class DButils(object):
         """
         Return the fileID for the input filename
 
-        @param filename: filename to return the fileid of
-        @type filename: str
+        :param filename: filename to return the fileid of
+        :type filename: str
 
-        @return: file_id: file_id of the input file
-        @rtype: long
+        :return: file_id: file_id of the input file
+        :rtype: long
         """
         if isinstance(filename, self.File):
             return filename.file_id
@@ -1494,11 +1504,11 @@ class DButils(object):
         """
         Return the codeID for the input code
 
-        @param codename: filename to return the fileid of
-        @type filename: str
+        :param codename: filename to return the fileid of
+        :type filename: str
 
-        @return: code_id: code_id of the input file
-        @rtype: long
+        :return: code_id: code_id of the input file
+        :rtype: long
         """
         try:
             c_id = long(codename)
@@ -1547,11 +1557,11 @@ class DButils(object):
         """
         Return the fileID for the input filename
 
-        @param process_id: process_)id to return the input_product_id for
-        @type process_id: long
+        :param process_id: process_)id to return the input_product_id for
+        :type process_id: long
 
-        @return: list of input_product_ids
-        @rtype: list
+        :return: list of input_product_ids
+        :rtype: list
         """
         sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional).filter_by(process_id = process_id).all()
         return sq
@@ -1765,10 +1775,10 @@ class DButils(object):
         """
         Return the product ID for an input product name
 
-        @param product_name: the name of the product to et the id of
-        @type product_name: str
+        :param product_name: the name of the product to et the id of
+        :type product_name: str
 
-        @return: product_id -the product  ID for the input product name
+        :return: product_id -the product  ID for the input product name
         """
         try:
             product_name = long(product_name)
@@ -1791,10 +1801,10 @@ class DButils(object):
     def getSatelliteID(self,
                         sat_name):
         """
-        @param sat_name: the satellite name to look up the id
-        @type sat_name: str
+        :param sat_name: the satellite name to look up the id
+        :type sat_name: str
 
-        @return: satellite_id - the requested satellite  ID
+        :return: satellite_id - the requested satellite  ID
         """
         if isinstance(sat_name, (list, tuple)):
             s_id = map(self.getSatelliteID, sat_name)
@@ -1870,8 +1880,8 @@ class DButils(object):
         """
         return the base directory for the current mission
 
-        @return: base directory for current mission
-        @rtype: str
+        :return: base directory for current mission
+        :rtype: str
         """
         if mission_id is None:
             mission_id = self.session.query(self.Mission.mission_id).all()
@@ -1892,8 +1902,8 @@ class DButils(object):
         """
         check the incoming directory for the current mission and add those files to the getting list
 
-        @return: processing list of file ids
-        @rtype: list
+        :return: processing list of file ids
+        :rtype: list
         """
         path = self.getIncomingPath()
         DBlogging.dblogger.debug("Looking for files in {0}".format(path))
