@@ -26,7 +26,3 @@ API documentation
     runMe
     Utils
     Version
-
-Undocumented Python objects
----------------------------
-:doc:`python`
