@@ -59,13 +59,21 @@ class DBNoData(Exception):
 
 class DButils(object):
     """
-    @summary: DButils - utility routines for the DBProcessing class, all of these may be user called but are meant to
+    Utility routines for the DBProcessing class, all of these may be user called but are meant to
     be internal routines for DBProcessing
     """
 
     def __init__(self, mission='Test', db_var=None, echo=False, engine='sqlite'):
         """
-        @summary: Initialize the DButils class, default mission is 'Test'
+        Initialize the DButils class
+
+        :param mission: Name of the mission
+        :type mission: str
+        :param db_var: Does nothing.
+        :param echo: if True, the Engine will log all statements as well as a repr() of their parameter lists to the logger
+        :type echo: bool
+        :param engine: DB engine to connect to
+        :type engine: str
         """
         self.dbIsOpen = False
         if mission is None:

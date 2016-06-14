@@ -38,7 +38,7 @@ configFromDB.py
 Build a config file from an existing database. This is untested and not
 fully useful yet.
 
-.. option:: The filename to save the config
+.. option:: filename The filename to save the config
 .. option:: -m,--mission The basebase to to connect to
 .. option:: -f,--force Force the creation of the config file, allows overwrite
 .. option:: -s,--satellite The name of the satellite for the config file
