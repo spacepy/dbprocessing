@@ -898,7 +898,7 @@ class ProcessqueueTests(TestSetup):
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, pq)
 
 class TestWithtestDB(unittest.TestCase):
-    """Tests that require(or were written after the creation of) the new testDB are here."""
+    """Tests that require the new testDB (or were written after it was made)"""
     def setUp(self):
         super(TestWithtestDB, self).setUp()
         self.tempD = tempfile.mkdtemp()
@@ -916,26 +916,26 @@ class TestWithtestDB(unittest.TestCase):
         remove_tree(self.tempD)
 
     def test_checkDiskForFile_DBTrue_FileTrue(self):
-        """Checks if checkDiskForFile returns true if the file exists and the DB says it does"""
+        """Check file in database exists on disk"""
         self.assertTrue(self.dbu.checkDiskForFile(1))
 
     def test_checkDiskForFile_DBTrue_FileFalse_FixTrue(self):
-        """Checks if checkDiskForFile will succesfully fix if the file does not exist and the DB says it does"""
+        """Check consistency between FS and DB, correct DB"""
         os.remove(self.tempD+'/L0/testDB_001_first.raw')
         self.assertTrue(self.dbu.checkDiskForFile(1, True))
 
     def test_checkDiskForFile_DBTrue_FileFalse(self):
-        """Checks if checkDiskForFile returns false if the file does not exist and the DB says it does"""
+        """checkDiskForFile returns false if the file in DB does not exist"""
         os.remove(self.tempD+'/L0/testDB_001_first.raw')
         self.assertFalse(self.dbu.checkDiskForFile(1))
 
     def test_checkDiskForFile_DBFalse_FileTrue(self):
-        """Checks if checkDiskForFile returns true if the DB says it doesn't exist"""        
+        """checkDiskForFile returns true for nonexistent file, real and in DB"""
         self.dbu.getEntry('File', 1).exists_on_disk = False
         self.assertTrue(self.dbu.checkDiskForFile(1))
 
     def test_checkFileSHA(self):
-        """Checks if checkFileSHA works"""
+        """Compare DB and real checksum, both matching and nonmatching"""
         self.assertTrue(self.dbu.checkFileSHA(1))
 
         with open(self.tempD + '/L0/testDB_001_first.raw', 'w') as fp:
