@@ -1,0 +1,12 @@
+{% extends "!layout.html" %}
+
+{% set script_files = script_files + ["_static/copybutton.js"] %}
+
+{% block rootrellink %}
+        <li><a href="{{ pathto('search') }}">search</a>|&nbsp;</li>
+       <li><a href="{{ pathto('index') }}">top</a> &raquo;</li>
+{% endblock %}
+
+{# put the sidebar before the body #}
+{% block sidebar1 %}{{ sidebar() }}{% endblock %}
+{% block sidebar2 %}{% endblock %}
