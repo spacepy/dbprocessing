@@ -55,8 +55,6 @@ class DigestError(Exception):
 
     .. note: maybe just combine this with ReadError for the current purpose
 
-
-
     """
     def __init__(self, *params):
         super(DigestError, self).__init__(*params)
@@ -68,25 +66,17 @@ class Diskfile(object):
     Diskfile class contains methods for dealing with files on disk,
     all parsing for what mission files belong to is continued in here
     to add a new mission code must be added here.
-
-
-
-    Parameters
-    ==========
-    infile : str
-        a file to create a diskfile around
-    dbu :  :class:`.DButils`
-        pass in the current :class:`.DButils` session so that a new connection is not made
-
     """
 
-    def __init__(self,
-                 infile,
-                 dbu):
+    def __init__(self, infile, dbu):
         """
         setup a Diskfile class, takes in a filename and creates a params dict to hold information about the file
         then tests to see what mission the file is from
-
+        
+        :param infile: a file to create a Diskfile around
+        :type infile: str
+        :param dbu: pass in the current session so that a new connection is not made
+        :type dbu: :class:`.DButils`
         """
         self.infile = infile
         try:
@@ -154,21 +144,14 @@ class Diskfile(object):
 #        DBlogging.dblogger.debug("{0} Access Checked out OK".format(self.infile))
 
 
-def calcDigest( infile):
+def calcDigest(infile):
     """Calculate the SHA1 digest from a file.
 
+    :param infile: Path to the file
+    :type infile: str
 
-    .. _file:
-
-    Parameters
-    ==========
-    file : str
-        path to the file
-
-    Returns
-    =======
-    out : str
-        hex digits of the file, SHA1 (40 bytes)
+    :return: Hex digits of the file, SHA1 (40 bytes)
+    :rtype: str
 
     """
     m = hashlib.sha1()

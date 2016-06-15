@@ -37,7 +37,15 @@ Of course, instead of ``test_all.py``, you can specify the name of the module yo
 
 Functional Tests:
 ~~~~~~~~~~~~~~~~~
-Todo
+Located in testDB/ is a functional test. The goal was to have the simplest test of dbprocessing so testing is quick and complete without having to use real data.
+
+Level 0 files are just simple words stored in testDB_{set}_(first|sec).raw format.
+
+Level 1 files are the concatenated versions of level 0, stored in testDB_{set}.cat format.
+
+Level 2 files are rot13’d versions of the level 1 files, and are stored in testDB_{set}.rot format.
+
+``testDB/scripts/runThisThing.sh`` will excute the needed scripts to run the entire dbprocessing chain.
 
 Documentation
 -------------
@@ -53,4 +61,30 @@ Run ``make html`` in the ``sphinx`` directory to build the html documentation, o
 
 Repository organization
 -----------------------
-Essentially none
+top-level
+~~~~~~~~~
+There should be(but there totally is) no committed files at the top level besides ``setup.py``, and ``.gitignore`` (not normally visible).
+
+build
+~~~~~
+This is used by ``setup.py`` in the build/install process; it is ignored by git. Don't hand-edit anything under here; can be safely deleted.
+
+dbprocessing
+~~~~~~~~~~~~
+Source tree for the main ``dbprocessing`` module. If it's in this directory, it's meant to be installed.
+
+scripts
+~~~~~~~
+Scripts meant to be called from the command line that should be installed with the module. They should be added to the ``scripts`` list in ``setup.py`` and documented in :doc:`scripts` (source file ``scripts.rst``).
+
+sphinx
+~~~~~~
+See `Documentation`_.
+
+testDB
+~~~~~~
+Funtional test
+
+tests
+~~~~~
+Unit tests

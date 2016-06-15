@@ -21,17 +21,18 @@ class DBfile(object):
     but instead a bridge between the two.
     """
 
-    def __init__(self,
-                 diskfile, dbu, makeDiskFile=False):
+    def __init__(self, diskfile, dbu, makeDiskFile=False):
         """
-        setup a DBfile classinputs a diskfile instance or a filename with the makeDiskFile keyword
+        Setup a DBfile class.
 
-        @TODO - do we need this keyword or the functionality?
+        .. todo:: Do we need this keyword or the functionality?
 
-        @param diskfile: a diskfile instance to create a DBfile from
-        @type infile: Diskfile
-        @param dbu: pass in the current DButils session so that a new connection is not made
-        @type dbu: DButils
+        :param diskfile: A file name or diskfile instance to create a DBfile from
+        :type diskfile: str or :class:`.Diskfile`
+        :param dbu: Pass in the current :class:`.DButils` session so that a new connection is not made
+        :type dbu: :class:`.DButils`
+        :param makeDiskFile: If true, diskfile is a filename and needs a Diskfile made.
+        :type makeDiskFile: bool
         """
         if makeDiskFile:
             diskfile = Diskfile.Diskfile(diskfile, dbu)
@@ -49,22 +50,23 @@ class DBfile(object):
 
     def checkVersion(self):
         """
-        checks the DBfile to see if it is the newest version
+        Checks the DBfile to see if it is the newest version
 
-        @return: True the file is newest, False it is not
-        @rtype: bool
+        .. todo:: This makes no sense.
+        
+        :return: True the file is newest, False it is not
+        :rtype: bool
         """
-        #TODO: This makes no sense.
 
         self.diskfile.params['newest_version'] = True
         return True
 
     def addFileToDB(self):
         """
-        wrapper around DButils.addFile to take params dict to keywords
+        Wrapper around DButils.addFile to take params dict to keywords
 
-        @return: the file_id of the newly added file
-        @rtype: long
+        :return: The file_id of the newly added file
+        :rtype: long
         """
         f_id = self.dbu.addFile(filename=self.diskfile.params['filename'],
                                 data_level=self.diskfile.params['data_level'],
@@ -88,10 +90,10 @@ class DBfile(object):
 
     def getDirectory(self):
         """
-        query the DB and get the directory that the file should exist in
+        Query the DB and get the directory that the file should exist in
 
-        @return: the full path for the DBfile
-        @rtype: str
+        :return: The full path for the DBfile
+        :rtype: str
         """
         relative_path = self.dbu.session.query(self.dbu.Product.relative_path).filter_by(
             product_id=self.diskfile.params['product_id'])
@@ -111,8 +113,8 @@ class DBfile(object):
         If the file is a symbolic link it is assumed already in the target directory and not
         moved, the link is just removed
 
-        @return: the from and to arguments to move with full path info
-        @rtype: list
+        :return: The from and to arguments to move with full path info
+        :rtype: tuple(str, str)
 
         """
         path = self.getDirectory()

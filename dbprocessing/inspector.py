@@ -1,37 +1,26 @@
 # -*- coding: utf-8 -*-
 
 """
-inspector requirements:
-    - one product per inspector file
-    - must implement a class called Inspector(inspector.inspector)
-    - must implement the abstract method inspect(kwargs) # yes takes in a dict
-    - must implement code_name = 'codename.py' at the self level
-    - inspect() must return a complete DiskFile instance or False (no other or exceptions allowed)
-        - this means populating the following items: (* user parameters)
-            mission : string name of the mission (filled by base class)
-            self.diskfile.params['filename'] : full path and filename (filled by base class)
-            * self.diskfile.params['utc_file_date'] : date object (user)
-            * self.diskfile.params['utc_start_time'] : datetime object (user)
-            * self.diskfile.params['utc_stop_time'] : datetime object (user)
-            self.diskfile.params['check_date'] : None (optional)
-            * self.diskfile.params['verbose_provenance'] : string (user) (optional)
-            * self.diskfile.params['quality_comment'] : string (user) (optional)
-            * self.diskfile.params['caveats'] : string (user) (optional)
-            * self.diskfile.params['release_number'] : int (user) (optional)
-            self.diskfile.params['file_create_date'] : datetime object (filled by base class)
-            * self.diskfile.params['met_start_time'] : long (user) (optional)
-            * self.diskfile.params['met_stop_time'] : long (user) (optional)
-            self.diskfile.params['exists_on_disk'] : bool (filled by base class)
-            self.diskfile.params['quality_checked'] : bool (filled by base class) (optional)
-            self.diskfile.params['product_id'] : long (filled by base class)
-            self.diskfile.params['shasum'] : str (filled by base class) (optional)
-            * self.diskfile.params['version'] : Version object (user)
-            self.diskfile.params['filefilelink'] : long (filled by db)
-            self.diskfile.params['filecodelink'] : long (filled by db)
-            self.diskfile.params['newest_version'] : bool (filled by db)
-            * self.diskfile.params['data_level'] : float (filled by db)
-
-inspector suggestions:
+Inspector requirements:
+    - One product per inspector file
+    - Must implement a class called Inspector(inspector.inspector)
+    - Must implement the abstract method inspect(kwargs)
+    - Must implement code_name = 'codename.py' at the self level
+    - inspect() must return anything that is not None for a valid match
+        - It also must populate the following items:
+            * self.diskfile.params['utc_file_date'] : date object
+            * self.diskfile.params['utc_start_time'] : datetime object
+            * self.diskfile.params['utc_stop_time'] : datetime object
+            * self.diskfile.params['version'] : Version object
+            * self.diskfile.params['check_date'] : None (optional)
+            * self.diskfile.params['verbose_provenance'] : string (optional)
+            * self.diskfile.params['quality_comment'] : string (optional)
+            * self.diskfile.params['caveats'] : string (optional)
+            * self.diskfile.params['release_number'] : int (optional)
+            * self.diskfile.params['met_start_time'] : long (optional)
+            * self.diskfile.params['met_stop_time'] : long (optional)
+            * self.diskfile.params['quality_checked'] : bool (optional)
+            * self.diskfile.params['process_keywords'] : str (optional)
 """
 from __future__ import print_function
 
@@ -68,6 +57,7 @@ class inspector(object):
     __metaclass__ = EphemeralCallable(ABCMeta)
 
     def __init__(self, filename, dbu, product, **kwargs):
+        """"""
         DBlogging.dblogger.debug("Entered inspector {0} with kwargs: {1}".format(self.code_name, kwargs))
         self.dbu = dbu # give us access to DButils
         self.filename = filename
@@ -165,17 +155,13 @@ class inspector(object):
 
 def extract_YYYYMMDD(filename):
     """
-    go through the filename and extract the first valid YYYYMMDD as a datetime
+    Go through the filename and extract the first valid YYYYMMDD as a datetime
 
-    Parameters
-    ==========
-    filename : str
-        filename to parse for a YYYYMMDD format
+    :param filename: Filename to parse for a YYYYMMDD format
+    :type filename: str
 
-    Returns
-    =======
-    out : (None, datetime.datetime)
-        the datetime found in the filename or None
+    :return: The datetime found in the filename or None
+    :rtype: datetime.datetime or None
     """
     # cmp = re.compile("[12][90]\d2[01]\d[0-3]\d")
     # return a datetime if there is one from YYYYMMDD
@@ -192,17 +178,13 @@ def extract_YYYYMMDD(filename):
 
 def extract_YYYYMM(filename):
     """
-    go through the filename and extract the first valid YYYYMM as a datetime.date
+    Go through the filename and extract the first valid YYYYMM as a datetime
 
-    Parameters
-    ==========
-    filename : str
-        filename to parse for a YYYYMMDD format
+    :param filename: Filename to parse for a YYYYMM format
+    :type filename: str
 
-    Returns
-    =======
-    out : (None, datetime.datetime)
-        the datetime found in the filename or None
+    :return: The date found in the filename or None
+    :rtype: datetime.date or None
     """
     # cmp = re.compile("[12][90]\d2[01]\d[0-3]\d")
     # return a datetime if there is one from YYYYMMDD
@@ -219,7 +201,12 @@ def extract_YYYYMM(filename):
 
 def valid_YYYYMMDD(inval):
     """
-    if inval is valid YYYYMMDD return True, False otherwise
+    Checks if input is valid YYYYMMDD
+
+    :param inval: Input to check if valid
+    :type inval: str
+    :return: Return True if valid, False otherwise
+    :rtype: bool
     """
     try:
         ans = datetime.datetime.strptime(inval, "%Y%m%d")
@@ -230,8 +217,15 @@ def valid_YYYYMMDD(inval):
 
 def extract_Version(filename, basename=False):
     """
-    go through the filename and pull out the fist valid vX.Y.Z and return as a
-    Version object
+    Go through the filename and pull out the first valid vX.Y.Z
+
+    :param filename: Filename to check for version
+    :type filename: str
+    :keyword basename: True if to return version and the basename, false if just version
+    :type basename: bool
+
+    :return: The first valid version string as an object
+    :rtype: :class:`.Version` or tuple(:class:`.Version`, base)
     """
     res = re.search("[vV]\d+\.\d+\.\d+\.", filename)
     ver = None

@@ -14,7 +14,6 @@ API documentation
     :maxdepth: 1
 
     DBfile
-    DBlogging
     dbprocessing
     DBqueue
     DBstrings
@@ -26,7 +25,3 @@ API documentation
     runMe
     Utils
     Version
-
-Undocumented Python objects
----------------------------
-:doc:`python`
