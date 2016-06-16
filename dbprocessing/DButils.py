@@ -397,7 +397,7 @@ class DButils(object):
 
     def _processqueueGetAll(self, version_bump=None):
         """
-        return the entire contents of the process queue
+        Return the entire contents of the process queue
         """
         if version_bump is None:
             try:
@@ -509,8 +509,9 @@ class DButils(object):
 
     def _processqueueLen(self):
         """
-        return the number of files in the process queue
+        Return the number of files in the process queue
         """
+
         return self.session.query(self.Processqueue).count()
 
     def _processqueuePop(self, index=0, version_bump=None):
@@ -534,7 +535,7 @@ class DButils(object):
 
     def _processqueueGet(self, index=0, version_bump=None, instance=False):
         """
-        get the file at the head of the queue (from the left)
+        Get the file at the head of the queue (from the left)
 
         Returns
         =======
@@ -600,7 +601,7 @@ class DButils(object):
         removes a file from the DB
 
         :param filename: name of the file to remove (or a list of names)
-        :param recursive: remove all files that depend on the given(unimplemented)
+        :param recursive: remove all files that depend on the Given(unimplemented)
 
         if recursive then it removes all files that depend on the one to remove
 
@@ -650,9 +651,7 @@ class DButils(object):
         """
         Return dictionaries of satellite, mission objects
 
-        Returns
-        -------
-        dict : dictionaries of satellite, mission objects
+        :return: dictionaries of satellite, mission objects
         :rtype: dict
         """
         ans = []
@@ -662,7 +661,10 @@ class DButils(object):
 
     def getAllInstruments(self):
         """
-        return dictionaries of instrument traceback dictionaries
+        Return dictionaries of instrument traceback dictionaries
+
+        :return: dictionaries of instrument traceback dictionaries
+        :rtype: dict
         """
         ans = []
         insts = self.session.query(self.Instrument).all()
@@ -671,7 +673,7 @@ class DButils(object):
 
     def getAllCodes(self, active=True):
         """
-        return a list of all codes
+        Return a list of all codes
         """
         ans = []
         if active:
@@ -683,11 +685,11 @@ class DButils(object):
 
     def getAllFilenames(self, fullPath=True, level=None, product=None, limit=None):
         """
-        return all the file names in the database
+        Return all the file names in the database
 
-        if level==None get all filenames, otherwise only for a level
+        if level=None get all filenames, otherwise only for a level
 
-        I worked this for speed the zip(*names) is way too slow (this is about x18 faster)
+        I worked this for speed the zip(\*names) is way too slow (this is about x18 faster)
         """
         if level is None and product is None:
             if limit is None:
@@ -720,7 +722,7 @@ class DButils(object):
                     rootdir,
                     incoming_dir):
         """
-        add a mission to the database
+        Add a mission to the database
 
         :param mission_name: the name of the mission
         :type mission_name: str
@@ -744,7 +746,8 @@ class DButils(object):
 
     def addSatellite(self,
                     satellite_name, mission_id):
-        """ add a satellite to the database
+        """
+        Add a satellite to the database
 
         :param satellite_name: the name of the mission
         :type satellite_name: str
@@ -763,7 +766,8 @@ class DButils(object):
                     output_product,
                     output_timebase,
                     extra_params=None):
-        """ add a process to the database
+        """
+        Add a process to the database
 
         :param process_name: the name of the process
         :type process_name: str
@@ -792,7 +796,8 @@ class DButils(object):
                     format,
                     level,
                     product_description):
-        """ add a product to the database
+        """
+        Add a product to the database
 
         :param product_name: the name of the product
         :type product_name: str
@@ -816,7 +821,7 @@ class DButils(object):
 
     def updateProductSubs(self, product_id):
         """
-        update an existing product performing the {} replacements
+        Update an existing product performing the {} replacements
         """
         # need to do {} replacement, have to do it as a modification
         p1 = self.getEntry('Product', product_id)
@@ -833,7 +838,7 @@ class DButils(object):
 
     def updateInspectorSubs(self, insp_id):
         """
-        update an existing inspector performing the {} replacements
+        Update an existing inspector performing the {} replacements
         """
         # need to do {} replacement, have to do it as a modification
         p1 = self.getEntry('Inspector', insp_id)
@@ -846,7 +851,7 @@ class DButils(object):
 
     def updateProcessSubs(self, proc_id):
         """
-        update an existing product performing the {} replacements
+        Update an existing product performing the {} replacements
         """
         # need to do {} replacement, have to do it as a modification
         p1 = self.getEntry('Process', proc_id)
@@ -863,7 +868,7 @@ class DButils(object):
                     process_id,
                     optional):
         """
-        add a product process link to the database
+        Add a product process link to the database
 
         :param input_product_id: id of the product to link
         :type input_product_id: int
@@ -882,7 +887,7 @@ class DButils(object):
                      resulting_file_id,
                      source_code):
         """
-        add a file code  link to the database
+        Add a file code  link to the database
 
         :param resulting_file_id: id of the product to link
         :type resulting_file_id: int
@@ -898,7 +903,7 @@ class DButils(object):
 
     def delInspector(self, i):
         """
-        removes an inspector form the db
+        Removes an inspector form the db
         """
         insp = self.getEntry('Inspector', i)
         self.session.delete(insp)
@@ -906,7 +911,7 @@ class DButils(object):
 
     def delFilefilelink(self, f):
         """
-        remove entries from Filefilelink, it will remove if the file is in either column
+        Remove entries from Filefilelink, it will remove if the file is in either column
         """
         f = self.getFileID(f) # change a name to a number
         n1 = self.session.query(self.Filefilelink).filter_by(source_file = f).delete()
@@ -918,7 +923,7 @@ class DButils(object):
 
     def delFilecodelink(self, f):
         """
-        remove entries from Filecodelink fore a given file
+        Remove entries from Filecodelink fore a Given file
         """
         f = self.getFileID(f) # change a name to a number
         n2 = self.session.query(self.Filecodelink).filter_by(resulting_file = f).delete()
@@ -930,7 +935,8 @@ class DButils(object):
     def addFilefilelink(self,
                      resulting_file_id,
                      source_file,):
-        """ add a file file  link to the database
+        """
+        Add a file file  link to the database
 
         :param source_file: id of the product to link
         :type source_file: int
@@ -948,7 +954,8 @@ class DButils(object):
     def addInstrumentproductlink(self,
                      instrument_id,
                      product_id):
-        """ add a instrument product  link to the database
+        """
+        Add a instrument product  link to the database
 
         :param instrument_id: id of the instrument to link
         :type instrument_id: int
@@ -965,7 +972,8 @@ class DButils(object):
     def addInstrument(self,
                     instrument_name,
                     satellite_id):
-        """ add a Instrument to the database
+        """
+        Add a Instrument to the database
 
         :param instrument_name: the name of the mission
         :type instrument_name: str
@@ -1117,7 +1125,7 @@ class DButils(object):
 
     def _nameSubProduct(self, inStr, product_id):
         """
-        in inStr replace the standard {} with the names
+        In inStr replace the standard {} with the names
         """
         if inStr is None:
             return inStr
@@ -1159,7 +1167,7 @@ class DButils(object):
 
     def _nameSubInspector(self, inStr, inspector_id):
         """
-        in inStr replace the standard {} with the names
+        In inStr replace the standard {} with the names
         """
         if inStr is None:
             return inStr
@@ -1186,7 +1194,7 @@ class DButils(object):
 
     def _nameSubProcess(self, inStr, process_id):
         """
-        in inStr replace the standard {} with the names
+        In inStr replace the standard {} with the names
         """
         p_id = self.getProcessID(process_id)
         if inStr is None:
@@ -1211,7 +1219,7 @@ class DButils(object):
 
     def _nameSubFile(self, inStr, file_id):
         """
-        in inStr replace the standard {} with the names
+        In inStr replace the standard {} with the names
         """
         if inStr is None:
             return inStr
@@ -1232,7 +1240,7 @@ class DButils(object):
 
     def commitDB(self):
         """
-        do the commit to the DB
+        Do the commit to the DB
         """
         try:
             self.session.commit()
@@ -1278,7 +1286,7 @@ class DButils(object):
                 shasum = None,
                 process_keywords = None):
         """
-        add a datafile to the database
+        Add a datafile to the database
 
         :param filename: filename to add
         :type filename: str
@@ -1312,7 +1320,7 @@ class DButils(object):
         :keyword met_stop_time: met stop time of the file
         :type met_stop_time: long
 
-        @ return: file_id of the newly inserted file
+        :return: file_id of the newly inserted file
         :rtype: long
         """
         d1 = self.File()
@@ -1347,7 +1355,7 @@ class DButils(object):
         :param ec_id: executable code id to see if is active
         :param date: date object to use when checking
 
-        :return: True - the code is active for that date, False otherwise
+        :return: True if the code is active for that date, False otherwise
 
         """
         # can only be one here (sq)
@@ -1371,7 +1379,7 @@ class DButils(object):
 
     def getFileFullPath(self, filename):
         """
-        return the full path to a file given the name or id
+        Return the full path to a file Given the name or id
         (name or id is based on type)
 
         TODO, this is really slow, this query made it a lot faster but I bet it can get better
@@ -1390,7 +1398,7 @@ class DButils(object):
 
     def getProcessFromInputProduct(self, product):
         """
-        given a product id return all the processes that use that as an input
+        Given a product id return all the processes that use that as an input
 
         Use getProductID if have a name (or not sure)
         """
@@ -1412,14 +1420,14 @@ class DButils(object):
 
     def getRunProcess(self):
         """
-        return a list of the processes who's output_timebase is "RUN"
+        Return a list of the processes who's output_timebase is "RUN"
         """
         proc = self.session.query(self.Process).filter_by(output_timebase = 'RUN').all()
         return proc
 
     def getProcessID(self, proc_name):
         """
-        given a process name return its id
+        Given a process name return its id
         """
         try:
            proc_id = long(proc_name)
@@ -1432,7 +1440,7 @@ class DButils(object):
 
     def getSatelliteMission(self, sat_name):
         """
-        given a satellite or satellite id return the mission
+        Given a satellite or satellite id return the mission
         """
         s_id = self.getSatelliteID(sat_name) # is a name
         m_id = self.getEntry('Satellite', s_id).mission_id
@@ -1440,7 +1448,7 @@ class DButils(object):
 
     def getInstrumentID(self, name, satellite_id=None):
         """
-        Return the instrument_id for a given instrument
+        Return the instrument_id for a Given instrument
 
         :return: instrument_id - the instrument ID
         """
@@ -1466,13 +1474,13 @@ class DButils(object):
             return sq[0].instrument_id
 
     def getMissions(self):
-        """return a list of all the missions"""
+        """Return a list of all the missions"""
         sq = self.session.query(self.Mission.mission_name)
         return map(itemgetter(0), sq.all())
 
     def renameFile(self, filename, newname):
         """
-        rename a file in the db
+        Rename a file in the db
         """
         f = self.getEntry('File', filename)
         f.filename = newname
@@ -1532,7 +1540,7 @@ class DButils(object):
 
     def getFileDates(self, file_id):
         """
-        given a file_id or name return the dates it spans
+        Given a file_id or name return the dates it spans
         """
         sq = self.getEntry('File', file_id)
         start_time = sq.utc_start_time.date()
@@ -1544,7 +1552,7 @@ class DButils(object):
 
     def file_id_Clean(self, invals):
         """
-        given a list of file objects clean out older versions of matching files
+        Given a list of file objects clean out older versions of matching files
         matching is defined as same product_id and same utc_file_date
         """
         tmp = []
@@ -1563,7 +1571,7 @@ class DButils(object):
         """
         Return the fileID for the input filename
 
-        :param process_id: process_)id to return the input_product_id for
+        :param process_id: process_id to return the input_product_id for
         :type process_id: long
 
         :return: list of input_product_ids
@@ -1574,7 +1582,7 @@ class DButils(object):
 
     def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
-        return the files in the db by product id that have data in the date specified
+        Return the files in the db by product id that have data in the date specified
         """
         dates = []
         for d in daterange:
@@ -1644,7 +1652,7 @@ class DButils(object):
 
     def getFilesByDate(self, daterange, newest_version=False):
         """
-        return the files in the db that have data in the date specified
+        Return the files in the db that have data in the date specified
         """
         dates = []
         for d in daterange:
@@ -1682,7 +1690,7 @@ class DButils(object):
 
     def getFilesByProduct(self, prod_id, newest_version=False):
         """
-        given a product_id or name return all the file instances associated with it
+        Given a product_id or name return all the file instances associated with it
 
         if newest is set return only the newest files
         """
@@ -1713,7 +1721,7 @@ class DButils(object):
 
     def getFilesByInstrument(self, inst_id, level=None, id_only=False):
         """
-        given an instrument_if return all the file instances associated with it
+        Given an instrument_if return all the file instances associated with it
         """
         inst_id = self.getInstrumentID(inst_id) # name or number
         subq = (self.session.query(self.Instrumentproductlink.product_id)
@@ -1736,7 +1744,7 @@ class DButils(object):
 
     def getAllFileIds(self, newest_version=False, limit=None):
         """
-        return all the file ids in the database
+        Return all the file ids in the database
 
         the itemgetter method is a lot faster then zip(*) (x16)
         """
@@ -1759,7 +1767,7 @@ class DButils(object):
 
     def getActiveInspectors(self):
         """
-        query the db and return a list of all the active inspector file names [(filename, arguments, product), ...]
+        Query the db and return a list of all the active inspector file names [(filename, arguments, product), ...]
         """
         activeInspector = namedtuple('activeInspector', 'path arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
@@ -1769,7 +1777,7 @@ class DButils(object):
 
     def getChildrenProcesses(self, file_id):
         """
-        given a file ID return all the processes that use this as input
+        Given a file ID return all the processes that use this as input
         """
         DBlogging.dblogger.debug( "Entered getChildrenProcesses():  file_id: {0}".format(file_id) )
         product_id = self.getEntry('File', file_id).product_id
@@ -1807,6 +1815,7 @@ class DButils(object):
     def getSatelliteID(self,
                         sat_name):
         """
+        Returns the satellite ID for an input satellite name
         :param sat_name: the satellite name to look up the id
         :type sat_name: str
 
@@ -1844,12 +1853,11 @@ class DButils(object):
 
     def getAllCodesFromProcess(self, proc_id):
         """
-        given a process id return the code ids that performs that process and the valid dates
+        Given a process id return the code ids that performs that process and the valid dates
 
-        Returns
-        =======
-        outval : (int, datetime.date, datetime.date)
-            code id and dates that perform a process
+        :return: Dode id and dates that perform a process
+        :rtype: truple(int, datetime.date, datetime.date)
+            
         """
         DBlogging.dblogger.debug("Entered getAllCodesFromProcess: {0}".format(proc_id))
         # will have as many values as there are codes for a process
@@ -1863,12 +1871,10 @@ class DButils(object):
 
     def getCodeFromProcess(self, proc_id, utc_file_date):
         """
-        given a process id return the code id that makes performs that process
+        Given a process id return the code id that makes performs that process
 
-        Returns
-        =======
-        outval : int
-            code id that performs the process
+        :return: Code id that performs the process
+        :rtype: int
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess: {0}".format(proc_id))
         # will have as many values as there are codes for a process
@@ -1879,12 +1885,12 @@ class DButils(object):
         if sq.count() == 0:
             return None
         elif sq.count() > 1:
-           raise(DBError('More than one code active for a given day'))
+           raise(DBError('More than one code active for a Given day'))
         return sq[0].code_id
 
     def getMissionDirectory(self, mission_id=None):
         """
-        return the base directory for the current mission
+        Return the base directory for the current mission
 
         :return: base directory for current mission
         :rtype: str
@@ -1906,7 +1912,7 @@ class DButils(object):
 
     def checkIncoming(self, glb='*'):
         """
-        check the incoming directory for the current mission and add those files to the getting list
+        Check the incoming directory for the current mission and add those files to the getting list
 
         :return: processing list of file ids
         :rtype: list
@@ -1918,7 +1924,7 @@ class DButils(object):
 
     def getIncomingPath(self, mission_id=None):
         """
-        return the incoming path for the current mission
+        Return the incoming path for the current mission
         """
         if mission_id is None:
             mission_id = self.session.query(self.Mission.mission_id).all()
@@ -1935,7 +1941,7 @@ class DButils(object):
 
     def getErrorPath(self):
         """
-        return the error path for the current mission
+        Return the error path for the current mission
         """
         basedir = self.getMissionDirectory()
         path = os.path.join(basedir, 'errors/')
@@ -1943,7 +1949,7 @@ class DButils(object):
 
     def getFilecodelink_byfile(self, file_id):
         """
-        given a file_id return the code_id associated with it, or None
+        Given a file_id return the code_id associated with it, or None
         """
         DBlogging.dblogger.debug("Entered getFilecodelink_byfile: file_id={0}".format(file_id))
         f_id = self.getFileID(file_id)
@@ -1955,7 +1961,7 @@ class DButils(object):
 
     def getMissionID(self, mission_name):
         """
-        given a mission name return its ID
+        Given a mission name return its ID
         """
         try:
             m_id = long(mission_name)
@@ -1971,7 +1977,7 @@ class DButils(object):
 
     def tag_release(self, rel_num):
         """
-        tag all the newest versions of files to a release number (integer)
+        Tag all the newest versions of files to a release number (integer)
         """
         newest_files = []
         prod_ids = [v.product_id for v in self.getAllProducts()]
@@ -1985,7 +1991,7 @@ class DButils(object):
 
     def addRelease(self, filename, release, commit=False):
         """
-        given a filename or file_id add an entry to the release table
+        Given a filename or file_id add an entry to the release table
         """
         f_id = self.getFileID(filename)  # if a number
         rel = self.Release()
@@ -1997,7 +2003,7 @@ class DButils(object):
 
     def list_release(self, rel_num, fullpath=True):
         """
-        given a release number return a list of all the filenames with the release
+        Given a release number return a list of all the filenames with the release
         """
         sq = self.session.query(self.Release.file_id).filter_by(release_num = rel_num).all()
         sq = map(itemgetter(0), sq)
@@ -2010,7 +2016,7 @@ class DButils(object):
 
     def checkFileSHA(self, file_id):
         """
-        given a file id or name check the db checksum and the file checksum
+        Given a file id or name check the db checksum and the file checksum
         """
         db_sha = self.getEntry('File', file_id).shasum
         disk_sha = calcDigest(self.getFileFullPath(file_id))
@@ -2019,7 +2025,7 @@ class DButils(object):
 
     def checkFiles(self, limit=None):
         """
-        check files in the DB, return inconsistent files and why
+        Check files in the DB, return inconsistent files and why
         """
         files = self.getAllFilenames(fullPath=False, limit=limit)
         ## check of existence and checksum
@@ -2034,7 +2040,7 @@ class DButils(object):
 
     def getTraceback(self, table, in_id, in_id2=None):
         """
-        master routine for all the getXXXTraceback functions, this will make for less code
+        Master routine for all the getXXXTraceback functions, this will make for less code
 
         this is some large select statements with joins in them, these are tested and do work
         """
@@ -2200,7 +2206,7 @@ class DButils(object):
 
     def getProductsByInstrument(self, inst_id):
         """
-        get all the products for a given instrument
+        Get all the products for a Given instrument
         """
         inst_id = self.getInstrumentID(inst_id)
         sq = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id = inst_id).all()
@@ -2211,7 +2217,7 @@ class DButils(object):
 
     def getProductsByLevel(self, level):
         """
-        get all the products for a given level
+        Get all the products for a Given level
         """
         sq = self.session.query(self.Product.product_id).filter_by(level = level).all()
         if sq:
@@ -2221,7 +2227,7 @@ class DButils(object):
 
     def getAllProcesses(self, timebase='all'):
         """
-        get all processes
+        Get all processes
         """
         if timebase == 'all':
             procs = self.session.query(self.Process).all()
@@ -2231,7 +2237,7 @@ class DButils(object):
 
     def getProcessTimebase(self, process_id):
         """
-        return the timebase for a product
+        Return the timebase for a product
         """
         # this is two queries but allows for name or id as input
         process_id = self.getProcessID(process_id)
@@ -2239,14 +2245,14 @@ class DButils(object):
 
     def getAllProducts(self):
         """
-        return a list of all products as instances
+        Return a list of all products as instances
         """
         prods = self.session.query(self.Product).all()
         return prods
 
     def getEntry(self, table, *args):
         """
-        master method to return a entry instance from any table in the db
+        Master method to return a entry instance from any table in the db
         """
         # just try and get the entry
         retval = self.session.query(getattr(self, table)).get(args[0])
@@ -2260,7 +2266,7 @@ class DButils(object):
 
     def getFilesByCode(self, code_id, id_only=False):
         """
-        given a code_id (or name) return the files that were created using it
+        Given a code_id (or name) return the files that were created using it
         """
         code_id = self.getCodeID(code_id)
         f_ids = self.session.query(self.Filecodelink.resulting_file).filter_by(source_code=code_id).all()
@@ -2273,7 +2279,7 @@ class DButils(object):
 
     def getFileParents(self, file_id, id_only=False):
         """
-        given a file_id (or filename) return the files that went into making it
+        Given a file_id (or filename) return the files that went into making it
         """
         file_id = self.getFileID(file_id)
         f_ids = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file=file_id).all()
@@ -2288,7 +2294,7 @@ class DButils(object):
 
     def getVersion(self, fileid):
         """
-        return the version instance for a file
+        Return the version instance for a file
         """
         if not isinstance(fileid, self.File):
             fileid = self.getEntry('File', fileid)
@@ -2298,7 +2304,7 @@ class DButils(object):
 
     def getChildTree(self, inprod):
         """
-        given an input product return a list of its output product ids
+        Given an input product return a list of its output product ids
         """
         out_proc = self.getProcessFromInputProduct(inprod)
         return [self.getEntry('Process', op).output_product for op in out_proc]

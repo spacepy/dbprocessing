@@ -11,15 +11,12 @@ import subprocess
 class module(object):
     def __init__(self, *args):
         """
-        commands are entered as args to this class then parsed
+        Commands are entered as args to this class then parsed
 
-        Parameters
-        ==========
-        args : arguments
-            arguments pass straight through to module
+        :keyward args : Arguments passed straight through to module
+        
+        :examples:
 
-        Examples
-        ========
         mod = module('load', 'icy')
         """
         self.env = os.environ.copy()
@@ -30,7 +27,7 @@ class module(object):
 
     def _parse(self, inval):
         """
-        parse the module call and return an environment
+        Parse the module call and return an environment
         """
         regex = re.compile(r'^os\.environ\[(.*)\]$')
         for val in inval:
@@ -50,17 +47,13 @@ class module(object):
     @classmethod
     def get_env(self, *args):
         """
-        return a complete environment suitable for passing through to
+        Return a complete environment suitable for passing through to
         subprocess.call()
 
-        Parameters
-        ==========
-        args : arguments
-            arguments pass straight through to module
+        :keyward args : Arguments passed straight through to module
 
-        Returns
-        =======
-        dictionary containg the request environment
+        :return:dictionary containg the request environment
+        :rtype: dict
         """
         m = module(*args)
         return m.env

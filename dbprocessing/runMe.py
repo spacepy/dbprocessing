@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Oct 23 10:12:11 2012
-
-@author: balarsen
-"""
 from __future__ import print_function
 from collections import namedtuple
 import datetime
@@ -38,7 +32,7 @@ class ProcessException(Exception):
 
 def mk_tempdir(suffix='_dbprocessing'):
     """
-    create a secure temp directory
+    Create a secure temp directory
     """
     tempdir = tempfile.mkdtemp(suffix=suffix)
     DBlogging.dblogger.debug("Created temp directory: {0}".format(tempdir))
@@ -46,7 +40,7 @@ def mk_tempdir(suffix='_dbprocessing'):
 
 def rm_tempdir(tempdir):
     """
-    remove the temp directory
+    Remove the temp directory
     """
     name = tempdir
     shutil.rmtree(tempdir)
@@ -55,7 +49,7 @@ def rm_tempdir(tempdir):
 
 def _extract_files(cmdline):
     """
-    given a command line extract out the files that are input to the process
+    Given a command line extract out the files that are input to the process
     """
     # is the input a list, if so make it a string
     if hasattr(cmdline, '__iter__'):
@@ -81,7 +75,7 @@ def _extract_files(cmdline):
 
 def _pokeFile(filename):
     """
-    given a filename open it non-blocking and see if it works
+    Given a filename open it non-blocking and see if it works
     """
     try:
         fp = os.open(filename, os.O_NONBLOCK, os.O_RDONLY)
@@ -98,7 +92,7 @@ def _pokeFile(filename):
 
 def _start_a_run(runme):
     """
-    given a runme that we want to start poke the all the files to be sure the automunter has them all up
+    Given a runme that we want to start poke the all the files to be sure the automunter has them all up
 
     intermediate steps:
     1) need to extract all the files that will be used for the process and poke them all
@@ -132,23 +126,16 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     """
     Go through a list of runMe objects and run them
 
-    TODO
-    ====
-    This function can be made a smart as one wants, for now it is not made to be smart, but flexible
+    .. todo:: This function can be made a smart as one wants, for now it is not made to be smart, but flexible
 
-    Parameters
-    ==========
-    runme_list : list
-        list of runMe objects that need to be run
-    rundir : str
-        directory to run in, if None then use a temp directory
+    :param runme_list: List of runMe objects that need to be run
+    :type runme_list: list
 
-    Returns
-    =======
-    n_good : int
-        number of processes that successfully completed
-    n_bad : int
-        number of processes that failed
+    :param rundir: Directory to run in, if None then use a temp directory
+    :type rundir: str
+
+    :return: number of processes that successfully completed, number of processes that failed
+    :rtype: tuple(int, int)
     """
     ############################################################
     # 1) build up the command line and store in a commands list
