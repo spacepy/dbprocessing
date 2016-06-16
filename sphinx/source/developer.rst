@@ -23,7 +23,9 @@ Tests
 -----
 There are two types of testing done with this project. Unit tests, which test if the individual pieces work, and functional tests, which test if the peices work together
 
-Unit Tests:
+.. _unit:
+
+Unit Tests
 ~~~~~~~~~~~
 Unit Tests are located in the tests/ directory.
 
@@ -35,7 +37,9 @@ To check test coverage (i.e., how many lines of code are actually hit by the tes
 
 Of course, instead of ``test_all.py``, you can specify the name of the module you want to test.
 
-Functional Tests:
+.. _functional:
+
+Functional Tests
 ~~~~~~~~~~~~~~~~~
 Located in testDB/ is a functional test. The goal was to have the simplest test of dbprocessing so testing is quick and complete without having to use real data.
 
@@ -63,7 +67,7 @@ Repository organization
 -----------------------
 top-level
 ~~~~~~~~~
-There should be(but there totally is) no committed files at the top level besides ``setup.py``, and ``.gitignore`` (not normally visible).
+There should be(but there totally are) no committed files at the top level besides ``setup.py``, and ``.gitignore`` (not normally visible).
 
 build
 ~~~~~
@@ -73,6 +77,18 @@ dbprocessing
 ~~~~~~~~~~~~
 Source tree for the main ``dbprocessing`` module. If it's in this directory, it's meant to be installed.
 
+Documents
+~~~~~~~~~
+?
+
+gui
+~~~
+?
+
+OneOffs
+~~~~~~~
+?
+
 scripts
 ~~~~~~~
 Scripts meant to be called from the command line that should be installed with the module. They should be added to the ``scripts`` list in ``setup.py`` and documented in :doc:`scripts` (source file ``scripts.rst``).
@@ -81,10 +97,37 @@ sphinx
 ~~~~~~
 See `Documentation`_.
 
+test_codes
+~~~~~~~~~~
+?
+
 testDB
 ~~~~~~
-Funtional test
+See :ref:`functional`.
+
+Testing_Utils
+~~~~~~~~~~~~~
+?
 
 tests
 ~~~~~
-Unit tests
+See :ref:`unit`.
+
+tests_scripts
+~~~~~~~~~~~~~
+?
+
+Todo
+----
+FastData
+~~~~~~~~
+
+Multiday file handling
+~~~~~~~~~~~~~~~~~~~~~~
+The project needs a way to pass more than just "today" and "yesterday" to the codes.
+
+Adding "previous" and "next" columns to the product process link may be a way of handling this("previous=2" would mean "to make a product of date 2018-01-15, hand in 2018-01-13 and 2018-01-14 of the input product as well at 2018-01-15" and "next=1" would put in 2018-01-16.)
+
+newest_version
+~~~~~~~~~~~~~~
+The column is not actually kept updated. Currently it works just by comparing version numbers, but it needs to decided if the column should just be removed because it's unused, or if work should be done to keep this field updated.
