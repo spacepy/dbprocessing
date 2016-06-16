@@ -3,6 +3,7 @@ dbprocessing Scripts
 
 addFromConfig.py
 ----------------
+.. program:: addFromConfig
 
 Adds data to a database from a config file. This is the second step in
 setting up new processing chain.
@@ -17,6 +18,7 @@ format and capability.
 
 addVerboseProvenance.py
 -----------------------
+.. program:: addVerboseProvenance
 
 go into the database and get the verbose provencoe for a file
 then add that to the global attrs for the file
@@ -26,6 +28,7 @@ This code has not been fully tested or used.
 
 clearProcessingFlag.py
 ----------------------
+.. program:: clearProcessingFlag
 
 Clear a processing flag (lock) on a database that has crashed.
 
@@ -34,6 +37,7 @@ Clear a processing flag (lock) on a database that has crashed.
 
 configFromDB.py
 ---------------
+.. program:: configFromDB
 
 Build a config file from an existing database. This is untested and not
 fully useful yet.
@@ -47,6 +51,7 @@ fully useful yet.
 
 coveragePlot.py
 ---------------
+.. program:: coveragePlot
 
 Creates a coverage plots based on config file input. This script is useful for
 determining which files may be missing from a procesing chain.
@@ -59,6 +64,7 @@ format and capability.
 
 CreateDB.py
 -----------
+.. program:: CreateDB
 
 Create an empty sqlite database for use in dbprocessing.
 (currently creates a RBSP database, this should be updated as an option).
