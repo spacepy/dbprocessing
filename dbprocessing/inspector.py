@@ -234,12 +234,11 @@ def extract_Version(filename, basename=False):
         verstring = res.group()
         tmp = verstring.split('.')
         ver = Version.Version(tmp[0][1:], tmp[1], tmp[2])
+        if basename:
+            base = filename.split(verstring)[0]
+            return ver, base
 
-    if not basename:
-        return ver
-    else:
-        base = filename.split(verstring)[0]
-        return ver, base
+    return ver
 
 
 
