@@ -114,7 +114,7 @@ class DBUtilsOtherTests(TestSetup):
         """resetProcessingFlag"""
         self.dbu.startLogging()
         self.assertTrue(self.dbu.currentlyProcessing())
-        self.assertRaises(ValueError, self.dbu.resetProcessingFlag)  # no comment
+        self.assertRaises(ValueError, self.dbu.resetProcessingFlag, comment=None)  # no comment
         self.dbu.resetProcessingFlag('testing comment')
         self.assertFalse(self.dbu.currentlyProcessing())
 
