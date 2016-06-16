@@ -24,7 +24,7 @@ if __name__ == "__main__":
     n_del = 0
     for ff in args:
         try:
-            a.purgeFileFromDB(ff)
+            a._purgeFileFromDB(ff)
             print(' File {0} was removed from DB'.format(ff))
             n_del += 1
         except DButils.DBNoData:

@@ -11,8 +11,6 @@ import sys
 import traceback
 import warnings
 
-from spacepy import pycdf
-
 from dbprocessing import DButils
 from dbprocessing import Version
 
@@ -40,7 +38,7 @@ if __name__ == '__main__':
         except DButils.DBNoData:
             print("WARNING: File {1} not in db".format(f), file=sys.stderr)
         else:
-            dbu.purgeFileFromDB(f)
+            dbu._purgeFileFromDB(f)
             print("  File {0}:{1} removed from DB".format(f_id, f))
 
     

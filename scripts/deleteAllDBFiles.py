@@ -22,5 +22,5 @@ if __name__ == "__main__":
     a = DButils.DButils(options.mission)
     f = a.getAllFilenames()
     for ff in f:
-        a.purgeFileFromDB(ff[0])
+        a._purgeFileFromDB(ff[0])
     print('deleted {0} files'.format(len(f)))

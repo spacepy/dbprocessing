@@ -104,6 +104,6 @@ if __name__ == "__main__":
                     else:
                         print("        ** was already not marked exists_on_disk")
         if rmfiles:
-            dbu.purgeFileFromDB(rmfiles)
+            dbu._purgeFileFromDB(rmfiles)
     
     dbu.closeDB()

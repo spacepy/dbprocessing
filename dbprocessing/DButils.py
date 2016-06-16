@@ -605,7 +605,7 @@ class DButils(object):
 
         if recursive then it removes all files that depend on the one to remove
 
-        >>>  pnl.purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
+        >>>  pnl._purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
 
         # TODO: make the recurive parameter actually do anything
         """
