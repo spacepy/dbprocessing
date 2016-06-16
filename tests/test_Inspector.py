@@ -37,8 +37,11 @@ class InspectorFunctions(unittest.TestCase):
         self.assertEqual(Version.Version(1,0,0), inspector.extract_Version('rbspa_pre_ect-hope-L1_20130231_v1.0.0.cdf'))
         self.assertEqual(Version.Version(1,0,0), inspector.extract_Version('rbspa_pre_ect-hope-L1_20130202_v1.0.0.cdf'))
         self.assertEqual(Version.Version(1,10,0), inspector.extract_Version('rbspa_pre_ect-hope-L1_20130202_v1.10.0.cdf'))
+        self.assertEqual((Version.Version(1,10,0), 'rbspa_pre_ect-hope-L1_20130202_'), inspector.extract_Version('rbspa_pre_ect-hope-L1_20130202_v1.10.0.cdf', basename=True))
         self.assertEqual(None, inspector.extract_Version('rbspa_pre_ect-hope-L1_20130202_v1.f.0.cdf'))
         self.assertEqual(None, inspector.extract_Version('rbspa_pre_ect-hope-L1_20130202_v1.0.cdf'))
+        self.assertEqual(None, inspector.extract_Version('rbspa_pre_ect-hope-L1_20130202_v1.0.cdf', basename=True))
+
 
 class InspectorClass(unittest.TestCase):
     """Tests of the inspector class"""
