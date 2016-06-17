@@ -21,7 +21,7 @@ This will install into ``.local`` in your home directory.
 
 Tests
 -----
-There are two types of testing done with this project. Unit tests, which test if the individual pieces work, and functional tests, which test if the peices work together
+There are two types of testing done with this project. Unit tests, which test if the individual pieces work, and functional tests, which test if the pieces work together
 
 .. _unit:
 
@@ -41,7 +41,7 @@ Of course, instead of ``test_all.py``, you can specify the name of the module yo
 
 Functional Tests
 ~~~~~~~~~~~~~~~~~
-Located in testDB/ is a functional test. The goal was to have the simplest test of dbprocessing so testing is quick and complete without having to use real data.
+Located in test_DB/ is a functional test. The goal was to have the simplest test of dbprocessing so testing is quick and complete without having to use real data.
 
 Level 0 files are just simple words stored in testDB_{set}_(first|sec).raw format.
 
@@ -49,7 +49,7 @@ Level 1 files are the concatenated versions of level 0, stored in testDB_{set}.c
 
 Level 2 files are rot13’d versions of the level 1 files, and are stored in testDB_{set}.rot format.
 
-``testDB/scripts/runThisThing.sh`` will excute the needed scripts to run the entire dbprocessing chain.
+``testDB/scripts/runThisThing.sh`` will execute the needed scripts to run the entire dbprocessing chain.
 
 Documentation
 -------------
