@@ -1650,6 +1650,41 @@ class DButils(object):
                 filter(self.File.utc_file_date.between(dates[0], dates[1])).all()
         return sq
 
+
+
+    def _makeVersionnumTable(self, prod_id=None):
+        # don't trust that the db has this correct
+        # create a table populated with
+        #   versionnum, file_id, utc_file_date
+        if prod_id is None:
+            version = (self.session.query((self.File.interface_version * 1000
+                                           + self.File.quality_version * 100
+                                           + self.File.revision_version).label('versionnum'),
+                                          self.File.file_id,
+                                          self.File.utc_file_date,
+                                          self.File.product_id)
+                       .group_by(self.File.file_id).subquery())
+        else:
+            version = (self.session.query((self.File.interface_version * 1000
+                                           + self.File.quality_version * 100
+                                           + self.File.revision_version).label('versionnum'),
+                                          self.File.file_id,
+                                          self.File.utc_file_date,
+                                          self.File.product_id)
+                       .filter(self.File.product_id == prod_id)
+                       .group_by(self.File.file_id).subquery())
+        return version
+
+    def _makeVersionnumSubquery(self, prod_id=None):
+        version = self._makeVersionnumTable(prod_id=prod_id)
+
+        subq =  (self.session.query(func.max(version.c.versionnum))
+                 .group_by(version.c.utc_file_date)).subquery()
+        return subq
+
+
+
+
     def getFilesByDate(self, daterange, newest_version=False):
         """
         Return the files in the db that have data in the date specified
@@ -1688,6 +1723,10 @@ class DButils(object):
                 filter(self.File.utc_file_date.between(dates[0], dates[1])).all()
         return sq
 
+
+
+
+
     def getFilesByProduct(self, prod_id, newest_version=False):
         """
         Given a product_id or name return all the file instances associated with it
@@ -1696,19 +1735,8 @@ class DButils(object):
         """
         prod_id = self.getProductID(prod_id)
         if newest_version:
-            # don't trust that the db has this correct
-            # create a tabel populated with
-            #   versionnum, file_id, utc_file_date
-            version = (self.session.query( (self.File.interface_version*1000
-                                           + self.File.quality_version*100
-                                           + self.File.revision_version).label('versionnum'),
-                                          self.File.file_id,
-                                          self.File.utc_file_date )
-                       .filter(self.File.product_id == prod_id)
-                       .group_by(self.File.file_id).subquery())
-
-            subq = (self.session.query(func.max(version.c.versionnum))
-                  .group_by(version.c.utc_file_date)).subquery()
+            version = self._makeVersionnumTable(prod_id=prod_id)
+            subq = self._makeVersionnumSubquery(prod_id=prod_id)
 
             sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
 
