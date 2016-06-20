@@ -6,7 +6,7 @@ addFromConfig.py
 .. program:: addFromConfig
 
 Adds data to a database from a config file. This is the second step in
-setting up new processing chain.
+setting up a new processing chain.
 
 See :doc:`ConfigurationFiles` for a full description of the config file
 format and capability.
@@ -20,7 +20,7 @@ addVerboseProvenance.py
 -----------------------
 .. program:: addVerboseProvenance
 
-go into the database and get the verbose provencoe for a file
+Go into the database and get the verbose provenance for a file
 then add that to the global attrs for the file
 either putout to the same file or a different file
 
@@ -53,7 +53,7 @@ coveragePlot.py
 ---------------
 .. program:: coveragePlot
 
-Creates a coverage plots based on config file input. This script is useful for
+Creates a coverage plot based on config file input. This script is useful for
 determining which files may be missing from a procesing chain.
 
 .. option:: configfile The config file to read.
@@ -77,7 +77,7 @@ This is the first step in the setup of a new processing chain.
 
 dataToIncoming.py
 -----------------
-concept, never actually used. supposed to be one script + config file, but we wound up using separate scripts for everything
+Concept, never actually used. supposed to be one script + config file, but we wound up using separate scripts for everything
 
 dbOnlyFiles.py:
 ---------------
@@ -325,7 +325,7 @@ Goes through the database and adds all the files that are a certain product and 
 
 updateCode.py:
 --------------
-new version of code, rerun based on that, better done through config files (although can't be done that way) and then run reprocessByCode
+New version of code, rerun based on that, better done through config files (although can't be done that way) and then run reprocessByCode
 
 updateProducts.py:
 ------------------
