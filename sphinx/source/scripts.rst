@@ -43,11 +43,11 @@ Build a config file from an existing database. This is untested and not
 fully useful yet.
 
 .. option:: filename The filename to save the config
-.. option:: -m,--mission The basebase to to connect to
-.. option:: -f,--force Force the creation of the config file, allows overwrite
-.. option:: -s,--satellite The name of the satellite for the config file
-.. option:: -i,--instrument The name of the instrument for the config file
-.. option:: -c,--nocomments Make the config file without a comment header block on top
+.. option:: -m <dbname>, --mission <dbname> The database to to connect to
+.. option:: -f, --force Force the creation of the config file, allows overwrite
+.. option:: -s, --satellite The name of the satellite for the config file
+.. option:: -i, --instrument The name of the instrument for the config file
+.. option:: -c, --nocomments Make the config file without a comment header block on top
 
 coveragePlot.py
 ---------------
@@ -85,14 +85,14 @@ dbOnlyFiles.py:
 
 Show files in database but not on disk. Additionally, this can remove files from the db that are only in the db.
 
-.. option:: -s,--startDate Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e,--endDate Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -f,--fix Fix the database exists_on_disk field
-.. option:: -m,--mission elected mission database
+.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
+.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
+.. option:: -f, --fix Fix the database exists_on_disk field
+.. option:: -m <dbname>, --mission <dbname> elected mission database
 .. option:: --echo echo sql queries for debugging
-.. option:: -n,--newest Only check the newest files
+.. option:: -n, --newest Only check the newest files
 .. option:: --startID The File id to start on
-.. option:: -v,--verbose Print out each file as it is checked
+.. option:: -v, --verbose Print out each file as it is checked
 
 DBRunner.py:
 ------------
@@ -101,13 +101,13 @@ DBRunner.py:
 Used to demo run codes for certain dates out of the database. This primarily used in testing can also be used to reprocess files as needed
 
 .. option:: filename The filename to save the config
-.. option:: -d,--dryrun Dryrun, only print what would be done
-.. option:: -m,--mission Selected mission database
+.. option:: -d, --dryrun Dryrun, only print what would be done
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
 .. option:: --echo Start sqlalchemy with echo in place for debugging
-.. option:: -s,--startDate Date to start search (e.g. 2012-10-02 or 20121002)
-.. option:: -e,--endDate Date to end search (e.g. 2012-10-25 or 20121025)
+.. option:: -s <date>, --startDate <date> Date to start search (e.g. 2012-10-02 or 20121002)
+.. option:: -e <date>, --endDate <date> Date to end search (e.g. 2012-10-25 or 20121025)
 .. option:: --nooptional Do not include optional inputs
-.. option:: -n,--num-proc Number of processes to run in parallel
+.. option:: -n, --num-proc Number of processes to run in parallel
 
 deleteAllDBFiles.py:
 --------------------
@@ -115,7 +115,7 @@ deleteAllDBFiles.py:
 
 Deletes all file entries in the database.
 
-.. option:: -m Selected mission database
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
 
 deleteAllDBProducts.py:
 -----------------------
@@ -129,7 +129,7 @@ deleteDBFile.py:
 
 Deletes individual files from the database.
 
-.. option:: -m,--mission Selected mission database
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
 
 .. warning:: This is the same as purgeFileFromDB.py, and seems less clean. Delete?
 
@@ -185,8 +185,8 @@ In a given directory, make symlinks to all the newest versions of files into ano
 
 .. option:: config The config file
 .. option:: --verbose Print out verbose information
-.. option:: -l,--list Instead of syncing, list the sections of the conf file
-.. option:: -f,--filter Comma seperated list of strings that must be in the sync conf name (e.g. -f hope,rbspa)
+.. option:: -l, --list Instead of syncing list the sections of the conf file
+.. option:: -f, --filter Comma seperated list of strings that must be in the sync conf name (e.g. -f hope,rbspa)
 
 .. warning:: There's no documentation on the config file
 
@@ -208,7 +208,7 @@ possibleProblemDates.py:
 
 A database scrub/validation routine.
 
-.. option:: -m,--mission Selected mission database
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
 .. option:: --fix Fix the issues (make a backup first)
 .. option:: --echo Echo sql queries for debugging
 
@@ -256,8 +256,8 @@ purgeFileFromDB.py:
 
 Deletes individual files from the database.
 
-.. option:: -m,--mission Selected mission database
-.. option:: -r,--recursive Recursive removal
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
+.. option:: -r, --recursive Recursive removal
 
 reprocessByAll.py:
 ------------------
@@ -265,10 +265,10 @@ reprocessByAll.py:
 
 Goes through the database and adds all the files that are a certain level to the processqueue so that the next ProcessQueue -p will run them
 
-.. option:: -s,--startDate Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e,--endDate Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -l,--level The level to reprocess for
-.. option:: -m,--mission Selected mission database
+.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
+.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
+.. option:: -l <level>, --level <level> The level to reprocess for
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
 
 .. warning:: Should work, probably doesn't
 
@@ -279,10 +279,10 @@ reprocessByCode.py:
 Goes through the database and adds all the files that went into the code to the processqueue so that the next ProcessQueue -p will run them
 
 .. option:: codeID code to reprocess for
-.. option:: -s,--startDate Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e,--endDate Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -m,--mission Selected mission database
-.. option:: --force Force the reprocessing, speicify which version number to increment (1,2,3)
+.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
+.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
+.. option:: --force Force the reprocessing. Speicify which version number to increment (1,2,3)
 
 .. warning:: Should work, probably doesn't
 
@@ -292,11 +292,11 @@ reprocessByDate.py:
 
 Goes through the database and adds all the files that are in a date range to the processqueue so that the next ProcessQueue -p will run them
 
-.. option:: -s,--startDate Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e,--endDate Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -m,--mission Selected mission database
+.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
+.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
 .. option:: --echo Echo sql queries for debugging
-.. option:: --force Force the reprocessing, speicify which version number to increment (1,2,3)
+.. option:: --force Force the reprocessing. Speicify which version number to increment (1,2,3)
 
 reprocessByInstrument.py:
 -------------------------
@@ -304,12 +304,12 @@ reprocessByInstrument.py:
 
 Goes through the database and adds all the files that are a certain instrument and level to the processqueue so that the next ProcessQueue -p will run them
 
-.. option:: -s,--startDate Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e,--endDate Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -m,--mission Selected mission database
-.. option:: -l,--level The level to reprocess for the given instrument
+.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
+.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
+.. option:: -l <level>, --level <level> The level to reprocess for the given instrument
 .. option:: --echo Echo sql queries for debugging
-.. option:: --force Force the reprocessing, speicify which version number to increment (1,2,3)
+.. option:: --force Force the reprocessing. Speicify which version number to increment (1,2,3)
 
 reprocessByProduct.py:
 ----------------------
@@ -317,9 +317,9 @@ reprocessByProduct.py:
 
 Goes through the database and adds all the files that are a certain product and put then to the processqueue so that the next ProcessQueue -p will run them
 
-.. option:: -s,--startDate Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e,--endDate Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -m,--mission Selected mission database
+.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
+.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
 .. option:: --echo Echo sql queries for debugging
 .. option:: --force Force the reprocessing, speicify which version number to increment (1,2,3)
 
@@ -338,7 +338,7 @@ updateSHAsum.py:
 Goes into the database and update the shasum entry for a file that is changed after ingestion.
 
 .. option:: infile File to update the shasum of
-.. option:: -m,--mission Selected mission database
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
 
 weeklyReport.py:
 ----------------

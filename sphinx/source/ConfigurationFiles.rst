@@ -3,13 +3,13 @@ Configuration Files
 
 Basics
 ------
-The configuration file consists of sections, led by a [section] header and followed by
-name: value entries, name=value is also accepted.
+Configuration files in this project are INI files. The configuration file consists of sections,
+led by a [section] header and followed by name=value properties(name: value is also supported).
 
 Note that leading whitespace is removed from values.
 The optional values can contain format strings which refer to other values in the same section,
 or values in a special DEFAULT section. Additional defaults can be provided on initialization
-and retrieval. Lines beginning with '#' or ';' are ignored and may be used to provide comments.
+and retrieval.
 
 Configuration files may include comments, prefixed by specific characters (# and ;).
 Comments may appear on their own in an otherwise empty line, or may be entered in lines
@@ -20,7 +20,7 @@ comment, while # does not.)
 
 coveragePlot.py
 ---------------
-::
+.. code-block:: ini 
 
     #############################
     # sample config file
@@ -29,8 +29,6 @@ coveragePlot.py
     ## # Substitutions
     ## # {TODAY}
     ## # {N DAYS}  -> add N days to the previous where N is an int
-
-
 
 
     ## ##################
