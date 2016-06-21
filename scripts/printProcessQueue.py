@@ -8,8 +8,7 @@ from optparse import OptionParser
 from dbprocessing import DButils
 
 def output_html(items):
-    output = """
-<!DOCTYPE html>
+    output = """<!DOCTYPE html>
 <html>
   <head>
     <title>DBprocessing</title>
@@ -36,10 +35,10 @@ def output_html(items):
 
   <body>
 """
-    output += '<h1>{0}</h1>\n'.format(dbu.mission)
-    output += '<h2>{0}</h2>\n'.format(datetime.datetime.utcnow().isoformat())
+    output += '    <h1>{0}</h1>\n'.format(dbu.mission)
+    output += '    <h2>{0}</h2>\n'.format(datetime.datetime.utcnow().isoformat())
 
-    output += '<h2>{0}</h2>\n'.format('processQueue')
+    output += '    <h2>{0}</h2>\n'.format('processQueue')
     output +="""    <table>
         <tr><th>file_id</th><th>filename</th><th>product</th></tr>
 """
