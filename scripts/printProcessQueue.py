@@ -1,21 +1,95 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
+from __future__ import print_function
 
+import datetime
 import sys
+from optparse import OptionParser
 
 from dbprocessing import DButils
 
-if len(sys.argv) != 2:
-    print('Usage: {0} database'.format(sys.argv[0]))
-    sys.exit(-1)
+def output_html(items):
+    output = """
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DBprocessing</title>
+    <style type="text/css">
+        table, td, th
+        {
+        border:1px solid green;
+        padding:3px 7px 2px 7px;
+        border-collapse: collapse;
+        }
+        th
+        {
+        background-color:green;
+        color:white;
+        }
+        tr.alt td
+        {
+        color:#000000;
+        background-color:#EAF2D3;
+        }
+    </style>
+  </head>
 
-if __name__ == "__main__":
-    a = DButils.DButils(sys.argv[1])
-    a.openDB()
-    a._createTableObjects()
-    n_items = a.Processqueue.len()
-    items = a.Processqueue.getAll()
-    print('There are a total of {0} files'.format(n_items))
+
+  <body>
+"""
+    output += '<h1>{0}</h1>\n'.format(dbu.mission)
+    output += '<h2>{0}</h2>\n'.format(datetime.datetime.utcnow().isoformat())
+
+    output += '<h2>{0}</h2>\n'.format('processQueue')
+    output +="""    <table>
+        <tr><th>file_id</th><th>filename</th><th>product</th></tr>
+"""
+    for index, item in enumerate(items):
+        if( index % 2 == 0 ):
+            output += '        <tr>'
+        else:
+            output += "        <tr class='alt'>"
+
+        output += '<td>{0}</td><td>{1}</td><td>{2}</td></tr>\n'.format(index, item['file'].filename, item['product'].product_name)
+
+    output += "    </table>\n  </body>\n</html>"
+    return output
+
+def output_text(items):
+    output = dbu.mission + '\n'
+    output += datetime.datetime.utcnow().isoformat() + '\n'
+    output += 'ProcessQueue\n'
+
+    for index, item in enumerate(items):
+        output += '{0}\t{1}\t{2}\n'.format(index, item['file'].filename, item['product'].product_name)
+
+    return output
+
+if __name__ == '__main__':
+    parser = OptionParser()
+    parser.add_option("", "--html", dest="html", action="store_true",
+                      help="Output in html", default=False)
+    parser.add_option("-o", "--output", dest="output",
+                      help="Write output to a file")
+
+    (options, args) = parser.parse_args()
+
+    if( len(args) != 1 ):
+        parser.error("Must pass a mission DB")
+
+    dbu = DButils.DButils(sys.argv[1])
+    items = dbu.Processqueue.getAll()
+    traceback = []
     for v in items:
-        tb = a.getTraceback('File', v)
-        print('{0}\t{1}\t{2}'.format(v, tb['file'].filename, tb['product'].product_name))
+        traceback.append(dbu.getTraceback('File', v))
 
+    if( options.html ):
+        out = output_html(traceback)
+    else:
+        out = output_text(traceback)
+
+    if( options.output is None):
+        print(out)
+    else:
+        output = open(options.output, 'w')
+        output.write(out)
+        output.close()

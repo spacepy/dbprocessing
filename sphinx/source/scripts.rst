@@ -230,19 +230,8 @@ printProcessQueue.py:
 Prints the process queue.
 
 .. option:: Database The name of the database to print the queue of
-
-.. warning:: Broken
-
-processQueueHTML.py:
---------------------
-.. program:: processQueueHTML
-
-Prints the process queue.
-
-.. option:: Database The name of the database to print the queue of
-.. option:: Output The name of the file to output the html to
-
-.. warning:: Broken. Also consider merging with printProcessQueue.py
+.. option:: -o, --output The name of the file to output to(if blank, print to stdout)
+.. option:: --html Output in HTML
 
 ProcessQueue.py:
 ----------------
