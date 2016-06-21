@@ -117,6 +117,11 @@ tests_scripts
 ~~~~~~~~~~~~~
 ?
 
+Database Structure
+------------------
+.. image:: out.png
+	:scale: 50 %
+	
 Todo
 ----
 FastData

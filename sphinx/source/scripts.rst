@@ -54,7 +54,7 @@ coveragePlot.py
 .. program:: coveragePlot
 
 Creates a coverage plot based on config file input. This script is useful for
-determining which files may be missing from a procesing chain.
+determining which files may be missing from a processing chain.
 
 .. option:: configfile The config file to read.
 
@@ -101,7 +101,7 @@ DBRunner.py:
 Used to demo run codes for certain dates out of the database. This primarily used in testing can also be used to reprocess files as needed
 
 .. option:: filename The filename to save the config
-.. option:: -d, --dryrun Dryrun, only print what would be done
+.. option:: -d, --dryrun Only print what would be done
 .. option:: -m <dbname>, --mission <dbname> Selected mission database
 .. option:: --echo Start sqlalchemy with echo in place for debugging
 .. option:: -s <date>, --startDate <date> Date to start search (e.g. 2012-10-02 or 20121002)
@@ -143,7 +143,7 @@ flushProcessQueue.py:
 
 Clears the ProcessQueue of a database.
 
-.. option:: Datebase The name of the database to wipe the ProcesQueue of.
+.. option:: Database The name of the database to wipe the ProcesQueue of.
 
 histogramCodes.py:
 ------------------
@@ -186,7 +186,7 @@ In a given directory, make symlinks to all the newest versions of files into ano
 .. option:: config The config file
 .. option:: --verbose Print out verbose information
 .. option:: -l, --list Instead of syncing list the sections of the conf file
-.. option:: -f, --filter Comma seperated list of strings that must be in the sync conf name (e.g. -f hope,rbspa)
+.. option:: -f, --filter Comma separated list of strings that must be in the sync conf name (e.g. -f hope,rbspa)
 
 .. warning:: There's no documentation on the config file
 
@@ -220,7 +220,7 @@ printInfo.py:
 
 Prints a table of info about files or products or processes.
 
-.. option:: Datebase The name of the database to print table of
+.. option:: Database The name of the database to print table of
 .. option:: Field Either Product or Mission (more to come)
 
 printProcessQueue.py:
@@ -229,7 +229,7 @@ printProcessQueue.py:
 
 Prints the process queue.
 
-.. option:: Datebase The name of the database to print the queue of
+.. option:: Database The name of the database to print the queue of
 
 .. warning:: Broken
 
@@ -239,7 +239,7 @@ processQueueHTML.py:
 
 Prints the process queue.
 
-.. option:: Datebase The name of the database to print the queue of
+.. option:: Database The name of the database to print the queue of
 .. option:: Output The name of the file to output the html to
 
 .. warning:: Broken. Also consider merging with printProcessQueue.py
@@ -309,7 +309,7 @@ Goes through the database and adds all the files that are a certain instrument a
 .. option:: -m <dbname>, --mission <dbname> Selected mission database
 .. option:: -l <level>, --level <level> The level to reprocess for the given instrument
 .. option:: --echo Echo sql queries for debugging
-.. option:: --force Force the reprocessing. Speicify which version number to increment (1,2,3)
+.. option:: --force Force the reprocessing. Specify which version number to increment (1,2,3)
 
 reprocessByProduct.py:
 ----------------------
@@ -321,7 +321,7 @@ Goes through the database and adds all the files that are a certain product and 
 .. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
 .. option:: -m <dbname>, --mission <dbname> Selected mission database
 .. option:: --echo Echo sql queries for debugging
-.. option:: --force Force the reprocessing, speicify which version number to increment (1,2,3)
+.. option:: --force Force the reprocessing. Specify which version number to increment (1,2,3)
 
 updateCode.py:
 --------------
