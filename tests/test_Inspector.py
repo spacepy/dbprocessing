@@ -51,6 +51,7 @@ class InspectorClass(unittest.TestCase):
     """Tests of the inspector class"""
 
     def setUp(self):
+        """Makes a copy of the DB to run tests on without altering the original."""
         super(InspectorClass, self).setUp()
         # These tests shouldn't change the DB but use a copy anyway
         # Would need to at least update DB path if we wanted to
