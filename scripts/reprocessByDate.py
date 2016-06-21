@@ -7,17 +7,12 @@ processqueue so that the next ProcessQueue -p will run them
 """
 from __future__ import print_function
 
-
-
-import datetime
 from optparse import OptionParser
 
 from dateutil import parser as dup
-from dateutil.relativedelta import relativedelta
 
 import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
-
 
 if __name__ == "__main__":
     usage = "%prog -s yyyymmdd -e yyyymmdd -m database"
@@ -32,7 +27,7 @@ if __name__ == "__main__":
                       help="selected mission database", default=None)
     parser.add_option("", "--echo", dest="echo", action='store_true',
                       help="echo sql queries for debugging", default=False)
-    
+
     (options, args) = parser.parse_args()
     if len(args) != 0:
         parser.error("incorrect number of arguments")
@@ -59,5 +54,3 @@ if __name__ == "__main__":
         num = 0
     print('Added {0} files to be reprocessed'.format(num))
     DBlogging.dblogger.info('Added {0} files to be reprocessed'.format(num))
-
-
