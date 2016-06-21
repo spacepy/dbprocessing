@@ -182,14 +182,14 @@ def flatten(l):
 
 def toBool(value):
     """
-    Returns true if passed 'True', 'true', True, 1, 'Yes', or 'yes'
+    Returns true if passed 'True', 'true', True, 1, 'Yes', 'yes', 'Y', or 'y'
 
     :param value: Value to evaluate if true
     :type value: any
 
     :rtype: bool
     """
-    return value in ['True', 'true', True, 1, 'Yes', 'yes']
+    return value in ['True', 'true', True, 1, 'Yes', 'yes', 'Y', 'y']
 
 def toNone(value):
     """
