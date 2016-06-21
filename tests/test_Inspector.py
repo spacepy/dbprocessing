@@ -3,10 +3,14 @@ from __future__ import print_function
 
 import datetime
 import unittest
+from distutils.dir_util import copy_tree, remove_tree
+import tempfile
+import imp
 
 from dbprocessing import inspector
 from dbprocessing import Version
-
+from dbprocessing import DButils
+from dbprocessing import Diskfile
 
 class InspectorFunctions(unittest.TestCase):
     """Tests of the inspector functions"""
@@ -46,6 +50,40 @@ class InspectorFunctions(unittest.TestCase):
 class InspectorClass(unittest.TestCase):
     """Tests of the inspector class"""
 
+    def setUp(self):
+        super(InspectorClass, self).setUp()
+        # These tests shouldn't change the DB but use a copy anyway
+        # Would need to at least update DB path if we wanted to
+        # use DB
+        self.tempD = tempfile.mkdtemp()
+        copy_tree('testDB/', self.tempD)
+
+        self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
+        self.inspect = imp.load_source('inspect', 'inspector/rot13_L1.py')
+
+    def tearDown(self):
+        super(InspectorClass, self).tearDown()
+        remove_tree(self.tempD)
+
+    def test_inspector(self):
+        """Test inspector class"""
+
+        # File doesn't match the inspector pattern...
+        self.assertEqual(None, self.inspect.Inspector('inspector/testDB_01_first.raw', self.dbu, 1,))
+
+        # File matches pattern...
+        goodfile = 'inspector/testDB_001_first.raw'
+        self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)))
+        #self.assertEqual(None, self.inspect.Inspector(goodfile, self.dbu, 1,).extract_YYYYMMDD())
+        
+        # This inspector sets the data_level - not allowed
+        inspect = imp.load_source('inspect', 'inspector/rot13_L1_dlevel.py')
+        self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)))
+
+        # The file doesn't match the inspector pattern...
+        badfile = 'inspector/testDB_01_first.raw'
+        inspect = imp.load_source('inspect', 'inspector/rot13_L1.py')
+        self.assertEqual(None, inspect.Inspector(badfile, self.dbu, 1,))
 
 
 
