@@ -13,7 +13,7 @@ class module(object):
         """
         Commands are entered as args to this class then parsed
 
-        :keyward args : Arguments passed straight through to module
+        :keyword args : Arguments passed straight through to module
         
         :examples:
 
