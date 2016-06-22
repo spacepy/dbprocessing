@@ -4,6 +4,7 @@ Class to hold random utilities of use throughout this code
 """
 from __future__ import print_function
 
+import ConfigParser
 import collections
 import datetime
 import os
@@ -68,6 +69,7 @@ def progressbar(count, blocksize, totalsize, text='Download Progress'):
     if percent == 100: print('\n')
     sys.stdout.flush()
 
+
 def chunker(seq, size):
     """
     Return a long iterable in a tuple of shorter lists.
@@ -83,6 +85,7 @@ def chunker(seq, size):
     """
 
     return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
+
 
 def unique(seq):
     """
@@ -191,6 +194,7 @@ def toBool(value):
     """
     return value in ['True', 'true', True, 1, 'Yes', 'yes', 'Y', 'y']
 
+
 def toNone(value):
     """
     Returns None if passed '', 'None', 'none', or 'NONE
@@ -219,7 +223,7 @@ def strargs_to_args(strargs):
 
     if strargs is None:
         return None
-    kwargs = {}
+    kwargs = { }
     if isinstance(strargs, (list, tuple)):  # we have multiple to deal with
         # TODO why was this needed?
         if len(strargs) == 1:
@@ -301,8 +305,8 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
     if '{d}' in path:
         path = path.replace('{d}', utc_file_date.strftime('%d'))
     if '{b}' in path:
-        months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct',
-                  11: 'Nov', 12: 'Dec'}
+        months = { 1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct',
+                   11: 'Nov', 12: 'Dec' }
         path = path.replace('{b}', months[utc_file_date.month])
     if '{y}' in path:
         path = path.replace('{y}', utc_file_date.strftime('%y'))
@@ -342,8 +346,8 @@ def split_code_args(args):
     # loop through and see if an index has just a -x (any letter)
     for ii, v in enumerate(ans):
         if re.match(r'\-\S', v):  # found a single letter option
-            ans[ii] = ans[ii] + " " + ans[ii+1]
-            del ans[ii+1]
+            ans[ii] = ans[ii] + " " + ans[ii + 1]
+            del ans[ii + 1]
 
     return ans
 
@@ -364,3 +368,22 @@ def processRunning(pid):
         return False
     else:
         return True
+
+
+def readconfig(config_filepath):
+    """
+    Create a ConfigParser object, to read the config file
+
+    :param config_filepath: full path to the config file
+    :type config_filepath: str
+    :return: Dictionary of key value pairs from config files
+    :rtype: dict
+    """
+    cfg = ConfigParser.SafeConfigParser()
+    cfg.read(config_filepath)
+    sections = cfg.sections()
+    # Read each parameter in turn
+    ans = { }
+    for section in sections:
+        ans[section] = dict(cfg.items(section))
+    return ans
