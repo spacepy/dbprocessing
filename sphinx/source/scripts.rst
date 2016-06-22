@@ -125,7 +125,12 @@ Doesn't work, maybe should?
 
 deleteFromDBifNotOnDisk.py:
 ---------------------------
-says on tin, probably not ued
+.. program:: deleteFromDBifNotOnDisk
+Finds all files that are in the DB but not found on the DB
+
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
+.. option:: --fix Remove the files from the DB (make a backup first)
+.. option:: --echo Echo sql queries for debugging
 
 flushProcessQueue.py:
 ---------------------

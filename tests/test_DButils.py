@@ -950,8 +950,8 @@ class TestWithtestDB(unittest.TestCase):
             fp.write('I am some text that will change the SHA\n')
         os.remove(self.tempD + '/L0/testDB_001_first.raw')
 
-        ans = [('testDB_000_first.raw', '(100) bad checksum'),
-               ('testDB_001_first.raw', '(200) file not found')]
+        ans = [('testDB_000_first.raw', 1),
+               ('testDB_001_first.raw', 2)]
         self.assertEqual(ans, self.dbu.checkFiles())
 
     def addGenericCode(self, processID=1):

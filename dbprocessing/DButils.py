@@ -2054,6 +2054,8 @@ class DButils(object):
     def checkFiles(self, limit=None):
         """
         Check files in the DB, return inconsistent files and why
+
+        :return: A list of tupals with the resuls. 1 is a bad checksum, 2 is not found
         """
         files = self.getAllFilenames(fullPath=False, limit=limit)
         ## check of existence and checksum
@@ -2061,9 +2063,9 @@ class DButils(object):
         for f in files:
             try:
                 if not self.checkFileSHA(f):
-                    bad_list.append((f, '(100) bad checksum'))
+                    bad_list.append((f, 1))
             except DigestError:
-                bad_list.append((f, '(200) file not found'))
+                bad_list.append((f, 2))
         return bad_list
 
     def getTraceback(self, table, in_id, in_id2=None):
