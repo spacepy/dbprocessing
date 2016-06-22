@@ -123,16 +123,6 @@ deleteAllDBProducts.py:
 
 Doesn't work, maybe should?
 
-deleteDBFile.py:
-----------------
-.. program:: deleteDBFile
-
-Deletes individual files from the database.
-
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-
-.. warning:: This is the same as purgeFileFromDB.py, and seems less clean. Delete?
-
 deleteFromDBifNotOnDisk.py:
 ---------------------------
 says on tin, probably not ued
