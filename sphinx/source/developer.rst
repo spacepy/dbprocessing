@@ -135,4 +135,4 @@ Adding "previous" and "next" columns to the product process link may be a way of
 
 newest_version
 ~~~~~~~~~~~~~~
-The column is not actually kept updated. Currently it works just by comparing version numbers, but it needs to decided if the column should just be removed because it's unused, or if work should be done to keep this field updated.
+The column is not actually kept updated. Currently this is worked around by comparing version numbers, but it needs to decided if the column should just be removed because it's unused, or if work should be done to keep this field updated.
