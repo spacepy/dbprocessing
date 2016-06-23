@@ -4,10 +4,9 @@ from __future__ import division
 import os
 from optparse import OptionParser
 
-from dbprocessing import DButils, Utils
+from dbprocessing import DButils, Utils, DBlogging
 from dbprocessing.runMe import ProcessException
 
-from dbprocessing import DBlogging
 DBlogging.dblogger.setLevel(DBlogging.LEVELS['info'])
 
 
