@@ -1,51 +1,22 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 
-import itertools
-import glob
 import os
 from optparse import OptionParser
-import re
-import sys
-import traceback
-import warnings
 
-from spacepy import pycdf
-
-from rbsp import Version
-
-
-from dbprocessing import inspector
-
-
-import dbprocessing.DBlogging as DBlogging
-import dbprocessing.dbprocessing as dbprocessing
 from dbprocessing import DButils
 
 """
 go into the database and update the shasum entry for a file that is changed after ingestion
 """
 
-
-def getSHA(options, dbu, filename):
-    """
-    go into the db and get the VP
-    """
-    try:
-        sha = dbu.getEntry('File', dbu.getFileID(os.path.basename(filename))).shasum
-    except DButils.DBNoData:
-        sha = 'NOFILE'
-    return sha
-
-def updateSHA(options, dbu, filename):
+def updateSHA(dbu, filename):
     """
     update the shasum in the db
     """
     file = dbu.getEntry('File', dbu.getFileID(os.path.basename(filename)))
     file.shasum = DButils.calcDigest(filename)
     dbu.session.commit()
-
     
-
 if __name__ == '__main__':
     usage = "usage: %prog infile"
     parser = OptionParser(usage=usage)
@@ -65,12 +36,7 @@ if __name__ == '__main__':
         parser.error("Mission database {0} did not exist".format(options.mission))
 
     dbu = DButils.DButils(options.mission)
-
-    dbsha = getSHA(options, dbu, infile)
-    if dbsha == 'NOFILE': # file not in db we are done
-        sys.exit(-1)
-
-    updateSHA(options, dbu, filename)
+    updateSHA(dbu, infile)
 
     dbu.closeDB()
         
