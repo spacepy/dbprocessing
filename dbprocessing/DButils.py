@@ -687,35 +687,32 @@ class DButils(object):
         """
         Return all the file names in the database
 
-        if level=None get all filenames, otherwise only for a level
+        :param bool fullPath: Return the fullPath or just filename
+        :param int level: Filter by given level
+        :param int product: Filter by given product
+        :param int limit: Limit number of results
 
-        I worked this for speed the zip(\*names) is way too slow (this is about x18 faster)
+        :return: List of strs with the filename
+        :rtype: list
         """
-        if level is None and product is None:
-            if limit is None:
-                names = self.session.query(self.File.filename).all()
-            else:
-                names = self.session.query(self.File.filename).limit(limit)
-        elif product is None:
-            if limit is None:
-                names = self.session.query(self.File.filename).filter_by(data_level=level).all()
-            else:
-                names = self.session.query(self.File.filename).filter_by(data_level=level).limit(limit)
-        elif level is None:
-            if limit is None:
-                names = self.session.query(self.File.filename).filter_by(product_id=product).all()
-            else:
-                names = self.session.query(self.File.filename).filter_by(product_id=product).limit(limit)
-        else: # both specified
-            if limit is None:
-                names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).all()
-            else:
-                names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).limit(limit)
+
+        names = self.session.query(self.File.filename)
+
+        if level is not None:
+            names = names.filter_by(data_level=level)
+        if product is not None:
+            names = names.filter_by(product_id=product)
+
+        if limit is None:
+            names = names.all()
+        else:
+            names = names.limit(limit)
+
         names = map(itemgetter(0), names)
         if fullPath:
             names = map(self.getFileFullPath, names)
-        return names
 
+        return names
 
     def addMission(self,
                     mission_name,

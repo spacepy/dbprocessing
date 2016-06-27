@@ -304,67 +304,6 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(ans[0]['instrument'].instrument_name,
                          ans[1]['instrument'].instrument_name)
 
-    def test_getAllFilenames(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=False)
-        self.assertEqual(6681, len(files))
-        files = self.dbu.getAllFilenames(fullPath=False, level=2)
-        self.assertEqual(184, len(files))
-        files = self.dbu.getAllFilenames(fullPath=False, level=2, product=190)
-        self.assertEqual(15, len(files))
-        ans = set([u'rbspb_int_ect-mageis-L2_20130909_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130907_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130908_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130910_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130921_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130922_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130920_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130918_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130916_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130917_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130914_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130915_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130913_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130912_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130911_v3.0.0.cdf'])
-        self.assertFalse(ans.difference(set(files)))
-
-    def test_getAllFilenames_limit(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=False, limit=10)
-        self.assertEqual(10, len(files))
-        files = self.dbu.getAllFilenames(fullPath=False, level=2, limit=10)
-        self.assertEqual(10, len(files))
-        files = self.dbu.getAllFilenames(fullPath=False, level=2, product=190, limit=4)
-        self.assertEqual(4, len(files))
-        ans = set([u'rbspb_int_ect-mageis-L2_20130907_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130909_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130908_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130910_v3.0.0.cdf'])
-        self.assertFalse(ans.difference(set(files)))
-
-    def test_getAllFilenames_level(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=False, product=1)
-        self.assertEqual(len(files), 30)
-
-    def test_getAllFilenames_level_limit(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=False, product=1, limit=10)
-        self.assertEqual(len(files), 10)
-
-    def test_getAllFilenames_fullpath(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=True, product=1)
-        self.assertEqual(len(files), 30)
-        self.assertTrue(all(['/n/space_data' in v for v in files]))
-
-    def test_getAllFilenames_fullpath_limit(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=True, product=1, limit=10)
-        self.assertEqual(len(files), 10)
-        self.assertTrue(all(['/n/space_data' in v for v in files]))
-
     def test_getAllFileIds(self):
         """getAllFileIds"""
         files = self.dbu.getAllFileIds()
@@ -1254,10 +1193,52 @@ class TestWithtestDB(unittest.TestCase):
         """Tests all of the release stuff, it's all intertwined anyway"""
         self.dbu.tag_release(1)
 
-        ans = ['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw', 'testDB_000_sec.raw',
-               'testDB_001.rot', 'testDB_000.rot', 'testDB_001_first.raw', 'testDB_000_first.raw']
+        ans = ['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw',
+               'testDB_000_sec.raw', 'testDB_001.rot', 'testDB_000.rot',
+               'testDB_001_first.raw', 'testDB_000_first.raw']
         self.assertEqual(ans, self.dbu.list_release(1, fullpath=False))
 
+    def test_getAllFilenames_all(self):
+        """getAllFilenames should return all files in the db when passed no filters"""
+        ans = ['testDB_000.cat', 'testDB_000.rot', 'testDB_000_first.raw',
+               'testDB_000_sec.raw', 'testDB_001.cat', 'testDB_001.rot',
+               'testDB_001_first.raw', 'testDB_001_sec.raw']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False))
+
+    def test_getAllFilenames_product(self):
+        """getAllFilenames should return the files with product_id 1"""
+        ans = ['testDB_000.cat', 'testDB_001.cat']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, product = 1))
+
+    def test_getAllFilenames_level(self):
+        """getAllFilenames should return the files with level 0"""
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+               'testDB_001_sec.raw', 'testDB_000_sec.raw']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, level = 0))
+
+    def test_getAllFilenames_ProductAndLevel(self):
+        """getAllFilenames should return the files with level 1 and product 1"""
+        ans = ['testDB_000.cat', 'testDB_001.cat']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, level = 1, product = 1))
+
+    def test_getAllFilenames_limit(self):
+        """getAllFilenames should only return 4 items with limit=4"""
+        ans = ['testDB_000.cat', 'testDB_000.rot', 'testDB_000_first.raw',
+               'testDB_000_sec.raw']
+        out = self.dbu.getAllFilenames(fullPath = False, limit = 4)
+
+        self.assertEqual(4, len(out))
+        self.assertEqual(ans, out)
+
+    def test_getAllFilenames_fullPath(self):
+        """getAllFilenames should return the fullPath"""
+        out = self.dbu.getAllFilenames()
+
+        self.assertTrue(all([self.tempD in v for v in out]))
 
 if __name__ == "__main__":
     unittest.main()
