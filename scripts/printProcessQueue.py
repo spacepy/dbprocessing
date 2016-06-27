@@ -2,7 +2,6 @@
 from __future__ import print_function
 
 import datetime
-import sys
 from optparse import OptionParser
 
 from dbprocessing import DButils
@@ -75,7 +74,7 @@ if __name__ == '__main__':
     if( len(args) != 1 ):
         parser.error("Must pass a mission DB")
 
-    dbu = DButils.DButils(sys.argv[1])
+    dbu = DButils.DButils(args[0])
     items = dbu.Processqueue.getAll()
     traceback = []
     for v in items:
