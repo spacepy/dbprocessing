@@ -2,10 +2,16 @@
 from __future__ import print_function
 
 import datetime
-import unittest
 from distutils.dir_util import copy_tree, remove_tree
 import os
+import sys
 import tempfile
+import unittest
+
+try:
+    import StringIO
+except:
+    import io as StringIO
 
 from dbprocessing import Utils
 from dbprocessing import DButils
@@ -52,18 +58,21 @@ class UtilsTests(unittest.TestCase):
         # Substitutions that require referring to the DB...
         filename = 'testDB_001_first.raw'
         path = '{INSTRUMENT}'
-        self.assertEqual('rot13', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        self.assertEqual('rot13', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=self.dbu))
         path = '{SATELLITE}'
-        self.assertEqual('testDB-a', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        self.assertEqual('testDB-a',
+                         Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=self.dbu))
         path = '{SPACECRAFT}'
-        self.assertEqual('testDB-a', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        self.assertEqual('testDB-a',
+                         Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=self.dbu))
         path = '{MISSION}'
-        self.assertEqual('testDB', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        self.assertEqual('testDB', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=self.dbu))
         path = '{PRODUCT}'
-        self.assertEqual('testDB_rot13_L0_first', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        self.assertEqual('testDB_rot13_L0_first',
+                         Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=self.dbu))
         # Verify that unknown values are ignored
         path = '{xxx}'
-        self.assertEqual('{xxx}', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version,dbu=self.dbu))
+        self.assertEqual('{xxx}', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=self.dbu))
 
     def test_chunker(self):
         """chunker()"""
@@ -155,18 +164,32 @@ class UtilsTests(unittest.TestCase):
         dt = datetime.datetime(2012, 8, 30, 8, 5)
         ans1 = '[2012-08-30T08:05:00]'
         self.assertEqual(ans1, Utils.dateForPrinting(dt))
-        self.assertEqual('['+datetime.datetime.now().replace(microsecond=0).isoformat()+']', Utils.dateForPrinting())
+        self.assertEqual('[' + datetime.datetime.now().replace(microsecond=0).isoformat() + ']',
+                         Utils.dateForPrinting())
 
     def test_split_code_args(self):
         """split_code_args"""
-        self.assertEqual(["code", "hello", "outfile"], Utils.split_code_args("code hello outfile") )
-        self.assertEqual(["code", "-n hello", "outfile"], Utils.split_code_args("code -n hello outfile") )
-        self.assertEqual(["code", "infile", "--flag hello", "outfile"], Utils.split_code_args("code infile --flag hello outfile") )
+        self.assertEqual(["code", "hello", "outfile"], Utils.split_code_args("code hello outfile"))
+        self.assertEqual(["code", "-n hello", "outfile"], Utils.split_code_args("code -n hello outfile"))
+        self.assertEqual(["code", "infile", "--flag hello", "outfile"],
+                         Utils.split_code_args("code infile --flag hello outfile"))
 
     def test_processRunnin1(self):
         """processRunning"""
-        self.assertTrue( Utils.processRunning( os.getpid() ) )
-        self.assertFalse( Utils.processRunning( 44565 ) )
+        self.assertTrue(Utils.processRunning(os.getpid()))
+        self.assertFalse(Utils.processRunning(44565))
+
+    def test_progressbar(self):
+        """progressbar shouldhave a known output"""
+        realstdout = sys.stdout
+        output = StringIO.StringIO()
+        sys.stdout = output
+        self.assertEqual(Utils.progressbar(0, 1, 100), None)
+        result = output.getvalue()
+        output.close()
+        self.assertEqual(result, "\rDownload Progress ...0%")
+        sys.stdout = realstdout
+
 
 if __name__ == "__main__":
     unittest.main()
