@@ -683,7 +683,17 @@ class DButils(object):
         ans = map(lambda x: self.getTraceback('Code', x.code_id), codes)
         return ans
 
-    def getAllFilenames(self, fullPath=True, level=None, product=None, limit=None):
+    def getAllFilenames(self,
+                        fullPath=True, 
+                        startDate="1970-01-01", 
+                        endDate="2070-01-01", 
+                        level=None, 
+                        product=None, 
+                        code=None, 
+                        instrument=None, 
+                        exists=None,
+                        newest_version=False, 
+                        limit=None):
         """
         Return all the file names in the database
 
@@ -696,20 +706,11 @@ class DButils(object):
         :rtype: list
         """
 
-        names = self.session.query(self.File.filename)
+        files = self.getFiles(startDate, endDate, level, product, code, instrument, exists, newest_version, limit)
 
-        if level is not None:
-            names = names.filter_by(data_level=level)
-        if product is not None:
-            names = names.filter_by(product_id=product)
-
-        if limit is None:
-            names = names.all()
-        else:
-            names = names.limit(limit)
-
-        names = map(itemgetter(0), names)
+        names = [d.filename for d in files]
         if fullPath:
+            # This is probobly slow, but hopfully not slow enough to be an issue
             names = map(self.getFileFullPath, names)
 
         return names
@@ -1576,6 +1577,44 @@ class DButils(object):
         """
         sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional).filter_by(process_id = process_id).all()
         return sq
+
+    def getFiles(self,
+                 startDate="1970-01-01", 
+                 endDate="2070-01-01", 
+                 level=None, 
+                 product=None, 
+                 code=None, 
+                 instrument=None, 
+                 exists=None,
+                 newest_version=False, 
+                 limit=None):
+        files = self.session.query(self.File)
+
+        if level is not None:
+            files = files.filter_by(data_level=level)
+        if product is not None:
+            files = files.filter_by(product_id=product)
+        if exists is not None:
+            files = files.filter_by(exists_on_disk=int(exists))
+        if code is not None:
+            files = files.join(self.Filecodelink, self.File.file_id == self.Filecodelink.resulting_file)\
+                         .filter_by(source_code=code)
+        if instrument is not None:
+            files = files.join(self.Instrumentproductlink, self.File.product_id == self.Instrumentproductlink.product_id)\
+                         .filter_by(instrument_id=instrument)
+        if startDate != "1970-01-01" or endDate != "2070-01-01":
+            # I.E, they changed atleast one of the date parameters from "all"
+            files = files.filter(self.File.utc_file_date.between(startDate, endDate))
+        if newest_version:
+            raise(NotImplementedError("There is an error in this query, do not use!"))
+            files = files.filter_by(newest_version=int(newest_version))
+
+        if limit is None:
+            files = files.all()
+        else:
+            files = files.limit(limit)
+
+        return files
 
     def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
