@@ -1600,7 +1600,6 @@ class DButils(object):
                          .filter_by(instrument_id=instrument)
         if (startDate != "1970-01-01" or endDate != "2070-01-01") and startDate is not None and endDate is not None:
             # I.E, they changed atleast one of the date parameters from "all"
-            print("S: {0} E: {1}".format(startDate, endDate))
             files = files.filter(self.File.utc_file_date.between(startDate, endDate))
         if newest_version:
             raise(NotImplementedError("There is an error in this query, do not use!"))
