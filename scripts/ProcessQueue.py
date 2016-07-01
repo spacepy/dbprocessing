@@ -108,6 +108,11 @@ if __name__ == "__main__":
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
             pq.dbu.stopLogging('Abnormal exit on exception')
+        except KeyboardInterrupt:
+            print('Shutting down processing chain')
+            DBlogging.dblogger.error('Ctrl-C issued, quiting')
+            pq.dbu.stopLogging('Ctrl-C Exit')
+
         else:
             pq.dbu.stopLogging('Nominal Exit')
         pq.dbu.closeDB()
@@ -178,6 +183,10 @@ if __name__ == "__main__":
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
             pq.dbu.stopLogging('Abnormal exit on exception')
+        except KeyboardInterrupt:
+            print('Shutting down processing chain')
+            DBlogging.dblogger.error('Ctrl-C issued, quiting')
+            pq.dbu.stopLogging('Ctrl-C Exit')
         else:
             pq.dbu.stopLogging('Nominal Exit')
         finally: 
