@@ -1,16 +1,13 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 
 """
 this code searches the database and disk for files that are in the db but not on disk
 files that are such should have thier exists_on_disk flag set to false
-
-additionally, this can remove files from the db that are only in the db
 """
 from __future__ import division
 
 import bisect
 import datetime
-import math
 import os
 from optparse import OptionParser
 
@@ -19,11 +16,7 @@ from dateutil.relativedelta import relativedelta
 
 import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
-try:
-    from dbprocessing.Utils import progressbar
-except ImportError:
-    def progressbar(*args, **kwargs):
-        pass
+from dbprocessing.Utils import progressbar
 
 if __name__ == "__main__":
     usage = "%prog -m mission"
@@ -66,51 +59,13 @@ if __name__ == "__main__":
 
     dbu = dbprocessing.DButils.DButils(options.mission, echo=options.echo)
 
-    # getFileFullPath is really slow
-
-    files = sorted(dbu.getAllFileIds(newest_version=options.newest))
+    files = sorted(dbu.getAllFileIds(startDate=startDate, endDate=endDate, newest_version=options.newest))
     files = files[bisect.bisect_left(files, options.startID):]
 
-    try:
-        for i, f in enumerate(files):
-            # get the name and see if it is there
-            ff = dbu.getEntry('File', f)
-            exists = ff.exists_on_disk
+    for f in files:
+        if options.verbose:
+            print("{0} is being checked".format(f))
+        if not dbu.checkDiskForFile(f, options.fix):
+            print("{0} is missing".format(f))
 
-            fullpath = dbu.getFileFullPath(f)
-            isfile = os.path.isfile(fullpath)
-            if not exists and isfile:
-                if options.fix:
-                    ff.exists_on_disk = True
-                    dbu.session.add(ff)
-                    extra = 'ff.exists_on_disk -> True'
-                else:
-                    extra = 'ff.exists_on_disk is False'                    
-            elif exists and not isfile:
-                if options.fix:
-                    ff.exists_on_disk = False
-                    dbu.session.add(ff)
-                    extra = 'ff.exists_on_disk -> False'
-                else:
-                    extra = 'ff.exists_on_disk is True'                    
-            else:
-                extra = None
-            if options.verbose or extra is not None:
-                print("{0:6} {1:7} {2} {3}".format(f, str(isfile), fullpath, extra ))
-            if options.fix:
-                if i % 100 == 0:
-                    dbu.commitDB()
-            if i % 1000 == 0:
-                print("On file {0} of {1}".format(i, max(files)))
-
-    finally:
-        if options.fix:
-            dbu.commitDB()
-        dbu.closeDB()
-
-
-
-
-
-
-    
+    dbu.closeDB()

@@ -2,17 +2,9 @@
 
 from __future__ import print_function
 
-import itertools
-import glob
-import os
 from optparse import OptionParser
-import re
-import sys
-import traceback
-import warnings
 
 from dbprocessing import DButils
-from dbprocessing import Version
 
 
 if __name__ == '__main__':

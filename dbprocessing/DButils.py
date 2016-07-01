@@ -608,6 +608,7 @@ class DButils(object):
         """
         if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
             filename = [filename]
+
         for ii, f in enumerate(filename):
             if not trust_id:
                 try:
@@ -617,7 +618,7 @@ class DButils(object):
             else:
                 pass # just use the id without a lookup
             if verbose:
-                print(ii, len(fillname), f)
+                print(ii, len(filename), f)
                 
             # we need to look in each table that could have a reference to this file and delete that
             try: ## processqueue
@@ -1597,8 +1598,9 @@ class DButils(object):
         if instrument is not None:
             files = files.join(self.Instrumentproductlink, self.File.product_id == self.Instrumentproductlink.product_id)\
                          .filter_by(instrument_id=instrument)
-        if startDate != "1970-01-01" or endDate != "2070-01-01":
+        if (startDate != "1970-01-01" or endDate != "2070-01-01") and startDate is not None and endDate is not None:
             # I.E, they changed atleast one of the date parameters from "all"
+            print("S: {0} E: {1}".format(startDate, endDate))
             files = files.filter(self.File.utc_file_date.between(startDate, endDate))
         if newest_version:
             raise(NotImplementedError("There is an error in this query, do not use!"))
@@ -1815,10 +1817,6 @@ class DButils(object):
 
         :return: product_id -the product  ID for the input product name
         """
-        if isinstance(product_name, (list, tuple)):
-            s_id = map(self.getProductID, product_name)
-            return s_id
-
         try:
             product_name = long(product_name)
             sq = self.session.query(self.Product).get(product_name)
@@ -1826,6 +1824,8 @@ class DButils(object):
                 return sq.product_id
             else:
                 raise(DBNoData("No product_id {0} found in the DB".format(product_name)))
+        except TypeError: # came in as list or tuple
+            return map(self.getProductID, product_name)
         except ValueError:
             sq = self.session.query(self.Product).filter_by(product_name = product_name)
             try:
@@ -1843,15 +1843,14 @@ class DButils(object):
 
         :return: satellite_id - the requested satellite  ID
         """
-        if isinstance(sat_name, (list, tuple)):
-            s_id = map(self.getSatelliteID, sat_name)
-            return s_id
         try:
             sat_id = long(sat_name)
             sq = self.session.query(self.Satellite).get(sat_id)
             if sq is None:
                 raise(NoResultFound("No satellite id={0} found".format(sat_id)))
             return sq.satellite_id
+        except TypeError: # came in as list or tuple
+            return map(self.getSatelliteID, sat_name)
         except ValueError: # it was a name
             sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).one()
             return sq.satellite_id  # there can be only one of each name
