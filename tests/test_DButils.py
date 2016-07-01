@@ -848,7 +848,7 @@ class TestWithtestDB(unittest.TestCase):
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
         self.dbu.getEntry('Mission', 1).rootdir = self.tempD  # Set the mission's dir to the tmp so we can work with it
         self.dbu.commitDB()
-        self.dbu.MissionDirectory = self.dbu.getMissionDirectory()
+        self.dbu.MissionDirectory = self.tempD
 
     def tearDown(self):
         super(TestWithtestDB, self).tearDown()
