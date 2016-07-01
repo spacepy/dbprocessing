@@ -385,10 +385,7 @@ class DButils(object):
         if not hasattr(item, '__iter__'):
             item = [item]
         for ii, v in enumerate(item):
-            try:
-                int(v)
-            except ValueError: # it was name
-                item[ii] = self.getFileID(v)
+            item[ii] = self.getFileID(v)
         sq = self.session.query(self.Processqueue).filter(self.Processqueue.file_id.in_(item))
         for v in sq:
             self.session.delete(v)
@@ -407,14 +404,14 @@ class DButils(object):
                 pqdata = self.session.query(self.Processqueue.file_id).all()
             ans = pqdata
         else:
+            pqdata1 = self.session.query(self.Processqueue.file_id).all()
+            pqdata2 = self.session.query(self.Processqueue.version_bump).all()
             try:
-                pqdata1 = self.session.query(self.Processqueue.file_id).all()
-                pqdata2 = self.session.query(self.Processqueue.version_bump).all()
                 pqdata1 = list(map(itemgetter(0), pqdata1))
                 pqdata2 = list(map(itemgetter(0), pqdata2))
             except (IndexError, TypeError):
-                pqdata1 = self.session.query(self.Processqueue.file_id).all()
-                pqdata2 = self.session.query(self.Processqueue.version_bump).all()
+                pass
+
             ans = zip(pqdata1, pqdata2)
         DBlogging.dblogger.debug( "Entire Processqueue was read: {0} elements returned".format(len(ans)))
         return ans
@@ -1593,7 +1590,7 @@ class DButils(object):
         if product is not None:
             files = files.filter_by(product_id=product)
         if exists is not None:
-            files = files.filter_by(exists_on_disk=int(exists))
+            files = files.filter_by(exists_on_disk=exists)
         if code is not None:
             files = files.join(self.Filecodelink, self.File.file_id == self.Filecodelink.resulting_file)\
                          .filter_by(source_code=code)
@@ -1605,7 +1602,8 @@ class DButils(object):
             files = files.filter(self.File.utc_file_date.between(startDate, endDate))
         if newest_version:
             raise(NotImplementedError("There is an error in this query, do not use!"))
-            files = files.filter_by(newest_version=int(newest_version))
+            # Maybe someday this will be kept updated
+            files = files.filter_by(newest_version=newest_version)
 
         if limit is None:
             return files.all()
@@ -1772,11 +1770,21 @@ class DButils(object):
             files = [i.file_id for i in files]
         return files
 
-    def getAllFileIds(self, newest_version=False, limit=None):
+    def getAllFileIds(self, 
+                      fullPath=True, 
+                      startDate="1970-01-01", 
+                      endDate="2070-01-01", 
+                      level=None, 
+                      product=None, 
+                      code=None, 
+                      instrument=None,  
+                      exists=None,
+                      newest_version=False, 
+                      limit=None):
         """
         Return all the file ids in the database
         """
-        files = self.getFiles(newest_version=newest_version, limit=limit)
+        files = self.getFiles(startDate, endDate, level, product, code, instrument, exists, newest_version, limit)
 
         return [i.file_id for i in files]
 
@@ -1807,6 +1815,10 @@ class DButils(object):
 
         :return: product_id -the product  ID for the input product name
         """
+        if isinstance(product_name, (list, tuple)):
+            s_id = map(self.getProductID, product_name)
+            return s_id
+
         try:
             product_name = long(product_name)
             sq = self.session.query(self.Product).get(product_name)
@@ -1818,10 +1830,7 @@ class DButils(object):
             sq = self.session.query(self.Product).filter_by(product_name = product_name)
             try:
                 # if two products have the same name always return the lower id one
-                try:
-                    return sorted(sq, key=lambda x: x.product_id)[0].product_id
-                except TypeError:
-                    return sq[0].product_id
+                sorted([x.product_id for x in sq])[0]
             except IndexError: # no file_id found
                 raise(DBNoData("No product_name %s found in the DB" % (product_name)))
 
@@ -1854,8 +1863,7 @@ class DButils(object):
         code = self.getEntry('Code', code_id)
         if not code.active_code: # not an active code
             return None
-        mission_dir =  self.MissionDirectory
-        return os.path.join(mission_dir, code.relative_path, code.filename)
+        return os.path.join(self.MissionDirectory, code.relative_path, code.filename)
 
     def getCodeVersion(self, code_id):
         """
@@ -1868,7 +1876,7 @@ class DButils(object):
         """
         Given a process id return the code ids that performs that process and the valid dates
 
-        :return: Dode id and dates that perform a process
+        :return: Code id and dates that perform a process
         :rtype: truple(int, datetime.date, datetime.date)
             
         """
@@ -1920,8 +1928,7 @@ class DButils(object):
                 except IndexError:
                     pass
 
-        mission = self.getEntry('Mission',mission_id)
-        return mission.rootdir
+        return self.getEntry('Mission',mission_id).rootdir
 
     def checkIncoming(self, glb='*'):
         """
@@ -2224,7 +2231,7 @@ class DButils(object):
         inst_id = self.getInstrumentID(inst_id)
         sq = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id = inst_id).all()
         if sq:
-            return  map(itemgetter(0), sq)
+            return map(itemgetter(0), sq)
         else:
             return None
 
@@ -2234,7 +2241,7 @@ class DButils(object):
         """
         sq = self.session.query(self.Product.product_id).filter_by(level = level).all()
         if sq:
-            return  map(itemgetter(0), sq)
+            return map(itemgetter(0), sq)
         else:
             return None
 
