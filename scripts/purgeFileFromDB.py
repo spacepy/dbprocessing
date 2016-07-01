@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 
 from __future__ import print_function
 
@@ -34,13 +34,9 @@ if __name__ == '__main__':
 
     for f in args:
         try:
-            f_id = dbu.getFileID(f)
-        except DButils.DBNoData:
-            print("WARNING: File {1} not in db".format(f), file=sys.stderr)
-        else:
             dbu._purgeFileFromDB(f)
             print("  File {0}:{1} removed from DB".format(f_id, f))
+        except DButils.DBNoData:
+            print("WARNING: File {1} not in db".format(f), file=sys.stderr)
 
-    
     dbu.closeDB()
-        

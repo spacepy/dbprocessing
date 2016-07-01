@@ -24,7 +24,7 @@ Go into the database and get the verbose provenance for a file
 then add that to the global attrs for the file
 either putout to the same file or a different file
 
-This code has not been fully tested or used.
+.. warning:: This code has not been fully tested or used.
 
 clearProcessingFlag.py
 ----------------------
@@ -39,8 +39,7 @@ configFromDB.py
 ---------------
 .. program:: configFromDB
 
-Build a config file from an existing database. This is untested and not
-fully useful yet.
+Build a config file from an existing database.
 
 .. option:: filename The filename to save the config
 .. option:: -m <dbname>, --mission <dbname> The database to to connect to
@@ -48,6 +47,8 @@ fully useful yet.
 .. option:: -s, --satellite The name of the satellite for the config file
 .. option:: -i, --instrument The name of the instrument for the config file
 .. option:: -c, --nocomments Make the config file without a comment header block on top
+
+.. warning:: This is untested and not fully useful yet.
 
 coveragePlot.py
 ---------------
@@ -123,19 +124,15 @@ deleteAllDBProducts.py:
 
 Doesn't work, maybe should?
 
-deleteDBFile.py:
-----------------
-.. program:: deleteDBFile
-
-Deletes individual files from the database.
-
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-
-.. warning:: This is the same as purgeFileFromDB.py, and seems less clean. Delete?
-
 deleteFromDBifNotOnDisk.py:
 ---------------------------
-says on tin, probably not ued
+.. program:: deleteFromDBifNotOnDisk
+
+Finds all files that are in the DB but not found on the DB
+
+.. option:: -m <dbname>, --mission <dbname> Selected mission database
+.. option:: --fix Remove the files from the DB (make a backup first)
+.. option:: --echo Echo sql queries for debugging
 
 flushProcessQueue.py:
 ---------------------
