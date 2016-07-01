@@ -62,6 +62,17 @@ class ProcessQueue(object):
         except AttributeError:
             pass
 
+    def set_filename(self, filename):
+        """
+        Setter for filename, this is cleaner than just random sets
+
+        :param filename: filename to set to self.filename
+        :type filename: str
+        :return: None
+        """
+        self.filename = filename
+        self.basename = os.path.basename(self.filename)
+
     def rm_tempdir(self):
         """
         remove the temp directory
@@ -131,11 +142,11 @@ class ProcessQueue(object):
         given a diskfile go through and do all the steps to add it into the db
         """
         if df is None:
-            DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.filename))
+            DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.basename))
             if not self.dryrun:
                 self.moveToError(self.filename)
             else:
-                print('<dryrun> Found no product moving to error, {0}'.format(self.filename))
+                print('<dryrun> Found no product moving to error, {0}'.format(self.basename))
             return None
 
         # create the DBfile
@@ -205,21 +216,23 @@ class ProcessQueue(object):
             vals = self.queue
 
         for val in vals:
-            self.filename = val
-            DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.filename, len(self.queue)))
+            self.set_filename(val)
+            DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.basename, len(self.queue)))
             # see if the file is in the db, if so then don't call the inspectors
             try:
-                id = self.dbu.getFileID(os.path.basename(self.filename))
-                DBlogging.dblogger.info('File {0}:{1} was already in DB, not inspecting'.format(id, os.path.basename(self.filename)))
-                print('Removed from incoming: {0}'.format(os.path.basename(self.filename)))
+                id = self.dbu.getFileID(self.basename)
+                DBlogging.dblogger.info(
+                    'File {0}:{1} was already in DB, not inspecting'.format(id, self.basename))
+                print('Removed from incoming: {0}'.format(self.basename))
+                self.moveToError(self.filename)
                 continue
             except DButils.DBNoData:
-                DBlogging.dblogger.info('File {0} was not in DB, inspecting'.format(self.filename))
+                DBlogging.dblogger.info('File {0} was not in DB, inspecting'.format(self.basename))
                 pass
             df = self.figureProduct()
             if df != []:
                 self.diskfileToDB(df)
-                print('Removed from incoming: {0}'.format(self.filename))
+                print('Removed from incoming: {0}'.format(self.basename))
 
     def figureProduct(self, filename=None):
         """
@@ -435,7 +448,8 @@ class ProcessQueue(object):
     # TODO can functools.partial help here?
     def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=2):
         return (
-        self._reprocessBy(id_in, code=True, prod=False, startDate=startDate, endDate=endDate, incVersion=incVersion))
+            self._reprocessBy(id_in, code=True, prod=False, startDate=startDate, endDate=endDate,
+                              incVersion=incVersion))
 
     def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=None):
         if isinstance(startDate, datetime.datetime):
@@ -476,7 +490,7 @@ class ProcessQueue(object):
         file_ids = [f.file_id for f in files]
 
         # we can rawadd here as we know all the ids are valid since they came from the db
-        nadded = self.dbu.Processqueue.rawadd(file_ids) # incVersion doesn't work anyway now 6-Jun-2016 BAL
+        nadded = self.dbu.Processqueue.rawadd(file_ids)  # incVersion doesn't work anyway now 6-Jun-2016 BAL
         # added = self.dbu.Processqueue.push(file_ids, incVersion)
         return nadded
 
