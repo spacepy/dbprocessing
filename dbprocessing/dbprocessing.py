@@ -208,9 +208,13 @@ class ProcessQueue(object):
             self.filename = val
             DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.filename, len(self.queue)))
             # see if the file is in the db, if so then don't call the inspectors
-            if self.dbu.session.query(self.dbu.File).filter_by(filename=self.filename).count():
-                print("file was already in dd: {0}".format(self.filename))
-                return
+            try:
+                id = self.dbu.getFileID(self.filename)
+                DBlogging.dblogger.info('File {0}:{1} was already in DB, not inspecting'.format(id, self.filename))
+                continue
+            except DButils.DBNoData:
+                DBlogging.dblogger.info('File {0} was not in DB, inspecting'.format(self.filename))
+                pass
             df = self.figureProduct()
             if df != []:
                 self.diskfileToDB(df)
