@@ -265,7 +265,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
 
                 _start_a_run(runme)
                 processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
-                time.sleep(1)
+                time.sleep(0.5)
 
         for p in list(processes.keys()):
             if p.poll() is None: # still running
