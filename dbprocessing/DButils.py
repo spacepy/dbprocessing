@@ -1829,7 +1829,7 @@ class DButils(object):
             sq = self.session.query(self.Product).filter_by(product_name = product_name)
             try:
                 # if two products have the same name always return the lower id one
-                sorted([x.product_id for x in sq])[0]
+                return(sorted([x.product_id for x in sq])[0])
             except IndexError: # no file_id found
                 raise(DBNoData("No product_name %s found in the DB" % (product_name)))
 
