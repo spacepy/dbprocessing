@@ -190,6 +190,10 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual(result, "\rDownload Progress ...0%")
         sys.stdout = realstdout
 
+    def test_readconfig(self):
+        """test readconfig"""
+        self.assertEqual({'section2': {'sect2a': 'sect2_value1'}, 'section1': {'sect1a': 'sect1_value1', 'sect1b': 'sect1_value2'}}, Utils.readconfig('testconfig.txt'))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,5 @@
+[section1]
+sect1a=sect1_value1
+sect1b=sect1_value2
+[section2]
+sect2a=sect2_value1
