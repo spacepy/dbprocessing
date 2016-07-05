@@ -385,10 +385,7 @@ class DButils(object):
         if not hasattr(item, '__iter__'):
             item = [item]
         for ii, v in enumerate(item):
-            try:
-                int(v)
-            except ValueError: # it was name
-                item[ii] = self.getFileID(v)
+            item[ii] = self.getFileID(v)
         sq = self.session.query(self.Processqueue).filter(self.Processqueue.file_id.in_(item))
         for v in sq:
             self.session.delete(v)
@@ -407,14 +404,14 @@ class DButils(object):
                 pqdata = self.session.query(self.Processqueue.file_id).all()
             ans = pqdata
         else:
+            pqdata1 = self.session.query(self.Processqueue.file_id).all()
+            pqdata2 = self.session.query(self.Processqueue.version_bump).all()
             try:
-                pqdata1 = self.session.query(self.Processqueue.file_id).all()
-                pqdata2 = self.session.query(self.Processqueue.version_bump).all()
                 pqdata1 = list(map(itemgetter(0), pqdata1))
                 pqdata2 = list(map(itemgetter(0), pqdata2))
             except (IndexError, TypeError):
-                pqdata1 = self.session.query(self.Processqueue.file_id).all()
-                pqdata2 = self.session.query(self.Processqueue.version_bump).all()
+                pass
+
             ans = zip(pqdata1, pqdata2)
         DBlogging.dblogger.debug( "Entire Processqueue was read: {0} elements returned".format(len(ans)))
         return ans
@@ -611,6 +608,7 @@ class DButils(object):
         """
         if not hasattr(filename, '__iter__'): # if not an iterable make it a iterable
             filename = [filename]
+
         for ii, f in enumerate(filename):
             if not trust_id:
                 try:
@@ -620,7 +618,7 @@ class DButils(object):
             else:
                 pass # just use the id without a lookup
             if verbose:
-                print(ii, len(fillname), f)
+                print(ii, len(filename), f)
                 
             # we need to look in each table that could have a reference to this file and delete that
             try: ## processqueue
@@ -683,39 +681,39 @@ class DButils(object):
         ans = map(lambda x: self.getTraceback('Code', x.code_id), codes)
         return ans
 
-    def getAllFilenames(self, fullPath=True, level=None, product=None, limit=None):
+    def getAllFilenames(self,
+                        fullPath=True, 
+                        startDate="1970-01-01", 
+                        endDate="2070-01-01", 
+                        level=None, 
+                        product=None, 
+                        code=None, 
+                        instrument=None, 
+                        exists=None,
+                        newest_version=False, 
+                        limit=None):
         """
         Return all the file names in the database
 
-        if level=None get all filenames, otherwise only for a level
+        :param bool fullPath: Return the fullPath or just filename
+        :param int level: Filter by given level
+        :param int product: Filter by given product
+        :param int limit: Limit number of results
 
-        I worked this for speed the zip(\*names) is way too slow (this is about x18 faster)
+        :return: List of strs with the filename
+        :rtype: list
         """
-        if level is None and product is None:
-            if limit is None:
-                names = self.session.query(self.File.filename).all()
-            else:
-                names = self.session.query(self.File.filename).limit(limit)
-        elif product is None:
-            if limit is None:
-                names = self.session.query(self.File.filename).filter_by(data_level=level).all()
-            else:
-                names = self.session.query(self.File.filename).filter_by(data_level=level).limit(limit)
-        elif level is None:
-            if limit is None:
-                names = self.session.query(self.File.filename).filter_by(product_id=product).all()
-            else:
-                names = self.session.query(self.File.filename).filter_by(product_id=product).limit(limit)
-        else: # both specified
-            if limit is None:
-                names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).all()
-            else:
-                names = self.session.query(self.File.filename).filter_by(product_id=product).filter_by(data_level=level).limit(limit)
-        names = map(itemgetter(0), names)
-        if fullPath:
-            names = map(self.getFileFullPath, names)
-        return names
 
+        files = self.getFiles(startDate, endDate, level, product, code, instrument, exists, newest_version, limit)
+
+        
+        if fullPath:
+            # Get file_id instead, saves time since getFileFullPath gets the ID anyway
+            names = [d.file_id for d in files]
+            # This is probobly slow, but hopfully not slow enough to be an issue
+            return map(self.getFileFullPath, names)
+        else:
+            return [d.filename for d in files]
 
     def addMission(self,
                     mission_name,
@@ -1360,8 +1358,12 @@ class DButils(object):
         """
         # can only be one here (sq)
         code = self.getEntry('Code', ec_id)
-        if code.active_code == False:
+        if not code.active_code:
             return False
+
+        if not code.newest_version:
+            return False
+
         try:
             if code.code_start_date > date:
                 return False
@@ -1372,8 +1374,6 @@ class DButils(object):
                 return False
             if code.code_stop_date < date.date():
                 return False
-        if not code.newest_version:
-            return False
 
         return True
 
@@ -1385,7 +1385,7 @@ class DButils(object):
         TODO, this is really slow, this query made it a lot faster but I bet it can get better
 
         """
-        if hasattr(filename, 'upper'):
+        if isinstance(filename, (str, unicode)):
             filename = self.getFileID(filename)
         sq = self.session.query(self.File.filename, self.Product.relative_path).filter(self.File.file_id == filename).join((self.Product, self.File.product_id == self.Product.product_id)).one()
         path =  os.path.join(self.MissionDirectory, *sq[::-1])
@@ -1422,8 +1422,7 @@ class DButils(object):
         """
         Return a list of the processes who's output_timebase is "RUN"
         """
-        proc = self.session.query(self.Process).filter_by(output_timebase = 'RUN').all()
-        return proc
+        return self.session.query(self.Process).filter_by(output_timebase = 'RUN').all()
 
     def getProcessID(self, proc_name):
         """
@@ -1442,9 +1441,7 @@ class DButils(object):
         """
         Given a satellite or satellite id return the mission
         """
-        s_id = self.getSatelliteID(sat_name) # is a name
-        m_id = self.getEntry('Satellite', s_id).mission_id
-        return self.getEntry('Mission', m_id)
+        return self.getTraceback('Satellite', sat_name)['mission']
 
     def getInstrumentID(self, name, satellite_id=None):
         """
@@ -1544,11 +1541,8 @@ class DButils(object):
         """
         sq = self.getEntry('File', file_id)
         start_time = sq.utc_start_time.date()
-        stop_time =  sq.utc_stop_time.date()
-        retval = [start_time, stop_time]
-        # ans = np.unique(retval).tolist()
-        DBlogging.dblogger.debug( "Found getFileDates():  file_id: {0}, dates: {1}".format(file_id, retval) )
-        return retval
+        stop_time = sq.utc_stop_time.date()
+        return [start_time, stop_time]
 
     def file_id_Clean(self, invals):
         """
@@ -1580,10 +1574,51 @@ class DButils(object):
         sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional).filter_by(process_id = process_id).all()
         return sq
 
+    def getFiles(self,
+                 startDate="1970-01-01", 
+                 endDate="2070-01-01", 
+                 level=None, 
+                 product=None, 
+                 code=None, 
+                 instrument=None, 
+                 exists=None,
+                 newest_version=False, 
+                 limit=None):
+        files = self.session.query(self.File)
+
+        if level is not None:
+            files = files.filter_by(data_level=level)
+        if product is not None:
+            files = files.filter_by(product_id=product)
+        if exists is not None:
+            files = files.filter_by(exists_on_disk=exists)
+        if code is not None:
+            files = files.join(self.Filecodelink, self.File.file_id == self.Filecodelink.resulting_file)\
+                         .filter_by(source_code=code)
+        if instrument is not None:
+            files = files.join(self.Instrumentproductlink, self.File.product_id == self.Instrumentproductlink.product_id)\
+                         .filter_by(instrument_id=instrument)
+        if (startDate != "1970-01-01" or endDate != "2070-01-01") and startDate is not None and endDate is not None:
+            # I.E, they changed atleast one of the date parameters from "all"
+            files = files.filter(self.File.utc_file_date.between(startDate, endDate))
+        if newest_version:
+            raise(NotImplementedError("There is an error in this query, do not use!"))
+            # Maybe someday this will be kept updated
+            files = files.filter_by(newest_version=newest_version)
+
+        if limit is None:
+            return files.all()
+        else:
+            return files.limit(limit)
+
     def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
         Return the files in the db by product id that have data in the date specified
         """
+        # return self.getFiles(startDate=min(daterange),
+        #                      endDate=max(daterange),
+        #                      product=product_id
+        #                      newest_version=newest_version)
         dates = []
         for d in daterange:
             try:
@@ -1685,46 +1720,14 @@ class DButils(object):
 
 
 
+
     def getFilesByDate(self, daterange, newest_version=False):
         """
         Return the files in the db that have data in the date specified
         """
-        dates = []
-        for d in daterange:
-            try:
-                dates.append(d.date())
-            except AttributeError:
-                dates.append(d)
-
-        if newest_version:
-            raise(NotImplementedError("There is an error in this query, do not use!"))
-            # don't trust that the db has this correct
-            # create a tabel populated with
-            #   versionnum, file_id, utc_file_date
-            version = (self.session.query( (self.File.interface_version*1000
-                                           + self.File.quality_version*100
-                                           + self.File.revision_version).label('versionnum'),
-                                          self.File.file_id,
-                                          self.File.utc_file_date,
-                                           self.File.product_id)
-                       .filter(self.File.utc_file_date.between(*dates))
-                       .group_by(self.File.product_id)).subquery()
-
-            subq = (self.session.query(func.max(version.c.versionnum))
-                  .group_by(version.c.product_id)).subquery()
-
-            sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
-
-            sq = list(map(itemgetter(0), sq))
-            sq = self.session.query(self.File).filter(self.File.file_id.in_(sq)).all()
-
-        else:
-            sq = self.session.query(self.File).\
-                filter(self.File.utc_file_date.between(dates[0], dates[1])).all()
-        return sq
-
-
-
+        return self.getFiles(startDate=min(daterange),
+                             endDate=max(daterange),
+                             newest_version=newest_version)
 
 
     def getFilesByProduct(self, prod_id, newest_version=False):
@@ -1747,51 +1750,44 @@ class DButils(object):
             sq = self.session.query(self.File).filter_by(product_id = prod_id)
         return sq.all()
 
-    def getFilesByInstrument(self, inst_id, level=None, id_only=False):
+    def getFilesByInstrument(self, inst_id, level=None, newest_version=False, id_only=False):
         """
         Given an instrument_if return all the file instances associated with it
         """
         inst_id = self.getInstrumentID(inst_id) # name or number
-        subq = (self.session.query(self.Instrumentproductlink.product_id)
-                .filter(self.Instrumentproductlink.instrument_id == inst_id).subquery())
-
-        getme = (self.File.file_id if id_only else self.File)
-
-        if level is None:
-            files = (self.session.query(getme)
-                     .filter(self.File.product_id.in_(subq))
-                     .all())
-        else:
-            files = (self.session.query(getme)
-                     .filter(self.File.data_level==level)
-                     .filter(self.File.product_id.in_(subq))
-                     .all())
+        files = self.getFiles(instrument=inst_id, level=level, newest_version=newest_version)
+        
         if id_only:
-            files = map(itemgetter(0), files)
+            files = [i.file_id for i in files]
         return files
 
-    def getAllFileIds(self, newest_version=False, limit=None):
+    def getFilesByCode(self, code_id, newest_version=False, id_only=False):
+        """
+        Given a code_id (or name) return the files that were created using it
+        """
+        files = self.getFiles(code=code_id, newest_version=newest_version)
+
+        if id_only:
+            files = [i.file_id for i in files]
+        return files
+
+    def getAllFileIds(self, 
+                      fullPath=True, 
+                      startDate="1970-01-01", 
+                      endDate="2070-01-01", 
+                      level=None, 
+                      product=None, 
+                      code=None, 
+                      instrument=None,  
+                      exists=None,
+                      newest_version=False, 
+                      limit=None):
         """
         Return all the file ids in the database
-
-        the itemgetter method is a lot faster then zip(*) (x16)
         """
-        if not newest_version:
-            if limit is None:
-                ids = self.session.query(self.File.file_id).all()
-            else:
-                ids = self.session.query(self.File.file_id).limit(limit)
-            ids =  map(itemgetter(0), ids)
-        else:
-            raise(NotImplementedError("There is an error in the query, do not use"))
-            # get all the product ids
-            p_ids = self.getAllProducts()
-            p_ids =  map(attrgetter('product_id'), p_ids)
-            ids = []
-            for p in p_ids:
-                ids.extend(self.getFilesByProduct(p, newest_version=True))
-            ids =  map(attrgetter('product_id'), ids)
-        return ids
+        files = self.getFiles(startDate, endDate, level, product, code, instrument, exists, newest_version, limit)
+
+        return [i.file_id for i in files]
 
     def getActiveInspectors(self):
         """
@@ -1799,9 +1795,7 @@ class DButils(object):
         """
         activeInspector = namedtuple('activeInspector', 'path arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
-        basedir = self.getMissionDirectory()
-        retval = [activeInspector(os.path.join(basedir, ans.relative_path, ans.filename), ans.arguments, ans.product) for ans in sq]
-        return retval
+        return [activeInspector(os.path.join(self.MissionDirectory, ans.relative_path, ans.filename), ans.arguments, ans.product) for ans in sq]
 
     def getChildrenProcesses(self, file_id):
         """
@@ -1829,14 +1823,13 @@ class DButils(object):
                 return sq.product_id
             else:
                 raise(DBNoData("No product_id {0} found in the DB".format(product_name)))
+        except TypeError: # came in as list or tuple
+            return map(self.getProductID, product_name)
         except ValueError:
             sq = self.session.query(self.Product).filter_by(product_name = product_name)
             try:
                 # if two products have the same name always return the lower id one
-                try:
-                    return sorted(sq, key=lambda x: x.product_id)[0].product_id
-                except TypeError:
-                    return sq[0].product_id
+                return(sorted([x.product_id for x in sq])[0])
             except IndexError: # no file_id found
                 raise(DBNoData("No product_name %s found in the DB" % (product_name)))
 
@@ -1849,15 +1842,14 @@ class DButils(object):
 
         :return: satellite_id - the requested satellite  ID
         """
-        if isinstance(sat_name, (list, tuple)):
-            s_id = map(self.getSatelliteID, sat_name)
-            return s_id
         try:
             sat_id = long(sat_name)
             sq = self.session.query(self.Satellite).get(sat_id)
             if sq is None:
                 raise(NoResultFound("No satellite id={0} found".format(sat_id)))
             return sq.satellite_id
+        except TypeError: # came in as list or tuple
+            return map(self.getSatelliteID, sat_name)
         except ValueError: # it was a name
             sq = self.session.query(self.Satellite).filter_by(satellite_name=sat_name).one()
             return sq.satellite_id  # there can be only one of each name
@@ -1869,8 +1861,7 @@ class DButils(object):
         code = self.getEntry('Code', code_id)
         if not code.active_code: # not an active code
             return None
-        mission_dir =  self.getMissionDirectory()
-        return os.path.join(mission_dir, code.relative_path, code.filename)
+        return os.path.join(self.MissionDirectory, code.relative_path, code.filename)
 
     def getCodeVersion(self, code_id):
         """
@@ -1883,7 +1874,7 @@ class DButils(object):
         """
         Given a process id return the code ids that performs that process and the valid dates
 
-        :return: Dode id and dates that perform a process
+        :return: Code id and dates that perform a process
         :rtype: truple(int, datetime.date, datetime.date)
             
         """
@@ -1935,8 +1926,7 @@ class DButils(object):
                 except IndexError:
                     pass
 
-        mission = self.getEntry('Mission',mission_id)
-        return mission.rootdir
+        return self.getEntry('Mission',mission_id).rootdir
 
     def checkIncoming(self, glb='*'):
         """
@@ -1971,9 +1961,7 @@ class DButils(object):
         """
         Return the error path for the current mission
         """
-        basedir = self.getMissionDirectory()
-        path = os.path.join(basedir, 'errors/')
-        return path
+        return os.path.join(self.MissionDirectory, 'errors/')
 
     def getFilecodelink_byfile(self, file_id):
         """
@@ -1981,10 +1969,10 @@ class DButils(object):
         """
         DBlogging.dblogger.debug("Entered getFilecodelink_byfile: file_id={0}".format(file_id))
         f_id = self.getFileID(file_id)
-        sq = self.session.query(self.Filecodelink.source_code).filter_by(resulting_file = f_id).all() # can only be one
+        sq = self.session.query(self.Filecodelink.source_code).filter_by(resulting_file = f_id).first() # can only be one
         try:
-            return sq[0][0]
-        except IndexError:
+            return sq[0]
+        except TypeError:
             return None
 
     def getMissionID(self, mission_name):
@@ -2241,7 +2229,7 @@ class DButils(object):
         inst_id = self.getInstrumentID(inst_id)
         sq = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id = inst_id).all()
         if sq:
-            return  map(itemgetter(0), sq)
+            return map(itemgetter(0), sq)
         else:
             return None
 
@@ -2251,7 +2239,7 @@ class DButils(object):
         """
         sq = self.session.query(self.Product.product_id).filter_by(level = level).all()
         if sq:
-            return  map(itemgetter(0), sq)
+            return map(itemgetter(0), sq)
         else:
             return None
 
@@ -2280,32 +2268,20 @@ class DButils(object):
         prods = self.session.query(self.Product).all()
         return prods
 
-    def getEntry(self, table, *args):
+    def getEntry(self, table, args):
         """
         Master method to return a entry instance from any table in the db
         """
         # just try and get the entry
-        retval = self.session.query(getattr(self, table)).get(args[0])
+        retval = self.session.query(getattr(self, table)).get(args)
         if retval is None: # either this was not a valid pk or not a pk that os in the db
             # see if it was a name
             if ('get' + table + 'ID') in dir(self):
                 cmd = 'get' + table + 'ID'
-                pk = getattr(self, cmd)(args[0])
+                pk = getattr(self, cmd)(args)
                 retval = self.session.query(getattr(self, table)).get(pk)
         return retval
 
-    def getFilesByCode(self, code_id, id_only=False):
-        """
-        Given a code_id (or name) return the files that were created using it
-        """
-        code_id = self.getCodeID(code_id)
-        f_ids = self.session.query(self.Filecodelink.resulting_file).filter_by(source_code=code_id).all()
-        f_ids = map(itemgetter(0), f_ids)
-        files = map(lambda x: self.getEntry('File', x), f_ids)
-        if not id_only:
-            return files
-        else:
-            return [val.file_id for val in files]
 
     def getFileParents(self, file_id, id_only=False):
         """

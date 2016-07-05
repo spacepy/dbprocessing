@@ -10,6 +10,8 @@ import unittest
 
 from dbprocessing import DButils
 from dbprocessing import Diskfile
+from dbprocessing.Diskfile import FilenameError
+from dbprocessing.Diskfile import InputError
 from dbprocessing import Version
 
 
@@ -90,6 +92,15 @@ class DiskfileTests(TestSetup):
 
         self.assertTrue(repr(df) == '<Diskfile.Diskfile object: ' + reprfile + '>')
         os.remove(reprfile)
+
+    def raiseUnusedException(self, exceptionName):
+        """For testing exceptions not currently used in code"""
+        raise exceptionName
+
+    def test_exceptions(self):
+        """Test exceptions not raised in code"""
+        self.assertRaises(FilenameError, self.raiseUnusedException, FilenameError)
+        self.assertRaises(InputError, self.raiseUnusedException, InputError)        
 
 if __name__ == "__main__":
     unittest.main()

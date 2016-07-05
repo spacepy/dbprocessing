@@ -304,67 +304,6 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(ans[0]['instrument'].instrument_name,
                          ans[1]['instrument'].instrument_name)
 
-    def test_getAllFilenames(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=False)
-        self.assertEqual(6681, len(files))
-        files = self.dbu.getAllFilenames(fullPath=False, level=2)
-        self.assertEqual(184, len(files))
-        files = self.dbu.getAllFilenames(fullPath=False, level=2, product=190)
-        self.assertEqual(15, len(files))
-        ans = set([u'rbspb_int_ect-mageis-L2_20130909_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130907_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130908_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130910_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130921_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130922_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130920_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130918_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130916_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130917_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130914_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130915_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130913_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130912_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130911_v3.0.0.cdf'])
-        self.assertFalse(ans.difference(set(files)))
-
-    def test_getAllFilenames_limit(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=False, limit=10)
-        self.assertEqual(10, len(files))
-        files = self.dbu.getAllFilenames(fullPath=False, level=2, limit=10)
-        self.assertEqual(10, len(files))
-        files = self.dbu.getAllFilenames(fullPath=False, level=2, product=190, limit=4)
-        self.assertEqual(4, len(files))
-        ans = set([u'rbspb_int_ect-mageis-L2_20130907_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130909_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130908_v3.0.0.cdf',
-                   u'rbspb_int_ect-mageis-L2_20130910_v3.0.0.cdf'])
-        self.assertFalse(ans.difference(set(files)))
-
-    def test_getAllFilenames_level(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=False, product=1)
-        self.assertEqual(len(files), 30)
-
-    def test_getAllFilenames_level_limit(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=False, product=1, limit=10)
-        self.assertEqual(len(files), 10)
-
-    def test_getAllFilenames_fullpath(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=True, product=1)
-        self.assertEqual(len(files), 30)
-        self.assertTrue(all(['/n/space_data' in v for v in files]))
-
-    def test_getAllFilenames_fullpath_limit(self):
-        """getAllFilenames"""
-        files = self.dbu.getAllFilenames(fullPath=True, product=1, limit=10)
-        self.assertEqual(len(files), 10)
-        self.assertTrue(all(['/n/space_data' in v for v in files]))
-
     def test_getAllFileIds(self):
         """getAllFileIds"""
         files = self.dbu.getAllFileIds()
@@ -909,7 +848,7 @@ class TestWithtestDB(unittest.TestCase):
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
         self.dbu.getEntry('Mission', 1).rootdir = self.tempD  # Set the mission's dir to the tmp so we can work with it
         self.dbu.commitDB()
-        self.dbu.MissionDirectory = self.dbu.getMissionDirectory()
+        self.dbu.MissionDirectory = self.tempD
 
     def tearDown(self):
         super(TestWithtestDB, self).tearDown()
@@ -950,8 +889,7 @@ class TestWithtestDB(unittest.TestCase):
             fp.write('I am some text that will change the SHA\n')
         os.remove(self.tempD + '/L0/testDB_001_first.raw')
 
-        ans = [('testDB_000_first.raw', 1),
-               ('testDB_001_first.raw', 2)]
+        ans = [('testDB_001_first.raw', 2), ('testDB_000_first.raw', 1)]
         self.assertEqual(ans, self.dbu.checkFiles())
 
     def addGenericCode(self, processID=1):
@@ -1254,10 +1192,83 @@ class TestWithtestDB(unittest.TestCase):
         """Tests all of the release stuff, it's all intertwined anyway"""
         self.dbu.tag_release(1)
 
-        ans = ['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw', 'testDB_000_sec.raw',
-               'testDB_001.rot', 'testDB_000.rot', 'testDB_001_first.raw', 'testDB_000_first.raw']
+        ans = ['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw',
+               'testDB_000_sec.raw', 'testDB_001.rot', 'testDB_000.rot',
+               'testDB_001_first.raw', 'testDB_000_first.raw']
         self.assertEqual(ans, self.dbu.list_release(1, fullpath=False))
 
+    def test_getAllFilenames_all(self):
+        """getAllFilenames should return all files in the db when passed no filters"""
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+               'testDB_001_sec.raw', 'testDB_000_sec.raw', 'testDB_000.cat',
+               'testDB_001.cat', 'testDB_001.rot', 'testDB_000.rot']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False))
+
+    def test_getAllFilenames_product(self):
+        """getAllFilenames should return the files with product_id 1"""
+        ans = ['testDB_000.cat', 'testDB_001.cat']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, 
+                                                       product = 1))
+
+    def test_getAllFilenames_level(self):
+        """getAllFilenames should return the files with level 0"""
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+               'testDB_001_sec.raw', 'testDB_000_sec.raw']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
+                                                       level = 0))
+
+    def test_getAllFilenames_code(self):
+        """getAllFilenames should return the files with code 1"""
+        ans = ['testDB_000.cat', 'testDB_001.cat']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
+                                                       code = 1))
+
+    def test_getAllFilenames_instrument(self):
+        """getAllFilenames should return the files with instrument 1"""
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+               'testDB_001_sec.raw', 'testDB_000_sec.raw', 'testDB_000.cat',
+               'testDB_001.cat', 'testDB_001.rot', 'testDB_000.rot']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, 
+                                                       instrument = 1))
+
+    def test_getAllFilenames_date(self):
+        ans = ['testDB_000_first.raw', 'testDB_000_sec.raw', 
+               'testDB_000.cat', 'testDB_000.rot']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
+                                                       startDate = "2016-01-01",
+                                                       endDate = "2016-01-01"))
+
+    def test_getAllFilenames_allFilters(self):
+        """getAllFilenames should return the files with all the filters"""
+        ans = ['testDB_000.cat', 'testDB_001.cat']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
+                                                       level = 1,
+                                                       product = 1,
+                                                       code = 1,
+                                                       instrument = 1,
+                                                       exists = True))
+
+    def test_getAllFilenames_limit(self):
+        """getAllFilenames should only return 4 items with limit=4"""
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+               'testDB_001_sec.raw', 'testDB_000_sec.raw']
+        out = self.dbu.getAllFilenames(fullPath = False, limit = 4)
+
+        self.assertEqual(4, len(out))
+        self.assertEqual(ans, out)
+
+    def test_getAllFilenames_fullPath(self):
+        """getAllFilenames should return the fullPath"""
+        out = self.dbu.getAllFilenames()
+
+        self.assertTrue(all([self.tempD in v for v in out]))
 
 if __name__ == "__main__":
     unittest.main()
