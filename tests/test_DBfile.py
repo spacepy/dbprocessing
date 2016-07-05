@@ -100,5 +100,41 @@ class DBfileTests(unittest.TestCase):
         self.assertEqual(real_ans, dbf.move())
         self.assertTrue(os.path.isdir(self.tempD + '/L1'))
 
+    def test_move_goodtgzfile(self):
+        """Test moving a valid .tgz file"""
+        dbf = self.createDummyDBF('/goodtar.tgz')
+
+        remove_tree(self.tempD + '/L1')
+        real_ans = (self.tempD + '/goodtar.tgz', self.tempD + '/L1/goodtar.tgz')
+        self.assertFalse(os.path.isdir(os.path.join(self.tempD, 'L1')))
+        self.assertEqual(real_ans, dbf.move())
+        self.assertTrue(os.path.isdir(os.path.join(self.tempD, 'L1')))
+        # Verify that archive was expanded
+        self.assertTrue(os.path.isfile(os.path.join(self.tempD, 'tar1.txt')))
+        self.assertTrue(os.path.isfile(os.path.join(self.tempD, 'tar2.txt')))
+
+    def test_move_badtgzfile(self):
+        """Test moving a corrupted .tgz file"""
+        dbf = self.createDummyDBF('/badtar.tgz')
+
+        remove_tree(self.tempD + '/L1')
+        real_ans = (self.tempD + '/badtar.tgz', self.tempD + '/L1/badtar.tgz')
+        self.assertFalse(os.path.isdir(os.path.join(self.tempD, 'L1')))
+        # Method return may not be helpful but this is it for now
+        self.assertEqual(real_ans, dbf.move())
+        self.assertTrue(os.path.isdir(os.path.join(self.tempD, 'L1')))
+
+    def test_move_nulltgzfile(self):
+        """Test moving an empty .tgz file"""
+        dbf = self.createDummyDBF('/emptytar.tgz')
+
+        remove_tree(self.tempD + '/L1')
+        real_ans = (self.tempD + '/emptytar.tgz', self.tempD + '/L1/emptytar.tgz')
+        self.assertFalse(os.path.isdir(os.path.join(self.tempD, 'L1')))
+        # Method return may not be helpful but this is it for now
+        self.assertEqual(real_ans, dbf.move())
+        self.assertTrue(os.path.isdir(os.path.join(self.tempD, 'L1')))
+
+
 if __name__ == "__main__":
     unittest.main()
