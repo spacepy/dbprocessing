@@ -548,6 +548,8 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(1, self.dbu.getProductID(1))
         self.assertEqual(2, self.dbu.getProductID(2))
         self.assertEqual(163, self.dbu.getProductID('rbspb_mageis-M75-sp-hg-L0'))
+        self.assertEqual([163, 2], self.dbu.getProductID(('rbspb_mageis-M75-sp-hg-L0', 2)))
+        self.assertEqual([163, 1], self.dbu.getProductID(['rbspb_mageis-M75-sp-hg-L0', 1]))
         self.assertRaises(DButils.DBNoData, self.dbu.getProductID, 'badval')
         self.assertRaises(DButils.DBNoData, self.dbu.getProductID, 343423)
 
@@ -691,6 +693,7 @@ class DBUtilsGetTests(TestSetup):
         for vv in files:
             self.assertTrue(self.dbu.getFileID(vv) in ids)
         self.assertEqual([1846, 1802, 1873], ids)
+        self.assertEqual([], self.dbu.getFileParents(3000))
 
     def test_getProductParentTree(self):
         """getProductParentTree"""
@@ -1196,6 +1199,9 @@ class TestWithtestDB(unittest.TestCase):
                'testDB_000_sec.raw', 'testDB_001.rot', 'testDB_000.rot',
                'testDB_001_first.raw', 'testDB_000_first.raw']
         self.assertEqual(ans, self.dbu.list_release(1, fullpath=False))
+        # Test additional release options
+        self.dbu.addRelease('testDB_000.cat', 2, commit=True)
+        self.assertEqual([self.tempD + '/L1/testDB_000.cat'], self.dbu.list_release(2, fullpath=True))
 
     def test_getAllFilenames_all(self):
         """getAllFilenames should return all files in the db when passed no filters"""
