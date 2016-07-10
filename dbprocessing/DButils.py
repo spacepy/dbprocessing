@@ -1768,7 +1768,7 @@ class DButils(object):
         files = self.getFiles(code=code_id, newest_version=newest_version)
 
         if id_only:
-            files = [i.file_id for i in files]
+            files = map(attrgetter('file_id'), files) # this is faster than a list comprehension
         return files
 
     def getAllFileIds(self, 
