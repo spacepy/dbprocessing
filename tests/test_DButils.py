@@ -466,8 +466,8 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(1, len(val))
         self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], val)
 
-    def test_getFilesByDate(self):
-        """getFilesByDate"""
+    def test_getFilesByDate1(self):
+        """getFilesByDate, newest_version=False"""
         self.assertFalse(self.dbu.getFilesByDate([datetime.date(2013, 12, 12)] * 2))
         val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)] * 2)
         self.assertEqual(256, len(val))
@@ -478,6 +478,9 @@ class DBUtilsGetTests(TestSetup):
                'ect_rbspa_0377_349_01.ptp.gz']
         filenames = sorted([v.filename for v in val])
         self.assertEqual(ans, filenames[:len(ans)])
+
+    def test_getFilesByDate2(self):
+        """getFilesByDate, newest_version=True"""
         val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)] * 2, newest_version=True)
         self.assertEqual(2, len(val))
         filenames = sorted([v.filename for v in val])
@@ -1236,13 +1239,23 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, 
                                                        instrument = 1))
 
-    def test_getAllFilenames_date(self):
+    def test_getAllFilenames_date1(self):
+        """getAllFilenames, date, string"""
         ans = ['testDB_000_first.raw', 'testDB_000_sec.raw', 
                'testDB_000.cat', 'testDB_000.rot']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
                                                        startDate = "2016-01-01",
                                                        endDate = "2016-01-01"))
+
+    def test_getAllFilenames_date2(self):
+        """getAllFilenames, date, datetime.date"""
+        ans = ['testDB_000_first.raw', 'testDB_000_sec.raw',
+               'testDB_000.cat', 'testDB_000.rot']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
+                                                       startDate = datetime.date(2016, 1, 1),
+                                                       endDate = datetime.date(2016, 1, 1)))
 
     def test_getAllFilenames_allFilters(self):
         """getAllFilenames should return the files with all the filters"""
