@@ -783,6 +783,7 @@ class DButils(object):
         p1.process_name = process_name
         p1.extra_params = Utils.toNone(extra_params)
         p1.output_timebase = output_timebase
+        p1.trigger = trigger
         self.session.add(p1)
         self.commitDB()
         # self.updateProcessSubs(p1.process_id)
