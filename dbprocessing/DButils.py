@@ -619,7 +619,7 @@ class DButils(object):
                 pass # just use the id without a lookup
             if verbose:
                 print(ii, len(filename), f)
-                
+
             # we need to look in each table that could have a reference to this file and delete that
             try: ## processqueue
                 self.Processqueue.remove(f)
@@ -682,15 +682,15 @@ class DButils(object):
         return ans
 
     def getAllFilenames(self,
-                        fullPath=True, 
-                        startDate="1970-01-01", 
-                        endDate="2070-01-01", 
-                        level=None, 
-                        product=None, 
-                        code=None, 
-                        instrument=None, 
+                        fullPath=True,
+                        startDate="1970-01-01",
+                        endDate="2070-01-01",
+                        level=None,
+                        product=None,
+                        code=None,
+                        instrument=None,
                         exists=None,
-                        newest_version=False, 
+                        newest_version=False,
                         limit=None):
         """
         Return all the file names in the database
@@ -706,7 +706,7 @@ class DButils(object):
 
         files = self.getFiles(startDate, endDate, level, product, code, instrument, exists, newest_version, limit)
 
-        
+
         if fullPath:
             # Get file_id instead, saves time since getFileFullPath gets the ID anyway
             names = [d.file_id for d in files]
@@ -763,7 +763,8 @@ class DButils(object):
                     process_name,
                     output_product,
                     output_timebase,
-                    extra_params=None):
+                    extra_params=None,
+                    trigger=None):
         """
         Add a process to the database
 
@@ -1575,14 +1576,14 @@ class DButils(object):
         return sq
 
     def getFiles(self,
-                 startDate="1970-01-01", 
-                 endDate="2070-01-01", 
-                 level=None, 
-                 product=None, 
-                 code=None, 
-                 instrument=None, 
+                 startDate="1970-01-01",
+                 endDate="2070-01-01",
+                 level=None,
+                 product=None,
+                 code=None,
+                 instrument=None,
                  exists=None,
-                 newest_version=False, 
+                 newest_version=False,
                  limit=None):
         files = self.session.query(self.File)
 
@@ -1756,7 +1757,7 @@ class DButils(object):
         """
         inst_id = self.getInstrumentID(inst_id) # name or number
         files = self.getFiles(instrument=inst_id, level=level, newest_version=newest_version)
-        
+
         if id_only:
             files = [i.file_id for i in files]
         return files
@@ -1771,16 +1772,16 @@ class DButils(object):
             files = [i.file_id for i in files]
         return files
 
-    def getAllFileIds(self, 
-                      fullPath=True, 
-                      startDate="1970-01-01", 
-                      endDate="2070-01-01", 
-                      level=None, 
-                      product=None, 
-                      code=None, 
-                      instrument=None,  
+    def getAllFileIds(self,
+                      fullPath=True,
+                      startDate="1970-01-01",
+                      endDate="2070-01-01",
+                      level=None,
+                      product=None,
+                      code=None,
+                      instrument=None,
                       exists=None,
-                      newest_version=False, 
+                      newest_version=False,
                       limit=None):
         """
         Return all the file ids in the database
@@ -1876,7 +1877,7 @@ class DButils(object):
 
         :return: Code id and dates that perform a process
         :rtype: truple(int, datetime.date, datetime.date)
-            
+
         """
         DBlogging.dblogger.debug("Entered getAllCodesFromProcess: {0}".format(proc_id))
         # will have as many values as there are codes for a process
