@@ -56,6 +56,37 @@ class TestSetup(unittest.TestCase):
 class DBUtilsOtherTests(TestSetup):
     """Tests that are not processqueue or get or add"""
 
+    def test_newest_version(self):
+        """explicit test to show the error in the newest_version, the reason for NotImplemented"""
+        # this one works
+        self.assertEqual(len([v.filename for v in self.dbu.getFilesByProduct(13, newest_version=False)]), 75)
+        # this one works
+        self.assertEqual(len([v.filename for v in self.dbu.getFilesByProduct(13, newest_version=True)]), 21)
+        newest_files = set([
+                         u'ect_rbspa_0220_377_02.ptp.gz',
+                         u'ect_rbspa_0221_377_04.ptp.gz',
+                         u'ect_rbspa_0370_377_06.ptp.gz',
+                         u'ect_rbspa_0371_377_03.ptp.gz',
+                         u'ect_rbspa_0372_377_03.ptp.gz',
+                         u'ect_rbspa_0373_377_04.ptp.gz',
+                         u'ect_rbspa_0374_377_02.ptp.gz',
+                         u'ect_rbspa_0375_377_03.ptp.gz',
+                         u'ect_rbspa_0376_377_07.ptp.gz',
+                         u'ect_rbspa_0377_377_01.ptp.gz',
+                         u'ect_rbspa_0378_377_03.ptp.gz',
+                         u'ect_rbspa_0379_377_04.ptp.gz',
+                         u'ect_rbspa_0380_377_02.ptp.gz',
+                         u'ect_rbspa_0381_377_02.ptp.gz',
+                         u'ect_rbspa_0382_377_07.ptp.gz',
+                         u'ect_rbspa_0383_377_04.ptp.gz',
+                         u'ect_rbspa_0384_377_02.ptp.gz',
+                         u'ect_rbspa_0385_377_03.ptp.gz',
+                         u'ect_rbspa_0386_377_03.ptp.gz',
+                         u'ect_rbspa_0387_377_02.ptp.gz',
+                         u'ect_rbspa_0388_377_03.ptp.gz',
+                         u'ect_rbspa_0389_377_05.ptp.gz'])
+        self.assertFalse(set([v.filename for v in self.dbu.getFilesByProduct(13, newest_version=True)]).difference(newest_files))
+
     def test_checkIncoming(self):
         """checkIncoming"""
         """checkIncoming"""
@@ -466,8 +497,8 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(1, len(val))
         self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], val)
 
-    def test_getFilesByDate(self):
-        """getFilesByDate"""
+    def test_getFilesByDate1(self):
+        """getFilesByDate, newest_version=False"""
         self.assertFalse(self.dbu.getFilesByDate([datetime.date(2013, 12, 12)] * 2))
         val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)] * 2)
         self.assertEqual(256, len(val))
@@ -478,6 +509,9 @@ class DBUtilsGetTests(TestSetup):
                'ect_rbspa_0377_349_01.ptp.gz']
         filenames = sorted([v.filename for v in val])
         self.assertEqual(ans, filenames[:len(ans)])
+
+    def test_getFilesByDate2(self):
+        """getFilesByDate, newest_version=True"""
         val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)] * 2, newest_version=True)
         self.assertEqual(2, len(val))
         filenames = sorted([v.filename for v in val])
@@ -1242,13 +1276,23 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, 
                                                        instrument = 1))
 
-    def test_getAllFilenames_date(self):
+    def test_getAllFilenames_date1(self):
+        """getAllFilenames, date, string"""
         ans = ['testDB_000_first.raw', 'testDB_000_sec.raw', 
                'testDB_000.cat', 'testDB_000.rot']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
                                                        startDate = "2016-01-01",
                                                        endDate = "2016-01-01"))
+
+    def test_getAllFilenames_date2(self):
+        """getAllFilenames, date, datetime.date"""
+        ans = ['testDB_000_first.raw', 'testDB_000_sec.raw',
+               'testDB_000.cat', 'testDB_000.rot']
+
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
+                                                       startDate = datetime.date(2016, 1, 1),
+                                                       endDate = datetime.date(2016, 1, 1)))
 
     def test_getAllFilenames_allFilters(self):
         """getAllFilenames should return the files with all the filters"""
