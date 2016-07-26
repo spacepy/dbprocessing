@@ -4,7 +4,6 @@ from __future__ import print_function
 from optparse import OptionParser
 
 from sqlalchemy import types
-import sqlalchemy.exc
 
 from dbprocessing import DButils
 
@@ -24,10 +23,4 @@ if __name__ == '__main__':
     dbu = DButils.DButils(options.mission)
 
     # Add trigger support
-    try:
-        add_column(dbu.session, "process", "trigger", types.String(250))
-    except sqlalchemy.exc.OperationalError as e:
-        if "duplicate column" in e.message:
-            pass
-        else:
-            raise
+    add_column(dbu.session, "process", "trigger", types.String(250))
