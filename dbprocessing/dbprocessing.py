@@ -293,11 +293,11 @@ class ProcessQueue(object):
         ## here decide how we build output and do it.
 
         timebase = self.dbu.getProcessTimebase(process_id)
+        DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
         if timebase in ['FILE', 'DAILY']:  # taking one file to the next file
             # for file based processing we are going to look to the "process_keywords" and cull the
             #   retuned files based on making sure they are all the same
             #   If process_keywords is none it will fall back to current behavior (since they will all be the same)
-            DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
             files = []
             # get all the possible files based on dates that we might want to put into the process now
 
@@ -332,7 +332,6 @@ class ProcessQueue(object):
                 # and give it the right name
                 files = files_out
         else:
-            DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
             raise (NotImplementedError('Not implemented yet: {0} based processing'.format(timebase)))
             raise (ValueError('Bad timebase for product: {0}'.format(process_id)))
         return files, input_product_id

@@ -8,14 +8,11 @@ from __future__ import print_function
 
 import ConfigParser
 import datetime
-import itertools
 import glob
 import os
 from optparse import OptionParser
 import re
 import traceback
-import shutil
-import sys
 import warnings
 
 from dateutil import parser as dup
@@ -231,7 +228,7 @@ if __name__ == '__main__':
         out = []
         for c in config:
             print(c)
-        sys.exit(0)
+        return
     print(config)
 
     for sec in config:
