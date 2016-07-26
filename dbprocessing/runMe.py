@@ -304,14 +304,10 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 print("{0} Process {1} FINISHED".format(DFP(), ' '.join(rm.cmdline)))
 
                 if rm.trigger:
-                    cmd = rm.trigger.format(inputFiles=rm.input_files, outputFile=rm.filename, fileDate=rm.utc_file_date)
-                    DBlogging.dblogger.info("{0} Trigger {1} STARTING".format(DFP(), cmd))
-
-                    try:
-                        tCall = subprocess.call(cmd, shell=True)
-                        DBlogging.dblogger.info("{0} Trigger {1} FINISHED".format(DFP(), cmd))
-                    except CalledProcessError as e:
-                        DBlogging.dblogger.info("{0} Trigger {1} FAILED ({2})".format(DFP(), cmd, e.returncode))
+                    cmd = rm.trigger.format(inputFiles=rm.input_files, outputFile=rm.filename)
+                    print("{0} Trigger {1} STARTING".format(DFP(), cmd))
+                    subprocess.call(cmd, shell=True)
+                    print("{0} Trigger {1} FINISHED".format(DFP(), cmd))
 
                 n_good += 1
             else:
