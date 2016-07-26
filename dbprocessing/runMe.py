@@ -308,7 +308,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                     DBlogging.dblogger.info("{0} Trigger {1} STARTING".format(DFP(), cmd))
 
                     try:
-                        subprocess.check_call(cmd, shell=True)
+                        tCall = subprocess.call(cmd, shell=True)
                         DBlogging.dblogger.info("{0} Trigger {1} FINISHED".format(DFP(), cmd))
                     except CalledProcessError as e:
                         DBlogging.dblogger.info("{0} Trigger {1} FAILED ({2})".format(DFP(), cmd, e.returncode))
