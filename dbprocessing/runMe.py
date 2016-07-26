@@ -360,11 +360,7 @@ class runMe(object):
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
         self.out_prod = process_entry.output_product
-
-        if hasattr(process_entry, 'trigger'):
-            self.trigger = process_entry.trigger
-        else:
-            self.trigger = None # Backwards compatability
+        self.trigger = process_entry.trigger
         ptb = self.dbu.getTraceback('Product', self.out_prod)
         self.data_level = ptb['product'].level # This is the level of the output product, sorts on this and date
         # grab the format
