@@ -109,7 +109,6 @@ class dbprocessing_db(object):
                                                 index=True),
                                   schema.Column('output_timebase', types.String(10), nullable=True, index=True),
                                   schema.Column('extra_params', types.Text, nullable=True),
-                                  schema.Column('trigger', types.String(250), nullable=True, unique=False),
                                   schema.UniqueConstraint('process_name', 'output_product')
                                   )
 
@@ -146,7 +145,6 @@ class dbprocessing_db(object):
                                   schema.Column('product_id', types.Integer,
                                                 schema.ForeignKey('product.product_id'), nullable=False),
                                   schema.Column('shasum', types.String(40), nullable=True),
-                                  #schema.Column('predecessor',  types.Integer, nullable=True, index=True),
                                   schema.Column('newest_version', types.Boolean, nullable=False),
                                   schema.Column('process_keywords', types.Text, nullable=True),
                                   schema.CheckConstraint('utc_stop_time is not NULL OR met_stop_time is not NULL'),

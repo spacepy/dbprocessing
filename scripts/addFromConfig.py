@@ -49,7 +49,7 @@ expected_keyword['process'] = ['process_name', 'output_product',
                                'code_description', 'code_version',
                                'code_output_interface', 'code_active',
                                'code_date_written', 'code_newest_version',
-                               'code_arguments', 'code_cpu', 'code_ram', 'trigger']
+                               'code_arguments', 'code_cpu', 'code_ram']
 
 
 def readconfig(config_filepath):
