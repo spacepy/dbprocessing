@@ -21,7 +21,7 @@ import Version
 
 runObj = namedtuple('runObj', 'runme time probfile')
 """
-used in _start_a_run() and runner() to hold the runme object that is running,
+used in _start_a_run() and runner() to hold the runme object that is running, 
 the time it started, and the probfile pointer
 """
 
@@ -79,7 +79,7 @@ def _pokeFile(filename):
     """
     try:
         fp = os.open(filename, os.O_NONBLOCK, os.O_RDONLY)
-    except OSError:
+    except OSError: 
         return 'NOFILE'
     except Exception:
         return 'OTHER'
@@ -163,7 +163,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
 
     # sort the runme_list on level and filename (which is like date and product and s/c together)
     runme_list = sorted(list(runme_list2), key = lambda x: (x.data_level, x.filename))
-
+    
     # found some cases where the same command line was in the list more than once based on
     #   more than one dependency in the process queue, go through and clean these out
     # TODO add this to the DB so that we can have a defined version string
@@ -177,7 +177,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     #            tmp_rme.append(rme)
     #        if tmp_rme:
     #            runme_list_uniq.append(max(tmp_rme, key=lambda x: len(x.cmdline)))
-
+                
     #print runme_list_uniq, runme_list
     #runme_list = runme_list_uniq
 
@@ -200,8 +200,8 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     # 2
     runme_list = remove_dups(outfiles, runme_list)
     print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
-
-
+    
+    
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
     #    for some code here
@@ -209,7 +209,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
 
     n_good = 0 # number of processes successfully completed
     n_bad = 0 # number of processes failed
-
+    
     #    while runme_list or processes:
     while runme_list or processes:
         while (len(processes) < MAX_PROC) and runme_list:
@@ -258,7 +258,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                                              .format(os.path.basename(' '.join(runme.cmdline))))
                     #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
                     try:
-                        rm_tempdir(runme.tempdir) # delete the tempdir
+                        rm_tempdir(runme.tempdir) # delete the tempdir                    
                     except OSError:
                         pass
                     continue # move to next process
@@ -302,13 +302,6 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                     rm_tempdir(rm.tempdir) # delete the temp directory
                     rm._add_links(rm.cmdline)
                 print("{0} Process {1} FINISHED".format(DFP(), ' '.join(rm.cmdline)))
-
-                if rm.trigger:
-                    cmd = rm.trigger.format(inputFiles=rm.input_files, outputFile=rm.filename)
-                    print("{0} Trigger {1} STARTING".format(DFP(), cmd))
-                    subprocess.call(cmd, shell=True)
-                    print("{0} Trigger {1} FINISHED".format(DFP(), cmd))
-
                 n_good += 1
             else:
                 raise(ValueError("Should not have gotten here"))
@@ -356,7 +349,6 @@ class runMe(object):
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
         self.out_prod = process_entry.output_product
-        self.trigger = process_entry.trigger
         ptb = self.dbu.getTraceback('Product', self.out_prod)
         self.data_level = ptb['product'].level # This is the level of the output product, sorts on this and date
         # grab the format
@@ -488,7 +480,7 @@ class runMe(object):
         if db_code_id is None:
             # I think things will also crash here
             DBlogging.dblogger.error("Database inconsistency found!! A generated file {0} does not have a filecodelink".format(self.filename))
-
+            
             #attempt to figure it out and add one
             tb = self.dbu.getTraceback('File', self.filename)
             proc_id = self.dbu.getProcessFromOutputProduct(tb['product'].product_id)
@@ -527,8 +519,10 @@ class runMe(object):
         if ver_diff[0] > 0:
             self.output_version.incInterface()
             DBlogging.dblogger.debug("Filename: {0} incInterface()".format(self.filename))
-
-        return any(ver_diff)
+        if any(ver_diff):
+            return True
+        else:
+            return False
 
     def _parentsChanged(self, f_id_db):
         """
@@ -563,9 +557,9 @@ class runMe(object):
             DBlogging.dblogger.debug("parent: {0} version: {1} parent_max {2} version {3}".format(
                 parent.file_id, self.dbu.getVersion(parent), parent_max.file_id, self.dbu.getVersion(parent_max)))
 
-
+            
             # if a parent is no longer newest we need to inc
-            if self.dbu.getVersion(parent) != self.dbu.getVersion(parent_max):
+            if self.dbu.getVersion(parent) != self.dbu.getVersion(parent_max): 
                 # we have a parent file for a certain date,
                 #   get all the files for that date and see if the parent is the newest
                 #   if it is then that parent has not changed, do not run
