@@ -21,7 +21,7 @@ import Version
 
 runObj = namedtuple('runObj', 'runme time probfile')
 """
-used in _start_a_run() and runner() to hold the runme object that is running, 
+used in _start_a_run() and runner() to hold the runme object that is running,
 the time it started, and the probfile pointer
 """
 
@@ -79,7 +79,7 @@ def _pokeFile(filename):
     """
     try:
         fp = os.open(filename, os.O_NONBLOCK, os.O_RDONLY)
-    except OSError: 
+    except OSError:
         return 'NOFILE'
     except Exception:
         return 'OTHER'
@@ -149,7 +149,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     ## 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     # in make_command_line a tempdir gets created (self.tempdir) it will need to be cleaned
     for runme in runme_list:
-        force = False if rundir is None else True
+        force = rundir is not None
         runme.make_command_line(force = force, rundir=rundir)
     # get rid of all the runme objects that are not runnable
     runme_list2 = set([v for v in runme_list if v.ableToRun])
@@ -163,7 +163,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
 
     # sort the runme_list on level and filename (which is like date and product and s/c together)
     runme_list = sorted(list(runme_list2), key = lambda x: (x.data_level, x.filename))
-    
+
     # found some cases where the same command line was in the list more than once based on
     #   more than one dependency in the process queue, go through and clean these out
     # TODO add this to the DB so that we can have a defined version string
@@ -177,7 +177,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     #            tmp_rme.append(rme)
     #        if tmp_rme:
     #            runme_list_uniq.append(max(tmp_rme, key=lambda x: len(x.cmdline)))
-                
+
     #print runme_list_uniq, runme_list
     #runme_list = runme_list_uniq
 
@@ -200,8 +200,8 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     # 2
     runme_list = remove_dups(outfiles, runme_list)
     print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
-    
-    
+
+
     # TODO For a future revision think on adding a timeout ability to the subprocess
     #    see: http://stackoverflow.com/questions/1191374/subprocess-with-timeout
     #    for some code here
@@ -209,7 +209,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
 
     n_good = 0 # number of processes successfully completed
     n_bad = 0 # number of processes failed
-    
+
     #    while runme_list or processes:
     while runme_list or processes:
         while (len(processes) < MAX_PROC) and runme_list:
@@ -228,7 +228,6 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
 
             # make sure the file is not in the DB before you try this
             try:
-                #force = False if rundir is None else True
                 if force:
                     raise(DButils.DBNoData)
 
@@ -258,7 +257,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                                              .format(os.path.basename(' '.join(runme.cmdline))))
                     #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
                     try:
-                        rm_tempdir(runme.tempdir) # delete the tempdir                    
+                        rm_tempdir(runme.tempdir) # delete the tempdir
                     except OSError:
                         pass
                     continue # move to next process
@@ -305,7 +304,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 n_good += 1
             else:
                 raise(ValueError("Should not have gotten here"))
-            # execution gets here iff the process finished
+            # execution gets here if the process finished
             del processes[p]
         time.sleep(0.5)
 
@@ -432,21 +431,11 @@ class runMe(object):
 
     __repr__ = __str__
 
-
     def __eq__(self, other):
         """
         define what equals means for 2 runme objects
         """
-#        attrs = ['ableToRun', 'code_id', 'data_level', 'extra_params', 'input_files', 'out_prod', 'pq',
-#                 'args', 'codepath', 'filename', 'output_version', 'process_id', 'utc_file_date']
-        attrs = ['ableToRun', 'code_id', 'extra_params', 'input_files', 'out_prod', 'pq',
-                 'args', 'codepath', 'filename', 'output_version', 'process_id', 'utc_file_date']
-        if not isinstance(other, runMe):
-            raise(TypeError("Cannot compare runMe with {0}".format(type(other))))
-        for a in attrs:
-            if getattr(self, a) != getattr(other, a):
-                return False
-        return True # made it though them all
+        return self.__dict__ == other.__dict__
 
 ##     def __hash__(self):
 ##         """
@@ -480,7 +469,7 @@ class runMe(object):
         if db_code_id is None:
             # I think things will also crash here
             DBlogging.dblogger.error("Database inconsistency found!! A generated file {0} does not have a filecodelink".format(self.filename))
-            
+
             #attempt to figure it out and add one
             tb = self.dbu.getTraceback('File', self.filename)
             proc_id = self.dbu.getProcessFromOutputProduct(tb['product'].product_id)
@@ -557,9 +546,9 @@ class runMe(object):
             DBlogging.dblogger.debug("parent: {0} version: {1} parent_max {2} version {3}".format(
                 parent.file_id, self.dbu.getVersion(parent), parent_max.file_id, self.dbu.getVersion(parent_max)))
 
-            
+
             # if a parent is no longer newest we need to inc
-            if self.dbu.getVersion(parent) != self.dbu.getVersion(parent_max): 
+            if self.dbu.getVersion(parent) != self.dbu.getVersion(parent_max):
                 # we have a parent file for a certain date,
                 #   get all the files for that date and see if the parent is the newest
                 #   if it is then that parent has not changed, do not run
