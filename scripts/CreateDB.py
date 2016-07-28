@@ -105,8 +105,7 @@ class dbprocessing_db(object):
                                                 nullable=False, index=True),
                                   schema.Column('process_name', types.String(50), nullable=False),  # hmm long enough?
                                   schema.Column('output_product', types.Integer,
-                                                schema.ForeignKey('product.product_id'), nullable=False, unique=True,
-                                                index=True),
+                                                schema.ForeignKey('product.product_id'), nullable=True, index=True),
                                   schema.Column('output_timebase', types.String(10), nullable=True, index=True),
                                   schema.Column('extra_params', types.Text, nullable=True),
                                   schema.UniqueConstraint('process_name', 'output_product')
