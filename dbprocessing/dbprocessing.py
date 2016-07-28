@@ -294,7 +294,7 @@ class ProcessQueue(object):
 
         timebase = self.dbu.getProcessTimebase(process_id)
         DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
-        if timebase in ['FILE', 'DAILY']:  # taking one file to the next file
+        if timebase in ['FILE', 'DAILY', 'RUN']:  # taking one file to the next file
             # for file based processing we are going to look to the "process_keywords" and cull the
             #   retuned files based on making sure they are all the same
             #   If process_keywords is none it will fall back to current behavior (since they will all be the same)

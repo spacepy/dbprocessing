@@ -195,8 +195,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     outfiles = [os.path.basename(v.filename) for v in runme_list]
     def remove_dups(seq, oval):
         seen = set()
-        seen_add = seen.add
-        return [oval[i] for i in xrange(len(seq)) if not (seq[i] in seen or seen_add(seq[i]))]
+        return [oval[i] for i in xrange(len(seq)) if seq[i] ==  '' or not (seq[i] in seen or seen.add(seq[i]))]
     # 2
     runme_list = remove_dups(outfiles, runme_list)
     print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
@@ -241,26 +240,29 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                         pass
             except DButils.DBNoData:
                 print("{0} Process starting ({2}): {1}".format(DFP(), ' '.join(runme.cmdline), len(runme_list)))
-                if rundir is None:
-                    prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
-                else:
-                    prob_name = os.path.join(rundir, runme.filename + '.prob')
-                try:
-                    fp = open(prob_name, 'w')
-                    fp.write(' '.join(runme.cmdline))
-                    fp.write('\n\n')
-                    fp.write('-'*80)
-                    fp.write('\n\n')
-                    fp.flush()
-                except IOError:
-                    DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
-                                             .format(os.path.basename(' '.join(runme.cmdline))))
-                    #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
+                if runme.filename != '':
+                    if rundir is None:
+                        prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
+                    else:
+                        prob_name = os.path.join(rundir, runme.filename + '.prob')
                     try:
-                        rm_tempdir(runme.tempdir) # delete the tempdir
-                    except OSError:
-                        pass
-                    continue # move to next process
+                        fp = open(prob_name, 'w')
+                        fp.write(' '.join(runme.cmdline))
+                        fp.write('\n\n')
+                        fp.write('-'*80)
+                        fp.write('\n\n')
+                        fp.flush()
+                    except IOError:
+                        DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
+                                                 .format(os.path.basename(' '.join(runme.cmdline))))
+                        #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
+                        try:
+                            rm_tempdir(runme.tempdir) # delete the tempdir
+                        except OSError:
+                            pass
+                        continue # move to next process
+                else:
+                    fp = None
 
                 _start_a_run(runme)
                 processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
@@ -275,10 +277,12 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 DBlogging.dblogger.error("Command returned a non-zero return code ({1}): {0}"
                                          .format(' '.join(rm.cmdline), p.returncode))
                 print("{0} Command returned a non-zero return code: {1}\n\t{2}".format(DFP(), ' '.join(rm.cmdline), p.returncode))
-                fp.flush(); fp.close()
+                if fp is not None:
+                    fp.flush()
+                    fp.close()
                 #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
                 #rm.moveToError(os.path.join(rm.tempdir, fp.name))
-                if rundir is None:
+                if rundir is None and rm.filename != '':
                     rm.moveToError(fp.name)
                     # assume the file is bad and move it to error
                     rm.moveToError(os.path.join(rm.tempdir, rm.filename))
@@ -287,11 +291,13 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 n_bad += 1
 
             elif p.returncode == 0: # p.returncode == 0  SUCCESS
-                fp.flush(); fp.close()
+                if fp is not None:
+                    fp.flush()
+                    fp.close()
                 # this is not a perfect time since all the adding occurs before the next poll
                 DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
                 print("{0} Command: {1} took {2} seconds".format(DFP(), os.path.basename(rm.cmdline[0]), time.time()-t))
-                if rundir is None: # if rundir then this is a test
+                if rundir is None and rm.filename != '': # if rundir then this is a test
                     try:
                         rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
                     except IOError:
@@ -347,80 +353,82 @@ class runMe(object):
         DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(self.code_id, self.codepath))
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
-        self.out_prod = process_entry.output_product
-        ptb = self.dbu.getTraceback('Product', self.out_prod)
-        self.data_level = ptb['product'].level # This is the level of the output product, sorts on this and date
-        # grab the format
-        format_str = ptb['product'].format
-        # get the process_keywords from the file if there are any
-        try:
-            process_keywords = Utils.strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
-            for key in process_keywords:
-                format_str = format_str.replace('{'+key+'}', process_keywords[key])
-        except TypeError:
-            pass
+        if process_entry.output_timebase == "RUN":
+            self.data_level = 5000
+        else:
+            self.out_prod = process_entry.output_product
+            ptb = self.dbu.getTraceback('Product', self.out_prod)
+            self.data_level = ptb['product'].level # This is the level of the output product, sorts on this and date
+            # grab the format
+            format_str = ptb['product'].format
+            # get the process_keywords from the file if there are any
+            try:
+                process_keywords = Utils.strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
+                for key in process_keywords:
+                    format_str = format_str.replace('{'+key+'}', process_keywords[key])
+            except TypeError:
+                pass
 
-        ## need to build a version string for the output file
-        ## this sets the interface version
-        code_entry = self.dbu.getEntry('Code', self.code_id)
-        code_version = code_entry.code_id
-        output_interface_version = code_entry.output_interface_version
+            ## need to build a version string for the output file
+            ## this sets the interface version
+            code_entry = self.dbu.getEntry('Code', self.code_id)
+            output_interface_version = code_entry.output_interface_version
 
-        fmtr = DBstrings.DBformatter()
-        # set the default version for the output file
-        self.output_version = Version.Version(output_interface_version, 0, 0)
+            fmtr = DBstrings.DBformatter()
+            # set the default version for the output file
+            self.output_version = Version.Version(output_interface_version, 0, 0)
 
-        ## we have a filename, now we need to increment versions as needed/appropriate to
-        ## come up with a unique one
+            ## we have a filename, now we need to increment versions as needed/appropriate to
+            ## come up with a unique one
 
-        # in this loop see if the file can be created i.e. ges not already exist in the db
-        while True:
-            # make the filename in the loop as output_version is manipulated below
-            self.filename = fmtr.format(
-                format_str,
-                SATELLITE=ptb['satellite'].satellite_name,
-                PRODUCT=ptb['product'].product_name,
-                VERSION=str(self.output_version),
-                datetime=utc_file_date,
-                INSTRUMENT=ptb['instrument'].instrument_name)
-            DBlogging.dblogger.debug("Filename: %s created" % (self.filename))
-            if not force:
-                f_id_db = self._fileInDB()
-            else:
-                f_id_db = False
-            if not f_id_db: # if the file is not in the db lets make it
-                break # lets call this the only way out of here that creates the runner
-            codechange = self._codeVerChange(f_id_db)
-            if codechange: # if the code did change maybe we have a unique
-                DBlogging.dblogger.debug("Code did change for file: {0}".format(self.filename))
-                continue
-            parentchange = self._parentsChanged(f_id_db)
-            if parentchange is None: # this is an inconsistency mark it and move on
-                DBlogging.dblogger.info("Parent was None for file: {0}".format(self.filename))
-                break
-            if parentchange:
-                DBlogging.dblogger.debug("Parent did change for file: {0}".format(self.filename))
-                continue
-            # Need to check for version_bump in the processqueue
-            DBlogging.dblogger.debug("Jumping out of runme, not going to run anything".format())
+            # in this loop see if the file can be created i.e. ges not already exist in the db
+            while True:
+                # make the filename in the loop as output_version is manipulated below
+                self.filename = fmtr.format(
+                    format_str,
+                    SATELLITE=ptb['satellite'].satellite_name,
+                    PRODUCT=ptb['product'].product_name,
+                    VERSION=str(self.output_version),
+                    datetime=utc_file_date,
+                    INSTRUMENT=ptb['instrument'].instrument_name)
+                DBlogging.dblogger.debug("Filename: %s created" % (self.filename))
+                if not force:
+                    f_id_db = self._fileInDB()
+                else:
+                    f_id_db = False
+                if not f_id_db: # if the file is not in the db lets make it
+                    break # lets call this the only way out of here that creates the runner
+                codechange = self._codeVerChange(f_id_db)
+                if codechange: # if the code did change maybe we have a unique
+                    DBlogging.dblogger.debug("Code did change for file: {0}".format(self.filename))
+                    continue
+                parentchange = self._parentsChanged(f_id_db)
+                if parentchange is None: # this is an inconsistency mark it and move on
+                    DBlogging.dblogger.info("Parent was None for file: {0}".format(self.filename))
+                    break
+                if parentchange:
+                    DBlogging.dblogger.debug("Parent did change for file: {0}".format(self.filename))
+                    continue
+                # Need to check for version_bump in the processqueue
+                DBlogging.dblogger.debug("Jumping out of runme, not going to run anything".format())
 
-            return # if we get here then we are not going to run anything
+                return # if we get here then we are not going to run anything
 
-        ## get extra_params from the process
-        args = process_entry.extra_params
-        if args is not None:
-            args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
-            args = args.split('|')
-            self.extra_params = args
+            ## get extra_params from the process
+            args = process_entry.extra_params
+            if args is not None:
+                args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+                args = args.split('|')
+                self.extra_params = args
 
-        ## get arguments from the code
-        args = code_entry.arguments
-        if args is not None:
-            args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
-            args = args.split()
-            for arg in args:
-                # if 'input' not in arg and 'output' not in arg:
-                self.args.append(arg)
+            ## get arguments from the code
+            args = code_entry.arguments
+            if args is not None:
+                args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+                args = args.split()
+                for arg in args:
+                    # if 'input' not in arg and 'output' not in arg:
+                    self.args.append(arg)
 
         ## getting here means that we are going to be returning a full
         ##   class ready to run the process
@@ -664,12 +672,14 @@ class runMe(object):
         for i_fid in self.input_files:
             cmdline.append(self.dbu.getFileFullPath(i_fid))
         # the putname goes last
-        if rundir is None:
-            self.tempdir = mk_tempdir(suffix='_{0}_runMe'.format(self.filename))
-            cmdline.append(os.path.join(self.tempdir, self.filename))
+        if self.filename != '':
+            if rundir is None:
+                self.tempdir = mk_tempdir(suffix='_{0}_runMe'.format(self.filename))
+                cmdline.append(os.path.join(self.tempdir, self.filename))
+            else:
+                cmdline.append(os.path.join(rundir, self.filename))
         else:
-            cmdline.append(os.path.join(rundir, self.filename))
-
+            cmdline.append("Trigger") # give it an "output file", so runner doesn't get nervous about the output already existing
         # and make sure to expand any path variables
         cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]
         DBlogging.dblogger.debug("built command: {0}".format(' '.join(cmdline)))
