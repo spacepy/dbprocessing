@@ -68,6 +68,13 @@ class addFromConfig(unittest.TestCase):
         conf = readconfig('testing_configs/testDB_missingProduct.conf')
         self.assertRaises(ValueError, _keysPresentCheck, conf)
 
+    def test_keysPresentCheck_Trigger(self):
+        try:
+            conf = readconfig('testing_configs/testDB_trigger.conf')
+            _keysPresentCheck(conf)
+        except Exception as e:
+            self.fail(e)
+
     def test_fileTest_Valid(self):
         try:
             _fileTest('testing_configs/testDB.conf')

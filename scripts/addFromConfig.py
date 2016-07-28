@@ -136,7 +136,7 @@ def _keysPresentCheck(conf):
                     if conf[k][k2] not in conf:
                         raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
                 elif 'output_product' in k2:
-                    if conf[k][k2] not in conf:
+                    if conf[k][k2] not in conf and conf[k]['output_timebase'] != "RUN":
                         raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
 
 
