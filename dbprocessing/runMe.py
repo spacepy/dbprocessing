@@ -679,7 +679,7 @@ class runMe(object):
             else:
                 cmdline.append(os.path.join(rundir, self.filename))
         else:
-            cmdline.append("Trigger") # give it an "output file", so runner doesn't get nervous about the output already existing
+            cmdline.append("Run") # give it an "output file", so runner doesn't get nervous about the output already existing
         # and make sure to expand any path variables
         cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]
         DBlogging.dblogger.debug("built command: {0}".format(' '.join(cmdline)))
