@@ -240,29 +240,26 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                         pass
             except DButils.DBNoData:
                 print("{0} Process starting ({2}): {1}".format(DFP(), ' '.join(runme.cmdline), len(runme_list)))
-                if runme.filename != '':
-                    if rundir is None:
-                        prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
-                    else:
-                        prob_name = os.path.join(rundir, runme.filename + '.prob')
-                    try:
-                        fp = open(prob_name, 'w')
-                        fp.write(' '.join(runme.cmdline))
-                        fp.write('\n\n')
-                        fp.write('-'*80)
-                        fp.write('\n\n')
-                        fp.flush()
-                    except IOError:
-                        DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
-                                                 .format(os.path.basename(' '.join(runme.cmdline))))
-                        #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
-                        try:
-                            rm_tempdir(runme.tempdir) # delete the tempdir
-                        except OSError:
-                            pass
-                        continue # move to next process
+                if rundir is None:
+                    prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
                 else:
-                    fp = None
+                    prob_name = os.path.join(rundir, runme.filename + '.prob')
+                try:
+                    fp = open(prob_name, 'w')
+                    fp.write(' '.join(runme.cmdline))
+                    fp.write('\n\n')
+                    fp.write('-'*80)
+                    fp.write('\n\n')
+                    fp.flush()
+                except IOError:
+                    DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
+                                             .format(os.path.basename(' '.join(runme.cmdline))))
+                    #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
+                    try:
+                        rm_tempdir(runme.tempdir) # delete the tempdir
+                    except OSError:
+                        pass
+                    continue # move to next process
 
                 _start_a_run(runme)
                 processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
@@ -273,16 +270,14 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 continue
             # OK process done, get the info from the dict
             rm, t, fp = processes[p] # unpack the tuple
+
+            fp.close()
             if p.returncode != 0: # non zero return code FAILED
                 DBlogging.dblogger.error("Command returned a non-zero return code ({1}): {0}"
                                          .format(' '.join(rm.cmdline), p.returncode))
                 print("{0} Command returned a non-zero return code: {1}\n\t{2}".format(DFP(), ' '.join(rm.cmdline), p.returncode))
-                if fp is not None:
-                    fp.flush()
-                    fp.close()
-                #print('%%%%%%%%%%%%%%%%%%%%%%%', os.path.join(rm.tempdir, fp.name), fp.name, rm.tempdir )
-                #rm.moveToError(os.path.join(rm.tempdir, fp.name))
-                if rundir is None and rm.filename != '':
+
+                if rundir is None:
                     rm.moveToError(fp.name)
                     # assume the file is bad and move it to error
                     rm.moveToError(os.path.join(rm.tempdir, rm.filename))
@@ -291,25 +286,21 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 n_bad += 1
 
             elif p.returncode == 0: # p.returncode == 0  SUCCESS
-                if fp is not None:
-                    fp.flush()
-                    fp.close()
                 # this is not a perfect time since all the adding occurs before the next poll
                 DBlogging.dblogger.info("Command: {0} took {1} seconds".format(os.path.basename(rm.cmdline[0]), time.time()-t))
                 print("{0} Command: {1} took {2} seconds".format(DFP(), os.path.basename(rm.cmdline[0]), time.time()-t))
-                if rundir is None and rm.filename != '': # if rundir then this is a test
-                    try:
+
+                if rundir is None: # if rundir then this is a test
+                    if rm.data_level != 5000: # RUN timebases are allowed to not have files
                         rm.moveToIncoming(os.path.join(rm.tempdir, rm.filename))
-                    except IOError:
-                        glb = glob.glob(os.path.join(rm.tempdir, rm.filename) + '*.png')
-                        if len(glb) == 1:
-                            rm.moveToIncoming(glb[0])
+                        rm._add_links(rm.cmdline)
                     rm_tempdir(rm.tempdir) # delete the temp directory
-                    rm._add_links(rm.cmdline)
+
                 print("{0} Process {1} FINISHED".format(DFP(), ' '.join(rm.cmdline)))
                 n_good += 1
             else:
                 raise(ValueError("Should not have gotten here"))
+
             # execution gets here if the process finished
             del processes[p]
         time.sleep(0.5)
@@ -355,6 +346,7 @@ class runMe(object):
         process_entry = self.dbu.getEntry('Process', self.process_id)
         if process_entry.output_timebase == "RUN":
             self.data_level = 5000
+            self.filename = 'RUN_{0}'.format(process_entry.process_name)
         else:
             self.out_prod = process_entry.output_product
             ptb = self.dbu.getTraceback('Product', self.out_prod)
@@ -672,18 +664,12 @@ class runMe(object):
         for i_fid in self.input_files:
             cmdline.append(self.dbu.getFileFullPath(i_fid))
         # the putname goes last
-        if self.filename != '':
-            if rundir is None:
-                self.tempdir = mk_tempdir(suffix='_{0}_runMe'.format(self.filename))
-                cmdline.append(os.path.join(self.tempdir, self.filename))
-            else:
-                cmdline.append(os.path.join(rundir, self.filename))
+        if rundir is None:
+            self.tempdir = mk_tempdir(suffix='_{0}_runMe'.format(self.filename))
+            cmdline.append(os.path.join(self.tempdir, self.filename))
         else:
-            cmdline.append("Run") # give it an "output file", so runner doesn't get nervous about the output already existing
+            cmdline.append(os.path.join(rundir, self.filename))
         # and make sure to expand any path variables
         cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]
         DBlogging.dblogger.debug("built command: {0}".format(' '.join(cmdline)))
         self.cmdline = cmdline
-
-
-
