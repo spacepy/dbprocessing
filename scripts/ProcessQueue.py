@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 from __future__ import print_function
 
 import datetime
@@ -7,8 +7,6 @@ import operator
 from optparse import OptionParser
 import traceback
 import subprocess
-
-import spacepy.toolbox as tb
 
 from dbprocessing import DBlogging, dbprocessing
 from dbprocessing.runMe import ProcessException
@@ -143,7 +141,7 @@ if __name__ == "__main__":
                 # make the cpommand lines for all the files in tehj processqueue
                 totalsize = pq.dbu.Processqueue.len()
                 tmp_ind = 0
-                tb.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
+                Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
                 while pq.dbu.Processqueue.len() > 0:
                     # do smarter pop that sorts at the db level
                     #f = (pq.dbu.session.query(pq.dbu.Processqueue.file_id)
@@ -159,7 +157,7 @@ if __name__ == "__main__":
                     #    continue
                     pq.buildChildren(f)
                     tmp_ind += 1
-                    tb.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
+                    Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
 
                     #pq.runme_list.extend(sorted([v for v in pq.runme_list if v.ableToRun], key=lambda x: x.utc_file_date))
                     
