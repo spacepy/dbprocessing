@@ -18,7 +18,6 @@
 # <- create the inst_prod link
 
 import ConfigParser
-import itertools
 import os
 import shutil
 import sys
@@ -66,22 +65,19 @@ def readconfig(config_filepath):
 
 def _sectionCheck(conf):
     """
-    check the sections to be sure hey are correct and readable
+    Check the sections to be sure they are correct and readable
     """
     # check the section names that are there.
     keys = conf.keys()
-    for key, exp in itertools.product(conf.keys(), expected):
-        if key == exp or key.startswith(exp):
+    for key in conf.keys():
+        # startswith allows you to supply a tuple of strings to test for
+        if key.startswith(tuple(expected + ["DEFAULT"])):
             keys.remove(key)
-            continue
+
     # do we have any left over keys?
     if keys:
-        for k in keys:
-            if k == 'default':
-                raise (ValueError('Found section: {0}, it must be {1}'.format('default', 'DEFAULT')))
-            if k == 'DEFAULT':  # default is ok
-                continue
-            raise (ValueError('Section error, {0} was not understood'.format(keys)))
+        raise(ValueError('Section error, {0} was not understood'.format(keys[0])))
+
     # check that all the required sections are there
     for req in expected[:-2]:
         if not req in conf:
@@ -140,50 +136,33 @@ def _keysPresentCheck(conf):
                     if conf[k][k2] not in conf:
                         raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
                 elif 'output_product' in k2:
-                    if conf[k][k2] not in conf:
+                    if conf[k][k2] not in conf and conf[k]['output_timebase'] != "RUN":
                         raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
 
 
 def configCheck(conf):
     """
-    go through a file that has been read in and make sure that it is going to
+    Go through a file that has been read in and make sure that it is going to
     work before we do anything
     """
     _sectionCheck(conf)
-    _keysCheck(conf, 'mission')
-    _keysCheck(conf, 'satellite')
-    _keysCheck(conf, 'instrument')
-    conf['mission'] = _keysRemoveExtra(conf, 'mission')
-    conf['satellite'] = _keysRemoveExtra(conf, 'satellite')
-    conf['instrument'] = _keysRemoveExtra(conf, 'instrument')
-    # loop over the processes
+
     for k in conf:
-        if k.startswith('process'):
-            _keysCheck(conf, k)
-            conf[k] = _keysRemoveExtra(conf, k)
-    # loop over the products
-    for k in conf:
-        if k.startswith('product'):
-            _keysCheck(conf, k)
-            conf[k] = _keysRemoveExtra(conf, k)
+        _keysCheck(conf, k)
+        conf[k] = _keysRemoveExtra(conf, k)
 
     _keysPresentCheck(conf)
 
 
 def _fileTest(filename):
     """
-    open up the file as txt and do a check that there are no repeated section headers
+    Open up the file as txt and do a check that there are no repeated section headers
     """
-
-    def rep_list(inval):
-        seen = set()
-        seen_twice = set(x for x in inval if x in seen or seen.add(x))
-        return list(seen_twice)
-
     with open(filename, 'r') as fp:
         data = fp.readlines()
     data = [v.strip() for v in data if v[0] == '[']
-    seen_twice = rep_list(data)
+
+    seen_twice = set([x for x in data if data.count(x) > 1]) # It's O(n^2), but it's small enough it doesn't matter
     if seen_twice:
         raise (ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice)))
 
@@ -275,7 +254,8 @@ def addStuff(cfg, options):
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('code') and 'input' not in k)
             # need to replace the output product with the right ID
             # if it is a key then have to get the name from cfg, or it is a name itself
-            tmp['output_product'] = cfg[tmp['output_product']]['product_id']
+            if tmp['output_product'] is not '':
+                tmp['output_product'] = cfg[tmp['output_product']]['product_id']
             p_id = dbu.addProcess(**tmp)
             print('Added Process: {0} {1}'.format(p_id, dbu.getEntry('Process', p_id).process_name))
 

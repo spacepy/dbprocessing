@@ -8,8 +8,6 @@ from optparse import OptionParser
 import traceback
 import subprocess
 
-import spacepy.toolbox as tb
-
 from dbprocessing import DBlogging, dbprocessing
 from dbprocessing.runMe import ProcessException
 from dbprocessing import runMe, Utils
@@ -108,6 +106,11 @@ if __name__ == "__main__":
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
             pq.dbu.stopLogging('Abnormal exit on exception')
+        except KeyboardInterrupt:
+            print('Shutting down processing chain')
+            DBlogging.dblogger.error('Ctrl-C issued, quiting')
+            pq.dbu.stopLogging('Ctrl-C Exit')
+
         else:
             pq.dbu.stopLogging('Nominal Exit')
         pq.dbu.closeDB()
@@ -138,7 +141,7 @@ if __name__ == "__main__":
                 # make the cpommand lines for all the files in tehj processqueue
                 totalsize = pq.dbu.Processqueue.len()
                 tmp_ind = 0
-                tb.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
+                Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
                 while pq.dbu.Processqueue.len() > 0:
                     # do smarter pop that sorts at the db level
                     #f = (pq.dbu.session.query(pq.dbu.Processqueue.file_id)
@@ -154,7 +157,7 @@ if __name__ == "__main__":
                     #    continue
                     pq.buildChildren(f)
                     tmp_ind += 1
-                    tb.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
+                    Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
 
                     #pq.runme_list.extend(sorted([v for v in pq.runme_list if v.ableToRun], key=lambda x: x.utc_file_date))
                     
@@ -178,6 +181,10 @@ if __name__ == "__main__":
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
             pq.dbu.stopLogging('Abnormal exit on exception')
+        except KeyboardInterrupt:
+            print('Shutting down processing chain')
+            DBlogging.dblogger.error('Ctrl-C issued, quiting')
+            pq.dbu.stopLogging('Ctrl-C Exit')
         else:
             pq.dbu.stopLogging('Nominal Exit')
         finally: 
