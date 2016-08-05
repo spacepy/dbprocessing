@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/python
 
 import datetime
 import itertools
@@ -19,16 +19,20 @@ make a meta kernel each day that is dated 2 weeks out
   - if yes, done, if no runnewMetaKernel.py and drop in incoming
 """
 
-dbu = DBUtils.DButils(os.path.expanduser('~ectsoc/MagEphem_processing.sqlite'))
+dbu = DBUtils.DButils(os.path.expanduser('/home/ectsoc/PROCESSING_DB/magephem_pre.sqlite'))
 
 mission_path = dbu.getMissionDirectory()
 g_inc_path = dbu.getIncomingPath()
 
-files = dbu.getFilesByProduct('rbsp_pre_kernel')
+filesa = dbu.getFilesByProduct('rbspa_pre_kernel')
+filesb = dbu.getFilesByProduct('rbspb_pre_kernel')
+
 #files = sorted(files, key=lambda x: x.utc_file_date)[-1]
 dbu.closeDB()
 
-files = set(v.filename for v in files)
+filesa = set(v.filename for v in filesa)
+filesb = set(v.filename for v in filesb)
+files = filesa.union(filesb)
 
 dates = [datetime.datetime.utcnow().date() + datetime.timedelta(days=v) for v in range(21)]
 
