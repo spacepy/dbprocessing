@@ -346,7 +346,7 @@ class runMe(object):
         process_entry = self.dbu.getEntry('Process', self.process_id)
         if process_entry.output_timebase == "RUN":
             self.data_level = 5000
-            self.filename = 'RUN_{0}_{1}'.format(process_entry.process_name, len(pq))
+            self.filename = 'RUN_{0}_{1}'.format(process_entry.process_name, len(pq.runme_list))
         else:
             self.out_prod = process_entry.output_product
             ptb = self.dbu.getTraceback('Product', self.out_prod)
