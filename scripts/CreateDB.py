@@ -55,6 +55,8 @@ class dbprocessing_db(object):
                                   schema.Column('mission_name', types.String(20), nullable=False, unique=True),
                                   schema.Column('rootdir', types.String(50), nullable=False, ),
                                   schema.Column('incoming_dir', types.String(50), nullable=False, ),
+                                  schema.Column('codedir', types.String(50), nullable=True, ),
+                                  schema.Column('inspectordir', types.String(50), nullable=True, ),
                                   )
 
         data_table = schema.Table('satellite', metadata,

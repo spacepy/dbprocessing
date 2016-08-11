@@ -95,7 +95,7 @@ class DButils(object):
 
         self.MissionDirectory = self.getMissionDirectory()
         self.CodeDirectory = self.getCodeDirectory()
-        self.InspectorDirectory = self.getCodeDirectory()
+        self.InspectorDirectory = self.getInspectorDirectory()
 
     def __del__(self):
         """
