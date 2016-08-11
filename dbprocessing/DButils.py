@@ -92,7 +92,10 @@ class DButils(object):
             self._patchProcessQueue()
         except AttributeError:
             raise (AttributeError('{0} is not a valid database'.format(mission)))
+
         self.MissionDirectory = self.getMissionDirectory()
+        self.CodeDirectory = self.getCodeDirectory()
+        self.InspectorDirectory = self.getCodeDirectory()
 
     def __del__(self):
         """
@@ -1798,7 +1801,7 @@ class DButils(object):
         """
         activeInspector = namedtuple('activeInspector', 'path arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
-        return [activeInspector(os.path.join(self.MissionDirectory, ans.relative_path, ans.filename), ans.arguments,
+        return [activeInspector(os.path.join(self.InspectorDirectory, ans.relative_path, ans.filename), ans.arguments,
                                 ans.product) for ans in sq]
 
     def getChildrenProcesses(self, file_id):
@@ -1865,7 +1868,7 @@ class DButils(object):
         code = self.getEntry('Code', code_id)
         if not code.active_code:  # not an active code
             return None
-        return os.path.join(self.MissionDirectory, code.relative_path, code.filename)
+        return os.path.join(self.CodeDirectory, code.relative_path, code.filename)
 
     def getCodeVersion(self, code_id):
         """
@@ -1932,6 +1935,58 @@ class DButils(object):
 
         return self.getEntry('Mission', mission_id).rootdir
 
+    def getCodeDirectory(self, mission_id=None):
+        """
+        Return the base directory for the current mission
+
+        :return: base directory for current mission
+        :rtype: str
+        """
+        if mission_id is None:
+            mission_id = self.session.query(self.Mission.mission_id).all()
+            if len(mission_id) == 0:
+                return None
+            elif len(mission_id) > 1:
+                raise (ValueError('No mission id specified and more than one mission present'))
+            else:
+                try:
+                    mission_id = mission_id[0][0]
+                except IndexError:
+                    pass
+
+        m = self.getEntry('Mission', mission_id)
+
+        if hasattr(m, 'codedir'):
+            return m.codedir
+        else:
+            return m.rootdir
+
+    def getInspectorDirectory(self, mission_id=None):
+        """
+        Return the base directory for the current mission
+
+        :return: base directory for current mission
+        :rtype: str
+        """
+        if mission_id is None:
+            mission_id = self.session.query(self.Mission.mission_id).all()
+            if len(mission_id) == 0:
+                return None
+            elif len(mission_id) > 1:
+                raise (ValueError('No mission id specified and more than one mission present'))
+            else:
+                try:
+                    mission_id = mission_id[0][0]
+                except IndexError:
+                    pass
+
+        m = self.getEntry('Mission', mission_id)
+
+        if hasattr(m, 'inspectordir'):
+            return m.inspectordir
+        else:
+            return m.rootdir
+
     def checkIncoming(self, glb='*'):
         """
         Check the incoming directory for the current mission and add those files to the getting list
@@ -1957,7 +2012,7 @@ class DButils(object):
 
         mission = self.getEntry('Mission', mission_id)
 
-        basedir = self.getMissionDirectory(mission_id=mission_id)
+        basedir = mission.rootdir
         inc_path = mission.incoming_dir
         return os.path.join(basedir, inc_path)
 
