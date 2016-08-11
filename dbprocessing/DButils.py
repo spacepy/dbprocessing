@@ -726,7 +726,9 @@ class DButils(object):
     def addMission(self,
                    mission_name,
                    rootdir,
-                   incoming_dir):
+                   incoming_dir,
+                   codedir,
+                   inspectordir):
         """
         Add a mission to the database
 
@@ -746,6 +748,8 @@ class DButils(object):
         m1.mission_name = mission_name
         m1.rootdir = rootdir.replace('{MISSION}', mission_name)
         m1.incoming_dir = incoming_dir.replace('{MISSION}', mission_name)
+        m1.codedir = codedir.replace('{MISSION}', mission_name)
+        m1.inspectordir = inspectordir.replace('{MISSION}', mission_name)
         self.session.add(m1)
         self.commitDB()
         return m1.mission_id
