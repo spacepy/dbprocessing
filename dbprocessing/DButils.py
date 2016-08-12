@@ -94,8 +94,12 @@ class DButils(object):
             raise (AttributeError('{0} is not a valid database'.format(mission)))
 
         self.MissionDirectory = self.getMissionDirectory()
-        self.CodeDirectory = self.getCodeDirectory()
-        self.InspectorDirectory = self.getInspectorDirectory()
+
+        cDir = self.getCodeDirectory()
+        self.CodeDirectory = cDir if cDir is not None else self.MissionDirectory
+
+        iDir = self.getInspectorDirectory()
+        self.InspectorDirectory = iDir if iDir is not None else self.CodeDirectory
 
     def __del__(self):
         """
@@ -1960,10 +1964,10 @@ class DButils(object):
 
         m = self.getEntry('Mission', mission_id)
 
-        if hasattr(m, 'codedir'):
+        if hasattr(m, 'codedir') and m.codedir != "":
             return m.codedir
         else:
-            return m.rootdir
+            return None
 
     def getInspectorDirectory(self, mission_id=None):
         """
@@ -1986,10 +1990,10 @@ class DButils(object):
 
         m = self.getEntry('Mission', mission_id)
 
-        if hasattr(m, 'inspectordir'):
+        if hasattr(m, 'inspectordir') and m.inspectordir != "":
             return m.inspectordir
         else:
-            return m.rootdir
+            return None
 
     def checkIncoming(self, glb='*'):
         """
