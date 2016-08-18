@@ -435,7 +435,14 @@ class runMe(object):
         """
         define what equals means for 2 runme objects
         """
-        return self.__dict__ == other.__dict__
+        attrs = ['ableToRun', 'code_id', 'extra_params', 'input_files', 'out_prod', 'pq',
+                 'args', 'codepath', 'filename', 'output_version', 'process_id', 'utc_file_date']
+        if not isinstance(other, runMe):
+            raise(TypeError("Cannot compare runMe with {0}".format(type(other))))
+        for a in attrs:
+            if getattr(self, a) != getattr(other, a):
+                return False
+        return True # made it though them all
 
 ##     def __hash__(self):
 ##         """
@@ -508,10 +515,8 @@ class runMe(object):
         if ver_diff[0] > 0:
             self.output_version.incInterface()
             DBlogging.dblogger.debug("Filename: {0} incInterface()".format(self.filename))
-        if any(ver_diff):
-            return True
-        else:
-            return False
+
+        return any(ver_diff)
 
     def _parentsChanged(self, f_id_db):
         """
@@ -554,7 +559,7 @@ class runMe(object):
                 #   if it is then that parent has not changed, do not run
                 #   if there is a newer parent then we do need to run
                 df = self.dbu.getVersion(parent_max) - self.dbu.getVersion(parent)
-                DBlogging.dblogger.debug("Found a difference between files {0} snd {1} -- {2}".format(
+                DBlogging.dblogger.debug("Found a difference between files {0} and {1} -- {2}".format(
                     parent.file_id, parent_max.file_id, df))
 
                 if df[1]:
@@ -567,10 +572,8 @@ class runMe(object):
             self._incVersion([0,1,0])
         elif revision_diff:
             self._incVersion([0,0,1])
-        if quality_diff or revision_diff:
-            return True
-        else:
-            return False
+
+        return quality_diff or revision_diff
 
     def moveToIncoming(self, fname):
         """
