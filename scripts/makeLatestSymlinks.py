@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 
 """
 in a given directory make symlinks to all the newest versions of files into another directory
@@ -11,6 +11,7 @@ import datetime
 import glob
 import os
 from optparse import OptionParser
+import sys
 import re
 import traceback
 import warnings
@@ -228,7 +229,7 @@ if __name__ == '__main__':
         out = []
         for c in config:
             print(c)
-        return
+        sys.exit(0)
     print(config)
 
     for sec in config:
