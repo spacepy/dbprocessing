@@ -164,7 +164,7 @@ class DBUtilsOtherTests(TestSetup):
         """_nameSubProduct"""
         self.assertTrue(self.dbu._nameSubProduct(None, 1) is None)
         self.assertEqual('Nothing to do', self.dbu._nameSubProduct('Nothing to do', 1))
-        # repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}'] 
+        # repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         self.assertEqual('rbsp-a_magnetometer_uvw_emfisis-Quick-Look', self.dbu._nameSubProduct('{PRODUCT}', 1))
         self.assertEqual('mageis', self.dbu._nameSubProduct('{INSTRUMENT}', 10))
         self.assertEqual('rbspa', self.dbu._nameSubProduct('{SATELLITE}', 1))
@@ -177,7 +177,7 @@ class DBUtilsOtherTests(TestSetup):
         """_nameSubInspector"""
         self.assertTrue(self.dbu._nameSubInspector(None, 1) is None)
         self.assertEqual('Nothing to do', self.dbu._nameSubInspector('Nothing to do', 1))
-        # repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}'] 
+        # repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         self.assertEqual('rbsp-a_magnetometer_uvw_emfisis-Quick-Look', self.dbu._nameSubInspector('{PRODUCT}', 1))
         self.assertEqual('mageis', self.dbu._nameSubInspector('{INSTRUMENT}', 10))
         self.assertEqual('rbspa', self.dbu._nameSubInspector('{SATELLITE}', 1))
@@ -190,7 +190,7 @@ class DBUtilsOtherTests(TestSetup):
         """_nameSubProcess"""
         self.assertTrue(self.dbu._nameSubProcess(None, 1) is None)
         self.assertEqual('Nothing to do', self.dbu._nameSubProcess('Nothing to do', 1))
-        # repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}'] 
+        # repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         self.assertEqual('rbspa_int_ect-mageisM35-hr-L05', self.dbu._nameSubProcess('{PRODUCT}', 1))
         self.assertEqual('mageis', self.dbu._nameSubProcess('{INSTRUMENT}', 10))
         self.assertEqual('rbspa', self.dbu._nameSubProcess('{SATELLITE}', 1))
@@ -202,7 +202,7 @@ class DBUtilsOtherTests(TestSetup):
         """_nameSubFile"""
         self.assertTrue(self.dbu._nameSubFile(None, 1) is None)
         self.assertEqual('Nothing to do', self.dbu._nameSubFile('Nothing to do', 1))
-        # repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}'] 
+        # repl = ['{INSTRUMENT}', '{SPACECRAFT}', '{SATELLITE}', '{MISSION}', '{PRODUCT}', '{LEVEL}', '{ROOTDIR}']
         self.assertEqual('rbspb_pre_MagEphem_OP77Q', self.dbu._nameSubFile('{PRODUCT}', 1))
         self.assertEqual('mageis', self.dbu._nameSubFile('{INSTRUMENT}', 10))
         self.assertEqual('rbspb', self.dbu._nameSubFile('{SATELLITE}', 1))
@@ -983,7 +983,8 @@ class TestWithtestDB(unittest.TestCase):
                                utc_stop_time=datetime.datetime(2010, 1, 2, 0, 0, 0),
                                product_id=productID,
                                newest_version=1,
-                               shasum='0'
+                               shasum='0',
+                               predecessor=None
                                )
         return fID
 
@@ -1239,7 +1240,7 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_all(self):
         """getAllFilenames should return all files in the db when passed no filters"""
-        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw',
                'testDB_001_sec.raw', 'testDB_000_sec.raw', 'testDB_000.cat',
                'testDB_001.cat', 'testDB_001.rot', 'testDB_000.rot']
 
@@ -1249,12 +1250,12 @@ class TestWithtestDB(unittest.TestCase):
         """getAllFilenames should return the files with product_id 1"""
         ans = ['testDB_000.cat', 'testDB_001.cat']
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, 
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
                                                        product = 1))
 
     def test_getAllFilenames_level(self):
         """getAllFilenames should return the files with level 0"""
-        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw',
                'testDB_001_sec.raw', 'testDB_000_sec.raw']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
@@ -1269,16 +1270,16 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_instrument(self):
         """getAllFilenames should return the files with instrument 1"""
-        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw',
                'testDB_001_sec.raw', 'testDB_000_sec.raw', 'testDB_000.cat',
                'testDB_001.cat', 'testDB_001.rot', 'testDB_000.rot']
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False, 
+        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
                                                        instrument = 1))
 
     def test_getAllFilenames_date1(self):
         """getAllFilenames, date, string"""
-        ans = ['testDB_000_first.raw', 'testDB_000_sec.raw', 
+        ans = ['testDB_000_first.raw', 'testDB_000_sec.raw',
                'testDB_000.cat', 'testDB_000.rot']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
@@ -1307,7 +1308,7 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_limit(self):
         """getAllFilenames should only return 4 items with limit=4"""
-        ans = ['testDB_001_first.raw', 'testDB_000_first.raw', 
+        ans = ['testDB_001_first.raw', 'testDB_000_first.raw',
                'testDB_001_sec.raw', 'testDB_000_sec.raw']
         out = self.dbu.getAllFilenames(fullPath = False, limit = 4)
 

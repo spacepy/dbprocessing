@@ -2012,13 +2012,13 @@ class DButils(object):
         Return the incoming path for the current mission
         """
         if mission_id is None:
-            mission_id = self.session.query(self.Mission.mission_id).all()
-            if len(mission_id) > 1:
+            missions = self.session.query(self.Mission).all()
+            if len(missions) > 1:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
-                mission_id = mission_id[0][0]
-
-        mission = self.getEntry('Mission', mission_id)
+                mission = missions[0]
+        else:
+            mission = self.getEntry('Mission', mission_id)
 
         basedir = mission.rootdir
         inc_path = mission.incoming_dir
