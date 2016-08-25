@@ -21,8 +21,8 @@ addVerboseProvenance.py
 .. program:: addVerboseProvenance
 
 Go into the database and get the verbose provenance for a file
-then add that to the global attrs for the file
-either putout to the same file or a different file
+then add that to the global attrs for the file.
+Either putout to the same file or a different file
 
 .. warning:: This code has not been fully tested or used.
 
