@@ -586,7 +586,10 @@ class runMe(object):
         if os.path.isfile(os.path.join(inc_path, os.path.basename(fname))):
         #TODO do I really want to remove old version:?
             os.remove( os.path.join(inc_path, os.path.basename(fname)) )
-        shutil.move(fname, inc_path + os.sep)
+        try:
+            shutil.move(fname, inc_path + os.sep)
+        except IOError:
+             DBlogging.dblogger.error("FAILED moveToIncoming: {0} {1}".format(fname, inc_path))
         DBlogging.dblogger.info("moveToIncoming: {0} {1}".format(fname, inc_path))
 
     def moveToError(self, fname):

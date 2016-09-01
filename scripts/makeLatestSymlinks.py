@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 
 """
 in a given directory make symlinks to all the newest versions of files into another directory
@@ -9,8 +9,10 @@ from __future__ import print_function
 import ConfigParser
 import datetime
 import glob
+from pprint import pprint
 import os
 from optparse import OptionParser
+import sys
 import re
 import traceback
 import warnings
@@ -227,9 +229,9 @@ if __name__ == '__main__':
     if options.list:
         out = []
         for c in config:
-            print(c)
-        return
-    print(config)
+            pprint(c)
+        sys.exit(0)
+    pprint(config)
 
     for sec in config:
         print('Processing [{0}]'.format(sec))
