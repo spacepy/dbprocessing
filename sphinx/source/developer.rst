@@ -153,7 +153,7 @@ Process(-p)
 
 		a. Start up to MAX_PROC processes with subprocess.Popen
 		b. Poll if they are done or not, and if they finished successfully
-			i. Success: Move output file to incoming dir, run all inspectors on it to see product a file is(why), move file to correct location, add file, file_code_link, and file_file_link records to db.
+			i. Success: Move output file to incoming dir, run all inspectors on it to see product a file is(why), diskfileToDB is run(see -i section)
 			ii. Failure: move stdout and stderr to errors
 
 ****
