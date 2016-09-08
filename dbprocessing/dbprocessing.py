@@ -190,7 +190,7 @@ class ProcessQueue(object):
                 f.newest_version = True
                 if not self.dryrun:
                     self.dbu.session.add(f)
-                    DBlogging.dblogger.debug("set file: {0}.newest_version=False".format(f.file_id))
+                    DBlogging.dblogger.debug("set file: {0}.newest_version=True".format(f.file_id))
 
         if not self.dryrun:
             try:
