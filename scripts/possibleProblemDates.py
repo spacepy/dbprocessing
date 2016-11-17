@@ -1,26 +1,14 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 
 from __future__ import division
 
-import bisect
 import datetime
-import glob
-import itertools
-import os
-import sys
-import re
 from optparse import OptionParser
-import re
 
-import dateutil.parser as dup
-import numpy as np
 from sqlalchemy import func
-
-import rbsp #rbsp.mission_day_to_UTC
 
 from dbprocessing import DButils, Utils, Version, inspector
 from dbprocessing.runMe import ProcessException
-from rbsp import Version
 
 from dbprocessing import DBlogging
 DBlogging.dblogger.setLevel(DBlogging.LEVELS['info'])
