@@ -983,8 +983,7 @@ class TestWithtestDB(unittest.TestCase):
                                utc_stop_time=datetime.datetime(2010, 1, 2, 0, 0, 0),
                                product_id=productID,
                                newest_version=1,
-                               shasum='0',
-                               predecessor=None
+                               shasum='0'
                                )
         return fID
 
