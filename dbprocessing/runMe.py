@@ -406,21 +406,21 @@ class runMe(object):
 
                 return # if we get here then we are not going to run anything
 
-            ## get extra_params from the process
-            args = process_entry.extra_params
-            if args is not None:
-                args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
-                args = args.split('|')
-                self.extra_params = args
+        ## get extra_params from the process
+        args = process_entry.extra_params
+        if args is not None:
+            args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+            args = args.split('|')
+            self.extra_params = args
 
-            ## get arguments from the code
-            args = code_entry.arguments
-            if args is not None:
-                args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
-                args = args.split()
-                for arg in args:
-                    # if 'input' not in arg and 'output' not in arg:
-                    self.args.append(arg)
+        ## get arguments from the code
+        args = code_entry.arguments
+        if args is not None:
+            args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+            args = args.split()
+            for arg in args:
+                # if 'input' not in arg and 'output' not in arg:
+                self.args.append(arg)
 
         ## getting here means that we are going to be returning a full
         ##   class ready to run the process
