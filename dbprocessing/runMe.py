@@ -345,24 +345,24 @@ class runMe(object):
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
         code_entry = self.dbu.getEntry('Code', self.code_id)
+
+        self.out_prod = process_entry.output_product
+        ptb = self.dbu.getTraceback('Product', self.out_prod)
+        self.data_level = ptb['product'].level # This is the level of the output product, sorts on this and date
+        # grab the format
+        format_str = ptb['product'].format
+        # get the process_keywords from the file if there are any
+        try:
+            process_keywords = Utils.strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
+            for key in process_keywords:
+                format_str = format_str.replace('{'+key+'}', process_keywords[key])
+        except TypeError:
+            pass
         
         if process_entry.output_timebase == "RUN":
             self.data_level = 5000
             self.filename = 'RUN_{0}_{1}'.format(process_entry.process_name, len(pq.runme_list))
         else:
-            self.out_prod = process_entry.output_product
-            ptb = self.dbu.getTraceback('Product', self.out_prod)
-            self.data_level = ptb['product'].level # This is the level of the output product, sorts on this and date
-            # grab the format
-            format_str = ptb['product'].format
-            # get the process_keywords from the file if there are any
-            try:
-                process_keywords = Utils.strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
-                for key in process_keywords:
-                    format_str = format_str.replace('{'+key+'}', process_keywords[key])
-            except TypeError:
-                pass
-
             ## need to build a version string for the output file
             ## this sets the interface version
             output_interface_version = code_entry.output_interface_version
