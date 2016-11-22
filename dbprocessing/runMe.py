@@ -344,6 +344,8 @@ class runMe(object):
         DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(self.code_id, self.codepath))
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
+        code_entry = self.dbu.getEntry('Code', self.code_id)
+        
         if process_entry.output_timebase == "RUN":
             self.data_level = 5000
             self.filename = 'RUN_{0}_{1}'.format(process_entry.process_name, len(pq.runme_list))
@@ -363,7 +365,6 @@ class runMe(object):
 
             ## need to build a version string for the output file
             ## this sets the interface version
-            code_entry = self.dbu.getEntry('Code', self.code_id)
             output_interface_version = code_entry.output_interface_version
 
             fmtr = DBstrings.DBformatter()
