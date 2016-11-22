@@ -345,10 +345,15 @@ class runMe(object):
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
         code_entry = self.dbu.getEntry('Code', self.code_id)
-        
+        output_interface_version = code_entry.output_interface_version
+
+        # set the default version for the output file
+        self.output_version = Version.Version(output_interface_version, 0, 0)
+
         if process_entry.output_timebase == "RUN":
             self.data_level = 5000
             self.filename = 'RUN_{0}_{1}'.format(process_entry.process_name, self.input_files[0])
+
             self.out_prod = -1 # Not sure if this is sane. There is no out_prod, but it's needed for runme.__eq__
         else:
             self.out_prod = process_entry.output_product
@@ -364,17 +369,10 @@ class runMe(object):
             except TypeError:
                 pass
 
-            ## need to build a version string for the output file
-            ## this sets the interface version
-            output_interface_version = code_entry.output_interface_version
-
-            fmtr = DBstrings.DBformatter()
-            # set the default version for the output file
-            self.output_version = Version.Version(output_interface_version, 0, 0)
-
             ## we have a filename, now we need to increment versions as needed/appropriate to
             ## come up with a unique one
 
+            fmtr = DBstrings.DBformatter()
             # in this loop see if the file can be created i.e. ges not already exist in the db
             while True:
                 # make the filename in the loop as output_version is manipulated below
