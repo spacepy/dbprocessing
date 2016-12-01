@@ -1622,11 +1622,6 @@ class DButils(object):
             files = files.filter(self.File.utc_file_date.between(startDate, endDate))
         if newest_version:
             raise (NotImplementedError("There is an error in this query, do not use!"))
-            # TODO think on making this cleaner, but the newest_version is a function of product
-            # so loop over all the products and that the newest version there.
-            prods = self.getAllProducts(id_only=True)
-            # Maybe someday this will be kept updated
-            files = files.filter_by(newest_version=newest_version)
 
         if limit is None:
             return files.all()
@@ -1637,104 +1632,10 @@ class DButils(object):
         """
         Return the files in the db by product id that have data in the date specified
         """
-        # return self.getFiles(startDate=min(daterange),
-        #                      endDate=max(daterange),
-        #                      product=product_id
-        #                      newest_version=newest_version)
-        dates = []
-        for d in daterange:
-            try:
-                dates.append(d.date())
-            except AttributeError:
-                dates.append(d)
-
-        if newest_version:
-            # don't trust that the db has this correct
-            # create a tabel populated with
-            #   versionnum, file_id, utc_file_date
-
-
-            # BUG DISCOVERED 2014-12-6 BAL
-            # the logic in these queries does not use the max version for each utc_file_date
-            # independently but instead the max in a range
-            # this workaround fixes this but could be better
-
-            aa = (self.session.query((self.File.interface_version * 1000
-                                      + self.File.quality_version * 100
-                                      + self.File.revision_version).label('versionnum'),
-                                     self.File.file_id,
-                                     self.File.filename, self.File,
-                                     self.File.utc_file_date)
-                  .filter(self.File.utc_file_date.between(*dates))
-                  .filter(self.File.product_id == product_id)
-                  # .order_by(self.File.filename.asc())
-                  .group_by(self.File.utc_file_date, 'versionnum')).all()
-
-            sq = []
-            for ele in aa:
-                tmp = [v for v in aa if v[4] == ele[4]]
-                t2 = max(tmp, key=lambda x: x[0])
-                sq.append(t2[2])
-            sq = sorted(list(set(list(sq))))
-
-
-        ##             version = (self.session.query( (self.File.interface_version*1000
-        ##                                            + self.File.quality_version*100
-        ##                                            + self.File.revision_version).label('versionnum'),
-        ##                                           self.File.file_id,
-        ##                                            self.File.filename,
-        ##                                           self.File.utc_file_date )
-        ##                        .filter(self.File.utc_file_date.between(*dates))
-        ##                        .filter(self.File.product_id == product_id)
-        ## #                       .group_by(self.File.file_id).subquery())
-        ##                        .order_by(self.File.filename.asc())
-        ##                        .group_by(self.File.utc_file_date)
-        ##                        .order_by(self.File.filename.asc())
-        ##                        .subquery())
-
-        ##             subq = (self.session.query(func.max(version.c.versionnum))
-        ##                   .group_by(version.c.utc_file_date)).order_by(version.c.utc_file_date).all()
-
-        ##             sq = [self.session.query(version.c.file_id).filter(version.c.versionnum == v[0]).all() for v in subq]
-        ##             sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
-
-        ##             sq = list(map(itemgetter(0), sq))
-        ##             sq = self.session.query(self.File).filter(self.File.file_id.in_(sq)).all()
-
-        else:
-            sq = self.session.query(self.File).filter_by(product_id=product_id). \
-                filter(self.File.utc_file_date.between(dates[0], dates[1])).all()
-        return sq
-
-    def _makeVersionnumTable(self, prod_id=None):
-        # don't trust that the db has this correct
-        # create a table populated with
-        #   versionnum, file_id, utc_file_date
-        if prod_id is None:
-            version = (self.session.query((self.File.interface_version * 1000
-                                           + self.File.quality_version * 100
-                                           + self.File.revision_version).label('versionnum'),
-                                          self.File.file_id,
-                                          self.File.utc_file_date,
-                                          self.File.product_id)
-                       .group_by(self.File.file_id).group_by(self.File.product_id).subquery())
-        else:
-            version = (self.session.query((self.File.interface_version * 1000
-                                           + self.File.quality_version * 100
-                                           + self.File.revision_version).label('versionnum'),
-                                          self.File.file_id,
-                                          self.File.utc_file_date,
-                                          self.File.product_id)
-                       .filter(self.File.product_id == prod_id)
-                       .group_by(self.File.file_id).subquery())
-        return version
-
-    def _makeVersionnumSubquery(self, prod_id=None):
-        version = self._makeVersionnumTable(prod_id=prod_id)
-
-        subq = (self.session.query(func.max(version.c.versionnum))
-                .group_by(version.c.utc_file_date)).subquery()
-        return subq
+        return self.getFiles(startDate=min(daterange),
+                             endDate=max(daterange),
+                             product=product_id,
+                             newest_version=newest_version)
 
     def getFilesByDate(self, daterange, newest_version=False):
         """
@@ -1750,19 +1651,7 @@ class DButils(object):
 
         if newest is set return only the newest files
         """
-        prod_id = self.getProductID(prod_id)
-        if newest_version:
-            version = self._makeVersionnumTable(prod_id=prod_id)
-            subq = self._makeVersionnumSubquery(prod_id=prod_id)
-
-            sq = self.session.query(version.c.file_id).filter(version.c.versionnum == subq).all()
-
-            sq = list(map(itemgetter(0), sq))
-            sq = self.session.query(self.File).filter(self.File.file_id.in_(sq))
-
-        else:
-            sq = self.session.query(self.File).filter_by(product_id=prod_id)
-        return sq.all()
+        return self.getFiles(product=prod_id, newest_version=newest_version)
 
     def getFilesByInstrument(self, inst_id, level=None, newest_version=False, id_only=False):
         """
@@ -1772,7 +1661,7 @@ class DButils(object):
         files = self.getFiles(instrument=inst_id, level=level, newest_version=newest_version)
 
         if id_only:
-            files = [i.file_id for i in files]
+            files = map(attrgetter('file_id'), files)  # this is faster than a list comprehension
         return files
 
     def getFilesByCode(self, code_id, newest_version=False, id_only=False):
@@ -1801,7 +1690,7 @@ class DButils(object):
         """
         files = self.getFiles(startDate, endDate, level, product, code, instrument, exists, newest_version, limit)
 
-        return [i.file_id for i in files]
+        return map(attrgetter('file_id'), files)  # this is faster than a list comprehension
 
     def getActiveInspectors(self):
         """
