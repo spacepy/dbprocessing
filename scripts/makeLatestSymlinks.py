@@ -118,6 +118,8 @@ def make_symlinks(files, files_out, outdir, linkdirs, mode, options):
     # if files_out then cull the files to get rid of the ones
     for f in files:
         if not os.path.isdir(outdir):
+            if options.verbose:
+                print('making outdir: {0} mode:{1}'.format(outdir, int(mode,8)))
             os.makedirs(outdir, int(mode, 8))
         outf = os.path.join(outdir, os.path.basename(f))
         #if options.verbose: print("  f:{0}:{1} outf:{2}:{3}".format(f, os.path.isfile(f),  outf,os.path.isfile(outf) ))
