@@ -1602,7 +1602,18 @@ class DButils(object):
                  exists=None,
                  newest_version=False,
                  limit=None):
-        files = self.session.query(self.File)
+
+        if newest_version:
+            # SQL runs group by before order by, so the ordering must be done in a subquery
+            stmt = self.session.query(self.File).order_by(self.File.interface_version * 1000
+                       + self.File.quality_version * 100
+                       + self.File.revision_version).subquery()
+            files = self.session.query() \
+                        .add_entity(self.File, alias=stmt) \
+                        .group_by(stmt.corresponding_column(self.File.product_id)) \
+                        .group_by(stmt.corresponding_column(self.File.utc_file_date))
+        else:
+            files = self.session.query(self.File)
 
         if level is not None:
             files = files.filter_by(data_level=level)
@@ -1619,23 +1630,33 @@ class DButils(object):
                 .filter_by(instrument_id=instrument)
         if (startDate != "1970-01-01" or endDate != "2070-01-01") and startDate is not None and endDate is not None:
             # I.E, they changed atleast one of the date parameters from "all"
-            files = files.filter(self.File.utc_file_date.between(startDate, endDate))
-        if newest_version:
-            raise (NotImplementedError("There is an error in this query, do not use!"))
 
-        if limit is None:
-            return files.all()
-        else:
-            return files.limit(limit)
+            if newest_version:
+                # Theres a strange bug involving auto-aliasing and the subquery,
+                # I was unable to figure it out besides this weird hack - Myles Johnson 1/5/2016
+                files = files.filter(stmt.corresponding_column(self.File.utc_file_date).between(startDate, endDate))
+            else:
+                files = files.filter(self.File.utc_file_date.between(startDate, endDate))
+        if limit is not None:
+            files = files.limit(limit)
+
+        return files.all()
 
     def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
         Return the files in the db by product id that have data in the date specified
         """
-        return self.getFiles(startDate=min(daterange),
+        files = self.getFiles(startDate=min(daterange),
                              endDate=max(daterange),
                              product=product_id,
                              newest_version=newest_version)
+        if newest_version:
+            # The pre-newestVersionFix version of this function returned filenames,
+            # so this is maintained only for legacy reasons.
+            files = map(attrgetter('filename'), files)  # this is faster than a list comprehension
+        
+        return files
+
 
     def getFilesByDate(self, daterange, newest_version=False):
         """
@@ -1651,7 +1672,8 @@ class DButils(object):
 
         if newest is set return only the newest files
         """
-        return self.getFiles(product=prod_id, newest_version=newest_version)
+
+        return self.getFiles(product=self.getProductID(prod_id), newest_version=newest_version)
 
     def getFilesByInstrument(self, inst_id, level=None, newest_version=False, id_only=False):
         """
@@ -1951,10 +1973,7 @@ class DButils(object):
         """
         Tag all the newest versions of files to a release number (integer)
         """
-        newest_files = []
-        prod_ids = self.getAllProducts(id_only=True)
-        for prod in prod_ids:
-            newest_files.extend(self.getFilesByProduct(prod, newest_version=True))
+        newest_files = self.getFiles(newest_version=True)
 
         for f in newest_files:
             self.addRelease(f, rel_num, commit=False)

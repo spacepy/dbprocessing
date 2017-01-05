@@ -57,11 +57,9 @@ class DBUtilsOtherTests(TestSetup):
     """Tests that are not processqueue or get or add"""
 
     def test_newest_version(self):
-        """explicit test to show the error in the newest_version, the reason for NotImplemented"""
-        # this one works
-        self.assertEqual(len([v.filename for v in self.dbu.getFilesByProduct(13, newest_version=False)]), 75)
-        # this one works
-        self.assertEqual(len([v.filename for v in self.dbu.getFilesByProduct(13, newest_version=True)]), 21)
+        """"""
+        self.assertEqual(len([v.filename for v in self.dbu.getFiles(product=13, newest_version=False)]), 75)
+        self.assertEqual(len([v.filename for v in self.dbu.getFiles(product=13, newest_version=True)]), 22)
         newest_files = set([
                          u'ect_rbspa_0220_377_02.ptp.gz',
                          u'ect_rbspa_0221_377_04.ptp.gz',
@@ -85,7 +83,7 @@ class DBUtilsOtherTests(TestSetup):
                          u'ect_rbspa_0387_377_02.ptp.gz',
                          u'ect_rbspa_0388_377_03.ptp.gz',
                          u'ect_rbspa_0389_377_05.ptp.gz'])
-        self.assertFalse(set([v.filename for v in self.dbu.getFilesByProduct(13, newest_version=True)]).difference(newest_files))
+        self.assertEqual(set([v.filename for v in self.dbu.getFiles(product=13, newest_version=True)]), newest_files)
 
     def test_checkIncoming(self):
         """checkIncoming"""
@@ -344,7 +342,7 @@ class DBUtilsGetTests(TestSetup):
     def test_getAllFileIds2(self):
         """getAllFileIds"""
         files = self.dbu.getAllFileIds(newest_version=True)
-        self.assertEqual(2752, len(files))
+        self.assertEqual(2848, len(files))
         self.assertEqual(len(files), len(set(files)))
 
     def test_getAllFileIds_limit(self):
@@ -513,10 +511,10 @@ class DBUtilsGetTests(TestSetup):
     def test_getFilesByDate2(self):
         """getFilesByDate, newest_version=True"""
         val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)] * 2, newest_version=True)
-        self.assertEqual(2, len(val))
+        self.assertEqual(129, len(val))
         filenames = sorted([v.filename for v in val])
-        ans = [u'rbsp-a_magnetometer_uvw_emfisis-Quick-Look_20130910_v1.3.1.cdf',
-               u'rbsp-b_magnetometer_uvw_emfisis-Quick-Look_20130910_v1.3.1.cdf']
+        ans = [u'ect_rbspa_0377_344_02.ptp.gz', 
+               u'ect_rbspa_0377_345_01.ptp.gz']
         self.assertEqual(ans, filenames[:len(ans)])
 
     def test_getFilesByProduct(self):
@@ -529,7 +527,7 @@ class DBUtilsGetTests(TestSetup):
         val = self.dbu.getFilesByProduct(187)
         self.assertEqual(90, len(val))
         val = self.dbu.getFilesByProduct(187, newest_version=True)
-        self.assertEqual(23, len(val))
+        self.assertEqual(24, len(val))
         filenames = [v.filename for v in self.dbu.getFilesByProduct(187, newest_version=True)]
         self.assertTrue('ect_rbspb_0380_381_02.ptp.gz' in filenames)
 
@@ -1229,10 +1227,10 @@ class TestWithtestDB(unittest.TestCase):
         """Tests all of the release stuff, it's all intertwined anyway"""
         self.dbu.tag_release(1)
 
-        ans = ['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw',
+        ans = set(['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw',
                'testDB_000_sec.raw', 'testDB_001.rot', 'testDB_000.rot',
-               'testDB_001_first.raw', 'testDB_000_first.raw']
-        self.assertEqual(ans, self.dbu.list_release(1, fullpath=False))
+               'testDB_001_first.raw', 'testDB_000_first.raw'])
+        self.assertEqual(ans, set(self.dbu.list_release(1, fullpath=False)))
         # Test additional release options
         self.dbu.addRelease('testDB_000.cat', 2, commit=True)
         self.assertEqual([self.tempD + '/L1/testDB_000.cat'], self.dbu.list_release(2, fullpath=True))
