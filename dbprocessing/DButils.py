@@ -611,13 +611,11 @@ class DButils(object):
         removes a file from the DB
 
         :param filename: name of the file to remove (or a list of names)
-        :param recursive: remove all files that depend on the Given(unimplemented)
+        :param recursive: remove all files that depend on the Given
 
         if recursive then it removes all files that depend on the one to remove
 
         >>>  pnl._purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
-
-        # TODO: make the recurive parameter actually do anything
         """
         if not hasattr(filename, '__iter__'):  # if not an iterable make it a iterable
             filename = [filename]
@@ -630,6 +628,12 @@ class DButils(object):
                     pass
             else:
                 pass  # just use the id without a lookup
+
+            if recursive:
+                ids = self.session.query(self.Filefilelink.resulting_file).filter_by(source_file=f).all()
+                for fid in ids:
+                    self._purgeFileFromDB(filename=fid.resulting_file, recursive=True, verbose=verbose)
+
             if verbose:
                 print(ii, len(filename), f)
 
