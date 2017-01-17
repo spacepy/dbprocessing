@@ -1301,7 +1301,6 @@ class DButils(object):
                 met_start_time=None,
                 met_stop_time=None,
                 product_id=None,
-                newest_version=None,
                 shasum=None,
                 process_keywords=None):
         """
@@ -1360,7 +1359,6 @@ class DButils(object):
         d1.met_start_time = met_start_time
         d1.met_stop_time = met_stop_time
         d1.exists_on_disk = exists_on_disk
-        d1.newest_version = newest_version
         d1.shasum = shasum
         d1.process_keywords = process_keywords
         self.session.add(d1)

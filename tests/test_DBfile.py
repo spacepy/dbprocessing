@@ -41,7 +41,6 @@ class DBfileTests(unittest.TestCase):
         dbf.diskfile.params['product_id'] = 1
         dbf.diskfile.params['shasum'] = Diskfile.calcDigest(self.tempD + fname)
         dbf.diskfile.params['version'] = Version.Version(1, 2, 3)
-        dbf.diskfile.params['newest_version'] = 1
 
         return dbf
 

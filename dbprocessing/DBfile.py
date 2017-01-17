@@ -41,25 +41,11 @@ class DBfile(object):
 
         self.dbu = dbu
         self.diskfile = diskfile
-        self.checkVersion()
 
     def __repr__(self):
         return "<DBfile.DBfile object: {0}>".format(self.diskfile.infile)
 
     __str__ = __repr__
-
-    def checkVersion(self):
-        """
-        Checks the DBfile to see if it is the newest version
-
-        .. todo:: This makes no sense.
-        
-        :return: True the file is newest, False it is not
-        :rtype: bool
-        """
-
-        self.diskfile.params['newest_version'] = True
-        return True
 
     def addFileToDB(self):
         """
@@ -83,7 +69,6 @@ class DBfile(object):
                                 caveats=self.diskfile.params['caveats'],
                                 met_start_time=self.diskfile.params['met_start_time'],
                                 met_stop_time=self.diskfile.params['met_stop_time'],
-                                newest_version=self.diskfile.params['newest_version'],
                                 shasum=self.diskfile.params['shasum'],
                                 process_keywords=self.diskfile.params['process_keywords'])
         return f_id

@@ -111,7 +111,6 @@ class Diskfile(object):
         self.params['version'] = None
         self.params['filefilelink'] = None
         self.params['filecodelink'] = None
-        self.params['newest_version'] = None
         self.params['process_keywords'] = None
 
         self.dbu = dbu

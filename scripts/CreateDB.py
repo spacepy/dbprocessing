@@ -146,7 +146,6 @@ class dbprocessing_db(object):
                                   schema.Column('product_id', types.Integer,
                                                 schema.ForeignKey('product.product_id'), nullable=False),
                                   schema.Column('shasum', types.String(40), nullable=True),
-                                  schema.Column('newest_version', types.Boolean, nullable=False),
                                   schema.Column('process_keywords', types.Text, nullable=True),
                                   schema.CheckConstraint('utc_stop_time is not NULL OR met_stop_time is not NULL'),
                                   schema.CheckConstraint('utc_start_time is not NULL OR met_start_time is not NULL'),

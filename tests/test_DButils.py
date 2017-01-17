@@ -490,10 +490,10 @@ class DBUtilsGetTests(TestSetup):
                'ect_rbspb_0377_381_02.ptp.gz',
                'ect_rbspb_0377_381_01.ptp.gz']
         self.assertEqual(ans, [v.filename for v in val])
-        # WARNING: calling newest_version=True returns FILENAME, not DButils.File
+
         val = self.dbu.getFilesByProductDate(187, [datetime.date(2013, 9, 10)] * 2, newest_version=True)
         self.assertEqual(1, len(val))
-        self.assertEqual(['ect_rbspb_0377_381_05.ptp.gz'], val)
+        self.assertEqual('ect_rbspb_0377_381_05.ptp.gz', val[0].filename)
 
     def test_getFilesByDate1(self):
         """getFilesByDate, newest_version=False"""
@@ -980,7 +980,6 @@ class TestWithtestDB(unittest.TestCase):
                                utc_start_time=datetime.datetime(2010, 1, 1, 0, 0, 0),
                                utc_stop_time=datetime.datetime(2010, 1, 2, 0, 0, 0),
                                product_id=productID,
-                               newest_version=1,
                                shasum='0'
                                )
         return fID
@@ -1045,7 +1044,6 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(datetime.datetime(2010, 1, 1, 0, 0), i.utc_start_time)
         self.assertEqual(datetime.datetime(2010, 1, 2, 0, 0), i.utc_stop_time)
         self.assertEqual(1, i.product_id)
-        self.assertEqual(1, i.newest_version)
         self.assertEqual('0', i.shasum)
 
     def test_addInstrument(self):
