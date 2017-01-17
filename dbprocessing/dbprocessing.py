@@ -370,7 +370,13 @@ class ProcessQueue(object):
         # things made here will also have to have inspectors
         raise (NotImplementedError('Not yet implemented'))
 
-    def _reprocessBy(self, id_in, code=False, prod=False, inst=False, level=None, startDate=None, endDate=None,
+    def _reprocessBy(self,
+                     startDate="1970-01-01",
+                     endDate="2070-01-01",
+                     level=None,
+                     product=None,
+                     code=None,
+                     instrument=None,
                      incVersion=2):
         """
         given a code_id (or name) add all files that this code touched to processqueue
@@ -386,142 +392,63 @@ class ProcessQueue(object):
         """
         # 1) get all the files made by this code
         # 2) get all the parents of the 1) files
-        # 3) add all these back to the processqueue (use set as duplicates breaks things)
-        if code:
-            code_id = self.dbu.getCodeID(id_in)  # allows name or id
-            files = self.dbu.getFilesByCode(code_id)
-        elif prod:
-            prod_id = self.dbu.getProductID(id_in)
-            files = self.dbu.getFilesByProduct(prod_id)
-        elif inst:
-            inst_id = self.dbu.getInstrumentID(id_in)
-            prods = self.dbu.getProductsByInstrument(inst_id)
-            if level is not None:  # cull the list by level
-                prods2 = []
-                for prod in prods:
-                    ptb = self.dbu.getTraceback('Product', prod)
-                    if ptb['product'].level == level:
-                        prods2.append(ptb['product'].product_id)
-                prods = prods2
-            for prod in prods:  # add them all to be reprocessed
-                self.reprocessByProduct(prod, startDate=startDate, endDate=endDate, incVersion=incVersion)
-        else:
-            raise (ValueError('No reprocess by specified'))
-        # files before this date are removed from the list
-        if startDate is not None:
-            files = [val for val in files if val.utc_file_date >= startDate]
-        # files after this date are removed from the list
-        if endDate is not None:
-            files = [val for val in files if val.utc_file_date <= endDate]
-        f_ids = [val.file_id for val in files]
-        parents = [self.dbu.getFileParents(val, id_only=True) for val in f_ids]
-        filesToReprocess = set(Utils.flatten(parents))
-        for f in filesToReprocess:
-            try:
-                self.dbu.Processqueue.push(f, incVersion)
-            except filesToReprocess:
-                pass
-        return len(filesToReprocess)
+        # 3) add all these back to the processqueue (use set as duplicates
+        # breaks things)
 
-    # TODO can functools.partial help here?
-    def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=2):
-        return (
-            self._reprocessBy(id_in, code=True, prod=False, startDate=startDate, endDate=endDate,
-                              incVersion=incVersion))
-
-    def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=None):
         if isinstance(startDate, datetime.datetime):
             startDate = startDate.date()
         if isinstance(endDate, datetime.datetime):
             endDate = endDate.date()
+        f_ids = [val.file_id for val in self.dbu.getFiles(startDate=startDate,
+                                                          endDate=endDate,
+                                                          level=level,
+                                                          product=product,
+                                                          code=code,
+                                                          instrument=instrument,
+                                                          newest_version=True)]
+
+        parents = [self.dbu.getFileParents(val, id_only=True) for val in f_ids]
+        filesToReprocess = set(Utils.flatten(parents))
+        return self.dbu.Processqueue.rawadd(filesToReprocess, incVersion)
+
+    def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=2):
+        try:
+            code_id = self.dbu.getCodeID(id_in)
+        except DButils.DBNoData:
+            print('No code_id {0} found in the DB'.format(id_in))
+            return None
+        return self._reprocessBy(code=code_id, startDate=startDate, endDate=endDate,
+                                 incVersion=incVersion)
+
+    def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=None):
         try:
             prod_id = self.dbu.getProductID(id_in)
         except DButils.DBNoData:
             print('No product_id {0} found in the DB'.format(id_in))
             return None
 
-        if startDate is None and endDate is None:
-            files = self.dbu.getFilesByProduct(prod_id, newest_version=True)
-        else:
-            if startDate is None:
-                startDate = datetime.date(1950, 1, 1)
-            elif endDate is None:
-                endDate = datetime.date(2100, 1, 1)
-            files = self.dbu.getFilesByProductDate(prod_id, [startDate, endDate], newest_version=True)
-
-        file_ids = [self.dbu.getFileID(f) for f in files]
-        added = self.dbu.Processqueue.push(file_ids, incVersion)
-        if added is None:
-            added = []
-        return len(added)
+        return self._reprocessBy(product=prod_id, startDate=startDate, endDate=endDate,
+                                 incVersion=incVersion)
 
     def reprocessByDate(self, startDate=None, endDate=None, incVersion=None):
-        if isinstance(startDate, datetime.datetime):
-            startDate = startDate.date()
-        if isinstance(endDate, datetime.datetime):
-            endDate = endDate.date()
-
-        if startDate is None or endDate is None:
-            raise (ValueError("Must specifiy start and end dates"))
-
-        files = self.dbu.getFilesByDate([startDate, endDate], newest_version=False)
-        file_ids = [f.file_id for f in files]
-
-        # we can rawadd here as we know all the ids are valid since they came from the db
-        nadded = self.dbu.Processqueue.rawadd(file_ids)  # incVersion doesn't work anyway now 6-Jun-2016 BAL
-        # added = self.dbu.Processqueue.push(file_ids, incVersion)
-        return nadded
+        return self._reprocessBy(startDate=startDate, endDate=endDate,
+                                 incVersion=incVersion)
 
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=None):
-        files = self.dbu.getFilesByInstrument(id_in, level=level, id_only=False)
-        # files before this date are removed from the list
-        if startDate is not None:
-            files = [val for val in files if val.utc_file_date >= startDate]
-        # files after this date are removed from the list
-        if endDate is not None:
-            files = [val for val in files if val.utc_file_date <= endDate]
-        f_ids = [val.file_id for val in files]
-        added = self.dbu.Processqueue.push(f_ids, incVersion)
-        return len(added)
+        try:
+            inst_id = self.dbu.getInstrumentID(id_in)
+        except DButils.DBNoData:
+            print('No inst_id {0} found in the DB'.format(id_in))
+            return None
+
+        return self._reprocessBy(instrument=inst_id, level=level, startDate=startDate, endDate=endDate,
+                                 incVersion=incVersion)
 
     def reprocessByAll(self, level=None, startDate=None, endDate=None):
         """
         this is a raw call into the db meant to be fast and all every file
         between the dates into the process queue
-        - there is no version incremnt allowed
+        - there is no version increment allowed
         """
-        if startDate is not None and endDate is not None and level is None:
-            files = self.dbu.session.query(self.dbu.File.file_id).filter(
-                self.dbu.File.utc_file_date >= startDate).filter(self.dbu.File.utc_file_date <= endDate).all()
-        elif startDate is not None and endDate is not None and level is not None:
-            files = self.dbu.session.query(self.dbu.File.file_id).filter(
-                self.dbu.File.utc_file_date >= startDate).filter(self.dbu.File.utc_file_date <= endDate).filter(
-                self.dbu.File.data_level == level).all()
-        elif startDate is None and endDate is not None and level is not None:
-            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date <= endDate).filter(
-                self.dbu.File.data_level == level).all()
-        elif startDate is None and endDate is None and level is not None:
-            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.data_level == level).all()
-        elif startDate is None and endDate is None and level is None:
-            files = self.dbu.session.query(self.dbu.File.file_id).all()
-        elif startDate is not None and endDate is None and level is None:
-            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date >= startDate).all()
-        elif startDate is None and endDate is not None and level is None:
-            files = self.dbu.session.query(self.dbu.File.file_id).filter(self.dbu.File.utc_file_date <= endDate).all()
-        elif startDate is not None and endDate is None and level is not None:
-            files = self.dbu.session.query(self.dbu.File.file_id).filter(
-                self.dbu.File.utc_file_date >= startDate).filter(self.dbu.File.data_level == level).all()
-
-        else:
-            raise (NotImplementedError("Sorry combination is not implemented"))
-
-        try:
-            ids = list(map(itemgetter(0), files))
-        except IndexError:
-            ids = []
-            n_added = 0
-
-        if ids:
-            n_added = self.dbu.Processqueue.rawadd(ids)
-
-        return n_added
+       return self._reprocessBy(level=level, startDate=startDate, endDate=endDate,
+                                incVersion=None)
