@@ -1361,6 +1361,11 @@ class DButils(object):
         d1.exists_on_disk = exists_on_disk
         d1.shasum = shasum
         d1.process_keywords = process_keywords
+
+        if hasattr(d1, 'newest_version'):
+            # This field is no longer used, but old databases may still have it.
+            d1.newest_version = False
+
         self.session.add(d1)
         self.commitDB()
         return d1.file_id
