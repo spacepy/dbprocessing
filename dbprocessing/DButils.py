@@ -1577,9 +1577,8 @@ class DButils(object):
             else:
                 tmp.append(i)
         invals = tmp
-        newest = list((v for fe in invals
-                       for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date] * 2, newest_version=True)))
-        newest = set([self.getEntry('File', v) for v in newest])
+        newest = set(v for fe in invals
+                       for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date] * 2, newest_version=True))
         return list(newest.intersection(invals))
 
     def getInputProductID(self, process_id):
@@ -1650,17 +1649,10 @@ class DButils(object):
         """
         Return the files in the db by product id that have data in the date specified
         """
-        files = self.getFiles(startDate=min(daterange),
+        return self.getFiles(startDate=min(daterange),
                              endDate=max(daterange),
                              product=product_id,
                              newest_version=newest_version)
-        if newest_version:
-            # The pre-newestVersionFix version of this function returned filenames,
-            # so this is maintained only for legacy reasons.
-            files = map(attrgetter('filename'), files)  # this is faster than a list comprehension
-        
-        return files
-
 
     def getFilesByDate(self, daterange, newest_version=False):
         """
