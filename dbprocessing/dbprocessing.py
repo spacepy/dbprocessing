@@ -377,18 +377,12 @@ class ProcessQueue(object):
                      product=None,
                      code=None,
                      instrument=None,
-                     incVersion=2):
+                     incVersion=None):
         """
-        given a code_id (or name) add all files that this code touched to processqueue
-            so that next -p run they will be reprocessed
-        If one adds a new code run this on the code that this is replacing
-        Force moves the file back to incoming and then removes it from the db
+        Given parameters, add all files to processqueue so that next
+        -p run they will be reprocessed
+
         incVersion sets which of the version numbers to increment {0}.{1}.{2}
-        ** this ends up being a little more aggressive as the input files are put
-           on the processqueue so all products associated with them are remade
-           ** If we want to change this then several steps need to occur:
-               1) need to have a way to tell buildchildren or _runner to only use
-                   certain codes
         """
         # 1) get all the files made by this code
         # 2) get all the parents of the 1) files

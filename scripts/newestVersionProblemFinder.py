@@ -111,7 +111,11 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission database")
-
+    parser.add_option("--settest", dest="settest", default=True, action="store_true",
+                      help="Run the tests that compare the results of the \
+                      old and new implementations of newest_version")
+    parser.add_option("--errortest", dest="errortest", default=True, action="store_true",
+                      help="Check if any file has a newer file_create_date but lower version number")
 
     (options, args) = parser.parse_args()
     if len(args) != 0:
@@ -119,33 +123,35 @@ if __name__ == "__main__":
 
     dbu = DButils.DButils(options.mission)
 
-    new = set(dbu.getAllFilenames(fullPath=False, newest_version=True))
-    old1 = set()
-    old2 = set()
+    if options.settest:
+        new = set(dbu.getAllFilenames(fullPath=False, newest_version=True))
+        old1 = set()
+        old2 = set()
 
-    prods = dbu.getAllProducts(id_only=True)
+        prods = dbu.getAllProducts(id_only=True)
 
-    for p in prods:
-        old1.update(oldGetFilesByProductDate(dbu, p, [date(1970, 1, 1), date(2070, 1, 1)], True))
-        old2.update(d.filename for d in oldGetFilesByProduct(dbu, p, True))
+        for p in prods:
+            old1.update(oldGetFilesByProductDate(dbu, p, [date(1970, 1, 1), date(2070, 1, 1)], True))
+            old2.update(d.filename for d in oldGetFilesByProduct(dbu, p, True))
 
-    print("Sizes - New: {0}, getFilesByProductDate: {1}, getFilesByProduct: {2}".format(len(new), len(old1), len(old2)))
+        print("Sizes - New: {0}, getFilesByProductDate: {1}, getFilesByProduct: {2}".format(len(new), len(old1), len(old2)))
 
-    for x in new - old1:
-        print("{0} in new but not getFilesByProductDate".format(x))
+        for x in new - old1:
+            print("{0} in new but not getFilesByProductDate".format(x))
 
-    for y in old1 - new:
-        print("{0} in getFilesByProductDate but not new".format(y))
+        for y in old1 - new:
+            print("{0} in getFilesByProductDate but not new".format(y))
 
-    for x in new - old2:
-        print("{0} in new but not getFilesByProduct".format(x))
+        for x in new - old2:
+            print("{0} in new but not getFilesByProduct".format(x))
 
-    for y in old2 - new:
-        print("{0} in getFilesByProduct but not new".format(y))
+        for y in old2 - new:
+            print("{0} in getFilesByProduct but not new".format(y))
 
-    files = dbu.getFiles(newest_version=True)
-    for f in files:
-        files2 = dbu.getFiles(product=f.product_id, startDate=f.utc_file_date, endDate=f.utc_file_date)
-        for f2 in files2:
-            if f.file_create_date < f2.file_create_date:
-                print('{0} is the "Newest Version", however was created after {1}'.format(f.filename, f2.filename))
+    if options.errortest:
+        files = dbu.getFiles(newest_version=True)
+        for f in files:
+            files2 = dbu.getFiles(product=f.product_id, startDate=f.utc_file_date, endDate=f.utc_file_date)
+            for f2 in files2:
+                if f.file_create_date < f2.file_create_date:
+                    print('{0} is the "Newest Version", however was created after {1}'.format(f.filename, f2.filename))
