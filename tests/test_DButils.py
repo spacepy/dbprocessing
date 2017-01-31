@@ -57,9 +57,9 @@ class DBUtilsOtherTests(TestSetup):
     """Tests that are not processqueue or get or add"""
 
     def test_newest_version(self):
-        """"""
-        self.assertEqual(len([v.filename for v in self.dbu.getFiles(product=13, newest_version=False)]), 75)
-        self.assertEqual(len([v.filename for v in self.dbu.getFiles(product=13, newest_version=True)]), 22)
+        """Test for newest_version"""
+        ans = [v.filename for v in self.dbu.getFilesByProduct(13, newest_version=True)]
+        self.assertEqual(len(ans), 21)
         newest_files = set([
                          u'ect_rbspa_0220_377_02.ptp.gz',
                          u'ect_rbspa_0221_377_04.ptp.gz',
@@ -83,7 +83,7 @@ class DBUtilsOtherTests(TestSetup):
                          u'ect_rbspa_0387_377_02.ptp.gz',
                          u'ect_rbspa_0388_377_03.ptp.gz',
                          u'ect_rbspa_0389_377_05.ptp.gz'])
-        self.assertEqual(set([v.filename for v in self.dbu.getFiles(product=13, newest_version=True)]), newest_files)
+        self.assertEqual(ans, newest_files)
 
     def test_checkIncoming(self):
         """checkIncoming"""
