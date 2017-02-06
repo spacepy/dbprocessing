@@ -20,9 +20,6 @@ if __name__ == '__main__':
 
     if len(args) < 1:
         parser.error("incorrect number of arguments")
-    
-    if options.recursive:
-        raise(NotImplementedError("Recursive removal not implemented in DButils yet"))
 
     dbu = DButils.DButils(options.mission)
     dbu._purgeFileFromDB(args, recursive=options.recursive, verbose=options.verbose)

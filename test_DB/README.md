@@ -14,7 +14,7 @@ testDB_{set}.rot format.
 How to run this:
 ----------------
 Eventually, this will be a full unittest suite and will simply be run that way,
-but for now scripts/runThisThing.sh will execute the needed scripts to run the
+but for now scripts/functionalTest.sh will execute the needed scripts to run the
 entire dbprocessing chain.
 
 

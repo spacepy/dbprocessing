@@ -403,27 +403,17 @@ class DButils(object):
         if sq:
             self.commitDB()
 
-    def _processqueueGetAll(self, version_bump=None):
+    def _processqueueGetAll(self, version_bump=False):
         """
         Return the entire contents of the process queue
         """
-        if version_bump is None:
-            try:
-                pqdata = self.session.query(self.Processqueue.file_id).all()
-                pqdata = map(itemgetter(0), pqdata)
-            except (IndexError, TypeError):
-                pqdata = self.session.query(self.Processqueue.file_id).all()
-            ans = pqdata
-        else:
-            pqdata1 = self.session.query(self.Processqueue.file_id).all()
-            pqdata2 = self.session.query(self.Processqueue.version_bump).all()
-            try:
-                pqdata1 = list(map(itemgetter(0), pqdata1))
-                pqdata2 = list(map(itemgetter(0), pqdata2))
-            except (IndexError, TypeError):
-                pass
+        pqdata = self.session.query(self.Processqueue).all()
 
-            ans = zip(pqdata1, pqdata2)
+        if version_bump:
+            ans = zip(map(attrgetter('file_id'), pqdata), map(attrgetter('version_bump'), pqdata))
+        else:
+            ans = map(attrgetter('file_id'), pqdata)
+
         DBlogging.dblogger.debug("Entire Processqueue was read: {0} elements returned".format(len(ans)))
         return ans
 
