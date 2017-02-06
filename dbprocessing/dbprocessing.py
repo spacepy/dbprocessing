@@ -178,7 +178,7 @@ class ProcessQueue(object):
                 self.session.rollback()
                 raise (DButils.DBError(IE))
             # add to processqueue for later processing
-            self.dbu.Processqueue.push(f.file_id)
+            self.dbu.Processqueue.push(f_id)
             return f_id
         else:
             return None
