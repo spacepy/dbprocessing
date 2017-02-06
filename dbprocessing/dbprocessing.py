@@ -444,5 +444,5 @@ class ProcessQueue(object):
         between the dates into the process queue
         - there is no version increment allowed
         """
-       return self._reprocessBy(level=level, startDate=startDate, endDate=endDate,
+        return self._reprocessBy(level=level, startDate=startDate, endDate=endDate,
                                 incVersion=None)
