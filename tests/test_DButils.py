@@ -58,8 +58,8 @@ class DBUtilsOtherTests(TestSetup):
 
     def test_newest_version(self):
         """Test for newest_version"""
-        ans = [v.filename for v in self.dbu.getFilesByProduct(13, newest_version=True)]
-        self.assertEqual(len(ans), 21)
+        ans = set([v.filename for v in self.dbu.getFilesByProduct(13, newest_version=True)])
+        self.assertEqual(len(ans), 22)
         newest_files = set([
                          u'ect_rbspa_0220_377_02.ptp.gz',
                          u'ect_rbspa_0221_377_04.ptp.gz',
