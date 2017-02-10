@@ -120,7 +120,11 @@ class Diskfile(object):
     def __repr__(self):
         return "<Diskfile.Diskfile object: {0}>".format(self.infile)
 
-    __str__ = __repr__
+    def __str__(self):
+        out = ""
+        for key, value in self.params.items():
+            out += "params['{0}'] = {1}\n".format(key, value)
+        return out
 
     def checkAccess(self):
         """
