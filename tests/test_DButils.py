@@ -89,7 +89,6 @@ class DBUtilsOtherTests(TestSetup):
 
     def test_checkIncoming(self):
         """checkIncoming"""
-        """checkIncoming"""
         self.assertFalse(self.dbu.checkIncoming())
         e = self.dbu.getEntry('Mission', 1)
         e.incoming_dir = os.path.abspath(os.path.dirname(__file__))
