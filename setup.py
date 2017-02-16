@@ -5,7 +5,6 @@ __author__ = 'Brian Larsen <balarsen@lanl.gov>'
 __version__ = '0.0'
 
 from distutils.core import setup
-import os
 
 scripts = ('scripts/addFromConfig.py', 'scripts/missingFilesByProduct.py',
            'scripts/addVerboseProvenance.py', 'scripts/missingFiles.py',
@@ -27,7 +26,7 @@ scripts = ('scripts/addFromConfig.py', 'scripts/missingFilesByProduct.py',
            'scripts/magephem_dataToIncoming.py', 'scripts/writeDBhtml.py',
            'scripts/magephem_def_dataToIncoming.py', 'scripts/writeProcessConf.py',
            'scripts/magephem-pre-CoverageHTML.py', 'scripts/writeProductsConf.py',
-           'scripts/makeLatestSymlinks.py')
+           'scripts/makeLatestSymlinks.py', 'scripts/testInspector.py')
 
 setup(name='dbprocessing',
       version='0.0',

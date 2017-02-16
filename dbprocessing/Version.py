@@ -108,66 +108,10 @@ class Version(object):
         self.revision += 1
         self._checkVersion()
 
-    def __eq__(self, other):
-        """
-        Same version numbers is equal
-
-        :param other: The other Version object
-        :type other: Version
-        """
-        if self.interface == other.interface:
-            if self.quality == other.quality:
-                if self.revision == other.revision:
-                    return True
-        return False
-
-
-    def __ne__(self, other):
-        """
-        Different version numbers are not equal
-
-        :param other: The other Version object
-        :type other: Version
-        """
-        return not self.__eq__(other)
-
-    def __gt__(self, other):
-        """
-        Greater than starts with interface then to quality then to revision
-
-        :param other: The other Version object
-        :type other: Version
-        """
-        val_s = 10000 * self.interface + 100 * self.quality + self.revision
-        val_o = 10000 * other.interface + 100 * other.quality + other.revision
-        return val_s > val_o
-
-    def __lt__(self, other):
-        """
-        Less than starts with interface then to quality then to revision
-
-        :param other: The other Version object
-        :type other: Version
-        """
-        return not self.__gt__(other) and not self.__eq__(other)
-
-    def __le__(self, other):
-        """
-        Less equal starts with interface then to quality then to revision
-
-        :param other: The other Version object
-        :type other: Version
-        """
-        return self.__eq__(other) or self.__lt__(other)
-
-    def __ge__(self, other):
-        """
-        Greater equal starts with interface then to quality then to revision
-
-        :param other: The other Version object
-        :type other: Version
-        """
-        return self.__eq__(other) or self.__gt__(other)
+    def __cmp__(self, other):
+        left = (self.interface, self.quality, self.revision)
+        right = (other.interface, other.quality, other.revision)
+        return cmp(left, right)
 
     def __sub__(self, other):
         """
