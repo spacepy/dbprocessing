@@ -79,13 +79,7 @@ class Diskfile(object):
         :type dbu: :class:`.DButils`
         """
         self.infile = infile
-        try:
-            self.checkAccess()
-        except WriteError:
-            print("!!!No write access on {0}!!!".format(self.infile))
-        except ReadError:
-            print("!!!No read access on {0}!!!".format(self.infile))
-
+        self.checkAccess()
 
         self.path = os.path.dirname(self.infile)
         self.filename = os.path.basename(self.infile)
@@ -100,7 +94,6 @@ class Diskfile(object):
         self.params['verbose_provenance'] = None
         self.params['quality_comment'] = None
         self.params['caveats'] = None
-        self.params['release_number'] = None
         self.params['file_create_date'] = None
         self.params['met_start_time'] = None
         self.params['met_stop_time'] = None
@@ -109,8 +102,6 @@ class Diskfile(object):
         self.params['product_id'] = None
         self.params['shasum'] = None
         self.params['version'] = None
-        self.params['filefilelink'] = None
-        self.params['filecodelink'] = None
         self.params['process_keywords'] = None
 
         self.dbu = dbu
@@ -133,11 +124,6 @@ class Diskfile(object):
         # need both read and write access
         self.READ_ACCESS = os.access(self.infile, os.R_OK)
         if not self.READ_ACCESS:
-#            # TODO this is a pngwalk hack
-#            glb = glob.glob(self.infile + '*.png')
-#            if len(glb) == 1:
-#                self.infile = glb[0]
-#            else:
             DBlogging.dblogger.debug("{0} read access denied!".format(self.infile))
             raise(ReadError("file is not readable, does it exist? {0}".format(self.infile)))
         self.WRITE_ACCESS = os.access(self.infile, os.W_OK) | os.path.islink(self.infile)

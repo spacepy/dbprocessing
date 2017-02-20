@@ -1292,7 +1292,8 @@ class DButils(object):
                 met_stop_time=None,
                 product_id=None,
                 shasum=None,
-                process_keywords=None):
+                process_keywords=None,
+                quality_checked=None):
         """
         Add a datafile to the database
 
@@ -1351,6 +1352,7 @@ class DButils(object):
         d1.exists_on_disk = exists_on_disk
         d1.shasum = shasum
         d1.process_keywords = process_keywords
+        d1.quality_checked = quality_checked
 
         if hasattr(d1, 'newest_version'):
             # This field is no longer used, but old databases may still have it.
