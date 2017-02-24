@@ -349,12 +349,12 @@ class DButils(object):
 
     def checkDiskForFile(self, file_id, fix=False):
         """
-        Check the filesystem to see if the file exits or not as it says in the db
+        Check the file system to see if the file exits or not as it says in the db
 
         :param file_id: id of the file to check
         :type file_id: int
 
-        :keyword fix: (optional) set to have the DB fixed to match the filesystem
+        :keyword fix: (optional) set to have the DB fixed to match the file system
            this is **NOT** sure to be safe
         :type fix: bool
 
@@ -392,7 +392,7 @@ class DButils(object):
         """
         remove a file from the queue by name or number
         """
-        # if the input is a filename need to handle that
+        # if the input is a file name need to handle that
         if not hasattr(item, '__iter__'):
             item = [item]
         for ii, v in enumerate(item):
@@ -442,7 +442,7 @@ class DButils(object):
                 return outval
 
         # first filter() takes care of putting in values that are not in the DB.  It is silent
-        # second filter() takes care of not readding files that are alereadhy in the queue
+        # second filter() takes care of not reading files that are already in the queue
         subq = self.session.query(self.Processqueue.file_id).subquery()
 
         fileid = (self.session.query(self.File.file_id)
@@ -2009,7 +2009,7 @@ class DButils(object):
         """
         Check files in the DB, return inconsistent files and why
 
-        :return: A list of tupals with the resuls. 1 is a bad checksum, 2 is not found
+        :return: A list of tuple with the results. 1 is a bad checksum, 2 is not found
         """
         files = self.getAllFilenames(fullPath=False, limit=limit)
         ## check of existence and checksum
