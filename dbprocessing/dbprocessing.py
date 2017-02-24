@@ -202,7 +202,7 @@ class ProcessQueue(object):
                 id = self.dbu.getFileID(self.basename)
                 DBlogging.dblogger.info(
                     'File {0}:{1} was already in DB, not inspecting'.format(id, self.basename))
-                print('{1}:{2} Removed from incoming: {0} - rejected'.format(self.basename, ii, len(vals)))
+                print('{1}:{2} Removed from incoming: {0} - rejected'.format(self.basename, ii, len(self.queue)))
                 self.moveToError(self.filename)
                 continue
             except DButils.DBNoData:
@@ -211,7 +211,7 @@ class ProcessQueue(object):
             df = self.figureProduct()
             if df != []:
                 self.diskfileToDB(df)
-                print('{1}:{2} Removed from incoming: {0} - ingested'.format(self.basename, ii, len(vals)))
+                print('{1}:{2} Removed from incoming: {0} - ingested'.format(self.basename, ii, len(self.queue)))
 
     def figureProduct(self, filename=None):
         """
