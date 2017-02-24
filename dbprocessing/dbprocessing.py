@@ -194,7 +194,7 @@ class ProcessQueue(object):
         else:
             vals = self.queue
 
-        for val in vals:
+        for ii, val in enumerate(vals, 1):
             self.set_filename(val)
             DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.basename, len(self.queue)))
             # see if the file is in the db, if so then don't call the inspectors
@@ -202,7 +202,7 @@ class ProcessQueue(object):
                 id = self.dbu.getFileID(self.basename)
                 DBlogging.dblogger.info(
                     'File {0}:{1} was already in DB, not inspecting'.format(id, self.basename))
-                print('Removed from incoming: {0}'.format(self.basename))
+                print('{1}:{2} Removed from incoming: {0} - rejected'.format(self.basename, ii, len(vals)))
                 self.moveToError(self.filename)
                 continue
             except DButils.DBNoData:
@@ -211,7 +211,7 @@ class ProcessQueue(object):
             df = self.figureProduct()
             if df != []:
                 self.diskfileToDB(df)
-                print('Removed from incoming: {0}'.format(self.basename))
+                print('{1}:{2} Removed from incoming: {0} - ingested'.format(self.basename, ii, len(vals)))
 
     def figureProduct(self, filename=None):
         """
