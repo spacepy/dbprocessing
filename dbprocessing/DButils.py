@@ -1930,7 +1930,7 @@ class DButils(object):
         """
         Return the error path for the current mission
         """
-        return os.path.join(self.MissionDirectory, 'errors/')
+        return os.path.join(self.CodeDirectory, 'errors/')
 
     def getFilecodelink_byfile(self, file_id):
         """
