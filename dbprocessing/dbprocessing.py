@@ -384,11 +384,6 @@ class ProcessQueue(object):
 
         incVersion sets which of the version numbers to increment {0}.{1}.{2}
         """
-        # 1) get all the files made by this code
-        # 2) get all the parents of the 1) files
-        # 3) add all these back to the processqueue (use set as duplicates
-        # breaks things)
-
         if isinstance(startDate, datetime.datetime):
             startDate = startDate.date()
         if isinstance(endDate, datetime.datetime):
@@ -401,28 +396,23 @@ class ProcessQueue(object):
                                                           instrument=instrument,
                                                           newest_version=True)]
 
-        parents = [self.dbu.getFileParents(val, id_only=True) for val in f_ids]
-        filesToReprocess = set(Utils.flatten(parents))
-        return self.dbu.Processqueue.rawadd(filesToReprocess, incVersion)
+        return self.dbu.Processqueue.rawadd(f_ids, incVersion)
 
     def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=2):
         try:
             code_id = self.dbu.getCodeID(id_in)
+            return self._reprocessBy(code=code_id, startDate=startDate, endDate=endDate,
+                                     incVersion=incVersion)
         except DButils.DBNoData:
-            print('No code_id {0} found in the DB'.format(id_in))
-            return None
-        return self._reprocessBy(code=code_id, startDate=startDate, endDate=endDate,
-                                 incVersion=incVersion)
-
+            DBlogging.dblogger.error('No code_id {0} found in the DB'.format(id_in))
+            
     def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=None):
         try:
             prod_id = self.dbu.getProductID(id_in)
+            return self._reprocessBy(product=prod_id, startDate=startDate, endDate=endDate,
+                                     incVersion=incVersion)
         except DButils.DBNoData:
-            print('No product_id {0} found in the DB'.format(id_in))
-            return None
-
-        return self._reprocessBy(product=prod_id, startDate=startDate, endDate=endDate,
-                                 incVersion=incVersion)
+            DBlogging.dblogger.error('No product_id {0} found in the DB'.format(id_in))
 
     def reprocessByDate(self, startDate=None, endDate=None, incVersion=None):
         return self._reprocessBy(startDate=startDate, endDate=endDate,
@@ -431,12 +421,10 @@ class ProcessQueue(object):
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=None):
         try:
             inst_id = self.dbu.getInstrumentID(id_in)
+            return self._reprocessBy(instrument=inst_id, level=level, startDate=startDate, endDate=endDate,
+                                     incVersion=incVersion)
         except DButils.DBNoData:
-            print('No inst_id {0} found in the DB'.format(id_in))
-            return None
-
-        return self._reprocessBy(instrument=inst_id, level=level, startDate=startDate, endDate=endDate,
-                                 incVersion=incVersion)
+            DBlogging.dblogger.error('No inst_id {0} found in the DB'.format(id_in))
 
     def reprocessByAll(self, level=None, startDate=None, endDate=None):
         """
