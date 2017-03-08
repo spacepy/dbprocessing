@@ -142,7 +142,10 @@ def delete_unneeded(files, files_out, options):
     for f in files_out:
         if os.path.basename(f) not in files_tmp:
             try:
-                os.remove(f)
+                if os.path.islink(f):
+                    os.remove(f)
+                else:
+                    warnings.warn("Trying to remove a non link: {0}".format(os.path.abspath(f)))
             except OSError:
                 pass
             if options.verbose: print("removing unneeded link {0}".format(f))

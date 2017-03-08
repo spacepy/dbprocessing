@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser.add_option("", "--echo", dest="echo", action="store_true",
                       help="Start sqlalchemy with echo in place for debugging", default=False)
     parser.add_option("", "--glb", dest="glob", type="string",
-                      help='Glob to use when reading files from incoming: defualt "*"', default="*")
+                      help='Glob to use when reading files from incoming: default "*"', default="*")
 
 
     (options, args) = parser.parse_args()

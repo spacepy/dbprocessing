@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 from __future__ import print_function
 
 import datetime
@@ -7,6 +7,7 @@ import os
 import shutil
 import sys
 import tempfile
+import time
 import traceback
 from operator import itemgetter
 
@@ -194,7 +195,8 @@ class ProcessQueue(object):
         else:
             vals = self.queue
 
-        for val in vals:
+        T0 = time.time()
+        for ii, val in enumerate(vals, 1):
             self.set_filename(val)
             DBlogging.dblogger.debug("popped '{0}' from the queue: {1} left".format(self.basename, len(self.queue)))
             # see if the file is in the db, if so then don't call the inspectors
@@ -202,16 +204,19 @@ class ProcessQueue(object):
                 id = self.dbu.getFileID(self.basename)
                 DBlogging.dblogger.info(
                     'File {0}:{1} was already in DB, not inspecting'.format(id, self.basename))
-                print('Removed from incoming: {0}'.format(self.basename))
                 self.moveToError(self.filename)
+                T1 = time.time() - T0
+                print('{1}:{2} Removed from incoming: {0} - already present  {3:.2f}s'.format(self.basename, ii, len(self.queue), T1))
+                T0 = time.time()
                 continue
             except DButils.DBNoData:
                 DBlogging.dblogger.info('File {0} was not in DB, inspecting'.format(self.basename))
-                pass
             df = self.figureProduct()
             if df != []:
                 self.diskfileToDB(df)
-                print('Removed from incoming: {0}'.format(self.basename))
+                T1 = time.time() - T0
+                print('{1}:{2} Removed from incoming: {0} - ingested   {3:.2f}s'.format(self.basename, ii, len(self.queue), T1))
+                T0 = time.time()
 
     def figureProduct(self, filename=None):
         """
