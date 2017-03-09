@@ -31,7 +31,7 @@ from dbprocessing import DButils
 expected = ['mission', 'satellite', 'instrument', 'product', 'process']
 expected_keyword = { }
 expected_keyword['mission'] = ['incoming_dir', 'mission_name', 'rootdir',
-                               'codedir', 'inspectordir']
+                               'codedir', 'inspectordir', 'errordir']
 expected_keyword['satellite'] = ['satellite_name']
 expected_keyword['instrument'] = ['instrument_name']
 expected_keyword['product'] = ['product_name', 'relative_path',

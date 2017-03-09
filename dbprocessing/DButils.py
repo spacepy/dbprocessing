@@ -1926,11 +1926,23 @@ class DButils(object):
         inc_path = mission.incoming_dir
         return os.path.join(basedir, inc_path)
 
-    def getErrorPath(self):
+    def getErrorPath(self, mission_id=None):
         """
         Return the error path for the current mission
         """
-        return os.path.join(self.CodeDirectory, 'errors/')
+        if mission_id is None:
+            missions = self.session.query(self.Mission).all()
+            if len(missions) > 1:
+                raise (ValueError('No mission id specified and more than one mission present'))
+            else:
+                mission = missions[0]
+        else:
+            mission = self.getEntry('Mission', mission_id)
+
+        if hasattr(m, 'errordir') and m.errordir != "":
+            return m.errordir
+        else:
+            return os.path.join(self.CodeDirectory, 'errors/')
 
     def getFilecodelink_byfile(self, file_id):
         """
