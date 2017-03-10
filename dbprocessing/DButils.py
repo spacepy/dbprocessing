@@ -1939,8 +1939,8 @@ class DButils(object):
         else:
             mission = self.getEntry('Mission', mission_id)
 
-        if hasattr(m, 'errordir') and m.errordir != "":
-            return m.errordir
+        if hasattr(mission, 'errordir') and mission.errordir != "":
+            return mission.errordir
         else:
             return os.path.join(self.CodeDirectory, 'errors/')
 
