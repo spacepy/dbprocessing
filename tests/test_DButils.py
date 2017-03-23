@@ -245,11 +245,11 @@ class DBUtilsAddTests(TestSetup):
 
     def test_addMission(self):
         """addMission"""
-        self.assertEqual(self.dbu.addMission('name', '/rootdir/', '/root/incoming', '/code/', '/inspectors/'), 2)
+        self.assertEqual(self.dbu.addMission('name', '/rootdir/', '/root/incoming', '/code/', '/inspectors/', '/errors/'), 2)
         self.assertEqual(self.dbu.getEntry('Mission', 2).mission_id, 2)
 
     def test_addSatellite(self):
-        """addMission"""
+        """test_addSatellite"""
         self.assertEqual(self.dbu.addSatellite('name', 1), 3)
         self.assertEqual(self.dbu.getEntry('Satellite', 3).satellite_id, 3)
 

@@ -726,7 +726,8 @@ class DButils(object):
                    rootdir,
                    incoming_dir,
                    codedir,
-                   inspectordir):
+                   inspectordir,
+                   errordir):
         """
         Add a mission to the database
 
@@ -748,6 +749,11 @@ class DButils(object):
         m1.incoming_dir = incoming_dir.replace('{MISSION}', mission_name)
         m1.codedir = codedir.replace('{MISSION}', mission_name)
         m1.inspectordir = inspectordir.replace('{MISSION}', mission_name)
+
+        if hasattr(m1, 'newest_version'):
+            # Old DBs will not have this, new ones will
+            m1.errordir = errordir
+
         self.session.add(m1)
         self.commitDB()
         return m1.mission_id
