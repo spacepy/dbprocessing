@@ -279,10 +279,6 @@ class DBUtilsGetTests(TestSetup):
 
     def test_openDB3(self):
         """__init__ bad engine"""
-        self.assertRaises(DButils.DBError, DButils.DButils, self.sqlworking, engine='i am bogus')
-
-    def test_openDB4(self):
-        """__init__ bad engine"""
         tfile = make_tmpfile()
         try:
             self.assertRaises(AttributeError, DButils.DButils, tfile),
