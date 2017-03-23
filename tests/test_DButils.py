@@ -647,7 +647,7 @@ class DBUtilsGetTests(TestSetup):
     def test_getErrorPath(self):
         """getErrorPath"""
         self.assertEqual('/n/space_data/cda/rbsp/errors/', self.dbu.getErrorPath())
-        self.assertRaises(TypeError, self.dbu.getErrorPath, 3)
+        self.assertRaises(DButils.DBNoData, self.dbu.getErrorPath, 3)
 
     def test_getFilecodelink_byfile(self):
         """getFilecodelink_byfile"""
