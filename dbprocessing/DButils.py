@@ -554,6 +554,7 @@ class DButils(object):
         """
         go through the process queue and clear out lower versions of the same files
         this is determined by product and utc_file_date
+        also sorts by level, date
         """
         # TODO this might break with weekly input files
         DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
@@ -568,14 +569,16 @@ class DButils(object):
         file_entries = self.session.query(self.File).filter(self.File.file_id.in_(subq)).all()
 
         file_entries2 = self.file_id_Clean(file_entries)
-        inds = (file_entries.index(v) for v in file_entries2)
-        version_bumps2 = (version_bumps[i] for i in inds)
+
         # ==============================================================================
         #         # sort keep on dates, then sort keep on level
         # ==============================================================================
         # this should make them in order for each level
         file_entries2 = sorted(file_entries2, key=lambda x: x.utc_file_date, reverse=1)
         file_entries2 = sorted(file_entries2, key=lambda x: x.data_level)
+        # apply same sort/filter to version_bumps
+        version_bumps2 = (version_bumps[file_entries.index(v)] for v in file_entries2)
+
         file_entries2 = [val.file_id for val in file_entries2]
         mixed_entries = itertools.izip(file_entries2, version_bumps2)
 
@@ -1945,7 +1948,7 @@ class DButils(object):
         else:
             mission = self.getEntry('Mission', mission_id)
 
-        if hasattr(mission, 'errordir') and mission.errordir != "":
+        if hasattr(mission, 'errordir') and mission.errordir != None:
             return mission.errordir
         else:
             return os.path.join(self.CodeDirectory, 'errors/')
