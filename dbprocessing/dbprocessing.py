@@ -91,7 +91,7 @@ class ProcessQueue(object):
         """
         create a secure temp directory
         """
-        self.tempdir = tempfile.mkdtemp(suffix)
+        self.tempdir = tempfile.mkdtemp(suffix, dir='/data/scratch')
 
     def checkIncoming(self, glb='*'):
         """

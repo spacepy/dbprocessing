@@ -609,7 +609,8 @@ class DButils(object):
         # all we need to do is look at each file and see if it is latest version or not, if it is not drop it
         entries = []
         version_bump = False
-        for pq in pqdata:
+        for i, pq in enumerate(pqdata):
+            print(i, len(pqdata))
             if pq[1] is not None:
                 entries.append(pq)  # if the version_bump is these it needs to stay in the queue
                 version_bump = True

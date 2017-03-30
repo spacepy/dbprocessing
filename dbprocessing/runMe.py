@@ -34,7 +34,7 @@ def mk_tempdir(suffix='_dbprocessing'):
     """
     Create a secure temp directory
     """
-    tempdir = tempfile.mkdtemp(suffix=suffix)
+    tempdir = tempfile.mkdtemp(suffix=suffix, dir='/data/scratch')
     DBlogging.dblogger.debug("Created temp directory: {0}".format(tempdir))
     return tempdir
 
