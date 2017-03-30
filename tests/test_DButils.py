@@ -989,12 +989,10 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_fileIsNewest(self):
         """test is a specific file is the newest version"""
-        fID1 = self.addGenericFile(1, version=(1,0,0))
-        fID2 = self.addGenericFile(1, version=(1,1,0))
-        fID3 = self.addGenericFile(1, version=(1,2,0))
-        fID4 = self.addGenericFile(1, version=(1,3,0))
-        files = self.dbu.getAllFilenames(fullPath=False)
-        print(files)
+        fID1 = self.addGenericFile(1, version=(1, 0, 0))
+        fID2 = self.addGenericFile(1, version=(1, 1, 0))
+        fID3 = self.addGenericFile(1, version=(1, 2, 0))
+        fID4 = self.addGenericFile(1, version=(1, 3, 0))
         self.assertFalse(self.dbu.fileIsNewest('testing_file_1.0.0.file'))
         self.assertFalse(self.dbu.fileIsNewest('testing_file_1.1.0.file'))
         self.assertFalse(self.dbu.fileIsNewest('testing_file_1.2.0.file'))
