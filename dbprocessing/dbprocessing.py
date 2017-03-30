@@ -325,6 +325,10 @@ class ProcessQueue(object):
         go through and all the runMe's and add to the runme_list variable
         """
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
+        # if this file is not a newest_version we do not ant to run
+        if not self.dbu.fileIsNewest(file_id):
+            DBlogging.dblogger.debug("Was not newest version in buildChildren: file_id={0}".format(file_id))
+            return  # do nothing
 
         children = self.dbu.getChildrenProcesses(file_id[0])  # returns process
         daterange = self.dbu.getFileDates(file_id[0])  # this is the dates that this file spans

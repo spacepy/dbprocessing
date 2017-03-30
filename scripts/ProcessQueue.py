@@ -124,14 +124,15 @@ if __name__ == "__main__":
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
             while pq.dbu.Processqueue.len() > 0:
-                print('{0} Cleaning Processes queue'.format(DFP()))
-                # clean the queue
-                pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates and sort
-                if not pq.dbu.Processqueue.len():
-                    print("{0} Process queue is empty".format(DFP()))
-                    break
-                # this loop makes all the runMe objects for all the files in the processqueue
+                # BAL 30 Mar 2017, no need to clean here as buildChildren() will clean
+                # print('{0} Cleaning Processes queue'.format(DFP()))
+                # # clean the queue
+                # pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates and sort
+                # if not pq.dbu.Processqueue.len():
+                #     print("{0} Process queue is empty".format(DFP()))
+                #     break
 
+                # this loop makes all the runMe objects for all the files in the processqueue
                 run_num = 0
                 n_good  = 0
                 n_bad   = 0
