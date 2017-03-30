@@ -80,7 +80,7 @@ if __name__ == "__main__":
                                         newest_version=True)
     # this returns filenames
     # make it file objects
-    dbfiles = [dbu.getEntry('File', v) for v in dbfiles]
+    #dbfiles = [dbu.getEntry('File', v) for v in dbfiles]
     
     # this is then file objects for all the newest files in the date range for this product
     # find the missing days

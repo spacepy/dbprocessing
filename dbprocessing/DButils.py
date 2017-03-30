@@ -1662,7 +1662,6 @@ class DButils(object):
                  exists=None,
                  newest_version=False,
                  limit=None):
-
         # leave this on top so that we don;t have to repeat code inside the logic below
         # SQL runs group by before order by, so the ordering must be done in a subquery
         stmt = self.session.query(self.File).order_by(self.File.interface_version * 1000
@@ -1687,6 +1686,7 @@ class DButils(object):
                         .group_by(stmt.corresponding_column(self.File.utc_file_date))
         else:
             files = self.session.query(self.File)
+
 
         if level is not None:
             files = files.filter_by(data_level=level)

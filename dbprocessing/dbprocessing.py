@@ -329,23 +329,32 @@ class ProcessQueue(object):
         """
         go through and all the runMe's and add to the runme_list variable
         """
+        T0 = time.time()
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
         # if this file is not a newest_version we do not ant to run
-        print("Entered buildChildren: file_id={0}".format(file_id))
+        #print("{1}: Entered buildChildren: file_id={0}".format(file_id, time.time()-T0))
+        T0 = time.time()
         if not self.dbu.fileIsNewest(file_id[0]):
             DBlogging.dblogger.debug("Was not newest version in buildChildren: file_id={0}".format(file_id))
-            print("Was not newest version in buildChildren: file_id={0}".format(file_id))
+            #print("Was not newest version in buildChildren: file_id={0}".format(file_id))
             return  # do nothing
-        print("was newest moving on in buildChildren: file_id={0}".format(file_id))
+        #print("{1}: was newest moving on in buildChildren: file_id={0}".format(file_id, time.time()-T0))
+        T0 = time.time()
 
         children = self.dbu.getChildrenProcesses(file_id[0])  # returns process
+        #print("{1}: done self.dbu.getChildrenProcesses buildChildren: file_id={0}".format(file_id, time.time()-T0))
+        T0 = time.time()
         daterange = self.dbu.getFileDates(file_id[0])  # this is the dates that this file spans
+        #print("{1}: done self.dbu.getFileDates  buildChildren: file_id={0}".format(file_id, time.time()-T0))
+        T0 = time.time()
 
         for child_process in children:
 
             # iterate over all the days between the start and stop date from above (including stop date)
             for utc_file_date in Utils.expandDates(*daterange):
                 files, input_product_id = self._getRequiredProducts(child_process, file_id[0], utc_file_date)
+                print("{0}: self._getRequiredProducts".format(time.time()-T0))
+                T0 = time.time()
                 if not files:
                     # figure out the missing products
                     DBlogging.dblogger.debug("For file: {0} date: {1} required files not present {2}"
@@ -363,7 +372,8 @@ class ProcessQueue(object):
                 DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
                 runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self)
-
+                #print("{0}:  runMe.runMe".format(time.time()-T0))
+                #T0 = time.time()
                 # only add to runme list if it can be run
                 if runme.ableToRun and (runme not in self.runme_list):
                     self.runme_list.append(runme)
