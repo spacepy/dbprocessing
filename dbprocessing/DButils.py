@@ -559,56 +559,78 @@ class DButils(object):
 
         # BAL 30 March 2017 Trying a different method here that might be cleaner
 
-        # TODO this might break with weekly input files
-        DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
-        pqdata = self.Processqueue.getAll(version_bump=True)
-
-        file_ids = list(map(itemgetter(0), pqdata))
-        version_bumps = list(map(itemgetter(1), pqdata))
-
-        # speed this up using a sql in_ call not looping over getEntry for each one
-        # this gets all the file objects for the processqueue file_ids
-        subq = self.session.query(self.Processqueue.file_id).subquery()
-        file_entries = self.session.query(self.File).filter(self.File.file_id.in_(subq)).all()
-
-        file_entries2 = self.file_id_Clean(file_entries)
-
-        # ==============================================================================
-        #         # sort keep on dates, then sort keep on level
-        # ==============================================================================
-        # this should make them in order for each level
-        file_entries2 = sorted(file_entries2, key=lambda x: x.utc_file_date, reverse=1)
-        file_entries2 = sorted(file_entries2, key=lambda x: x.data_level)
-        # apply same sort/filter to version_bumps
-        version_bumps2 = (version_bumps[file_entries.index(v)] for v in file_entries2)
-
-        file_entries2 = [val.file_id for val in file_entries2]
-        mixed_entries = itertools.izip(file_entries2, version_bumps2)
-
-        ## now we have a list of just the newest file_id's
-        if not dryrun:
-            self.Processqueue.flush()
-            #        self.Processqueue.push(ans)
-            if not any(version_bumps2):
-                self.Processqueue.push(file_entries2)
-            else:
-                itertools.starmap(self.Processqueue.push, mixed_entries)
-            #                for v in mixed_entries:
-            #                    itertools.startmap(self.Processqueue.push, v)
-        else:
-            print(
-                '<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.Processqueue.len()))
-
-        DBlogging.dblogger.debug(
-            "Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
+        # # TODO this might break with weekly input files
+        # DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
+        # pqdata = self.Processqueue.getAll(version_bump=True)
+        #
+        # file_ids = list(map(itemgetter(0), pqdata))
+        # version_bumps = list(map(itemgetter(1), pqdata))
+        #
+        # # speed this up using a sql in_ call not looping over getEntry for each one
+        # # this gets all the file objects for the processqueue file_ids
+        # subq = self.session.query(self.Processqueue.file_id).subquery()
+        # file_entries = self.session.query(self.File).filter(self.File.file_id.in_(subq)).all()
+        #
+        # file_entries2 = self.file_id_Clean(file_entries)
+        #
+        # # ==============================================================================
+        # #         # sort keep on dates, then sort keep on level
+        # # ==============================================================================
+        # # this should make them in order for each level
+        # file_entries2 = sorted(file_entries2, key=lambda x: x.utc_file_date, reverse=1)
+        # file_entries2 = sorted(file_entries2, key=lambda x: x.data_level)
+        # # apply same sort/filter to version_bumps
+        # version_bumps2 = (version_bumps[file_entries.index(v)] for v in file_entries2)
+        #
+        # file_entries2 = [val.file_id for val in file_entries2]
+        # mixed_entries = itertools.izip(file_entries2, version_bumps2)
+        #
+        # ## now we have a list of just the newest file_id's
+        # if not dryrun:
+        #     self.Processqueue.flush()
+        #     #        self.Processqueue.push(ans)
+        #     if not any(version_bumps2):
+        #         self.Processqueue.push(file_entries2)
+        #     else:
+        #         itertools.starmap(self.Processqueue.push, mixed_entries)
+        #     #                for v in mixed_entries:
+        #     #                    itertools.startmap(self.Processqueue.push, v)
+        # else:
+        #     print(
+        #         '<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.Processqueue.len()))
+        #
+        # DBlogging.dblogger.debug(
+        #     "Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
         # # BAL 30 March 2017 new version
         # # get all the files from the process queue
-        # DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
-        # pqdata = self.Processqueue.getAll(version_bump=True)
-        # # all we need to do is look at each file and see if it is latest version or not, if it is not drop it
+        DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
+        pqdata = self.Processqueue.getAll(version_bump=True)
+        # all we need to do is look at each file and see if it is latest version or not, if it is not drop it
+        entries = []
+        version_bump = False
+        for pq in pqdata:
+            if pq[1] is not None:
+                entries.append(pq)  # if the version_bump is these it needs to stay in the queue
+                version_bump = True
+            else:
+                if self.fileIsNewest(pq[0]):
+                    entries.append(pq)  # if the file is newest_version than we keep it
+        if not dryrun:
+            self.Processqueue.flush()
+            if not version_bump:
+                self.Processqueue.rawadd(zip(*entries)[0])
+            else:
+                for f in pqdata:
+                    self.Processqueue.add(f)
+        else:
+            print(
+                '<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.Processqueue.len()))
+        DBlogging.dblogger.debug(
+            "Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
 
-    def fileIsNewest(self, filename):
+
+    def fileIsNewest(self, filename, debug=False):
         """
         quesry the database, is this filename or file_id newest version?
 
@@ -617,16 +639,16 @@ class DButils(object):
         """
         trace = self.getTraceback('File', filename)
         product_id = trace['product'].product_id
-        print('product_id', product_id )
+        if debug: print('product_id', product_id )
         date = trace['file'].utc_file_date
-        print('date', date)
+        if debug: print('date', date)
         file_id = trace['file'].file_id
-        print('file_id', file_id, trace['file'].filename)
+        if debug: print('file_id', file_id, trace['file'].filename)
         latest = self.getFilesByProductDate(product_id, [date]*2, newest_version=True)
         if len(latest) > 1:
             raise(DBError("More than one latest for a product date"))
         latest_id = latest[0].file_id
-        print('latest_id', latest_id)
+        if debug: print('latest_id', latest_id)
         return file_id == latest_id
 
     def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False, trust_id=False):
