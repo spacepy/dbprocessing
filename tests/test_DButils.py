@@ -690,6 +690,7 @@ class DBUtilsGetTests(TestSetup):
     def test_getProcessTimebase(self):
         """getProcessTimebase"""
         self.assertEqual("DAILY", self.dbu.getProcessTimebase(1))
+        self.assertEqual("DAILY", self.dbu.getProcessTimebase('rbspa_int_ect-mageis-M35-hr_L05toL1'))
 
     def test_getFilesByCode(self):
         """getFilesByCode"""
@@ -701,9 +702,9 @@ class DBUtilsGetTests(TestSetup):
                               5861, 5865]), set(ids))
 
     def test_getVersion(self):
-        """getVersion"""
-        self.assertEqual(Version.Version(1, 0, 0), self.dbu.getVersion(1))
-        self.assertEqual(Version.Version(1, 1, 0), self.dbu.getVersion(123))
+        """getFileVersion"""
+        self.assertEqual(Version.Version(1, 0, 0), self.dbu.getFileVersion(1))
+        self.assertEqual(Version.Version(1, 1, 0), self.dbu.getFileVersion(123))
 
     def test_getChildTree(self):
         """getChildTree"""

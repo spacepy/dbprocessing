@@ -1470,7 +1470,7 @@ class DButils(object):
         if '{' in path:
             file_entry = self.getEntry('File', filename)
             path = Utils.dirSubs(path, file_entry.filename, file_entry.utc_file_date, file_entry.utc_start_time,
-                                 self.getVersion(file_entry.file_id))
+                                 self.getFileVersion(file_entry.file_id))
         return path
 
     def getProcessFromInputProduct(self, product):
@@ -1662,11 +1662,24 @@ class DButils(object):
                  newest_version=False,
                  limit=None):
 
-        if newest_version:
-            # SQL runs group by before order by, so the ordering must be done in a subquery
-            stmt = self.session.query(self.File).order_by(self.File.interface_version * 1000
-                       + self.File.quality_version * 100
-                       + self.File.revision_version).subquery()
+        # leave this on top so that we don;t have to repeat code inside the logic below
+        # SQL runs group by before order by, so the ordering must be done in a subquery
+        stmt = self.session.query(self.File).order_by(self.File.interface_version * 1000
+                                                      + self.File.quality_version * 100
+                                                      + self.File.revision_version).subquery()
+
+        # do this first as the newest_version subquery get simplier
+        # which makes things a little faster on large databases
+        if product is not None:
+            if newest_version:
+                files = self.session.query() \
+                            .add_entity(self.File, alias=stmt) \
+                            .group_by(stmt.corresponding_column(self.File.utc_file_date))
+            else:
+                files = self.session.query(self.File)
+            files = files.filter_by(product_id=product)
+
+        elif newest_version:
             files = self.session.query() \
                         .add_entity(self.File, alias=stmt) \
                         .group_by(stmt.corresponding_column(self.File.product_id)) \
@@ -1676,8 +1689,7 @@ class DButils(object):
 
         if level is not None:
             files = files.filter_by(data_level=level)
-        if product is not None:
-            files = files.filter_by(product_id=product)
+
         if exists is not None:
             files = files.filter_by(exists_on_disk=exists)
         if code is not None:
@@ -2297,8 +2309,6 @@ class DButils(object):
         """
         Return the timebase for a product
         """
-        # this is two queries but allows for name or id as input
-        process_id = self.getProcessID(process_id)
         return self.getEntry('Process', process_id).output_timebase
 
     def getAllProducts(self, id_only=False):
@@ -2316,7 +2326,7 @@ class DButils(object):
         """
         # just try and get the entry
         retval = self.session.query(getattr(self, table)).get(args)
-        if retval is None:  # either this was not a valid pk or not a pk that os in the db
+        if retval is None:  # either this was not a valid pk or not a pk that is in the db
             # see if it was a name
             if ('get' + table + 'ID') in dir(self):
                 cmd = 'get' + table + 'ID'
@@ -2339,7 +2349,7 @@ class DButils(object):
         else:
             return map(attrgetter('file_id'), files)
 
-    def getVersion(self, fileid):
+    def getFileVersion(self, fileid):
         """
         Return the version instance for a file
         """

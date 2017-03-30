@@ -287,9 +287,9 @@ class ProcessQueue(object):
 
             for val, opt in input_product_id:
                 # accept a datetime.datetime or datetime.date
-                try:
+                if isinstance(utc_file_date, datetime.datetime):
                     dt = utc_file_date.date()
-                except AttributeError:
+                else:  # already a date
                     dt = utc_file_date
 
                 tmp_files = self.dbu.getFilesByProductDate(val, [dt] * 2, newest_version=True)
@@ -302,7 +302,7 @@ class ProcessQueue(object):
             DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
 
             ###############
-            # BAL 30 March 2017, dropping this clean setp as they should all be newest version per above
+            # BAL 30 March 2017, dropping this clean step as they should all be newest version per above
             # remove all the files that are not the newest version, they all should be
             # files = self.dbu.file_id_Clean(files)
             ###############

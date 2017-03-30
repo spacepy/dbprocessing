@@ -216,7 +216,7 @@ if __name__ == "__main__":
                                                                      'product{0}_glob'.format(pn)])]
 
                 if 'product{0}_version'.format(pn) in conf['plot{0}'.format(pnum)]:
-                    files = [f for f in files if (dbu.getVersion(dbu.getEntry('File', f).file_id) >=
+                    files = [f for f in files if (dbu.getFileVersion(dbu.getEntry('File', f).file_id) >=
                                                   Utils.parseVersion(
                                                       conf['plot{0}'.format(pnum)]['product{0}_version'.format(pn)]))]
                 # now that we have all the files loop through and the the dates that we have to 1
