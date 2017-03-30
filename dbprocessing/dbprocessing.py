@@ -300,8 +300,13 @@ class ProcessQueue(object):
                     files.extend(tmp_files)
 
             DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
+
+            ###############
+            # BAL 30 March 2017, dropping this clean setp as they should all be newest version per above
             # remove all the files that are not the newest version, they all should be
-            files = self.dbu.file_id_Clean(files)
+            # files = self.dbu.file_id_Clean(files)
+            ###############
+
             if timebase == 'FILE':  # taking one file to the next file
                 files_out = []
                 # grab the process_keywords column for the file_id and all the possible other files
