@@ -546,19 +546,19 @@ class runMe(object):
             # get all the files for the same date and product as the parent to make sure
             #  this is the newest
             parents_all = self.dbu.getFilesByProductDate(parent.product_id, [parent.utc_file_date]*2)
-            parent_max = max(parents_all, key=lambda x: self.dbu.getVersion(x))
+            parent_max = max(parents_all, key=lambda x: self.dbu.getFileVersion(x))
 
             DBlogging.dblogger.debug("parent: {0} version: {1} parent_max {2} version {3}".format(
-                parent.file_id, self.dbu.getVersion(parent), parent_max.file_id, self.dbu.getVersion(parent_max)))
+                parent.file_id, self.dbu.getFileVersion(parent), parent_max.file_id, self.dbu.getFileVersion(parent_max)))
 
 
             # if a parent is no longer newest we need to inc
-            if self.dbu.getVersion(parent) != self.dbu.getVersion(parent_max):
+            if self.dbu.getFileVersion(parent) != self.dbu.getFileVersion(parent_max):
                 # we have a parent file for a certain date,
                 #   get all the files for that date and see if the parent is the newest
                 #   if it is then that parent has not changed, do not run
                 #   if there is a newer parent then we do need to run
-                df = self.dbu.getVersion(parent_max) - self.dbu.getVersion(parent)
+                df = self.dbu.getFileVersion(parent_max) - self.dbu.getFileVersion(parent)
                 DBlogging.dblogger.debug("Found a difference between files {0} and {1} -- {2}".format(
                     parent.file_id, parent_max.file_id, df))
 

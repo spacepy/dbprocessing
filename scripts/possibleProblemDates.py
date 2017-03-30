@@ -71,17 +71,17 @@ def wrongNewestVersion(dbu, fix=False):
 
         for date in dates:
             ftmp = [v for v in files if v.utc_file_date == date]
-            versions = [dbu.getVersion(v) for v in ftmp]
+            versions = [dbu.getFileVersion(v) for v in ftmp]
             mx = max(versions)
             commit = False
             for f in ftmp:
-                if dbu.getVersion(f) != mx and f.newest_version:
+                if dbu.getFileVersion(f) != mx and f.newest_version:
                     print('File {0}:{1} is marked newest, it should not be'.format(f.file_id, f.filename))
                     if fix:
                         f.newest_version = False
                         dbu.session.add(f)
                         commit = True
-                if dbu.getVersion(f) == mx and not f.newest_version:
+                if dbu.getFileVersion(f) == mx and not f.newest_version:
                     print('File {0}:{1} is not marked newest, it should be'.format(f.file_id, f.filename))
                     if fix:
                         f.newest_version = True

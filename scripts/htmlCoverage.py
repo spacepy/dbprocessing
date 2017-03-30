@@ -53,7 +53,7 @@ class file_(object):
         f is a dbutils file instance
         """
         self.filename = f.filename
-        self.version = dbu.getVersion(f)
+        self.version = dbu.getFileVersion(f)
         self.utc_file_date = f.utc_file_date
 
 
