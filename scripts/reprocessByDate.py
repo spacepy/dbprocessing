@@ -27,6 +27,8 @@ if __name__ == "__main__":
                       help="selected mission database", default=None)
     parser.add_option("", "--echo", dest="echo", action='store_true',
                       help="echo sql queries for debugging", default=False)
+    parser.add_option("", "--level", dest="level", type='float',
+                      help="The data level to reprocess", default=None)
 
     (options, args) = parser.parse_args()
     if len(args) != 0:
