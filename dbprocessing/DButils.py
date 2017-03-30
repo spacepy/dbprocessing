@@ -556,6 +556,9 @@ class DButils(object):
         this is determined by product and utc_file_date
         also sorts by level, date
         """
+
+        # BAL 30 March 2017 Trying a different method here that might be cleaner
+
         # TODO this might break with weekly input files
         DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
         pqdata = self.Processqueue.getAll(version_bump=True)
@@ -598,6 +601,33 @@ class DButils(object):
 
         DBlogging.dblogger.debug(
             "Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
+
+        # # BAL 30 March 2017 new version
+        # # get all the files from the process queue
+        # DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
+        # pqdata = self.Processqueue.getAll(version_bump=True)
+        # # all we need to do is look at each file and see if it is latest version or not, if it is not drop it
+
+    def fileIsNewest(self, filename):
+        """
+        quesry the database, is this filename or file_id newest version?
+
+        @param filename: filename or file_id
+        @return: Ture is file is lastest_version, False is not
+        """
+        trace = self.getTraceback('File', filename)
+        product_id = trace['product'].product_id
+        print('product_id', product_id )
+        date = trace['file'].utc_file_date
+        print('date', date)
+        file_id = trace['file'].file_id
+        print('file_id', file_id, trace['file'].filename)
+        latest = self.getFilesByProductDate(product_id, [date]*2, newest_version=True)
+        if len(latest) > 1:
+            raise(DBError("More than one latest for a product date"))
+        latest_id = latest[0].file_id
+        print('latest_id', latest_id)
+        return file_id == latest_id
 
     def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False, trust_id=False):
         """

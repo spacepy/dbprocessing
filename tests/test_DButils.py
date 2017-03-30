@@ -964,11 +964,12 @@ class TestWithtestDB(unittest.TestCase):
                                   )
         return pID
 
-    def addGenericFile(self, productID):
+    def addGenericFile(self, productID, version=(1,2,3)):
         """Adds a dummy file"""
-        fID = self.dbu.addFile(filename="testing_file.file",
+        version = Version.Version(*version)
+        fID = self.dbu.addFile(filename="testing_file_{0}.file".format(str(version)),
                                data_level=0,
-                               version=Version.Version(1, 2, 3),
+                               version=version,
                                file_create_date=datetime.date(2010, 1, 1),
                                exists_on_disk=1,
                                utc_file_date=datetime.date(2010, 1, 1),
@@ -985,6 +986,23 @@ class TestWithtestDB(unittest.TestCase):
                                      satellite_id=1
                                      )
         return iID
+
+    def test_fileIsNewest(self):
+        """test is a specific file is the newest version"""
+        fID1 = self.addGenericFile(1, version=(1,0,0))
+        fID2 = self.addGenericFile(1, version=(1,1,0))
+        fID3 = self.addGenericFile(1, version=(1,2,0))
+        fID4 = self.addGenericFile(1, version=(1,3,0))
+        files = self.dbu.getAllFilenames(fullPath=False)
+        print(files)
+        self.assertFalse(self.dbu.fileIsNewest('testing_file_1.0.0.file'))
+        self.assertFalse(self.dbu.fileIsNewest('testing_file_1.1.0.file'))
+        self.assertFalse(self.dbu.fileIsNewest('testing_file_1.2.0.file'))
+        self.assertTrue(self.dbu.fileIsNewest('testing_file_1.3.0.file'))
+        self.assertFalse(self.dbu.fileIsNewest(fID1))
+        self.assertFalse(self.dbu.fileIsNewest(fID2))
+        self.assertFalse(self.dbu.fileIsNewest(fID1))
+        self.assertTrue(self.dbu.fileIsNewest(fID4))
 
     def test_addCode(self):
         """Tests if addCode is succesful"""
@@ -1028,7 +1046,7 @@ class TestWithtestDB(unittest.TestCase):
         fID = self.addGenericFile(1)
 
         i = self.dbu.getEntry('File', fID)
-        self.assertEqual("testing_file.file", i.filename)
+        self.assertEqual("testing_file_1.2.3.file", i.filename)
         self.assertEqual(0, i.data_level)
         self.assertEqual(1, i.interface_version)
         self.assertEqual(2, i.quality_version)
