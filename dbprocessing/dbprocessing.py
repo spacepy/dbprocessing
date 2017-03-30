@@ -326,9 +326,12 @@ class ProcessQueue(object):
         """
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
         # if this file is not a newest_version we do not ant to run
-        if not self.dbu.fileIsNewest(file_id):
+        print("Entered buildChildren: file_id={0}".format(file_id))
+        if not self.dbu.fileIsNewest(file_id[0]):
             DBlogging.dblogger.debug("Was not newest version in buildChildren: file_id={0}".format(file_id))
+            print("Was not newest version in buildChildren: file_id={0}".format(file_id))
             return  # do nothing
+        print("was newest moving on in buildChildren: file_id={0}".format(file_id))
 
         children = self.dbu.getChildrenProcesses(file_id[0])  # returns process
         daterange = self.dbu.getFileDates(file_id[0])  # this is the dates that this file spans
