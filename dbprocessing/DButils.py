@@ -638,13 +638,13 @@ class DButils(object):
         @param filename: filename or file_id
         @return: Ture is file is lastest_version, False is not
         """
-        trace = self.getTraceback('File', filename)
-        product_id = trace['product'].product_id
+        file = self.getEntry('File', filename)
+        product_id = file.product_id
         if debug: print('product_id', product_id )
-        date = trace['file'].utc_file_date
+        date = file.utc_file_date
         if debug: print('date', date)
-        file_id = trace['file'].file_id
-        if debug: print('file_id', file_id, trace['file'].filename)
+        file_id = file.file_id
+        if debug: print('file_id', file_id, file.filename)
         latest = self.getFilesByProductDate(product_id, [date]*2, newest_version=True)
         if len(latest) > 1:
             raise(DBError("More than one latest for a product date"))
