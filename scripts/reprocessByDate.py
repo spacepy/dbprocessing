@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     print(startDate, endDate)
 
-    num = db.reprocessByDate(startDate=startDate, endDate=endDate, incVersion=options.force)
+    num = db.reprocessByDate(startDate=startDate, endDate=endDate, incVersion=options.force, level=options.level)
     if num is None:
         num = 0
     print('Added {0} files to be reprocessed'.format(num))
