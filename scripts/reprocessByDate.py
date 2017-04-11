@@ -27,6 +27,8 @@ if __name__ == "__main__":
                       help="selected mission database", default=None)
     parser.add_option("", "--echo", dest="echo", action='store_true',
                       help="echo sql queries for debugging", default=False)
+    parser.add_option("", "--level", dest="level", type='float',
+                      help="The data level to reprocess", default=None)
 
     (options, args) = parser.parse_args()
     if len(args) != 0:
@@ -49,7 +51,7 @@ if __name__ == "__main__":
 
     print(startDate, endDate)
 
-    num = db.reprocessByDate(startDate=startDate, endDate=endDate, incVersion=options.force)
+    num = db.reprocessByDate(startDate=startDate, endDate=endDate, incVersion=options.force, level=options.level)
     if num is None:
         num = 0
     print('Added {0} files to be reprocessed'.format(num))
