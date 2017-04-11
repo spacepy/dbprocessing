@@ -441,9 +441,9 @@ class ProcessQueue(object):
         except DButils.DBNoData:
             DBlogging.dblogger.error('No product_id {0} found in the DB'.format(id_in))
 
-    def reprocessByDate(self, startDate=None, endDate=None, incVersion=None):
+    def reprocessByDate(self, startDate=None, endDate=None, incVersion=None, level=None):
         return self._reprocessBy(startDate=startDate, endDate=endDate,
-                                 incVersion=incVersion)
+                                 incVersion=incVersion, level=level)
 
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=None):
         try:
