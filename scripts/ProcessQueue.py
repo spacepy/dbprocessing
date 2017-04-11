@@ -158,7 +158,7 @@ if __name__ == "__main__":
                     #    continue
                     pq.buildChildren(f)
                     tmp_ind += 1
-                    Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
+                    Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress: {0}:{1}'.format(tmp_ind, totalsize))
 
                     #pq.runme_list.extend(sorted([v for v in pq.runme_list if v.ableToRun], key=lambda x: x.utc_file_date))
                     
