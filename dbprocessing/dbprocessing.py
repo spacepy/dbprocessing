@@ -269,7 +269,10 @@ class ProcessQueue(object):
     def _getRequiredProducts(self, process_id, file_id, utc_file_date):
         #####################################################
         ## get all the input products for that process, and if they are optional
+        T0 = time.time()
         input_product_id = self.dbu.getInputProductID(process_id)  # this is a list of tuples (id, optional)
+        #print("    {0}: self.dbu.getInputProductID".format(time.time() - T0))
+        T0 = time.time()
 
         DBlogging.dblogger.debug(
             "Finding input files for file_id:{0} process_id:{1} date:{2}".format(file_id, process_id, utc_file_date))
@@ -277,6 +280,10 @@ class ProcessQueue(object):
         ## here decide how we build output and do it.
 
         timebase = self.dbu.getProcessTimebase(process_id)
+        #print("    {0}: self.dbu.getProcessTimebase".format(time.time() - T0))
+        T0 = time.time()
+
+
         DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
         if timebase in ['FILE', 'DAILY', 'RUN']:  # taking one file to the next file
             # for file based processing we are going to look to the "process_keywords" and cull the
@@ -292,7 +299,11 @@ class ProcessQueue(object):
                 else:  # already a date
                     dt = utc_file_date
 
-                tmp_files = self.dbu.getFilesByProductDate(val, [dt] * 2, newest_version=True)
+                tmp_files = [self.dbu.session.query(self.dbu.File).filter_by(utc_file_date=dt).filter_by(product_id=val).order_by(self.dbu.File.interface_version.desc()).order_by(self.dbu.File.quality_version.desc()).order_by(self.dbu.File.revision_version.desc()).first()]
+                # tmp_files = self.dbu.getFilesByProductDate(val, [dt] * 2, newest_version=True)
+                #print("    {0}: self.dbu.getFilesByProductDate, {1} {2}".format(time.time() - T0, val, dt))
+                T0 = time.time()
+
 
                 if not tmp_files and not opt:
                     return None, input_product_id
@@ -312,7 +323,10 @@ class ProcessQueue(object):
                 # grab the process_keywords column for the file_id and all the possible other files
                 #   they have to match in order for the file to be the same
                 infile_process_keywords = self.dbu.getEntry('File', file_id).process_keywords
-                files_process_keywords = [v.process_keywords for v in files]
+                try:
+                    files_process_keywords = [v.process_keywords for v in files]
+                except AttributeError:
+                    files_process_keywords = []
                 # now if the process_keywords in files_process_keywords does not match that in infile_process_keywords
                 #   drop it
                 for ii, v in enumerate(files_process_keywords):
@@ -353,7 +367,7 @@ class ProcessQueue(object):
             # iterate over all the days between the start and stop date from above (including stop date)
             for utc_file_date in Utils.expandDates(*daterange):
                 files, input_product_id = self._getRequiredProducts(child_process, file_id[0], utc_file_date)
-                print("{0}: self._getRequiredProducts".format(time.time()-T0))
+                #print("{0}: self._getRequiredProducts".format(time.time()-T0))
                 T0 = time.time()
                 if not files:
                     # figure out the missing products
@@ -368,7 +382,10 @@ class ProcessQueue(object):
                     ##                 DBlogging.dblogger.debug("For file: {0} date: {1} required files not present".format(file_id[0], utc_file_date))
                     ##                 continue # go on to the next file
 
-                input_files = [v.file_id for v in files]
+                try:
+                    input_files = [v.file_id for v in files]
+                except AttributeError:
+                    continue
                 DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
                 runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self)
