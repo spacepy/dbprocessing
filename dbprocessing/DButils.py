@@ -1662,6 +1662,11 @@ class DButils(object):
                  exists=None,
                  newest_version=False,
                  limit=None):
+        # if a datetime.datetime comes in this does not work, make them datetime.date
+        if hasattr(startDate, 'minute'):
+            startDate = startDate.date()
+        if hasattr(endDate, 'minute'):
+            startDate = endDate.date()
 
 
         # BAL not ideal but a special case where product_id is set and startDate == endDate

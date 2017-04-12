@@ -64,29 +64,41 @@ if __name__ == "__main__":
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
 
     dates = Utils.expandDates(startDate, endDate)
+    print('dates', list(dates))
+
+    inproc = args[0]
 
     # get the input products for a process
-    products = pq.dbu.getInputProductID(args[0])
+    products = pq.dbu.getInputProductID(inproc)
+    print('products', products)
 
     runme = []
     for d in dates:
+        print("Processing date: {0}".format(d))
         # we need a file_id that goes into the process
+        input_files = []
         for p, opt in products:
+            prod_ = pq.dbu.getEntry('Product', p)
+            print("    Processing product: {0} : {1}".format((p,opt), prod_.product_name))
             files = pq.dbu.getFilesByProductDate(p, [d]*2, newest_version=True)
+            if files:
+                fnames = [v.filename for v in files]
+            else:
+                fnames = []
+            print("        Found files: {0}".format(list(fnames)))
+
             #files = [v.file_id for v in files]
             if files:
-                break
-        if not files:
-            print("No process to run for {0}".format(d.isoformat()))
-            continue
-        files, input_prods = pq._getRequiredProducts(args[0], files[0], d)
-        if files:
-            input_files = [v.file_id for v in files]
-        else:
-            print("No files to run for process ({0}) {1} on {2}".format(args[0],
-                                                                      pq.dbu.getEntry('Process', args[0]).process_name,
+                input_files.extend([v.file_id for v in files])
+            if not files:
+                print("No process to run for {0}".format(d.isoformat()))
+                continue
+            #files, input_prods = pq._getRequiredProducts(inproc, files[0].filename, d)
+        if not input_files:
+            print("No files to run for process ({0}) {1} on {2}".format(inproc,
+                                                                      pq.dbu.getEntry('Process', inproc).process_name,
                                                                       d.isoformat()))
-            continue
-        runme.append(runMe.runMe(pq.dbu, d, args[0], input_files, pq, force=True))
+        else:
+            runme.append(runMe.runMe(pq.dbu, d, inproc, input_files, pq, force=True))
     runMe.runner(runme, pq.dbu, MAX_PROC=options.numproc, rundir='.')
                 
