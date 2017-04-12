@@ -266,12 +266,12 @@ class ProcessQueue(object):
 
         return claimed[0]  # return the diskfile
 
-    def _getRequiredProducts(self, process_id, file_id, utc_file_date):
+    def _getRequiredProducts(self, process_id, file_id, utc_file_date, debug=False):
         #####################################################
         ## get all the input products for that process, and if they are optional
         T0 = time.time()
         input_product_id = self.dbu.getInputProductID(process_id)  # this is a list of tuples (id, optional)
-        #print("    {0}: self.dbu.getInputProductID".format(time.time() - T0))
+        if debug: print("21:    {0}: self.dbu.getInputProductID: {1}".format(time.time() - T0, input_product_id))
         T0 = time.time()
 
         DBlogging.dblogger.debug(
@@ -280,28 +280,24 @@ class ProcessQueue(object):
         ## here decide how we build output and do it.
 
         timebase = self.dbu.getProcessTimebase(process_id)
-        #print("    {0}: self.dbu.getProcessTimebase".format(time.time() - T0))
+        if debug: print("22:    {0}: self.dbu.getProcessTimebase: {1}".format(time.time() - T0, timebase))
         T0 = time.time()
 
 
         DBlogging.dblogger.debug("Doing {0} based processing".format(timebase))
         if timebase in ['FILE', 'DAILY', 'RUN']:  # taking one file to the next file
             # for file based processing we are going to look to the "process_keywords" and cull the
-            #   retuned files based on making sure they are all the same
+            #   returned files based on making sure they are all the same
             #   If process_keywords is none it will fall back to current behavior (since they will all be the same)
             files = []
             # get all the possible files based on dates that we might want to put into the process now
 
-            for val, opt in input_product_id:
+            for iprod_id, opt in input_product_id:
                 # accept a datetime.datetime or datetime.date
-                if isinstance(utc_file_date, datetime.datetime):
-                    dt = utc_file_date.date()
-                else:  # already a date
-                    dt = utc_file_date
+                dt = Utils.datetimeToDate(utc_file_date)
 
-                tmp_files = [self.dbu.session.query(self.dbu.File).filter_by(utc_file_date=dt).filter_by(product_id=val).order_by(self.dbu.File.interface_version.desc()).order_by(self.dbu.File.quality_version.desc()).order_by(self.dbu.File.revision_version.desc()).first()]
-                # tmp_files = self.dbu.getFilesByProductDate(val, [dt] * 2, newest_version=True)
-                #print("    {0}: self.dbu.getFilesByProductDate, {1} {2}".format(time.time() - T0, val, dt))
+                tmp_files = self.dbu.getFilesByProductDate(iprod_id, [dt] * 2, newest_version=True)
+                if debug: print("23:    {0}: self.dbu.getFilesByProductDate, {1} {2} {3}".format(time.time() - T0, iprod_id, dt, tmp_files))
                 T0 = time.time()
 
 
@@ -339,35 +335,38 @@ class ProcessQueue(object):
             raise (ValueError('Bad timebase for product: {0}'.format(process_id)))
         return files, input_product_id
 
-    def buildChildren(self, file_id):
+    def buildChildren(self, file_id, debug=False):
         """
         go through and all the runMe's and add to the runme_list variable
         """
         T0 = time.time()
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
+        if debug: print("Entered buildChildren: file_id={0}".format(file_id))
         # if this file is not a newest_version we do not ant to run
         #print("{1}: Entered buildChildren: file_id={0}".format(file_id, time.time()-T0))
         T0 = time.time()
         if not self.dbu.fileIsNewest(file_id[0]):
             DBlogging.dblogger.debug("Was not newest version in buildChildren: file_id={0}".format(file_id))
-            #print("Was not newest version in buildChildren: file_id={0}".format(file_id))
+            print("    Was not newest version in buildChildren: file_id={0}".format(file_id))
             return  # do nothing
-        #print("{1}: was newest moving on in buildChildren: file_id={0}".format(file_id, time.time()-T0))
+            if debug: print("    {1}: was newest moving on in buildChildren: file_id={0}".format(file_id, time.time()-T0))
         T0 = time.time()
 
         children = self.dbu.getChildrenProcesses(file_id[0])  # returns process
-        #print("{1}: done self.dbu.getChildrenProcesses buildChildren: file_id={0}".format(file_id, time.time()-T0))
+        if debug: print("11:   {1}: done self.dbu.getChildrenProcesses buildChildren: file_id={0} : {2}".format(file_id, time.time()-T0, children))
         T0 = time.time()
         daterange = self.dbu.getFileDates(file_id[0])  # this is the dates that this file spans
-        #print("{1}: done self.dbu.getFileDates  buildChildren: file_id={0}".format(file_id, time.time()-T0))
+        if debug: print("12:   {1}: done self.dbu.getFileDates  buildChildren: file_id={0} : {2}".format(file_id, time.time()-T0, daterange))
         T0 = time.time()
 
+        if debug: print("children: {0}".format(children))
         for child_process in children:
 
             # iterate over all the days between the start and stop date from above (including stop date)
             for utc_file_date in Utils.expandDates(*daterange):
+                if debug: print("    utc_file_date: {0}".format(utc_file_date))
                 files, input_product_id = self._getRequiredProducts(child_process, file_id[0], utc_file_date)
-                #print("{0}: self._getRequiredProducts".format(time.time()-T0))
+                if debug: print("13:   {0}: self._getRequiredProducts   {1} {2}".format(time.time()-T0, files, input_product_id))
                 T0 = time.time()
                 if not files:
                     # figure out the missing products
@@ -428,10 +427,8 @@ class ProcessQueue(object):
 
         incVersion sets which of the version numbers to increment {0}.{1}.{2}
         """
-        if isinstance(startDate, datetime.datetime):
-            startDate = startDate.date()
-        if isinstance(endDate, datetime.datetime):
-            endDate = endDate.date()
+        startDate = Utils.datetimeToDate(startDate)
+        endDate = Utils.datetimeToDate(endDate)
         f_ids = [val.file_id for val in self.dbu.getFiles(startDate=startDate,
                                                           endDate=endDate,
                                                           level=level,

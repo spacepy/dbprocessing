@@ -1663,11 +1663,8 @@ class DButils(object):
                  newest_version=False,
                  limit=None):
         # if a datetime.datetime comes in this does not work, make them datetime.date
-        if hasattr(startDate, 'minute'):
-            startDate = startDate.date()
-        if hasattr(endDate, 'minute'):
-            startDate = endDate.date()
-
+        startDate = Utils.datetimeToDate(startDate)
+        endDate = Utils.datetimeToDate(endDate)
 
         # BAL not ideal but a special case where product_id is set and startDate == endDate
         # 30 March 2017
@@ -1792,7 +1789,8 @@ class DButils(object):
         """
         Return all the file ids in the database
         """
-        files = self.getFiles(startDate, endDate, level, product, code, instrument, exists, newest_version, limit)
+        files = self.getFiles(startDate=startDate, endDate=endDate, level=level, product=product, code=code,
+                              instrument=instrument, exists=exists, newest_version=newest_version, limit=limit)
 
         return map(attrgetter('file_id'), files)  # this is faster than a list comprehension
 

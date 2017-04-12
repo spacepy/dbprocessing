@@ -16,6 +16,21 @@ import dateutil.rrule  # do this long so where it is from is remembered
 from . import Version
 
 
+def datetimeToDate(dt):
+    """
+    given an input datetime.datetime or datetime.date return a datetime.date 
+    
+    :param dt: input to convert 
+    :type dt: datetime.datetime or datetime.date
+    :return: datetime.date
+    :rtype: datetime.date
+    """
+    if hasattr(dt, 'minute'):
+        return dt.date()
+    else:
+        return dt
+
+
 def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
     """
     Return a string of the date format for printing on the screen, if dt is None return now.

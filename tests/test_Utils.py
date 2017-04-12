@@ -194,6 +194,11 @@ class UtilsTests(unittest.TestCase):
         """test readconfig"""
         self.assertEqual({'section2': {'sect2a': 'sect2_value1'}, 'section1': {'sect1a': 'sect1_value1', 'sect1b': 'sect1_value2'}}, Utils.readconfig('testconfig.txt'))
 
+    def test_datetimeToDate(self):
+        """test datetimeToDate"""
+        self.assertEqual(Utils.datetimeToDate(datetime.date(2016, 12, 10)), datetime.date(2016, 12, 10))
+        self.assertEqual(Utils.datetimeToDate(datetime.datetime(2016, 12, 10, 11, 5)), datetime.date(2016, 12, 10))
+
 
 if __name__ == "__main__":
     unittest.main()
