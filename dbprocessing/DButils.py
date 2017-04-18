@@ -610,7 +610,7 @@ class DButils(object):
         entries = []
         version_bump = False
         for i, pq in enumerate(pqdata):
-            print(i, len(pqdata))
+            # print(i, len(pqdata))
             if pq[1] is not None:
                 entries.append(pq)  # if the version_bump is these it needs to stay in the queue
                 version_bump = True
