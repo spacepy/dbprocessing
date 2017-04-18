@@ -1711,7 +1711,7 @@ class DButils(object):
                 files = files.join(self.Instrumentproductlink,
                                    self.File.product_id == self.Instrumentproductlink.product_id) \
                     .filter_by(instrument_id=instrument)
-            if (startDate != "1970-01-01" or endDate != "2070-01-01") and startDate is not None and endDate is not None:
+            if (startDate != "1970-01-01" and startDate is not None) or (endDate != "2070-01-01" and endDate is not None):
                 # I.E, they changed atleast one of the date parameters from "all"
 
                 if newest_version:
