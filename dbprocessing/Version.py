@@ -112,21 +112,3 @@ class Version(object):
         left = (self.interface, self.quality, self.revision)
         right = (other.interface, other.quality, other.revision)
         return cmp(left, right)
-
-    def __sub__(self, other):
-        """
-        Subtract works on each version number
-
-        :param other: The other Version object
-        :type other: Version
-        """
-        return [self.interface - other.interface, self.quality - other.quality, self.revision - other.revision]
-
-    def __add__(self, other):
-        """
-        Add works on each version number
-
-        :param other: The other Version object
-        :type other: Version
-        """
-        return [self.interface + other.interface, self.quality + other.quality, self.revision + other.revision]
