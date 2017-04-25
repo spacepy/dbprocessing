@@ -1676,9 +1676,9 @@ class DButils(object):
 
             # leave this on top so that we don;t have to repeat code inside the logic below
             # SQL runs group by before order by, so the ordering must be done in a subquery
-            stmt = self.session.query(self.File).order_by(self.File.interface_version * 1000
-                                                          + self.File.quality_version * 100
-                                                          + self.File.revision_version).subquery()
+            stmt = self.session.query(self.File).order_by(self.File.interface_version) \
+                                                .order_by(self.File.quality_version) \
+                                                .order_by(self.File.revision_version).subquery()
 
             # do this first as the newest_version subquery get simplier
             # which makes things a little faster on large databases
@@ -1724,9 +1724,6 @@ class DButils(object):
                 files = files.limit(limit)
 
         return files.all()
-
-
-
 
     def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
