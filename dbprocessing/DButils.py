@@ -1950,12 +1950,16 @@ class DButils(object):
                 except IndexError:
                     pass
 
-        m = self.getEntry('Mission', mission_id)
-
-        if hasattr(m, 'codedir') and m.codedir != "":
-            return m.codedir
         else:
-            return None
+	    m = self.getEntry('Mission', mission_id)
+	    if os.path.isabs(m.codedir):
+		return m.codedir	
+            elif hasattr(m, 'codedir') and m.codedir != "":
+                basedir = m.rootdir
+	        code_path = m.codedir
+	        return os.path.join(basedir, code_path)
+            else:
+                return None
 
     def getInspectorDirectory(self, mission_id=None):
         """
@@ -1964,24 +1968,31 @@ class DButils(object):
         :return: base directory for current mission
         :rtype: str
         """
+
         if mission_id is None:
             mission_id = self.session.query(self.Mission.mission_id).all()
-            if len(mission_id) == 0:
-                return None
+            if len(mission_id) == 0:       		
+		return None
             elif len(mission_id) > 1:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
                 try:
-                    mission_id = mission_id[0][0]
+                    m = mission_id[0][0]
                 except IndexError:
-                    pass
+		    pass
 
-        m = self.getEntry('Mission', mission_id)
-
-        if hasattr(m, 'inspectordir') and m.inspectordir != "":
-            return m.inspectordir
-        else:
-            return None
+	else:
+            m = self.getEntry('Mission', mission_id)
+	
+	if hasattr(m, 'inspector_dir') and m.inspector_dir != "":	
+	    if os.path.isabs(m.inspector_dir):	
+	        return m.inspector_dir
+            else:        
+	        basedir = m.rootdir
+	        inspect_path = m.inspector_dir
+	        return os.path.join(basedir, inspect_path)
+        else:       
+	    return None
 
     def checkIncoming(self, glb='*'):
         """
@@ -2008,9 +2019,13 @@ class DButils(object):
         else:
             mission = self.getEntry('Mission', mission_id)
 
-        basedir = mission.rootdir
-        inc_path = mission.incoming_dir
-        return os.path.join(basedir, inc_path)
+	if hasattr(mission, 'incoming_dir') and mission.incoming_dir != None:
+	    if os.path.isabs(mission.incoming_dir):
+		return mission.incoming_dir
+	    else:
+        	basedir = mission.rootdir
+        	inc_path = mission.incoming_dir
+        	return os.path.join(basedir, inc_path)
 
     def getErrorPath(self, mission_id=None):
         """
@@ -2026,9 +2041,12 @@ class DButils(object):
             mission = self.getEntry('Mission', mission_id)
 
         if hasattr(mission, 'errordir') and mission.errordir != None:
-            return mission.errordir
-        else:
-            return os.path.join(self.CodeDirectory, 'errors/')
+            if os.path.isabs(mission.errordir):
+	        return mission.errordir
+            else:
+		basedir = mission.rootdir
+		err_path = mission.errordir
+                return os.path.join(basedir, err_path)
 
     def getFilecodelink_byfile(self, file_id):
         """

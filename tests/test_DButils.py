@@ -634,6 +634,23 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory())
         self.assertRaises(DButils.DBNoData, self.dbu.getMissionDirectory, 3)
 
+    #TESTS ADDED:
+    def test_getCodeDirectory(self):
+        """getCodeDirectory"""
+        #print(self.dbu.getCodeDirectory(1))
+        #print(self.dbu.getCodeDirectory())
+        self.assertEqual('/n/space_data/cda/rbsp/codedir', self.dbu.getCodeDirectory(1))
+        #self.assertEqual('/n/space_data/cda/rbsp/codedir', self.dbu.getCodeDirectory())
+        self.assertRaises(DButils.DBNoData, self.dbu.getCodeDirectory, 3)
+        
+    def test_getInspectorDirectory(self):
+        """getInspectorDirectory"""
+        #print(self.dbu.getInspectorDirectory(1))
+        self.assertEqual('/n/space_data/cda/rbsp/inspector_dir', self.dbu.getInspectorDirectory(1))
+        #self.assertEqual('/n/space_data/cda/rbsp/inspector_dir', self.dbu.getInspectorDirectory())
+        self.assertRaises(DButils.DBNoData, self.dbu.getInspectorDirectory, 3)
+    #END
+        
     def test_getIncomingPath(self):
         """getIncomingPath"""
         self.assertEqual('/n/space_data/cda/rbsp/mageis_incoming', self.dbu.getIncomingPath(1))
@@ -642,7 +659,8 @@ class DBUtilsGetTests(TestSetup):
 
     def test_getErrorPath(self):
         """getErrorPath"""
-        self.assertEqual('/n/space_data/cda/rbsp/errors/', self.dbu.getErrorPath())
+        self.assertEqual('/n/space_data/cda/rbsp/errors', self.dbu.getErrorPath(1))
+        self.assertEqual('/n/space_data/cda/rbsp/errors', self.dbu.getErrorPath())
         self.assertRaises(DButils.DBNoData, self.dbu.getErrorPath, 3)
 
     def test_getFilecodelink_byfile(self):
