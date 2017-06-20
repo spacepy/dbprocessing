@@ -5,6 +5,7 @@ import datetime
 import os
 import os.path
 import shutil
+import sqlite3
 import stat
 import tempfile
 import unittest
@@ -639,9 +640,36 @@ class DBUtilsGetTests(TestSetup):
         """getCodeDirectory"""
         #print(self.dbu.getCodeDirectory(1))
         #print(self.dbu.getCodeDirectory())
-        self.assertEqual('/n/space_data/cda/rbsp/codedir', self.dbu.getCodeDirectory(1))
-        #self.assertEqual('/n/space_data/cda/rbsp/codedir', self.dbu.getCodeDirectory())
+        self.assertEqual(self.dbu.getCodeDirectory(1), None)
+        #self.assertEqual( , self.dbu.getCodeDirectory())
         self.assertRaises(DButils.DBNoData, self.dbu.getCodeDirectory, 3)
+
+    def test_getCodeDirectorySpecified(self):
+        self.dbu.closeDB()
+        del self.dbu
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column codedir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET codedir = '/n/space_data/cda/rbsp/codedir' WHERE mission_id = 1")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getCodeDirectory(1),
+                         '/n/space_data/cda/rbsp/codedir')
+        
+    def test_getCodeDirectorySpecifiedBlank(self):
+        self.dbu.closeDB()
+        del self.dbu
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column codedir VARCHAR(50)")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getCodeDirectory(1), None)
         
     def test_getInspectorDirectory(self):
         """getInspectorDirectory"""

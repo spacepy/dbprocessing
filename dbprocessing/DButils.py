@@ -1949,17 +1949,13 @@ class DButils(object):
                     mission_id = mission_id[0][0]
                 except IndexError:
                     pass
-
+        m = self.getEntry('Mission', mission_id)
+        if hasattr(m, 'codedir') and m.codedir:
+            if os.path.isabs(m.codedir):
+                return m.codedir
+            return os.path.join(m.rootdir, m.codedir)
         else:
-	    m = self.getEntry('Mission', mission_id)
-	    if os.path.isabs(m.codedir):
-		return m.codedir	
-            elif hasattr(m, 'codedir') and m.codedir != "":
-                basedir = m.rootdir
-	        code_path = m.codedir
-	        return os.path.join(basedir, code_path)
-            else:
-                return None
+            return None
 
     def getInspectorDirectory(self, mission_id=None):
         """
@@ -1977,20 +1973,16 @@ class DButils(object):
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
                 try:
-                    m = mission_id[0][0]
+                    mission_id = mission_id[0][0]
                 except IndexError:
 		    pass
 
-	else:
-            m = self.getEntry('Mission', mission_id)
+        m = self.getEntry('Mission', mission_id)
 	
 	if hasattr(m, 'inspector_dir') and m.inspector_dir != "":	
 	    if os.path.isabs(m.inspector_dir):	
 	        return m.inspector_dir
-            else:        
-	        basedir = m.rootdir
-	        inspect_path = m.inspector_dir
-	        return os.path.join(basedir, inspect_path)
+	    return os.path.join(m.rootdir, m.inspector_dir)
         else:       
 	    return None
 
@@ -2043,10 +2035,7 @@ class DButils(object):
         if hasattr(mission, 'errordir') and mission.errordir != None:
             if os.path.isabs(mission.errordir):
 	        return mission.errordir
-            else:
-		basedir = mission.rootdir
-		err_path = mission.errordir
-                return os.path.join(basedir, err_path)
+            return os.path.join(mission.rootdir, mission.errordir)
 
     def getFilecodelink_byfile(self, file_id):
         """
