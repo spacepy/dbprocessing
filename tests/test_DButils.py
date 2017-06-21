@@ -34,24 +34,30 @@ def remove_tmpfile(fname):
     os.remove(fname)
 
 
-class TestSetup(unittest.TestCase):
+class TestSetupNoOpen(unittest.TestCase):
     """
-    master class for the setup and teardown
+    master class for the setup and teardown, without opening db
+    (so it can be altered first)
     """
 
     def setUp(self):
-        super(TestSetup, self).setUp()
+        super(TestSetupNoOpen, self).setUp()
         sqpath = os.path.join(os.path.dirname(__file__), 'RBSP_MAGEIS.sqlite')
         self.sqlworking = sqpath.replace('RBSP_MAGEIS.sqlite', 'working.sqlite')
         shutil.copy(sqpath, self.sqlworking)
         os.chmod(self.sqlworking, stat.S_IRUSR | stat.S_IWUSR)
-        self.dbu = DButils.DButils(self.sqlworking)
 
     def tearDown(self):
-        super(TestSetup, self).tearDown()
+        super(TestSetupNoOpen, self).tearDown()
         self.dbu.closeDB()
         del self.dbu
         os.remove(self.sqlworking)
+
+
+class TestSetup(TestSetupNoOpen):
+    def setUp(self):
+        super(TestSetup, self).setUp()
+        self.dbu = DButils.DButils(self.sqlworking)
 
 
 class DBUtilsOtherTests(TestSetup):
@@ -635,60 +641,34 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory())
         self.assertRaises(DButils.DBNoData, self.dbu.getMissionDirectory, 3)
 
-    #TESTS ADDED:
     def test_getCodeDirectory(self):
         """getCodeDirectory"""
-        #print(self.dbu.getCodeDirectory(1))
-        #print(self.dbu.getCodeDirectory())
         self.assertEqual(self.dbu.getCodeDirectory(1), None)
-        #self.assertEqual( , self.dbu.getCodeDirectory())
+        self.assertEqual(self.dbu.getCodeDirectory(), None)
         self.assertRaises(DButils.DBNoData, self.dbu.getCodeDirectory, 3)
-
-    def test_getCodeDirectorySpecified(self):
-        self.dbu.closeDB()
-        del self.dbu
-        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
-        connection = sqlite3.connect(self.sqlworking)
-        cursor = connection.cursor()
-        cursor.execute("ALTER TABLE mission ADD column codedir VARCHAR(50)")
-        connection.commit()
-        cursor.execute("UPDATE mission SET codedir = '/n/space_data/cda/rbsp/codedir' WHERE mission_id = 1")
-        connection.commit()
-        connection.close()
-        self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getCodeDirectory(1),
-                         '/n/space_data/cda/rbsp/codedir')
-        
-    def test_getCodeDirectorySpecifiedBlank(self):
-        self.dbu.closeDB()
-        del self.dbu
-        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
-        connection = sqlite3.connect(self.sqlworking)
-        cursor = connection.cursor()
-        cursor.execute("ALTER TABLE mission ADD column codedir VARCHAR(50)")
-        connection.commit()
-        connection.close()
-        self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getCodeDirectory(1), None)
         
     def test_getInspectorDirectory(self):
         """getInspectorDirectory"""
-        #print(self.dbu.getInspectorDirectory(1))
-        self.assertEqual('/n/space_data/cda/rbsp/inspector_dir', self.dbu.getInspectorDirectory(1))
-        #self.assertEqual('/n/space_data/cda/rbsp/inspector_dir', self.dbu.getInspectorDirectory())
+        self.assertEqual(self.dbu.getInspectorDirectory(1), None)
+        self.assertEqual(self.dbu.getInspectorDirectory(), None)
         self.assertRaises(DButils.DBNoData, self.dbu.getInspectorDirectory, 3)
-    #END
+
+    def test_getDirectory(self):
+        self.assertEqual(self.dbu.getDirectory('codedir', 1), None)
+        self.assertEqual(self.dbu.getDirectory('inspector_dir', 1), None)
+        self.assertEqual(self.dbu.getDirectory('incoming_dir', 1), '/n/space_data/cda/rbsp/mageis_incoming')
+        self.assertEqual(self.dbu.getDirectory('codedir'), None)
+        self.assertEqual(self.dbu.getDirectory('inspector_dir'), None)
+        self.assertEqual(self.dbu.getDirectory('incoming_dir'), '/n/space_data/cda/rbsp/mageis_incoming') 
         
     def test_getIncomingPath(self):
         """getIncomingPath"""
-        self.assertEqual('/n/space_data/cda/rbsp/mageis_incoming', self.dbu.getIncomingPath(1))
-        self.assertEqual('/n/space_data/cda/rbsp/mageis_incoming', self.dbu.getIncomingPath())
+        self.assertEqual(self.dbu.getIncomingPath(1), '/n/space_data/cda/rbsp/mageis_incoming')
         self.assertRaises(DButils.DBNoData, self.dbu.getIncomingPath, 3)
 
     def test_getErrorPath(self):
         """getErrorPath"""
-        self.assertEqual('/n/space_data/cda/rbsp/errors', self.dbu.getErrorPath(1))
-        self.assertEqual('/n/space_data/cda/rbsp/errors', self.dbu.getErrorPath())
+        self.assertEqual(self.dbu.getErrorPath(1), None)
         self.assertRaises(DButils.DBNoData, self.dbu.getErrorPath, 3)
 
     def test_getFilecodelink_byfile(self):
@@ -774,6 +754,132 @@ class DBUtilsGetTests(TestSetup):
         tmp = self.dbu.getProductParentTree()
         self.assertEqual(190, len(tmp))
         self.assertTrue([1, [10, 8, 39, 76]] in tmp)
+
+
+class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
+
+    def test_getCodeDirectoryAbsSpecified(self):
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column codedir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET codedir = '/n/space_data/cda/rbsp/codedir' WHERE mission_id = 1")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getCodeDirectory(1),
+                         '/n/space_data/cda/rbsp/codedir')
+        
+    def test_getCodeDirectoryRelSpecified(self):
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column codedir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET codedir = 'codedir' WHERE mission_id = 1")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getCodeDirectory(1),
+                         '/n/space_data/cda/rbsp/codedir')
+     
+    def test_getCodeDirectorySpecifiedBlank(self):
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column codedir VARCHAR(50)")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getCodeDirectory(1), None)
+
+    def test_getInspectorDirectoryAbsSpecified(self):
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column inspector_dir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET inspector_dir = '/n/space_data/cda/rbsp/inspector_dir' WHERE mission_id = 1")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getInspectorDirectory(1),
+                         '/n/space_data/cda/rbsp/inspector_dir')
+
+    def test_getInspectorDirectoryRelSpecified(self):
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column inspector_dir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET inspector_dir = 'inspector_dir' WHERE mission_id = 1")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getInspectorDirectory(1),
+                         '/n/space_data/cda/rbsp/inspector_dir')
+
+    def test_getInspectorDirectorySpecifiedBlank(self):
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column inspector_dir VARCHAR(50)")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getInspectorDirectory(1), None)
+
+    def test_getErrorDirectoryAbsSpecified(self):
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column errordir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET errordir = '/n/space_data/cda/rbsp/errordir' WHERE mission_id = 1")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getErrorPath(1),
+                         '/n/space_data/cda/rbsp/errordir')
+
+    def test_getErrorDirectoryRelSpecified(self):
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column errordir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET errordir = 'errordir' WHERE mission_id = 1")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getErrorPath(1),
+                         '/n/space_data/cda/rbsp/errordir')
+
+    def test_getErrorDirectorySpecifiedBlank(self):
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column errordir VARCHAR(50)")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getInspectorDirectory(1), None)
+
+    def test_getDirectorySpecified(self):
+        #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
+        connection = sqlite3.connect(self.sqlworking)
+        cursor = connection.cursor()
+        cursor.execute("ALTER TABLE mission ADD column codedir VARCHAR(50)")
+        cursor.execute("ALTER TABLE mission ADD column inspector_dir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET inspector_dir = 'inspector_dir' WHERE mission_id = 1")
+        cursor.execute("ALTER TABLE mission ADD column errordir VARCHAR(50)")
+        connection.commit()
+        cursor.execute("UPDATE mission SET errordir = '/n/space_data/cda/rbsp/errordir' WHERE mission_id = 1")
+        connection.commit()
+        connection.close()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual(self.dbu.getDirectory('errordir',1),'/n/space_data/cda/rbsp/errordir')
+        self.assertEqual(self.dbu.getDirectory('inspector_dir'), '/n/space_data/cda/rbsp/inspector_dir')
+        self.assertEqual(self.dbu.getDirectory('codedir'), None)
 
 
 class ProcessqueueTests(TestSetup):

@@ -14,6 +14,7 @@ import sqlalchemy
 from sqlalchemy import Table
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm import sessionmaker
+import sqlalchemy.orm.exc
 
 try:  # new version changed this annoyingly
     from sqlalchemy.exceptions import IntegrityError
@@ -1918,14 +1919,15 @@ class DButils(object):
         :rtype: str
         """
         if mission_id is None:
-            mission_id = self.session.query(self.Mission.mission_id).all()
-            if len(mission_id) == 0:
-                return None
-            elif len(mission_id) > 1:
+            try:
+                mission_id = self.session.query(self.Mission.mission_id).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                raise DBNoData('Nothing in specified column')
+            except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
                 try:
-                    mission_id = mission_id[0][0]
+                    mission_id = mission_id[0]
                 except IndexError:
                     pass
 
@@ -1939,21 +1941,22 @@ class DButils(object):
         :rtype: str
         """
         if mission_id is None:
-            mission_id = self.session.query(self.Mission.mission_id).all()
-            if len(mission_id) == 0:
-                return None
-            elif len(mission_id) > 1:
+            try:
+                mission_id = self.session.query(self.Mission.mission_id).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                raise DBNoData('Nothing in specified column')
+            except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
                 try:
-                    mission_id = mission_id[0][0]
+                    mission = mission_id[0]
                 except IndexError:
                     pass
-        m = self.getEntry('Mission', mission_id)
-        if hasattr(m, 'codedir') and m.codedir:
-            if os.path.isabs(m.codedir):
-                return m.codedir
-            return os.path.join(m.rootdir, m.codedir)
+        mission = self.getEntry('Mission', mission_id)
+        if hasattr(mission, 'codedir') and mission.codedir:
+            if os.path.isabs(mission.codedir):
+                return mission.codedir
+            return os.path.join(mission.rootdir, mission.codedir)
         else:
             return None
 
@@ -1966,23 +1969,23 @@ class DButils(object):
         """
 
         if mission_id is None:
-            mission_id = self.session.query(self.Mission.mission_id).all()
-            if len(mission_id) == 0:       		
-		return None
-            elif len(mission_id) > 1:
+            try:
+                missions = self.session.query(self.Mission.mission_id).one()   		
+	    except sqlalchemy.orm.exc.NoResultFound:
+                raise DBNoData('Nothing in specified column')
+            except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
-                try:
-                    mission_id = mission_id[0][0]
-                except IndexError:
-		    pass
+                mission = missions[0]
+        else:
+            mission = self.getEntry('Mission', mission_id)
 
-        m = self.getEntry('Mission', mission_id)
+        #m = self.getEntry('Mission', mission_id)
 	
-	if hasattr(m, 'inspector_dir') and m.inspector_dir != "":	
-	    if os.path.isabs(m.inspector_dir):	
-	        return m.inspector_dir
-	    return os.path.join(m.rootdir, m.inspector_dir)
+	if hasattr(mission, 'inspector_dir') and mission.inspector_dir:	
+	    if os.path.isabs(mission.inspector_dir):	
+	        return mission.inspector_dir
+	    return os.path.join(mission.rootdir, mission.inspector_dir)
         else:       
 	    return None
 
@@ -2003,8 +2006,11 @@ class DButils(object):
         Return the incoming path for the current mission
         """
         if mission_id is None:
-            missions = self.session.query(self.Mission).all()
-            if len(missions) > 1:
+            try:
+                missions = self.session.query(self.Mission).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                raise DBNoData('Nothing in specified column')
+            except sqlalchemy.orm.exc.MultipleResultsFound:    
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
                 mission = missions[0]
@@ -2024,18 +2030,41 @@ class DButils(object):
         Return the error path for the current mission
         """
         if mission_id is None:
-            missions = self.session.query(self.Mission).all()
-            if len(missions) > 1:
+            try:
+                missions = self.session.query(self.Mission).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                raise DBNoData('Nothing in specified column')
+            except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
                 mission = missions[0]
         else:
             mission = self.getEntry('Mission', mission_id)
 
-        if hasattr(mission, 'errordir') and mission.errordir != None:
+        if hasattr(mission, 'errordir') and mission.errordir:
             if os.path.isabs(mission.errordir):
 	        return mission.errordir
             return os.path.join(mission.rootdir, mission.errordir)
+
+    def getDirectory(self, column, mission_id=None, default=None):
+        """
+        Generic directory lookup function, gives directory for the specified column.
+        """
+	if mission_id is None:
+            try:
+                mission = self.session.query(self.Mission).one()
+            except sqlalchemy.orm.exc.NoResultFound:
+                raise DBNoData('Nothing in specified column')
+            except sqlalchemy.orm.exc.MultipleResultsFound:
+                raise ValueError('No mission id specified and more than one mission present')
+        else:
+            mission = self.getEntry('Mission', mission_id)
+        c = getattr(mission, column) if hasattr(mission, column) else default
+        if c != None:
+            c = os.path.expanduser(c)
+            return c if os.path.isabs(c) else os.path.join(mission.rootdir, c)
+	else:
+            return None
 
     def getFilecodelink_byfile(self, file_id):
         """
