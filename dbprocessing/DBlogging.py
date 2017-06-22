@@ -19,7 +19,11 @@ except NameError:
     logname = None
 
 # TODO this should be setup by a config file
-log_dir = os.path.expanduser(os.path.join('~', 'dbprocessing_logs'))
+if('DBPROCESSING_LOG_DIR' in os.environ):
+    log_dir = os.environ['DBPROCESSING_LOG_DIR']
+else:
+    log_dir = os.path.join('~', 'dbprocessing_logs')
+log_dir = os.path.expanduser(log_dir)
 if not os.path.isdir(log_dir):
     os.makedirs(log_dir)
 basename = 'dbprocessing_{0}'.format(logname if logname else 'log')
