@@ -1925,11 +1925,6 @@ class DButils(object):
                 return None
             except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
-            else:
-                try:
-                    mission_id = mission_id[0]
-                except IndexError:
-                    pass
 
         return self.getEntry('Mission', mission_id).rootdir
 
@@ -1947,11 +1942,6 @@ class DButils(object):
                 return None
             except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
-            else:
-                try:
-                    mission = mission_id[0]
-                except IndexError:
-                    pass
         mission = self.getEntry('Mission', mission_id)
         if hasattr(mission, 'codedir') and mission.codedir:
             if os.path.isabs(mission.codedir):
@@ -1970,18 +1960,14 @@ class DButils(object):
 
         if mission_id is None:
             try:
-                missions = self.session.query(self.Mission.mission_id).one()
+                mission = self.session.query(self.Mission).one()
 	    except sqlalchemy.orm.exc.NoResultFound:
                 return None
             except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
-            else:
-                mission = missions[0]
         else:
             mission = self.getEntry('Mission', mission_id)
 
-        #m = self.getEntry('Mission', mission_id)
-	
 	if hasattr(mission, 'inspector_dir') and mission.inspector_dir:	
 	    if os.path.isabs(mission.inspector_dir):	
 	        return mission.inspector_dir
@@ -2007,13 +1993,11 @@ class DButils(object):
         """
         if mission_id is None:
             try:
-                missions = self.session.query(self.Mission).one()
+                mission = self.session.query(self.Mission).one()
             except sqlalchemy.orm.exc.NoResultFound:
                 raise DBNoData('Nothing in specified column')
             except sqlalchemy.orm.exc.MultipleResultsFound:    
                 raise (ValueError('No mission id specified and more than one mission present'))
-            else:
-                mission = missions[0]
         else:
             mission = self.getEntry('Mission', mission_id)
 
@@ -2031,13 +2015,11 @@ class DButils(object):
         """
         if mission_id is None:
             try:
-                missions = self.session.query(self.Mission).one()
+                mission = self.session.query(self.Mission).one()
             except sqlalchemy.orm.exc.NoResultFound:
                 raise DBNoData('Nothing in specified column')
             except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
-            else:
-                mission = missions[0]
         else:
             mission = self.getEntry('Mission', mission_id)
 
