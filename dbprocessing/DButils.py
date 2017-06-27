@@ -1922,7 +1922,7 @@ class DButils(object):
             try:
                 mission_id = self.session.query(self.Mission.mission_id).one()
             except sqlalchemy.orm.exc.NoResultFound:
-                raise DBNoData('Nothing in specified column')
+                return None
             except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
@@ -1944,7 +1944,7 @@ class DButils(object):
             try:
                 mission_id = self.session.query(self.Mission.mission_id).one()
             except sqlalchemy.orm.exc.NoResultFound:
-                raise DBNoData('Nothing in specified column')
+                return None
             except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:
@@ -1970,9 +1970,9 @@ class DButils(object):
 
         if mission_id is None:
             try:
-                missions = self.session.query(self.Mission.mission_id).one()   		
+                missions = self.session.query(self.Mission.mission_id).one()
 	    except sqlalchemy.orm.exc.NoResultFound:
-                raise DBNoData('Nothing in specified column')
+                return None
             except sqlalchemy.orm.exc.MultipleResultsFound:
                 raise (ValueError('No mission id specified and more than one mission present'))
             else:

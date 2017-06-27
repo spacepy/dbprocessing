@@ -39,11 +39,11 @@ class TestSetupNoOpen(unittest.TestCase):
     master class for the setup and teardown, without opening db
     (so it can be altered first)
     """
-
+    dbfile = 'RBSP_MAGEIS.sqlite'
     def setUp(self):
         super(TestSetupNoOpen, self).setUp()
-        sqpath = os.path.join(os.path.dirname(__file__), 'RBSP_MAGEIS.sqlite')
-        self.sqlworking = sqpath.replace('RBSP_MAGEIS.sqlite', 'working.sqlite')
+        sqpath = os.path.join(os.path.dirname(__file__), self.dbfile)
+        self.sqlworking = sqpath.replace(self.dbfile, 'working.sqlite')
         shutil.copy(sqpath, self.sqlworking)
         os.chmod(self.sqlworking, stat.S_IRUSR | stat.S_IWUSR)
 
@@ -58,6 +58,14 @@ class TestSetup(TestSetupNoOpen):
     def setUp(self):
         super(TestSetup, self).setUp()
         self.dbu = DButils.DButils(self.sqlworking)
+
+
+class DBUtilsEmptyTests(TestSetup):
+    """Tests on an empty database"""
+    dbfile = 'emptyDB.sqlite'
+
+    def test_empty_mission_dir(self):
+        self.assertIsNone(self.dbu.getMissionDirectory())
 
 
 class DBUtilsOtherTests(TestSetup):
