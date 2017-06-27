@@ -6,6 +6,7 @@ import unittest
 from distutils.dir_util import copy_tree, remove_tree
 import tempfile
 import imp
+import warnings
 
 from dbprocessing import inspector
 from dbprocessing import Version
@@ -79,7 +80,13 @@ class InspectorClass(unittest.TestCase):
         
         # This inspector sets the data_level - not allowed
         inspect = imp.load_source('inspect', 'inspector/rot13_L1_dlevel.py')
-        self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)))
+        with warnings.catch_warnings(record=True) as w:
+            self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)))
+        self.assertEqual(len(w), 1)
+        self.assertTrue(isinstance(w[0].message, UserWarning))
+        self.assertEqual('Inspector rot13_L1_dlevel.py:  set level to 2.0, '
+                         'this is ignored and set by the product definition',
+                         str(w[0].message))
 
         # The file doesn't match the inspector pattern...
         badfile = 'inspector/testDB_01_first.raw'

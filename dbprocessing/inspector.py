@@ -28,6 +28,7 @@ from abc import ABCMeta, abstractmethod
 import datetime
 import os
 import re
+import warnings
 
 import DBlogging
 import Diskfile
@@ -91,7 +92,7 @@ class inspector(object):
         self.diskfile.params['product_id'] = self.product
         if self.diskfile.params['data_level'] is not None:
             DBlogging.dblogger.info("Inspector {0}:  set level to {1}, this is ignored and set by the product definition".format(self.code_name, self.diskfile.params['data_level']))
-            print("Inspector {0}:  set level to {1}, this is ignored and set by the product definition".format(self.code_name, self.diskfile.params['data_level']))
+            warnings.warn("Inspector {0}:  set level to {1}, this is ignored and set by the product definition".format(self.code_name, self.diskfile.params['data_level']))
         self.diskfile.params['data_level'] = self.dbu.getEntry('Product', self.product).level
 
 
