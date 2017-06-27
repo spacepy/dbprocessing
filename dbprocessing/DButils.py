@@ -155,7 +155,7 @@ class DButils(object):
                 raise (ValueError("DB file specified doesn't exist"))
             engineIns = sqlalchemy.create_engine('{0}:///{1}'.format(engine, os.path.expanduser(self.mission)),
                                                  echo=echo)
-            self.mission = os.path.realpath(os.path.expanduser(self.mission))
+            self.mission = os.path.abspath(os.path.expanduser(self.mission))
 
             DBlogging.dblogger.info("Database Connection opened: {0}  {1}".format(str(engineIns), self.mission))
 
