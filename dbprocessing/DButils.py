@@ -95,12 +95,10 @@ class DButils(object):
             raise (AttributeError('{0} is not a valid database'.format(mission)))
 
         self.MissionDirectory = self.getMissionDirectory()
-
-        cDir = self.getCodeDirectory()
-        self.CodeDirectory = cDir if cDir is not None else self.MissionDirectory
-
-        iDir = self.getInspectorDirectory()
-        self.InspectorDirectory = iDir if iDir is not None else self.CodeDirectory
+        self.CodeDirectory = self.getCodeDirectory(
+            default=self.MissionDirectory)
+        self.InspectorDirectory = self.getInspectorDirectory(
+            default=self.CodeDirectory)
 
     def __del__(self):
         """
@@ -1929,23 +1927,23 @@ class DButils(object):
         return os.path.abspath(os.path.expanduser(
             self.getEntry('Mission', mission_id).rootdir))
 
-    def getCodeDirectory(self, mission_id=None):
+    def getCodeDirectory(self, *args, **kwargs):
         """
         Return the base directory for the current mission
 
         :return: base directory for current mission
         :rtype: str
         """
-        return self.getDirectory('codedir', mission_id=mission_id)
+        return self.getDirectory('codedir', *args, **kwargs)
 
-    def getInspectorDirectory(self, mission_id=None):
+    def getInspectorDirectory(self, *args, **kwargs):
         """
         Return the base directory for the current mission
 
         :return: base directory for current mission
         :rtype: str
         """
-        return self.getDirectory('inspector_dir', mission_id=mission_id)
+        return self.getDirectory('inspector_dir', *args, **kwargs)
 
     def checkIncoming(self, glb='*'):
         """
@@ -1959,23 +1957,21 @@ class DButils(object):
         files = glob.glob(os.path.join(path, glb))
         return files
 
-    def getIncomingPath(self, mission_id=None):
+    def getIncomingPath(self, *args, **kwargs):
         """
         Return the incoming path for the current mission
         """
-        return self.getDirectory('incoming_dir', mission_id=mission_id)
+        return self.getDirectory('incoming_dir', *args, **kwargs)
 
-    def getErrorPath(self, mission_id=None):
+    def getErrorPath(self, *args, **kwargs):
         """
         Return the error path for the current mission
         """
-        return self.getDirectory('errordir', mission_id=mission_id)
+        return self.getDirectory('errordir', *args, **kwargs)
 
     def getDirectory(self, column, mission_id=None, default=None):
         """
         Generic directory lookup function, gives directory for the specified column.
-
-        Without column, returns rootdir
         """
 	if mission_id is None:
             try:
