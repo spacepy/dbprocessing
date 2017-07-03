@@ -1973,7 +1973,7 @@ class DButils(object):
         """
         Generic directory lookup function, gives directory for the specified column.
         """
-	if mission_id is None:
+        if mission_id is None:
             try:
                 mission = self.session.query(self.Mission).one()
             except sqlalchemy.orm.exc.NoResultFound:
@@ -1982,12 +1982,13 @@ class DButils(object):
                 raise ValueError('No mission id specified and more than one mission present')
         else:
             mission = self.getEntry('Mission', mission_id)
+        
         c = getattr(mission, column) if hasattr(mission, column) else default
         if c != None:
             c = os.path.expanduser(c)
             return c if os.path.isabs(c) else os.path.abspath(os.path.expanduser(
                 os.path.join(mission.rootdir, c)))
-	else:
+        else:
             return None
 
     def getFilecodelink_byfile(self, file_id):
