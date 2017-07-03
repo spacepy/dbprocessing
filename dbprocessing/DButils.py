@@ -1987,7 +1987,7 @@ class DButils(object):
         if c != None:
             c = os.path.expanduser(c)
             return c if os.path.isabs(c) else os.path.abspath(os.path.expanduser(
-                os.path.join(mission.rootdir, c)))
+                os.path.join(self.MissionDirectory, c)))
         else:
             return None
 
