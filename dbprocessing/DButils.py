@@ -1971,7 +1971,12 @@ class DButils(object):
 
     def getDirectory(self, column, mission_id=None, default=None):
         """
-        Generic directory lookup function, gives directory for the specified column.
+        Generic directory lookup function, gives directory for the specified
+        column.
+
+        The mission rootdir may be absolute or relative to current path.
+        Directory requested may be in db as absolute or relative to mission
+        root. Home dir references are expanded.
         """
         if mission_id is None:
             try:
@@ -1984,12 +1989,11 @@ class DButils(object):
             mission = self.getEntry('Mission', mission_id)
         
         c = getattr(mission, column) if hasattr(mission, column) else default
-        if c != None:
-            c = os.path.expanduser(c)
-            return c if os.path.isabs(c) else os.path.abspath(os.path.expanduser(
-                os.path.join(mission.rootdir, c)))
-        else:
+        if c is None:
             return None
+        #If c is absolute, join throws away the rootdir part.
+        return os.path.abspath(os.path.join(os.path.expanduser(mission.rootdir),
+                                            os.path.expanduser(c)))
 
     def getFilecodelink_byfile(self, file_id):
         """
