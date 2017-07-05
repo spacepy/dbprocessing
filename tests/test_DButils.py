@@ -671,12 +671,12 @@ class DBUtilsGetTests(TestSetup):
         
     def test_getIncomingPath(self):
         """getIncomingPath"""
-        self.assertEqual(self.dbu.getIncomingPath(1), '/n/space_data/cda/rbsp/mageis_incoming')
+        self.assertEqual(self.dbu.getIncomingPath(), '/n/space_data/cda/rbsp/mageis_incoming')
         self.assertRaises(DButils.DBNoData, self.dbu.getIncomingPath, 3)
 
     def test_getErrorPath(self):
         """getErrorPath"""
-        self.assertEqual(self.dbu.getErrorPath(1), None)
+        self.assertEqual(self.dbu.getErrorPath(), None)
         self.assertRaises(DButils.DBNoData, self.dbu.getErrorPath, 3)
 
     def test_getFilecodelink_byfile(self):
@@ -776,7 +776,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getCodeDirectory(1),
+        self.assertEqual(self.dbu.getCodeDirectory(),
                          '/n/space_data/cda/rbsp/codedir')
         
     def test_getCodeDirectoryRelSpecified(self):
@@ -789,7 +789,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getCodeDirectory(1),
+        self.assertEqual(self.dbu.getCodeDirectory(),
                          '/n/space_data/cda/rbsp/codedir')
      
     def test_getCodeDirectorySpecifiedBlank(self):
@@ -799,7 +799,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getCodeDirectory(1), None)
+        self.assertEqual(self.dbu.getCodeDirectory(), None)
 
     def test_getInspectorDirectoryAbsSpecified(self):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
@@ -811,7 +811,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getInspectorDirectory(1),
+        self.assertEqual(self.dbu.getInspectorDirectory(),
                          '/n/space_data/cda/rbsp/inspector_dir')
 
     def test_getInspectorDirectoryRelSpecified(self):
@@ -824,7 +824,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getInspectorDirectory(1),
+        self.assertEqual(self.dbu.getInspectorDirectory(),
                          '/n/space_data/cda/rbsp/inspector_dir')
 
     def test_getInspectorDirectorySpecifiedBlank(self):
@@ -834,7 +834,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getInspectorDirectory(1), None)
+        self.assertEqual(self.dbu.getInspectorDirectory(), None)
 
     def test_getErrorDirectoryAbsSpecified(self):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
@@ -842,12 +842,11 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         cursor = connection.cursor()
         cursor.execute("ALTER TABLE mission ADD column errordir VARCHAR(50)")
         connection.commit()
-        cursor.execute("UPDATE mission SET errordir = '/n/space_data/cda/rbsp/errordir' WHERE mission_id = 1")
+        cursor.execute("UPDATE mission SET errordir = '/n/space_data/cda/rbsp/errors' WHERE mission_id = 1")
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getErrorPath(1),
-                         '/n/space_data/cda/rbsp/errordir')
+        self.assertEqual(self.dbu.getErrorPath(), '/n/space_data/cda/rbsp/errors')
 
     def test_getErrorDirectoryRelSpecified(self):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
@@ -855,12 +854,12 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         cursor = connection.cursor()
         cursor.execute("ALTER TABLE mission ADD column errordir VARCHAR(50)")
         connection.commit()
-        cursor.execute("UPDATE mission SET errordir = 'errordir' WHERE mission_id = 1")
+        cursor.execute("UPDATE mission SET errordir = 'errors' WHERE mission_id = 1")
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getErrorPath(1),
-                         '/n/space_data/cda/rbsp/errordir')
+        self.assertEqual(self.dbu.getErrorPath(),
+                         '/n/space_data/cda/rbsp/errors')
 
     def test_getErrorDirectorySpecifiedBlank(self):
         connection = sqlite3.connect(self.sqlworking)
@@ -869,7 +868,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getInspectorDirectory(1), None)
+        self.assertEqual(self.dbu.getInspectorDirectory(), None)
 
     def test_getDirectorySpecified(self):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
@@ -881,11 +880,11 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         cursor.execute("UPDATE mission SET inspector_dir = 'inspector_dir' WHERE mission_id = 1")
         cursor.execute("ALTER TABLE mission ADD column errordir VARCHAR(50)")
         connection.commit()
-        cursor.execute("UPDATE mission SET errordir = '/n/space_data/cda/rbsp/errordir' WHERE mission_id = 1")
+        cursor.execute("UPDATE mission SET errordir = '/n/space_data/cda/rbsp/errors' WHERE mission_id = 1")
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getDirectory('errordir',1),'/n/space_data/cda/rbsp/errordir')
+        self.assertEqual(self.dbu.getDirectory('errordir'),'/n/space_data/cda/rbsp/errors')
         self.assertEqual(self.dbu.getDirectory('inspector_dir'), '/n/space_data/cda/rbsp/inspector_dir')
         self.assertEqual(self.dbu.getDirectory('codedir'), None)
 

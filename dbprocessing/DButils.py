@@ -1909,7 +1909,7 @@ class DButils(object):
             raise (DBError('More than one code active for a Given day'))
         return sq[0].code_id
 
-    def getMissionDirectory(self, mission_id=None):
+    def getMissionDirectory(self):
         """
         Return the base directory for the current mission
 
@@ -1967,9 +1967,11 @@ class DButils(object):
         """
         Return the error path for the current mission
         """
+        if not 'default' in kwargs:
+            kwargs['default'] = os.path.join(self.getCodeDirectory(), 'errors')
         return self.getDirectory('errordir', *args, **kwargs)
 
-    def getDirectory(self, column, mission_id=None, default=None):
+    def getDirectory(self, column, default=None):
         """
         Generic directory lookup function, gives directory for the specified
         column.
