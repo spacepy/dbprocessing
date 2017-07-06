@@ -652,7 +652,7 @@ class DBUtilsGetTests(TestSetup):
     def test_getCodeDirectory(self):
         """getCodeDirectory"""
         self.assertEqual(self.dbu.getCodeDirectory(1), None)
-        self.assertEqual(self.dbu.getCodeDirectory(), None)
+        self.assertEqual(self.dbu.getCodeDirectory(), '/n/space_data/cda/rbsp/codedir')
         self.assertRaises(DButils.DBNoData, self.dbu.getCodeDirectory, 3)
         
     def test_getInspectorDirectory(self):
