@@ -95,10 +95,10 @@ class DButils(object):
             raise (AttributeError('{0} is not a valid database'.format(mission)))
 
         self.MissionDirectory = self.getMissionDirectory()
-        self.CodeDirectory = self.getCodeDirectory(
-            default=self.MissionDirectory)
-        self.InspectorDirectory = self.getInspectorDirectory(
-            default=self.CodeDirectory)
+        self.CodeDirectory = self.getCodeDirectory()
+            #default=self.MissionDirectory)
+        self.InspectorDirectory = self.getInspectorDirectory()
+            #default=self.CodeDirectory)
 
     def __del__(self):
         """
@@ -1916,34 +1916,33 @@ class DButils(object):
         :return: base directory for current mission
         :rtype: str
         """
-        if mission_id is None:
-            try:
-                return os.path.abspath(os.path.expanduser(
-                    self.session.query(self.Mission.rootdir).one()[0]))
-            except sqlalchemy.orm.exc.NoResultFound:
-                return None
-            except sqlalchemy.orm.exc.MultipleResultsFound:
-                raise (ValueError('No mission id specified and more than one mission present'))
+        try:
+            return os.path.abspath(os.path.expanduser(
+                self.session.query(self.Mission.rootdir).one()[0]))
+        except sqlalchemy.orm.exc.NoResultFound:
+            return None
+        except sqlalchemy.orm.exc.MultipleResultsFound:
+            raise (ValueError('No mission id specified and more than one mission present'))
         return os.path.abspath(os.path.expanduser(
-            self.getEntry('Mission', mission_id).rootdir))
+            self.getEntry('Mission').rootdir))
 
-    def getCodeDirectory(self, *args, **kwargs):
+    def getCodeDirectory(self):
         """
         Return the base directory for the current mission
 
         :return: base directory for current mission
         :rtype: str
         """
-        return self.getDirectory('codedir', *args, **kwargs)
+        return self.getDirectory('codedir', default=self.getMissionDirectory())
 
-    def getInspectorDirectory(self, *args, **kwargs):
+    def getInspectorDirectory(self):
         """
         Return the base directory for the current mission
 
         :return: base directory for current mission
         :rtype: str
         """
-        return self.getDirectory('inspector_dir', *args, **kwargs)
+        return self.getDirectory('inspector_dir', default=self.getMissionDirectory())
 
     def checkIncoming(self, glb='*'):
         """
@@ -1957,19 +1956,18 @@ class DButils(object):
         files = glob.glob(os.path.join(path, glb))
         return files
 
-    def getIncomingPath(self, *args, **kwargs):
+    def getIncomingPath(self):
         """
         Return the incoming path for the current mission
         """
-        return self.getDirectory('incoming_dir', *args, **kwargs)
+        return self.getDirectory('incoming_dir')
 
-    def getErrorPath(self, *args, **kwargs):
+    def getErrorPath(self):
         """
         Return the error path for the current mission
         """
-        if not 'default' in kwargs:
-            kwargs['default'] = os.path.join(self.getCodeDirectory(), 'errors')
-        return self.getDirectory('errordir', *args, **kwargs)
+        #print(os.path.join(self.getCodeDirectory(),'errors'))
+        return self.getDirectory('errordir', default=os.path.join(self.getCodeDirectory(), 'errors'))
 
     def getDirectory(self, column, default=None):
         """
@@ -1980,19 +1978,16 @@ class DButils(object):
         Directory requested may be in db as absolute or relative to mission
         root. Home dir references are expanded.
         """
-        if mission_id is None:
-            try:
-                mission = self.session.query(self.Mission).one()
-            except sqlalchemy.orm.exc.NoResultFound:
-                mission = None #this will grab the default based on hasattr
-            except sqlalchemy.orm.exc.MultipleResultsFound:
-                raise ValueError('No mission id specified and more than one mission present')
-        else:
-            mission = self.getEntry('Mission', mission_id)
-        
+        try:
+            mission = self.session.query(self.Mission).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            mission = None #this will grab the default based on hasattr
+        except sqlalchemy.orm.exc.MultipleResultsFound:
+            raise ValueError('No mission id specified and more than one mission present')
+                
         c = getattr(mission, column) if hasattr(mission, column) else default
         if c is None:
-            return None
+            return default
         #If c is absolute, join throws away the rootdir part.
         return os.path.abspath(os.path.join(os.path.expanduser(mission.rootdir),
                                             os.path.expanduser(c)))
