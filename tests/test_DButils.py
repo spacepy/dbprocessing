@@ -645,26 +645,18 @@ class DBUtilsGetTests(TestSetup):
 
     def test_getMissionDirectory(self):
         """getMissionDirectory"""
-        self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory(1))
         self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory())
-        self.assertRaises(DButils.DBNoData, self.dbu.getMissionDirectory, 3)
 
     def test_getCodeDirectory(self):
         """getCodeDirectory"""
-        self.assertEqual(self.dbu.getCodeDirectory(1), None)
-        self.assertEqual(self.dbu.getCodeDirectory(), '/n/space_data/cda/rbsp/codedir')
-        self.assertRaises(DButils.DBNoData, self.dbu.getCodeDirectory, 3)
+        self.assertEqual(self.dbu.getCodeDirectory(), '/n/space_data/cda/rbsp')
         
     def test_getInspectorDirectory(self):
         """getInspectorDirectory"""
-        self.assertEqual(self.dbu.getInspectorDirectory(1), None)
-        self.assertEqual(self.dbu.getInspectorDirectory(), None)
-        self.assertRaises(DButils.DBNoData, self.dbu.getInspectorDirectory, 3)
+        self.assertEqual(self.dbu.getInspectorDirectory(),
+                         '/n/space_data/cda/rbsp')
 
     def test_getDirectory(self):
-        self.assertEqual(self.dbu.getDirectory('codedir', 1), None)
-        self.assertEqual(self.dbu.getDirectory('inspector_dir', 1), None)
-        self.assertEqual(self.dbu.getDirectory('incoming_dir', 1), '/n/space_data/cda/rbsp/mageis_incoming')
         self.assertEqual(self.dbu.getDirectory('codedir'), None)
         self.assertEqual(self.dbu.getDirectory('inspector_dir'), None)
         self.assertEqual(self.dbu.getDirectory('incoming_dir'), '/n/space_data/cda/rbsp/mageis_incoming') 
@@ -672,12 +664,11 @@ class DBUtilsGetTests(TestSetup):
     def test_getIncomingPath(self):
         """getIncomingPath"""
         self.assertEqual(self.dbu.getIncomingPath(), '/n/space_data/cda/rbsp/mageis_incoming')
-        self.assertRaises(DButils.DBNoData, self.dbu.getIncomingPath, 3)
 
     def test_getErrorPath(self):
         """getErrorPath"""
-        self.assertEqual(self.dbu.getErrorPath(), None)
-        self.assertRaises(DButils.DBNoData, self.dbu.getErrorPath, 3)
+        self.assertEqual(self.dbu.getErrorPath(),
+                         '/n/space_data/cda/rbsp/errors')
 
     def test_getFilecodelink_byfile(self):
         """getFilecodelink_byfile"""
@@ -799,7 +790,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getCodeDirectory(), None)
+        self.assertEqual(self.dbu.getCodeDirectory(), '/n/space_data/cda/rbsp')
 
     def test_getInspectorDirectoryAbsSpecified(self):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
@@ -834,7 +825,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getInspectorDirectory(), None)
+        self.assertEqual(self.dbu.getInspectorDirectory(), '/n/space_data/cda/rbsp')
 
     def test_getErrorDirectoryAbsSpecified(self):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
@@ -868,7 +859,7 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual(self.dbu.getInspectorDirectory(), None)
+        self.assertEqual(self.dbu.getInspectorDirectory(), '/n/space_data/cda/rbsp')
 
     def test_getDirectorySpecified(self):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
