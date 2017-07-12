@@ -96,9 +96,7 @@ class DButils(object):
 
         self.MissionDirectory = self.getMissionDirectory()
         self.CodeDirectory = self.getCodeDirectory()
-            #default=self.MissionDirectory)
         self.InspectorDirectory = self.getInspectorDirectory()
-            #default=self.CodeDirectory)
 
     def __del__(self):
         """
@@ -1933,7 +1931,7 @@ class DButils(object):
         :return: base directory for current mission
         :rtype: str
         """
-        return self.getDirectory('codedir', default=self.getMissionDirectory())
+        return self.getDirectory('codedir', default=self.MissionDirectory)
 
     def getInspectorDirectory(self):
         """
@@ -1942,7 +1940,7 @@ class DButils(object):
         :return: base directory for current mission
         :rtype: str
         """
-        return self.getDirectory('inspector_dir', default=self.getMissionDirectory())
+        return self.getDirectory('inspector_dir', default=self.MissionDirectory)
 
     def checkIncoming(self, glb='*'):
         """
@@ -1967,7 +1965,7 @@ class DButils(object):
         Return the error path for the current mission
         """
         #print(os.path.join(self.getCodeDirectory(),'errors'))
-        return self.getDirectory('errordir', default=os.path.join(self.getCodeDirectory(), 'errors'))
+        return self.getDirectory('errordir', default=os.path.join(self.CodeDirectory, 'errors'))
 
     def getDirectory(self, column, default=None):
         """
