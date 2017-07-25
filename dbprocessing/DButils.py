@@ -1921,8 +1921,6 @@ class DButils(object):
             return None
         except sqlalchemy.orm.exc.MultipleResultsFound:
             raise (ValueError('No mission id specified and more than one mission present'))
-        return os.path.abspath(os.path.expanduser(
-            self.getEntry('Mission').rootdir))
 
     def getCodeDirectory(self):
         """
