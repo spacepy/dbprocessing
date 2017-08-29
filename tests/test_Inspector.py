@@ -61,7 +61,7 @@ class InspectorClass(unittest.TestCase):
         copy_tree('testDB/', self.tempD)
 
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
-        self.inspect = imp.load_source('inspect', 'testDB/codes/inspectors/rot13_L1.py')
+        self.inspect = imp.load_source('inspect', 'inspector/rot13_L1.py')
 
     def tearDown(self):
         super(InspectorClass, self).tearDown()
@@ -71,15 +71,15 @@ class InspectorClass(unittest.TestCase):
         """Test inspector class"""
 
         # File doesn't match the inspector pattern...
-        self.assertEqual(None, self.inspect.Inspector('testDB/codes/inspectors/testDB_01_first.raw', self.dbu, 1,))
+        self.assertEqual(None, self.inspect.Inspector('inspector/testDB_01_first.raw', self.dbu, 1,))
 
         # File matches pattern...
-        goodfile = 'testDB/codes/inspectors/testDB_001_first.raw'
+        goodfile = 'inspector/testDB_001_first.raw'
         self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)))
         #self.assertEqual(None, self.inspect.Inspector(goodfile, self.dbu, 1,).extract_YYYYMMDD())
         
         # This inspector sets the data_level - not allowed
-        inspect = imp.load_source('inspect', 'testDB/codes/inspectors/rot13_L1_dlevel.py')
+        inspect = imp.load_source('inspect', 'inspector/rot13_L1_dlevel.py')
         with warnings.catch_warnings(record=True) as w:
             self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)))
         self.assertEqual(len(w), 1)
@@ -89,8 +89,8 @@ class InspectorClass(unittest.TestCase):
                          str(w[0].message))
 
         # The file doesn't match the inspector pattern...
-        badfile = 'testDB/codes/inspectors/testDB_01_first.raw'
-        inspect = imp.load_source('inspect', 'testDB/codes/inspectors/rot13_L1.py')
+        badfile = 'inspector/testDB_01_first.raw'
+        inspect = imp.load_source('inspect', 'inspector/rot13_L1.py')
         self.assertEqual(None, inspect.Inspector(badfile, self.dbu, 1,))
 
 
