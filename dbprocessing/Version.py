@@ -108,7 +108,27 @@ class Version(object):
         self.revision += 1
         self._checkVersion()
 
-    def __cmp__(self, other):
-        left = (self.interface, self.quality, self.revision)
-        right = (other.interface, other.quality, other.revision)
-        return cmp(left, right)
+    def __eq__(self, other):
+        return ((self.interface, self.quality, self.revision) == \
+                (other.interface, other.quality, other.revision))
+
+    def __ne__(self, other):
+        return ((self.interface, self.quality, self.revision) != \
+                (other.interface, other.quality, other.revision))
+
+    def __lt__(self, other):
+        return ((self.interface, self.quality, self.revision) < \
+                (other.interface, other.quality, other.revision))
+
+    def __le__(self, other):
+        return ((self.interface, self.quality, self.revision) <= \
+                (other.interface, other.quality, other.revision))
+
+    def __gt__(self, other):
+        return ((self.interface, self.quality, self.revision) > \
+                (other.interface, other.quality, other.revision))
+
+    def __ge__(self, other):
+        return ((self.interface, self.quality, self.revision) >= \
+                (other.interface, other.quality, other.revision))
+
