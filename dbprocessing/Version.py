@@ -1,11 +1,14 @@
 from __future__ import division
 from __future__ import print_function
 
+from functools import total_ordering
+
+
 class VersionError(Exception):
     """Error class for Version that calls out that an invalid version has been specified"""
     pass
 
-
+@total_ordering
 class Version(object):
     """
     A version class to simplify pushing around version information
@@ -67,7 +70,7 @@ class Version(object):
     def fromString(inval):
         """
         Given a string of the form x.y.z return a Version object
-        
+
         :param inval: String in the form xx.yy.zz
         :type inval: str
         :return: Version instance created from the string
@@ -113,22 +116,8 @@ class Version(object):
                 (other.interface, other.quality, other.revision))
 
     def __ne__(self, other):
-        return ((self.interface, self.quality, self.revision) != \
-                (other.interface, other.quality, other.revision))
+        return not (self == other)
 
     def __lt__(self, other):
         return ((self.interface, self.quality, self.revision) < \
                 (other.interface, other.quality, other.revision))
-
-    def __le__(self, other):
-        return ((self.interface, self.quality, self.revision) <= \
-                (other.interface, other.quality, other.revision))
-
-    def __gt__(self, other):
-        return ((self.interface, self.quality, self.revision) > \
-                (other.interface, other.quality, other.revision))
-
-    def __ge__(self, other):
-        return ((self.interface, self.quality, self.revision) >= \
-                (other.interface, other.quality, other.revision))
-
