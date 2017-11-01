@@ -19,10 +19,7 @@ import Utils
 import runMe
 from Utils import strargs_to_args
 
-try:  # new version changed this annoyingly
-    from sqlalchemy.exceptions import IntegrityError
-except ImportError:
-    from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError
 
 
 class ProcessQueue(object):
@@ -446,7 +443,7 @@ class ProcessQueue(object):
                                      incVersion=incVersion)
         except DButils.DBNoData:
             DBlogging.dblogger.error('No code_id {0} found in the DB'.format(id_in))
-            
+
     def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=None):
         try:
             prod_id = self.dbu.getProductID(id_in)

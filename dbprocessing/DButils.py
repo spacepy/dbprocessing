@@ -15,15 +15,9 @@ from sqlalchemy import Table
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy.orm.exc
-
-try:  # new version changed this annoyingly
-    from sqlalchemy.exceptions import IntegrityError
-    from sqlalchemy.exceptions import ArgumentError
-    from sqlalchemy.orm.exceptions import NoResultFound
-except ImportError:
-    from sqlalchemy.exc import IntegrityError
-    from sqlalchemy.exc import ArgumentError
-    from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import ArgumentError
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
 from sqlalchemy import and_
 
