@@ -171,7 +171,6 @@ def _fileTest(filename):
 def addStuff(cfg, options):
     # setup the db
     dbu = DButils.DButils(options.mission)
-
     # is the mission in the DB?  If not add it
     if cfg['mission']['mission_name'] not in dbu.getMissions():  # was it there?
         # add it
@@ -313,7 +312,8 @@ if __name__ == "__main__":
     MISSION = conf['mission']['mission_name']
     SPACECRAFT = conf['satellite']['satellite_name'].replace('{MISSION}', MISSION)
     INSTRUMENT = conf['instrument']['instrument_name'].replace('{MISSION}', MISSION).replace('{SPACECRAFT}', SPACECRAFT)
-    print(MISSION, SPACECRAFT, INSTRUMENT)
+    print('Adding to mission {0}, spacecraft {1}, instrument {2}'.format(
+        MISSION, SPACECRAFT, INSTRUMENT))
     with open(filename, 'r') as fp:
         cfg = fp.readlines()
     for ii, l in enumerate(cfg):
