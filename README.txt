@@ -1,3 +1,6 @@
+#This is very out of date to the point of being useless, please ignore - Myles 12/12/17
+
+
 README file for dbprocessing
 
 Revisions:
