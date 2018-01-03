@@ -1025,7 +1025,7 @@ class TestWithtestDB(unittest.TestCase):
         super(TestWithtestDB, self).setUp()
         self.tempD = tempfile.mkdtemp()
 
-        copy_tree('testDB/', self.tempD)
+        copy_tree(os.path.dirname(__file__) + '/testDB/', self.tempD)
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
         self.dbu.getEntry('Mission', 1).rootdir = self.tempD  # Set the mission's dir to the tmp so we can work with it
         self.dbu.commitDB()

@@ -27,7 +27,7 @@ class UtilsTests(unittest.TestCase):
         # Would need to at least update DB path if we wanted to
         # do more than vanilla dirSubs
         self.tempD = tempfile.mkdtemp()
-        copy_tree('testDB/', self.tempD)
+        copy_tree(os.path.dirname(__file__) + '/testDB/', self.tempD)
 
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
 
@@ -192,7 +192,7 @@ class UtilsTests(unittest.TestCase):
 
     def test_readconfig(self):
         """test readconfig"""
-        self.assertEqual({'section2': {'sect2a': 'sect2_value1'}, 'section1': {'sect1a': 'sect1_value1', 'sect1b': 'sect1_value2'}}, Utils.readconfig('testconfig.txt'))
+        self.assertEqual({'section2': {'sect2a': 'sect2_value1'}, 'section1': {'sect1a': 'sect1_value1', 'sect1b': 'sect1_value2'}}, Utils.readconfig(os.path.dirname(__file__) + '/testconfig.txt'))
 
     def test_datetimeToDate(self):
         """test datetimeToDate"""
