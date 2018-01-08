@@ -2,23 +2,23 @@
 from optparse import OptionParser
 
 def doProcess(infiles, outfile):
-	with open(outfile, 'w') as output:
-		for fname in infiles:
-			with open(fname) as infile:
-				output.write(infile.read())
+    with open(outfile, 'w') as output:
+        for fname in infiles:
+            with open(fname) as infile:
+                output.write(infile.read())
 
 if __name__ == '__main__':
-	usage = "usage: %prog [infiles] outfile"
-	parser = OptionParser(usage=usage)
-	
-	(options, args) = parser.parse_args()
+    usage = "usage: %prog [infiles] outfile"
+    parser = OptionParser(usage=usage)
 
-	if len(args) < 2:
-		parser.error("incorrect number of arguments")
+    (options, args) = parser.parse_args()
 
-	infiles = args[:-1]
-	outfile = args[-1]
+    if len(args) < 2:
+        parser.error("incorrect number of arguments")
 
-	print "infiles", infiles
-	print "outfile", outfile
-	doProcess(infiles, outfile)
+    infiles = args[:-1]
+    outfile = args[-1]
+
+    print "infiles", infiles
+    print "outfile", outfile
+    doProcess(infiles, outfile)
