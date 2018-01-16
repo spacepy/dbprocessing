@@ -18,7 +18,8 @@ class DBfileTests(unittest.TestCase):
     def setUp(self):
         super(DBfileTests, self).setUp()
         self.tempD = tempfile.mkdtemp()
-        copy_tree(os.path.dirname(__file__) + '/testDB/', self.tempD)
+        copy_tree(os.path.dirname(__file__) + '/../functional_test/', self.tempD)
+        copy_tree(os.path.dirname(__file__) + '/tars/', self.tempD)
 
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
         #Update the mission path to the tmp dir

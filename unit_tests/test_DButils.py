@@ -1025,7 +1025,7 @@ class TestWithtestDB(unittest.TestCase):
         super(TestWithtestDB, self).setUp()
         self.tempD = tempfile.mkdtemp()
 
-        copy_tree(os.path.dirname(__file__) + '/testDB/', self.tempD)
+        copy_tree(os.path.dirname(__file__) + '/../functional_test/', self.tempD)
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
         self.dbu.getEntry('Mission', 1).rootdir = self.tempD  # Set the mission's dir to the tmp so we can work with it
         self.dbu.commitDB()
@@ -1043,12 +1043,12 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_checkDiskForFile_DBTrue_FileFalse_FixTrue(self):
         """Check consistency between FS and DB, correct DB"""
-        os.remove(self.tempD + '/L0/testDB_001_first.raw')
+        os.remove(self.tempD + '/L0/testDB_001_sec.raw')
         self.assertTrue(self.dbu.checkDiskForFile(1, True))
 
     def test_checkDiskForFile_DBTrue_FileFalse(self):
         """checkDiskForFile returns false if the file in DB does not exist"""
-        os.remove(self.tempD + '/L0/testDB_001_first.raw')
+        os.remove(self.tempD + '/L0/testDB_001_sec.raw')
         self.assertFalse(self.dbu.checkDiskForFile(1))
 
     def test_checkDiskForFile_DBFalse_FileTrue(self):
@@ -1060,17 +1060,17 @@ class TestWithtestDB(unittest.TestCase):
         """Compare DB and real checksum, both matching and nonmatching"""
         self.assertTrue(self.dbu.checkFileSHA(1))
 
-        with open(self.tempD + '/L0/testDB_001_first.raw', 'w') as fp:
+        with open(self.tempD + '/L0/testDB_001_sec.raw', 'w') as fp:
             fp.write('I am some text that will change the SHA\n')
         self.assertFalse(self.dbu.checkFileSHA(1))
 
     def test_checkFiles(self):
         """Checks if checkFiles will detect both missing files and bad checksums"""
-        with open(self.tempD + '/L0/testDB_000_first.raw', 'w') as fp:
+        with open(self.tempD + '/L0/testDB_001_first.raw', 'w') as fp:
             fp.write('I am some text that will change the SHA\n')
-        os.remove(self.tempD + '/L0/testDB_001_first.raw')
+        os.remove(self.tempD + '/L0/testDB_000_first.raw')
 
-        ans = [('testDB_001_first.raw', 2), ('testDB_000_first.raw', 1)]
+        ans = [('testDB_001_first.raw', 1), ('testDB_000_first.raw', 2)]
         self.assertEqual(ans, self.dbu.checkFiles())
 
     def addGenericCode(self, processID=1):
@@ -1397,9 +1397,9 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_all(self):
         """getAllFilenames should return all files in the db when passed no filters"""
-        ans = ['testDB_001_first.raw', 'testDB_000_first.raw',
-               'testDB_001_sec.raw', 'testDB_000_sec.raw', 'testDB_000.cat',
-               'testDB_001.cat', 'testDB_001.rot', 'testDB_000.rot']
+        ans = ['testDB_001_sec.raw', 'testDB_001_first.raw',
+               'testDB_000_sec.raw', 'testDB_000_first.raw', 'testDB_000.cat',
+               'testDB_001.cat', 'testDB_000.rot', 'testDB_001.rot']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False))
 
@@ -1412,8 +1412,8 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_level(self):
         """getAllFilenames should return the files with level 0"""
-        ans = ['testDB_001_first.raw', 'testDB_000_first.raw',
-               'testDB_001_sec.raw', 'testDB_000_sec.raw']
+        ans = ['testDB_001_sec.raw', 'testDB_001_first.raw',
+               'testDB_000_sec.raw', 'testDB_000_first.raw']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
                                                        level = 0))
@@ -1427,16 +1427,16 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_instrument(self):
         """getAllFilenames should return the files with instrument 1"""
-        ans = ['testDB_001_first.raw', 'testDB_000_first.raw',
-               'testDB_001_sec.raw', 'testDB_000_sec.raw', 'testDB_000.cat',
-               'testDB_001.cat', 'testDB_001.rot', 'testDB_000.rot']
+        ans = ['testDB_001_sec.raw', 'testDB_001_first.raw',
+               'testDB_000_sec.raw', 'testDB_000_first.raw', 'testDB_000.cat',
+               'testDB_001.cat', 'testDB_000.rot', 'testDB_001.rot']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
                                                        instrument = 1))
 
     def test_getAllFilenames_date1(self):
         """getAllFilenames, date, string"""
-        ans = ['testDB_000_first.raw', 'testDB_000_sec.raw',
+        ans = ['testDB_000_sec.raw', 'testDB_000_first.raw',
                'testDB_000.cat', 'testDB_000.rot']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
@@ -1445,7 +1445,7 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_date2(self):
         """getAllFilenames, date, datetime.date"""
-        ans = ['testDB_000_first.raw', 'testDB_000_sec.raw',
+        ans = ['testDB_000_sec.raw', 'testDB_000_first.raw',
                'testDB_000.cat', 'testDB_000.rot']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
@@ -1465,8 +1465,8 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_limit(self):
         """getAllFilenames should only return 4 items with limit=4"""
-        ans = ['testDB_001_first.raw', 'testDB_000_first.raw',
-               'testDB_001_sec.raw', 'testDB_000_sec.raw']
+        ans = ['testDB_001_sec.raw', 'testDB_001_first.raw',
+               'testDB_000_sec.raw', 'testDB_000_first.raw']
         out = self.dbu.getAllFilenames(fullPath = False, limit = 4)
 
         self.assertEqual(4, len(out))

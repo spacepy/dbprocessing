@@ -27,7 +27,7 @@ class UtilsTests(unittest.TestCase):
         # Would need to at least update DB path if we wanted to
         # do more than vanilla dirSubs
         self.tempD = tempfile.mkdtemp()
-        copy_tree(os.path.dirname(__file__) + '/testDB/', self.tempD)
+        copy_tree(os.path.dirname(__file__) + '/../functional_test/', self.tempD)
 
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
 

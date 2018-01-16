@@ -1944,7 +1944,7 @@ class DButils(object):
         path = self.getIncomingPath()
         DBlogging.dblogger.debug("Looking for files in {0}".format(path))
         files = glob.glob(os.path.join(path, glb))
-        return files
+        return sorted(files)
 
     def getIncomingPath(self):
         """

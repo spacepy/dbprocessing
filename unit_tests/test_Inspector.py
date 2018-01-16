@@ -59,7 +59,7 @@ class InspectorClass(unittest.TestCase):
         # Would need to at least update DB path if we wanted to
         # use DB
         self.tempD = tempfile.mkdtemp()
-        copy_tree(os.path.dirname(__file__) + '/testDB/', self.tempD)
+        copy_tree(os.path.dirname(__file__) + '/../functional_test/', self.tempD)
 
         self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
         self.inspect = imp.load_source('inspect', os.path.dirname(__file__) + '/inspector/rot13_L1.py')
