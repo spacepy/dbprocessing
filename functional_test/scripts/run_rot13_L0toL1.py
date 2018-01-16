@@ -16,7 +16,7 @@ if __name__ == '__main__':
     if len(args) < 2:
         parser.error("incorrect number of arguments")
 
-    infiles = args[:-1]
+    infiles = sorted(args[:-1])
     outfile = args[-1]
 
     print "infiles", infiles
