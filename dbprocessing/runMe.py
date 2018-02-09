@@ -187,9 +187,6 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     while runme_list or processes:
         while (len(processes) < MAX_PROC) and runme_list:
             runme = runme_list.pop(0) # pop from the list, it is sorted!!
-            # belt and suspenders
-            if not runme.ableToRun:
-                continue
 
             DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
 
@@ -199,45 +196,31 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
             directory
             """
 
-            # make sure the file is not in the DB before you try this
+            print("{0} Process starting ({2}): {1}".format(DFP(), ' '.join(runme.cmdline), len(runme_list)))
+            if rundir is None:
+                prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
+            else:
+                prob_name = os.path.join(rundir, runme.filename + '.prob')
             try:
-                if force:
-                    raise(DButils.DBNoData)
-
-                tmp = dbu.getEntry('File', os.path.basename(runme.cmdline[-1])) # output is last
-                if tmp is not None: # we are not going to run
-                    DBlogging.dblogger.info("Did Not run: {0} output was in db"
+                fp = open(prob_name, 'w')
+                fp.write(' '.join(runme.cmdline))
+                fp.write('\n\n')
+                fp.write('-'*80)
+                fp.write('\n\n')
+                fp.flush()
+            except IOError:
+                DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
                                             .format(os.path.basename(' '.join(runme.cmdline))))
-                    try:
-                        rm_tempdir(runme.tempdir) # delete the tempdir
-                    except AttributeError:
-                        pass
-            except DButils.DBNoData:
-                print("{0} Process starting ({2}): {1}".format(DFP(), ' '.join(runme.cmdline), len(runme_list)))
-                if rundir is None:
-                    prob_name = os.path.join(runme.tempdir, runme.filename + '.prob')
-                else:
-                    prob_name = os.path.join(rundir, runme.filename + '.prob')
+                #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
                 try:
-                    fp = open(prob_name, 'w')
-                    fp.write(' '.join(runme.cmdline))
-                    fp.write('\n\n')
-                    fp.write('-'*80)
-                    fp.write('\n\n')
-                    fp.flush()
-                except IOError:
-                    DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
-                                             .format(os.path.basename(' '.join(runme.cmdline))))
-                    #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
-                    try:
-                        rm_tempdir(runme.tempdir) # delete the tempdir
-                    except OSError:
-                        pass
-                    continue # move to next process
+                    rm_tempdir(runme.tempdir) # delete the tempdir
+                except OSError:
+                    pass
+                continue # move to next process
 
-                _start_a_run(runme)
-                processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
-                time.sleep(0.5)
+            _start_a_run(runme)
+            processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
+            time.sleep(0.5)
 
         for p in list(processes.keys()):
             if p.poll() is None: # still running
