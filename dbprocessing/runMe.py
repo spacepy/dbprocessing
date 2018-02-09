@@ -151,35 +151,9 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     for runme in runme_list:
         force = rundir is not None
         runme.make_command_line(force = force, rundir=rundir)
-    # get rid of all the runme objects that are not runnable
-    runme_list2 = set([v for v in runme_list if v.ableToRun])
-    # get the ones we are not running and delete their tempdir
-    left_overs = set(runme_list).difference(runme_list2)
-    for lo in left_overs: # remove the tempdir
-        try:
-            rm_tempdir(lo.tempdir)
-        except (OSError, AttributeError):
-            pass
 
     # sort the runme_list on level and filename (which is like date and product and s/c together)
-    runme_list = sorted(list(runme_list2), key = lambda x: (x.data_level, x.filename))
-
-    # found some cases where the same command line was in the list more than once based on
-    #   more than one dependency in the process queue, go through and clean these out
-    # TODO add this to the DB so that we can have a defined version string
-    #basenames = Utils.unique([v.filename.split('_v')[0] for v in runme_list])
-    #runme_list_uniq = []
-    #for name in basenames:
-    #    # loop over all the runme's with this output and see which has the most arguments
-    #    tmp_rme = []
-    #    for rme in runme_list:
-    #        if name in rme.filename:
-    #            tmp_rme.append(rme)
-    #        if tmp_rme:
-    #            runme_list_uniq.append(max(tmp_rme, key=lambda x: len(x.cmdline)))
-
-    #print runme_list_uniq, runme_list
-    #runme_list = runme_list_uniq
+    runme_list = sorted(list(runme_list), key = lambda x: (x.data_level, x.filename))
 
     #########################################
     # 20140825 try another way of doing this
