@@ -621,17 +621,6 @@ class runMe(object):
         NOTE: creates a temp directory that needs to be cleaned!!
         """
 
-        ## 1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a
-        # if runme.filename is in the DB then we cannot run this.  (happens if 2 identical runMe are there
-        if not force:
-            try:
-                file_entry = self.dbu.getEntry('File', self.filename)
-                DBlogging.dblogger.debug("Not going to run the outfile is already in the db: {0}".format(self.filename))
-                self.ableToRun = False
-                return
-            except DButils.DBNoData:
-                pass # we can process this
-
         # build the command line we are to run
         cmdline = [self.codepath]
         # get extra_params from the process
