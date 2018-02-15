@@ -928,7 +928,9 @@ class DButils(object):
     def addproductprocesslink(self,
                               input_product_id,
                               process_id,
-                              optional):
+                              optional,
+                              yesterday=0,
+                              tomorrow=0):
         """
         Add a product process link to the database
 
@@ -936,11 +938,21 @@ class DButils(object):
         :type input_product_id: int
         :param process_id: id of the process to link
         :type process_id: int
+        :param optional: if the input product is necessary
+        :type optional: boolean
+        :param yesterday: How many extra days back do you need
+        :type yesterday: int
+        :param tomorrow: How many extra days forward do you need
+        :type tomorrow: int
         """
         ppl1 = self.Productprocesslink()
         ppl1.input_product_id = self.getProductID(input_product_id)
         ppl1.process_id = self.getProcessID(process_id)
         ppl1.optional = optional
+        #Backwards compatability with old databases
+        if hasattr(ppl1, 'yesterday'):
+            ppl1.yesterday = yesterday;
+            ppl1.tomorrow = tomorrow;
         self.session.add(ppl1)
         self.commitDB()
         return ppl1.input_product_id, ppl1.process_id
@@ -1629,7 +1641,7 @@ class DButils(object):
                        for v in self.getFilesByProductDate(fe.product_id, [fe.utc_file_date] * 2, newest_version=True))
         return list(newest.intersection(invals))
 
-    def getInputProductID(self, process_id):
+    def getInputProductID(self, process_id, range=False):
         """
         Return the fileID for the input filename
 
@@ -1639,8 +1651,13 @@ class DButils(object):
         :return: list of input_product_ids
         :rtype: list
         """
-        sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional).filter_by(
-            process_id=process_id).all()
+        if range:
+            sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional,
+                self.Productprocesslink.yesterday, self.Productprocesslink.tomorrow)\
+                .filter_by(process_id=process_id).all()
+        else:
+            sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional)\
+                .filter_by(process_id=process_id).all()
         return sq
 
     def getFiles(self,

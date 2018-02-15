@@ -267,7 +267,7 @@ class ProcessQueue(object):
         #####################################################
         ## get all the input products for that process, and if they are optional
         T0 = time.time()
-        input_product_id = self.dbu.getInputProductID(process_id)  # this is a list of tuples (id, optional)
+        input_product_id = self.dbu.getInputProductID(process_id, True)  # this is a list of tuples (id, optional, yesterday, tommorow)
         if debug: print("21:    {0}: self.dbu.getInputProductID: {1}".format(time.time() - T0, input_product_id))
         T0 = time.time()
 
@@ -289,11 +289,13 @@ class ProcessQueue(object):
             files = []
             # get all the possible files based on dates that we might want to put into the process now
 
-            for iprod_id, opt in input_product_id:
+            for iprod_id, opt, y, t in input_product_id:
                 # accept a datetime.datetime or datetime.date
                 dt = Utils.datetimeToDate(utc_file_date)
+                start = dt - datetime.timedelta(days=y)
+                end = dt + datetime.timedelta(days=t)
 
-                tmp_files = self.dbu.getFilesByProductDate(iprod_id, [dt] * 2, newest_version=True)
+                tmp_files = self.dbu.getFilesByProductDate(iprod_id, [start, end], newest_version=True)
                 if debug: print("23:    {0}: self.dbu.getFilesByProductDate, {1} {2} {3}".format(time.time() - T0, iprod_id, dt, tmp_files))
                 T0 = time.time()
 

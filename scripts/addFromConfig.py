@@ -23,6 +23,7 @@ import shutil
 import sys
 import tempfile
 from optparse import OptionParser
+from ast import literal_eval as make_tuple
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -61,6 +62,12 @@ def readconfig(config_filepath):
     ans = { }
     for section in sections:
         ans[section] = dict(cfg.items(section))
+        for item in ans[section]:
+            if 'input' in item:
+                if '(' in ans[section][item]:
+                    ans[section][item] = make_tuple(ans[section][item])
+                else:
+                    ans[section][item] = (ans[section][item], 0, 0)
     return ans
 
 
@@ -134,7 +141,7 @@ def _keysPresentCheck(conf):
         if k.startswith('process'):
             for k2 in conf[k]:
                 if 'input' in k2:
-                    if conf[k][k2] not in conf:
+                    if conf[k][k2][0] not in conf:
                         raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
                 elif 'output_product' in k2:
                     if conf[k][k2] not in conf and conf[k]['output_timebase'] != "RUN":
@@ -262,7 +269,7 @@ def addStuff(cfg, options):
             # now add the productprocesslink
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if 'input' in k)
             for k in tmp:
-                ppl = dbu.addproductprocesslink(cfg[tmp[k]]['product_id'], p_id, 'optional' in k)
+                ppl = dbu.addproductprocesslink(cfg[tmp[k][0]]['product_id'], p_id, 'optional' in k, tmp[k][1], tmp[k][2])
                 print('Added Productprocesslink: {0}'.format(ppl))
 
             # if the process was not there we will assume the code is not either (requires a process_id)
