@@ -120,6 +120,8 @@ class dbprocessing_db(object):
                                   schema.Column('input_product_id', types.Integer,
                                                 schema.ForeignKey('product.product_id'), nullable=False),
                                   schema.Column('optional', types.Boolean, nullable=False),
+                                  schema.Column('yesterday', types.Integer, nullable=False),
+                                  schema.Column('tomorrow', types.Integer, nullable=False),
                                   schema.PrimaryKeyConstraint('process_id', 'input_product_id')
                                   )
 
