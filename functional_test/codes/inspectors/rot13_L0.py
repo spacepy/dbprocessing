@@ -5,10 +5,10 @@ import re
 import datetime
 
 class Inspector(inspector.inspector):
-    code_name = "rot13_L0_first.py"
+    code_name = "rot13_L0.py"
 
     def inspect(self, kwargs):
-        m = re.match(r'testDB_(\d{3})_first\.raw$', self.basename)
+        m = re.match(r'testDB_{apid}_(\d{{3}})\.raw$'.format(**kwargs), self.basename)
         if not m:
             return None
 
@@ -16,5 +16,5 @@ class Inspector(inspector.inspector):
         self.diskfile.params['utc_stop_time'] = self.diskfile.params['utc_start_time'] + datetime.timedelta(days=1)
         self.diskfile.params['utc_file_date'] = self.diskfile.params['utc_start_time'].date()
         self.diskfile.params['version'] = Version.Version.fromString('1.0.0')#"Cheating" for coverage testing
-        self.diskfile.params['process_keywords'] = 'nnn=' + m.group(1)
+        self.diskfile.params['process_keywords'] = 'nnn=' + kwargs["apid"]
         return True
