@@ -1043,12 +1043,12 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_checkDiskForFile_DBTrue_FileFalse_FixTrue(self):
         """Check consistency between FS and DB, correct DB"""
-        os.remove(self.tempD + '/L0/testDB_001_sec.raw')
+        os.remove(self.tempD + '/L0/testDB_001_001.raw')
         self.assertTrue(self.dbu.checkDiskForFile(1, True))
 
     def test_checkDiskForFile_DBTrue_FileFalse(self):
         """checkDiskForFile returns false if the file in DB does not exist"""
-        os.remove(self.tempD + '/L0/testDB_001_sec.raw')
+        os.remove(self.tempD + '/L0/testDB_001_001.raw')
         self.assertFalse(self.dbu.checkDiskForFile(1))
 
     def test_checkDiskForFile_DBFalse_FileTrue(self):
@@ -1060,17 +1060,17 @@ class TestWithtestDB(unittest.TestCase):
         """Compare DB and real checksum, both matching and nonmatching"""
         self.assertTrue(self.dbu.checkFileSHA(1))
 
-        with open(self.tempD + '/L0/testDB_001_sec.raw', 'w') as fp:
+        with open(self.tempD + '/L0/testDB_001_001.raw', 'w') as fp:
             fp.write('I am some text that will change the SHA\n')
         self.assertFalse(self.dbu.checkFileSHA(1))
 
     def test_checkFiles(self):
         """Checks if checkFiles will detect both missing files and bad checksums"""
-        with open(self.tempD + '/L0/testDB_001_first.raw', 'w') as fp:
+        with open(self.tempD + '/L0/testDB_001_000.raw', 'w') as fp:
             fp.write('I am some text that will change the SHA\n')
-        os.remove(self.tempD + '/L0/testDB_000_first.raw')
+        os.remove(self.tempD + '/L0/testDB_000_000.raw')
 
-        ans = [('testDB_001_first.raw', 1), ('testDB_000_first.raw', 2)]
+        ans = [('testDB_001_000.raw', 1), ('testDB_000_000.raw', 2)]
         self.assertEqual(ans, self.dbu.checkFiles())
 
     def addGenericCode(self, processID=1):
@@ -1387,74 +1387,96 @@ class TestWithtestDB(unittest.TestCase):
         """Tests all of the release stuff, it's all intertwined anyway"""
         self.dbu.tag_release(1)
 
-        ans = set(['testDB_000.cat', 'testDB_001.cat', 'testDB_001_sec.raw',
-               'testDB_000_sec.raw', 'testDB_001.rot', 'testDB_000.rot',
-               'testDB_001_first.raw', 'testDB_000_first.raw'])
+        ans = set(['testDB_001_001.raw', 'testDB_000_001.raw', 
+                   'testDB_001_000.raw', 'testDB_000_000.raw',
+                   'testDB_2016-01-02.cat', 'testDB_2016-01-04.cat', 
+                   'testDB_2016-01-03.cat', 'testDB_2016-01-01.cat', 
+                   'testDB_2016-01-04.rot', 'testDB_2016-01-05.cat', 
+                   'testDB_2016-01-05.rot', 'testDB_2016-01-02.rot', 
+                   'testDB_2016-01-01.rot', 'testDB_2016-01-03.rot', 
+                   'testDB_000_002.raw', 'testDB_000_003.raw'])
         self.assertEqual(ans, set(self.dbu.list_release(1, fullpath=False)))
         # Test additional release options
-        self.dbu.addRelease('testDB_000.cat', 2, commit=True)
-        self.assertEqual([self.tempD + '/L1/testDB_000.cat'], self.dbu.list_release(2, fullpath=True))
+        self.dbu.addRelease('testDB_2016-01-01.cat', 2, commit=True)
+        self.assertEqual([self.tempD + '/L1/testDB_2016-01-01.cat'], self.dbu.list_release(2, fullpath=True))
 
     def test_getAllFilenames_all(self):
         """getAllFilenames should return all files in the db when passed no filters"""
-        ans = ['testDB_001_sec.raw', 'testDB_001_first.raw',
-               'testDB_000_sec.raw', 'testDB_000_first.raw', 'testDB_000.cat',
-               'testDB_001.cat', 'testDB_000.rot', 'testDB_001.rot']
+        ans = sorted(['testDB_001_001.raw', 'testDB_000_001.raw', 
+                   'testDB_001_000.raw', 'testDB_000_000.raw',
+                   'testDB_2016-01-02.cat', 'testDB_2016-01-04.cat', 
+                   'testDB_2016-01-03.cat', 'testDB_2016-01-01.cat', 
+                   'testDB_2016-01-04.rot', 'testDB_2016-01-05.cat', 
+                   'testDB_2016-01-05.rot', 'testDB_2016-01-02.rot', 
+                   'testDB_2016-01-01.rot', 'testDB_2016-01-03.rot', 
+                   'testDB_000_002.raw', 'testDB_000_003.raw'])
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False))
+        self.assertEqual(ans, sorted(self.dbu.getAllFilenames(fullPath = False)))
 
     def test_getAllFilenames_product(self):
         """getAllFilenames should return the files with product_id 1"""
-        ans = ['testDB_000.cat', 'testDB_001.cat']
+        ans = sorted(['testDB_2016-01-01.cat', 'testDB_2016-01-02.cat', 
+               'testDB_2016-01-03.cat', 'testDB_2016-01-04.cat',
+               'testDB_2016-01-05.cat'])
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
-                                                       product = 1))
+        self.assertEqual(ans, sorted(self.dbu.getAllFilenames(fullPath = False,
+                                                       product = 1)))
 
     def test_getAllFilenames_level(self):
         """getAllFilenames should return the files with level 0"""
-        ans = ['testDB_001_sec.raw', 'testDB_001_first.raw',
-               'testDB_000_sec.raw', 'testDB_000_first.raw']
+        ans = sorted(['testDB_001_001.raw', 'testDB_001_000.raw', 
+                'testDB_000_001.raw', 'testDB_000_000.raw',
+                'testDB_000_002.raw', 'testDB_000_003.raw'])
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
-                                                       level = 0))
+        self.assertEqual(ans, sorted(self.dbu.getAllFilenames(fullPath = False,
+                                                       level = 0)))
 
     def test_getAllFilenames_code(self):
         """getAllFilenames should return the files with code 1"""
-        ans = ['testDB_000.cat', 'testDB_001.cat']
+        ans = sorted(['testDB_2016-01-02.cat', 'testDB_2016-01-04.cat', 
+               'testDB_2016-01-03.cat', 'testDB_2016-01-01.cat', 
+               'testDB_2016-01-05.cat'])
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
-                                                       code = 1))
+        self.assertEqual(ans, sorted(self.dbu.getAllFilenames(fullPath = False,
+                                                       code = 1)))
 
     def test_getAllFilenames_instrument(self):
         """getAllFilenames should return the files with instrument 1"""
-        ans = ['testDB_001_sec.raw', 'testDB_001_first.raw',
-               'testDB_000_sec.raw', 'testDB_000_first.raw', 'testDB_000.cat',
-               'testDB_001.cat', 'testDB_000.rot', 'testDB_001.rot']
+        ans = sorted(['testDB_001_001.raw', 'testDB_000_001.raw', 
+                'testDB_001_000.raw', 'testDB_000_000.raw',
+                'testDB_2016-01-02.cat', 'testDB_2016-01-04.cat', 
+                'testDB_2016-01-03.cat', 'testDB_2016-01-01.cat', 
+                'testDB_2016-01-04.rot', 'testDB_2016-01-05.cat', 
+                'testDB_2016-01-05.rot', 'testDB_2016-01-02.rot', 
+                'testDB_2016-01-01.rot', 'testDB_2016-01-03.rot', 
+                'testDB_000_002.raw', 'testDB_000_003.raw'])
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
-                                                       instrument = 1))
+        self.assertEqual(ans, sorted(self.dbu.getAllFilenames(fullPath = False,
+                                                       instrument = 1)))
 
     def test_getAllFilenames_date1(self):
         """getAllFilenames, date, string"""
-        ans = ['testDB_000_sec.raw', 'testDB_000_first.raw',
-               'testDB_000.cat', 'testDB_000.rot']
+        ans = sorted(['testDB_001_000.raw', 'testDB_000_000.raw',
+               'testDB_2016-01-01.cat', 'testDB_2016-01-01.rot'])
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
+        self.assertEqual(ans, sorted(self.dbu.getAllFilenames(fullPath = False,
                                                        startDate = "2016-01-01",
-                                                       endDate = "2016-01-01"))
+                                                       endDate = "2016-01-01")))
 
     def test_getAllFilenames_date2(self):
         """getAllFilenames, date, datetime.date"""
-        ans = ['testDB_000_sec.raw', 'testDB_000_first.raw',
-               'testDB_000.cat', 'testDB_000.rot']
+        ans = sorted(['testDB_001_000.raw', 'testDB_000_000.raw',
+               'testDB_2016-01-01.cat', 'testDB_2016-01-01.rot'])
 
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
+        self.assertEqual(ans, sorted(self.dbu.getAllFilenames(fullPath = False,
                                                        startDate = datetime.date(2016, 1, 1),
-                                                       endDate = datetime.date(2016, 1, 1)))
+                                                       endDate = datetime.date(2016, 1, 1))))
 
     def test_getAllFilenames_allFilters(self):
         """getAllFilenames should return the files with all the filters"""
-        ans = ['testDB_000.cat', 'testDB_001.cat']
+        ans = ['testDB_2016-01-01.cat', 'testDB_2016-01-02.cat',
+               'testDB_2016-01-03.cat', 'testDB_2016-01-04.cat',
+               'testDB_2016-01-05.cat']
 
         self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
                                                        level = 1,
@@ -1465,8 +1487,8 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_limit(self):
         """getAllFilenames should only return 4 items with limit=4"""
-        ans = ['testDB_001_sec.raw', 'testDB_001_first.raw',
-               'testDB_000_sec.raw', 'testDB_000_first.raw']
+        ans = ['testDB_001_001.raw', 'testDB_001_000.raw',
+               'testDB_000_003.raw', 'testDB_000_002.raw']
         out = self.dbu.getAllFilenames(fullPath = False, limit = 4)
 
         self.assertEqual(4, len(out))

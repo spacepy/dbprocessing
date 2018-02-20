@@ -46,14 +46,14 @@ class DBfileTests(unittest.TestCase):
         return dbf
 
     def test_invalidInput(self):
-        self.assertRaises(DBfile.DBfileError, DBfile.DBfile, self.tempD + '/L0/testDB_000_first.raw', self.dbu)
+        self.assertRaises(DBfile.DBfileError, DBfile.DBfile, self.tempD + '/L0/testDB_000_000.raw', self.dbu)
 
     def test_repr(self):
-        dbf = DBfile.DBfile(self.tempD + '/L0/testDB_000_first.raw', self.dbu, makeDiskFile=True)
+        dbf = DBfile.DBfile(self.tempD + '/L0/testDB_000_000.raw', self.dbu, makeDiskFile=True)
         self.assertTrue(dbf.__repr__().startswith("<DBfile.DBfile object: "))
 
     def test_getDirectory(self):
-        dbf = DBfile.DBfile(self.tempD + '/L0/testDB_000_first.raw', self.dbu, makeDiskFile=True)
+        dbf = DBfile.DBfile(self.tempD + '/L0/testDB_000_000.raw', self.dbu, makeDiskFile=True)
         
         #Fails because product_id is not set
         self.assertRaises(DBfile.DBfileError, dbf.getDirectory )

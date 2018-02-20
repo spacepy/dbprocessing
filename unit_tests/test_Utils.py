@@ -56,7 +56,7 @@ class UtilsTests(unittest.TestCase):
         path = '{H}{M}{S}'
         self.assertEqual('010203', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version))
         # Substitutions that require referring to the DB...
-        filename = 'testDB_001_first.raw'
+        filename = 'testDB_000_000.raw'
         path = '{INSTRUMENT}'
         self.assertEqual('rot13', Utils.dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=self.dbu))
         path = '{SATELLITE}'
