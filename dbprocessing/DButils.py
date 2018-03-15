@@ -1949,7 +1949,7 @@ class DButils(object):
         :return: base directory for current mission
         :rtype: str
         """
-        return self.getDirectory('inspector_dir', default=self.CodeDirectory)
+        return self.getDirectory('inspectordir', default=self.CodeDirectory)
 
     def checkIncoming(self, glb='*'):
         """
