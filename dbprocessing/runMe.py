@@ -67,10 +67,16 @@ def _extract_files(cmdline):
         if s.startswith('--'):
             tmp = s.split('=')
             if os.path.sep in tmp[-1]: # this looks like a file
-                files.append(tmp[-1])
+                if ',' in tmp[-1]:
+                    files.append(tmp[-1].split(','))
+                else:
+                    files.append(tmp[-1])
         else:
             if os.path.sep in s: # this looks like a file
-                files.append(s)
+                if ',' in tmp[-1]:
+                    files.append(s.split(','))
+                else:
+                    files.append(s)
     return files
 
 def _pokeFile(filename):
