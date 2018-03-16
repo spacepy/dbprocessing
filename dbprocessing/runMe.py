@@ -73,7 +73,7 @@ def _extract_files(cmdline):
                     files.append(tmp[-1])
         else:
             if os.path.sep in s: # this looks like a file
-                if ',' in tmp[-1]:
+                if ',' in s:
                     files.append(s.split(','))
                 else:
                     files.append(s)
