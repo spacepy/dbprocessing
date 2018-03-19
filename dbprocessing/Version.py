@@ -121,3 +121,12 @@ class Version(object):
     def __lt__(self, other):
         return ((self.interface, self.quality, self.revision) < \
                 (other.interface, other.quality, other.revision))
+
+    def __sub__(self, other):
+        """
+        Subtract works on each version number
+
+        :param other: The other Version object
+        :type other: Version
+        """
+        return [self.interface - other.interface, self.quality - other.quality, self.revision - other.revision]

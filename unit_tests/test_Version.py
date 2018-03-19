@@ -101,6 +101,10 @@ class VersionTests(unittest.TestCase):
         self.assertRaises(ValueError, Version.Version, 0, 'string', 0)
         self.assertRaises(ValueError, Version.Version, 0, 0, 'string')
 
+    def test_sub(self):
+        """__sub__ should give known result"""
+        self.assertEqual(Version.Version(1,0,1)-Version.Version(1,0,0), [0,0,1])
+
     def test_repr(self):
         """__repr__ has known output"""
         self.assertEqual(Version.Version(1,0,1).__repr__(), 'Version: 1.0.1')
