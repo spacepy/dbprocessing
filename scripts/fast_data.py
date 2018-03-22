@@ -8,11 +8,9 @@ from dbprocessing import DButils
 
 def build_graph(dbu):
     G = nx.DiGraph()
-    print(len(dbu.session.query(dbu.File.file_id).all()))
-    G.add_nodes_from(dbu.session.query(dbu.File.file_id).all())
-    print(G.number_of_nodes())
+    G.add_nodes_from((r for r, in
+        dbu.session.query(dbu.File.file_id).all()))
     G.add_edges_from(dbu.session.query(dbu.Filefilelink.source_file, dbu.Filefilelink.resulting_file).all())
-    print(G.number_of_nodes())
     return G
 
 if __name__ == '__main__':
