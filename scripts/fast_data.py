@@ -10,7 +10,9 @@ def build_graph(dbu):
     G = nx.DiGraph()
     print(len(dbu.session.query(dbu.File.file_id).all()))
     G.add_nodes_from(dbu.session.query(dbu.File.file_id).all())
+    print(G.number_of_nodes())
     G.add_edges_from(dbu.session.query(dbu.Filefilelink.source_file, dbu.Filefilelink.resulting_file).all())
+    print(G.number_of_nodes())
     return G
 
 if __name__ == '__main__':
@@ -24,8 +26,6 @@ if __name__ == '__main__':
     dbu = DButils.DButils(options.mission)
     G = build_graph(dbu)
 
-    print(G.number_of_nodes())
-    print(G.number_of_edges())
     #print(len([n for n,d in G.in_degree().items() if d==0]))
     #print(nx.has_path(G, 1, 321022))
     dbu.closeDB()
