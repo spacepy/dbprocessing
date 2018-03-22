@@ -3,9 +3,15 @@
 from optparse import OptionParser
 
 import networkx as nx
-import matplotlib.pyplot as plt
 
 from dbprocessing import DButils
+
+def build_graph(dbu):
+    G = nx.DiGraph()
+    print(len(dbu.session.query(dbu.File.file_id).all()))
+    G.add_nodes_from(dbu.session.query(dbu.File.file_id).all())
+    G.add_edges_from(dbu.session.query(dbu.Filefilelink.source_file, dbu.Filefilelink.resulting_file).all())
+    return G
 
 if __name__ == '__main__':
     usage = "usage: %prog -m database"
@@ -16,16 +22,10 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     dbu = DButils.DButils(options.mission)
-    G = nx.Graph()
+    G = build_graph(dbu)
 
-    files = dbu.getFiles()
-    for f in files:
-        G.add_node(f.file_id)
-    
-    edges = dbu.session.query(dbu.Filefilelink).all()
-    for e in edges:
-        G.add_edge(e.source_file, e.resulting_file)
-    
-    #nx.draw(G, with_labels=True, font_weight='bold')
-    #plt.savefig("graph.png")
+    print(G.number_of_nodes())
+    print(G.number_of_edges())
+    #print(len([n for n,d in G.in_degree().items() if d==0]))
+    #print(nx.has_path(G, 1, 321022))
     dbu.closeDB()
