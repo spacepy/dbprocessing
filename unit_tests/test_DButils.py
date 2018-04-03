@@ -796,9 +796,9 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
         connection = sqlite3.connect(self.sqlworking)
         cursor = connection.cursor()
-        cursor.execute("ALTER TABLE mission ADD column inspector_dir VARCHAR(50)")
+        cursor.execute("ALTER TABLE mission ADD column inspectordir VARCHAR(50)")
         connection.commit()
-        cursor.execute("UPDATE mission SET inspector_dir = '/n/space_data/cda/rbsp/inspector_dir' WHERE mission_id = 1")
+        cursor.execute("UPDATE mission SET inspectordir = '/n/space_data/cda/rbsp/inspector_dir' WHERE mission_id = 1")
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
@@ -809,9 +809,9 @@ class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
         #https://stackoverflow.com/questions/7300948/add-column-to-sqlalchemy-table
         connection = sqlite3.connect(self.sqlworking)
         cursor = connection.cursor()
-        cursor.execute("ALTER TABLE mission ADD column inspector_dir VARCHAR(50)")
+        cursor.execute("ALTER TABLE mission ADD column inspectordir VARCHAR(50)")
         connection.commit()
-        cursor.execute("UPDATE mission SET inspector_dir = 'inspector_dir' WHERE mission_id = 1")
+        cursor.execute("UPDATE mission SET inspectordir = 'inspector_dir' WHERE mission_id = 1")
         connection.commit()
         connection.close()
         self.dbu = DButils.DButils(self.sqlworking)
