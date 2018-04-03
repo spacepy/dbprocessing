@@ -159,7 +159,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
         runme.make_command_line(force = force, rundir=rundir)
 
     # sort the runme_list on level and filename (which is like date and product and s/c together)
-    runme_list = sorted(list(runme_list), key = lambda x: (x.data_level, x.filename))
+    runme_list.sort(key = lambda x: (x.data_level, x.filename))
 
     #########################################
     # 20140825 try another way of doing this
@@ -173,11 +173,14 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
     # 1
     outfiles = [os.path.basename(v.filename) for v in runme_list]
-    def remove_dups(seq, oval):
-        seen = set()
-        return [oval[i] for i in xrange(len(seq)) if seq[i] ==  '' or not (seq[i] in seen or seen.add(seq[i]))]
     # 2
-    runme_list = remove_dups(outfiles, runme_list)
+    #Delete IF not blank AND it's already in seen (if not seen, add it to seen,
+    #but don't delete)
+    seen = set()
+    delvals = [i for i in range(len(outfiles)) if outfiles[i] != '' and
+               (outfiles[i] in seen or seen.add(outfiles[i]))]
+    for i in delvals[::-1]:
+        del runme_list[i]
     print("{0} len(runme_list)={1}".format(DFP(), len(runme_list)))
 
 
