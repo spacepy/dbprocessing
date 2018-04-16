@@ -1676,7 +1676,7 @@ class DButils(object):
 
         # BAL not ideal but a special case where product_id is set and startDate == endDate
         # 30 March 2017
-        if product is not None and startDate == endDate and newest_version:
+        if product is not None and startDate == endDate and startDate is not None and newest_version:
             files = self.session.query(self.File).filter_by(utc_file_date=startDate).filter_by(product_id=product).order_by(
                    self.File.interface_version.desc()).order_by(self.File.quality_version.desc()).order_by(
                     self.File.revision_version.desc()).limit(1)
