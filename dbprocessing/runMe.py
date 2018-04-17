@@ -196,6 +196,8 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     while runme_list or processes:
         while (len(processes) < MAX_PROC) and runme_list:
             runme = runme_list.pop(0) # pop from the list, it is sorted!!
+            if runme.data_level == 5000: #RUN timebase
+                runme.cmdline.pop(-1) #Chop the fake "output" file
 
             DBlogging.dblogger.info("Command: {0} starting".format(os.path.basename(' '.join(runme.cmdline))))
 
