@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
 	(options, args) = parser.parse_args()
 
-	if len(args) != 2:
+	if len(args) != 1:
 		parser.error("incorrect number of arguments")
 
 	infile = args[0]
