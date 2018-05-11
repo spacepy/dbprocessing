@@ -1673,65 +1673,43 @@ class DButils(object):
         # if a datetime.datetime comes in this does not work, make them datetime.date
         startDate = Utils.datetimeToDate(startDate)
         endDate = Utils.datetimeToDate(endDate)
-
-        # BAL not ideal but a special case where product_id is set and startDate == endDate
-        # 30 March 2017
-        if product is not None and startDate == endDate and startDate is not None and newest_version:
-            files = self.session.query(self.File).filter_by(utc_file_date=startDate).filter_by(product_id=product).order_by(
-                   self.File.interface_version.desc()).order_by(self.File.quality_version.desc()).order_by(
-                    self.File.revision_version.desc()).limit(1)
+        
+        if newest_version:
+            files = self.session.query(self.File, func.max(self.File.interface_version * 10000 + self.File.quality_version * 100 + self.File.revision_version))
         else:
+            files = self.session.query(self.File)
 
-            # leave this on top so that we don;t have to repeat code inside the logic below
-            # SQL runs group by before order by, so the ordering must be done in a subquery
-            stmt = self.session.query(self.File).order_by(self.File.interface_version) \
-                                                .order_by(self.File.quality_version) \
-                                                .order_by(self.File.revision_version).subquery()
+        if product is not None:
+            files = files.filter_by(product_id=product)
+        
+        if level is not None:
+            files = files.filter_by(data_level=level)
 
-            # do this first as the newest_version subquery get simplier
-            # which makes things a little faster on large databases
-            if product is not None:
-                if newest_version:
-                    files = self.session.query() \
-                                .add_entity(self.File, alias=stmt) \
-                                .group_by(stmt.corresponding_column(self.File.utc_file_date))
-                else:
-                    files = self.session.query(self.File)
-                files = files.filter_by(product_id=product)
+        if exists is not None:
+            files = files.filter_by(exists_on_disk=exists)
 
-            elif newest_version:
-                files = self.session.query() \
-                            .add_entity(self.File, alias=stmt) \
-                            .group_by(stmt.corresponding_column(self.File.product_id)) \
-                            .group_by(stmt.corresponding_column(self.File.utc_file_date))
+        if code is not None:
+            files = files.join(self.Filecodelink, self.File.file_id == self.Filecodelink.resulting_file) \
+                .filter_by(source_code=code)
+
+        if instrument is not None:
+            files = files.join(self.Instrumentproductlink,
+                                self.File.product_id == self.Instrumentproductlink.product_id) \
+                .filter_by(instrument_id=instrument)
+
+        if (startDate != "1970-01-01" and startDate is not None) or (endDate != "2070-01-01" and endDate is not None):
+            # I.E, they changed atleast one of the date parameters from "all"
+            files = files.filter(self.File.utc_file_date.between(startDate, endDate))
+
+        if newest_version:
+            files = files.group_by(self.File.product_id, self.File.utc_file_date)
+            x = files.limit(limit).all()
+            if len(x) > 0:
+                return zip(*x)[0]
             else:
-                files = self.session.query(self.File)
-
-            if level is not None:
-                files = files.filter_by(data_level=level)
-
-            if exists is not None:
-                files = files.filter_by(exists_on_disk=exists)
-            if code is not None:
-                files = files.join(self.Filecodelink, self.File.file_id == self.Filecodelink.resulting_file) \
-                    .filter_by(source_code=code)
-            if instrument is not None:
-                files = files.join(self.Instrumentproductlink,
-                                   self.File.product_id == self.Instrumentproductlink.product_id) \
-                    .filter_by(instrument_id=instrument)
-            if (startDate != "1970-01-01" and startDate is not None) or (endDate != "2070-01-01" and endDate is not None):
-                # I.E, they changed atleast one of the date parameters from "all"
-
-                if newest_version:
-                    # Theres a strange bug involving auto-aliasing and the subquery,
-                    # I was unable to figure it out besides this weird hack - Myles Johnson 1/5/2016
-                    files = files.filter(stmt.corresponding_column(self.File.utc_file_date).between(startDate, endDate))
-                else:
-                    files = files.filter(self.File.utc_file_date.between(startDate, endDate))
-            if limit is not None:
-                files = files.limit(limit)
-
-        return files.all()
+                return ()
+        else:
+            return files.limit(limit).all()
 
     def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
