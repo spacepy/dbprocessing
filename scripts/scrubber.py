@@ -9,8 +9,7 @@ class scrubber(object):
         self.dbu = DButils.DButils(mission)
 
     def parents_are_newest(self):
-        x = self.dbu.getFiles(newest_version=True)
-        n = set([i.file_id for i in x])
+        n = self.dbu.getAllFileIds(newest_version=True)
 
         xp = self.dbu.session.query(self.dbu.Filefilelink.source_file).filter(self.dbu.Filefilelink.resulting_file.in_(n)).all()
         np = set(zip(*xp)[0])
@@ -44,5 +43,5 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     scrubber = scrubber(options.mission)
-    #scrubber.parents_are_newest()
+    scrubber.parents_are_newest()
     scrubber.version_number_check()

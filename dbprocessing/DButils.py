@@ -2302,12 +2302,12 @@ class DButils(object):
         f_ids = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file=file_id).all()
         if not f_ids:
             return []
+            
         f_ids = map(itemgetter(0), f_ids)
-        files = [self.getEntry('File', val) for val in f_ids]
-        if not id_only:
-            return files
-        else:
-            return map(attrgetter('file_id'), files)
+        if id_only:
+            return f_ids
+
+        return [self.getEntry('File', val) for val in f_ids]
 
     def getFileVersion(self, fileid):
         """
