@@ -1675,7 +1675,7 @@ class DButils(object):
         endDate = Utils.datetimeToDate(endDate)
         
         if newest_version:
-            files = self.session.query(self.File, func.max(self.File.interface_version * 10000 + self.File.quality_version * 100 + self.File.revision_version))
+            files = self.session.query(self.File, func.max(self.File.interface_version * 1000000 + self.File.quality_version * 1000 + self.File.revision_version))
         else:
             files = self.session.query(self.File)
 
