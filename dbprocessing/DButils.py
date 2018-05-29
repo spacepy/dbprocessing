@@ -1674,10 +1674,7 @@ class DButils(object):
         startDate = Utils.datetimeToDate(startDate)
         endDate = Utils.datetimeToDate(endDate)
         
-        if newest_version:
-            files = self.session.query(self.File, func.max(self.File.interface_version * 1000000 + self.File.quality_version * 1000 + self.File.revision_version))
-        else:
-            files = self.session.query(self.File)
+        files = self.session.query(self.File)
 
         if product is not None:
             files = files.filter_by(product_id=product)
@@ -1702,12 +1699,10 @@ class DButils(object):
             files = files.filter(self.File.utc_file_date.between(startDate, endDate))
 
         if newest_version:
-            files = files.group_by(self.File.product_id, self.File.utc_file_date)
+            files = files.order_by(self.File.interface_version, self.File.quality_version, self.File.revision_version)
             x = files.limit(limit).all()
-            if len(x) > 0:
-                return zip(*x)[0]
-            else:
-                return ()
+            out = dict([((i.product_id, i.utc_file_date), i) for i in x])
+            return list(out.values())
         else:
             return files.limit(limit).all()
 
