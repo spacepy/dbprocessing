@@ -11,25 +11,20 @@ from dbprocessing import DButils, Version
 
 def build_graph(dbu):
     """Loads the file records and their parent-child relationships into a networkX graph
-    
+
     Arguments:
         dbu {DButils} -- The DButils instance for the mission
-    
+
     Returns:
         networkx.Graph -- A Graph of file records and their parent-child relationships
     """
 
     G = networkx.DiGraph()
     # This way is WAY slower, by about 3x - Myles 5/29/18
-    # G.add_nodes_from([(f.file_id, {
-    #     'filename': f.filename,
-    #     'product_id': f.product_id,
-    #     'utc_file_date': f.utc_file_date,
-    #     'exists_on_disk': f.exists_on_disk,
-    #     'version': dbu.getFileVersion(f)
-    # }) for f in dbu.session.query(dbu.File).all()])
-
+    # G.add_nodes_from([(f.file_id, f)
+    #                   for f in dbu.session.query(dbu.File).all()])
     G.add_nodes_from([(i, {
+        'file_id': i,
         'filename': a,
         'product_id': b,
         'utc_file_date': c,
@@ -48,15 +43,14 @@ def build_graph(dbu):
 
 def get_fastdata_participants(graph, cutoff):
     """Get all file records that meet the fast data participant requirements
-    
+
     Arguments:
         graph {networkx.Graph} -- A graph of file records and their parent-child relationships
         cutoff {datetime.date} -- Date to use as the fast data cut off
-    
+
     Returns:
         set(dict) -- Set of the file records
     """
-    print(type(graph.nodes[1]['utc_file_date']))
     l0 = [n for n, d in graph.in_degree() if d == 0]
     fast0 = set([x for x in l0 if graph.nodes[x]['utc_file_date'] > cutoff])
     fast0_children_lists = [networkx.descendants(graph, x) for x in fast0]
@@ -70,25 +64,47 @@ def reap_files(graph, participants):
     nodes.sort(key=lambda file: (
         file['product_id'], file['utc_file_date'], file['version']))
 
+    last_node = nodes[0]
     for node in reversed(nodes):
-        print(node)
+        if (node['product_id'] == last_node['product_id'] and
+                node['utc_file_date'] == last_node['utc_file_date'] and
+                node['version'] < last_node['version']):
+            os.remove(dbu.getFileFullPath(node['file_id']))
+            # This is slow, and we(I.E. not me) can fix it later if its too slow. - Myles 6/5/2018
+            dbu.getEntry('File', node['file_id']).exists_on_disk = False
+
+        last_node = node
+
+
+def reap_records(graph, participants):
+    nodes = [graph.nodes[x] for x in participants]
+    nodes.sort(key=lambda file: (
+        file.product_id, file.utc_file_date, file.version))
+
+    last_node = nodes[0]
+    for node in reversed(nodes):
+        if (node['product_id'] == last_node['product_id'] and
+                node['utc_file_date'] == last_node['utc_file_date'] and
+                node['version'] < last_node['version']):
+            if not node.exists_on_disk:
+                dbu._purgeFileFromDB(node['file_id'], trust_id=True)
+            
+        last_node = node
 
 
 if __name__ == '__main__':
-    usage = "usage: %prog -m database"
+    usage = "usage: %prog -m database -d YYYY-MM-DD --reap-files --reap-records"
     parser = OptionParser(usage=usage)
     parser.add_option(
         "-m",
         "--mission",
         dest="mission",
-        help="selected mission database",
-        default=None)
+        help="selected mission database",)
     parser.add_option(
         "-d",
         "--cutoff",
         dest="cutoff",
-        help="What date to use as the fast data cut off",
-        default=None)
+        help="What date to use as the fast data cut off",)
     parser.add_option(
         "--reap-files",
         dest="files",
@@ -104,15 +120,29 @@ if __name__ == '__main__':
 
     (options, args) = parser.parse_args()
 
+    if options.mission is None:
+        parser.error("Mission needs to be specified")
+
+    try:
+        cut_date = datetime.datetime.strptime(
+            options.cutoff, "%Y-%m-%d").date()
+    except TypeError as err:
+        parser.error("Must pass a cutoff date")
+    except ValueError as err:
+        parser.error(err.message)
+
+    if not (options.files or options.records):
+        parser.error("Must use --reap-files and/or --reap-records")
+
     dbu = DButils.DButils(options.mission)
     G = build_graph(dbu)
 
-    fd = get_fastdata_participants(G, datetime.date(2015, 1, 1))
-    
+    fd = get_fastdata_participants(G, cut_date)
+
     if options.files:
         reap_files(G, fd)
-    
-    # if options.records:
-    #     reap_records(G, fd)
+
+    if options.records:
+        reap_records(G, fd)
 
     dbu.closeDB()

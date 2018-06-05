@@ -1701,6 +1701,8 @@ class DButils(object):
         if newest_version:
             files = files.order_by(self.File.interface_version, self.File.quality_version, self.File.revision_version)
             x = files.limit(limit).all()
+            
+            # Last item wins. https://stackoverflow.com/questions/39678672/is-a-python-dict-comprehension-always-last-wins-if-there-are-duplicate-keys
             out = dict([((i.product_id, i.utc_file_date), i) for i in x])
             return list(out.values())
         else:
