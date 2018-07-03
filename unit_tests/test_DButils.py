@@ -1059,11 +1059,12 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_checkFileSHA(self):
         """Compare DB and real checksum, both matching and nonmatching"""
-        self.assertTrue(self.dbu.checkFileSHA(1))
+        file_id = self.dbu.getFileID("testDB_001_001.raw")
+        self.assertTrue(self.dbu.checkFileSHA(file_id))
 
         with open(self.tempD + '/L0/testDB_001_001.raw', 'w') as fp:
             fp.write('I am some text that will change the SHA\n')
-        self.assertFalse(self.dbu.checkFileSHA(1))
+        self.assertFalse(self.dbu.checkFileSHA(file_id))
 
     def test_checkFiles(self):
         """Checks if checkFiles will detect both missing files and bad checksums"""
@@ -1488,12 +1489,18 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_getAllFilenames_limit(self):
         """getAllFilenames should only return 4 items with limit=4"""
-        ans = ['testDB_001_001.raw', 'testDB_001_000.raw',
-               'testDB_000_003.raw', 'testDB_000_002.raw']
-        out = self.dbu.getAllFilenames(fullPath = False, limit = 4)
+        ans = set(['testDB_2016-01-01.cat', 'testDB_001_001.raw',
+                   'testDB_001_000.raw', 'testDB_000_003.raw',
+                   'testDB_000_002.raw', 'testDB_000_001.raw',
+                   'testDB_000_000.raw', 'testDB_2016-01-02.cat',
+                   'testDB_2016-01-03.cat', 'testDB_2016-01-04.cat',
+                   'testDB_2016-01-05.cat', 'testDB_2016-01-01.rot',
+                   'testDB_2016-01-02.rot', 'testDB_2016-01-03.rot',
+                   'testDB_2016-01-04.rot', 'testDB_2016-01-05.rot'])
+        out = set(self.dbu.getAllFilenames(fullPath = False, limit = 4))
 
         self.assertEqual(4, len(out))
-        self.assertEqual(ans, out)
+        self.assertTrue(out.issubset(ans))
 
     def test_getAllFilenames_fullPath(self):
         """getAllFilenames should return the fullPath"""

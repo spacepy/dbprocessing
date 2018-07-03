@@ -386,7 +386,7 @@ class ProcessQueue(object):
                     continue
                 DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
-                runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self)
+                runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self, file_id[1])
                 #print("{0}:  runMe.runMe".format(time.time()-T0))
                 #T0 = time.time()
                 # only add to runme list if it can be run

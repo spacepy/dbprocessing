@@ -491,6 +491,7 @@ class DButils(object):
             for f in files_to_add:
                 pq1 = self.Processqueue()
                 pq1.file_id = f
+                pq1.version_bump = version_bump
                 self.session.add(pq1)
                 DBlogging.dblogger.debug("File added to process queue {0}:{1}".format(fileid, '---'))
             self.commitDB()  # commit once for all the adds
@@ -503,7 +504,7 @@ class DButils(object):
 
         return self.session.query(self.Processqueue).count()
 
-    def _processqueuePop(self, index=0, version_bump=None):
+    def _processqueuePop(self, index=0):
         """
         pop a file off the process queue (from the left)
 
@@ -517,12 +518,12 @@ class DButils(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        val = self._processqueueGet(index=index, version_bump=version_bump, instance=True)
+        val = self._processqueueGet(index=index, instance=True)
         self.session.delete(val)
         self.commitDB()
         return (val.file_id, val.version_bump)
 
-    def _processqueueGet(self, index=0, version_bump=None, instance=False):
+    def _processqueueGet(self, index=0, instance=False):
         """
         Get the file at the head of the queue (from the left)
 
@@ -531,7 +532,7 @@ class DButils(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        if index < 0:  # emable the python from the end indexing
+        if index < 0:  # enable the python from the end indexing
             index = self.Processqueue.len() + index
 
         sq = self.session.query(self.Processqueue).offset(index).first()

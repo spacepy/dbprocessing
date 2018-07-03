@@ -284,9 +284,8 @@ class runMe(object):
     utc_file_date - datetime.date
     process_id - process to run (int)
     input_files - the files that exist to run with (list of int)
-    pq - processqueue instance
     """
-    def __init__(self, dbu, utc_file_date, process_id, input_files, pq, force=False):
+    def __init__(self, dbu, utc_file_date, process_id, input_files, pq, version_bump = None, force=False):
         DBlogging.dblogger.debug("Entered runMe {0}, {1}, {2}, {3}".format(dbu, utc_file_date, process_id, input_files))
         if isinstance(utc_file_date, datetime.datetime):
             utc_file_date = utc_file_date.date()
@@ -300,6 +299,7 @@ class runMe(object):
         self.utc_file_date = utc_file_date
         self.process_id = process_id
         self.input_files = input_files
+        self.version_bump = version_bump
         # since we have a process do we have a code that does it?
         self.code_id = self.dbu.getCodeFromProcess(process_id, utc_file_date)
         if self.code_id is None: # there is no code to actually run we are done
@@ -358,10 +358,22 @@ class runMe(object):
                     f_id_db = False
                 if not f_id_db: # if the file is not in the db lets make it
                     break # lets call this the only way out of here that creates the runner
+                
+                if self.version_bump == 0:
+                    self.output_version.incInterface()
+                    continue
+                if self.version_bump == 1:
+                    self.output_version.incQuality()
+                    continue
+                if self.version_bump == 2:
+                    self.output_version.incRevision()
+                    continue
+
                 codechange = self._codeVerChange(f_id_db)
                 if codechange: # if the code did change maybe we have a unique
                     DBlogging.dblogger.debug("Code did change for file: {0}".format(self.filename))
                     continue
+                
                 parentchange = self._parentsChanged(f_id_db)
                 if parentchange is None: # this is an inconsistency mark it and move on
                     DBlogging.dblogger.info("Parent was None for file: {0}".format(self.filename))
@@ -369,7 +381,7 @@ class runMe(object):
                 if parentchange:
                     DBlogging.dblogger.debug("Parent did change for file: {0}".format(self.filename))
                     continue
-                # Need to check for version_bump in the processqueue
+                
                 DBlogging.dblogger.debug("Jumping out of runme, not going to run anything".format())
 
                 return # if we get here then we are not going to run anything
