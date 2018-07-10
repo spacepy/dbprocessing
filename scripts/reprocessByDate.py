@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_option("-e", "--endDate", dest="endDate", type="string",
                       help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
     parser.add_option("", "--force", dest="force", type="int",
-                      help="Force the reprocessing, speicify which version number {0},{1},{2}", default=None)
+                      help="Force the reprocessing, specify which version number {0},{1},{2}", default=None)
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission database", default=None)
     parser.add_option("", "--echo", dest="echo", action='store_true',
