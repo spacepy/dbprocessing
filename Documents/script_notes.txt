@@ -35,9 +35,9 @@ QCEmailer_conf.txt: quality control loop stuff
 README.txt: whatever
 reprocessByAll.py: should work, probably doesn't
 reprocessByCode.py: ""
-reprocessByDate.py: This code works and is likely the one that shoulod be used most of the time for reprocessing files.
+reprocessByDate.py: This code works and is likely the one that should be used most of the time for reprocessing files. (BAL email 2018/7/11: "used as the default for do everything on a date range, maybe tha all one should go away")
 reprocessByInstrument.py: ""
-reprocessByProduct.py: does work, used all the time, beaten it to a pulp to make it work but haven't done that on the others
+reprocessByProduct.py: does work, used all the time, beaten it to a pulp to make it work but haven't done that on the others (BAL email 2018/7/11: "I use this a lot for individual processing")
 updateCode.py: new version of code, rerun based on that, better done through config files (although can't be done that way) and then run reprocessByCode
 updateProducts.py: probably broken
 updateSHAsum.py: meant to update database with new shasum if file has changed and want to keep it there
