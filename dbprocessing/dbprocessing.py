@@ -438,7 +438,7 @@ class ProcessQueue(object):
 
         return self.dbu.Processqueue.rawadd(f_ids, incVersion)
 
-    def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=2):
+    def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=None):
         try:
             code_id = self.dbu.getCodeID(id_in)
             return self._reprocessBy(code=code_id, startDate=startDate, endDate=endDate,
@@ -466,11 +466,3 @@ class ProcessQueue(object):
         except DButils.DBNoData:
             DBlogging.dblogger.error('No inst_id {0} found in the DB'.format(id_in))
 
-    def reprocessByAll(self, level=None, startDate=None, endDate=None):
-        """
-        this is a raw call into the db meant to be fast and all every file
-        between the dates into the process queue
-        - there is no version increment allowed
-        """
-        return self._reprocessBy(level=level, startDate=startDate, endDate=endDate,
-                                incVersion=None)
