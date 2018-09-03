@@ -390,6 +390,7 @@ class runMe(object):
         args = process_entry.extra_params
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+            args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
             args = args.split('|')
             self.extra_params = args
 
@@ -397,6 +398,7 @@ class runMe(object):
         args = code_entry.arguments
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
+            args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
             args = args.split()
             for arg in args:
                 # if 'input' not in arg and 'output' not in arg:

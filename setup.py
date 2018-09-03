@@ -26,7 +26,8 @@ scripts = ('scripts/addFromConfig.py', 'scripts/missingFilesByProduct.py',
            'scripts/magephem_dataToIncoming.py', 'scripts/writeDBhtml.py',
            'scripts/magephem_def_dataToIncoming.py', 'scripts/writeProcessConf.py',
            'scripts/magephem-pre-CoverageHTML.py', 'scripts/writeProductsConf.py',
-           'scripts/makeLatestSymlinks.py', 'scripts/testInspector.py')
+           'scripts/makeLatestSymlinks.py', 'scripts/testInspector.py',
+           'scripts/replaceArgsWithRootdir.py')
 
 setup(name='dbprocessing',
       version='0.0',
