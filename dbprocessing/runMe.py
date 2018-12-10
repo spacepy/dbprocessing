@@ -68,13 +68,13 @@ def _extract_files(cmdline):
             tmp = s.split('=')
             if os.path.sep in tmp[-1]: # this looks like a file
                 if ',' in tmp[-1]:
-                    files.append(tmp[-1].split(','))
+                    files.extend(tmp[-1].split(','))
                 else:
                     files.append(tmp[-1])
         else:
             if os.path.sep in s: # this looks like a file
                 if ',' in s:
-                    files.append(s.split(','))
+                    files.extend(s.split(','))
                 else:
                     files.append(s)
     return files
