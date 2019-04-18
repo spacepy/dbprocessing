@@ -34,8 +34,18 @@ def parse_args(argv=None):
 if __name__ == '__main__':
     args, kwargs = parse_args()
     db=DButils.DButils(kwargs['name'])
-    proc_id = db.getProcessID(kwargs['process'])
-    prod_id = db.getProductID(kwargs['product'])
+    try:
+        proc_id = db.getProcessID(kwargs['process'])
+    except:
+        raise ValueError('Could not find process in database: {}'.
+                         format(kwargs['process']))
+        
+    try:
+        prod_id = db.getProductID(kwargs['product'])
+    except:
+        raise ValueError('Could not find product in database: {}'.
+                         format(kwargs['product']))
+        
     if kwargs['yesterday']:
         yesterday = 1
     else:
