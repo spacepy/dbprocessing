@@ -33,6 +33,7 @@ import warnings
 import DBlogging
 import Diskfile
 import Version
+import DBstrings
 
 def EphemeralCallable(basetype=type):
     def _new_caller(cls, *args, **kwargs):
@@ -65,6 +66,9 @@ class inspector(object):
         self.basename = os.path.basename(self.filename)
         self.dirname = os.path.dirname(self.filename)
         self.product = product
+        self.filenameformat = self.dbu.getEntry('Product', self.product).format
+        DBformatter = DBstrings.DBformatter() #must instantiate class
+        self.filenameregex = DBformatter.re(self.filenameformat)
         self.diskfile = Diskfile.Diskfile(self.filename, self.dbu)
         insp = self.inspect(kwargs)
         if insp is None:

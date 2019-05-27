@@ -31,5 +31,4 @@ if __name__ == '__main__':
         df = inspect.Inspector(options.file, dbu, options.product, **kwargs)
     else:
         df = inspect.Inspector(options.file, dbu, options.product, )
-
     print(df)
