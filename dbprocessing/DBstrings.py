@@ -46,7 +46,7 @@ class DBformatter(string.Formatter):
         'MILLI': ('{MILLI:03d}', '\d{3}'),
         'MICRO': ('{MICRO:03d}', '\d{3}'),
         'QACODE': ('{QACODE}', 'ok|ignore|problem'),
-        'VERSION': ('{VERSION}', '\d\.\d\.\d'),
+        'VERSION': ('{VERSION}', '\d+\.\d+\.\d+'),
         'DATE': ('{DATE}', '(19|2\d)\d\d(0\d|1[0-2])[0-3]\d'),
         '??': ('{??}', '..'),
         '???': ('{???}', '...'),
