@@ -398,7 +398,7 @@ class ProcessQueue(object):
                         DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
                 else:
                     DBlogging.dblogger.info("Process: {} not being run because RUN timebase".\
-                                            format(self.dbu.getTraceback('process',42)['process'].process_name))
+                                            format(self.dbu.getEntry('process',child_process).process_name))
 
     def onStartup(self):
         """
