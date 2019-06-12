@@ -337,7 +337,7 @@ class ProcessQueue(object):
     def buildChildren(self, file_id, debug=False, skip_run=False):
         """
         go through and all the runMe's and add to the runme_list variable
-        param skip_run is set to skip runtime processes (eg make plots)
+        param skip_run is set to skip run timebase processes (eg make plots)
         """
         T0 = time.time()
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
@@ -387,18 +387,20 @@ class ProcessQueue(object):
                     continue
                 DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
-                if (self.dbu.getProcessTimebase(child_process) == 'DAILY') or \
-                   (skip_run == False):
-                    runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self, file_id[1])
-                    #print("{0}:  runMe.runMe".format(time.time()-T0))
-                    #T0 = time.time()
-                    # only add to runme list if it can be run
-                    if runme.ableToRun and (runme not in self.runme_list):
-                        self.runme_list.append(runme)
-                        DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
-                else:
-                    DBlogging.dblogger.info("Process: {} not being run because RUN timebase".\
-                                            format(self.dbu.getEntry('process',child_process).process_name))
+                if skip_run \
+                   and self.dbu.getProcessTimebase(child_process) == 'RUN':
+                    DBlogging.dblogger.info(
+                        "Process: {} skipping because RUN timebase"
+                        .format(self.dbu.getEntry('Process', child_process)
+                                .process_name))
+                    continue
+                runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self, file_id[1])
+                #print("{0}:  runMe.runMe".format(time.time()-T0))
+                #T0 = time.time()
+                # only add to runme list if it can be run
+                if runme.ableToRun and (runme not in self.runme_list):
+                    self.runme_list.append(runme)
+                    DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
 
     def onStartup(self):
         """

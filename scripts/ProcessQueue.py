@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser.add_option("-p", "", dest="p", action="store_true",
                       help="process mode", default=False)
     parser.add_option("-s", "", dest="s", action="store_true",
-                      help="Skip run-time processes", default=False)
+                      help="Skip run timebase processes", default=False)
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission database", default=None)
     parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
@@ -161,7 +161,7 @@ if __name__ == "__main__":
                     #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
                     #if f is None:
                     #    continue
-                    pq.buildChildren(f, skip_run = options.s)
+                    pq.buildChildren(f, skip_run=options.s)
                     tmp_ind += 1
                     Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress: {0}:{1}'.format(tmp_ind, totalsize))
 
