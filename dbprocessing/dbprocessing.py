@@ -334,9 +334,10 @@ class ProcessQueue(object):
             raise (ValueError('Bad timebase for product: {0}'.format(process_id)))
         return files, input_product_id
 
-    def buildChildren(self, file_id, debug=False):
+    def buildChildren(self, file_id, debug=False, skip_run=False):
         """
         go through and all the runMe's and add to the runme_list variable
+        param skip_run is set to skip runtime processes (eg make plots)
         """
         T0 = time.time()
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
@@ -386,13 +387,18 @@ class ProcessQueue(object):
                     continue
                 DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
-                runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self, file_id[1])
-                #print("{0}:  runMe.runMe".format(time.time()-T0))
-                #T0 = time.time()
-                # only add to runme list if it can be run
-                if runme.ableToRun and (runme not in self.runme_list):
-                    self.runme_list.append(runme)
-                    DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
+                if (self.dbu.getProcessTimebase(child_process) == 'DAILY') or \
+                   (skip_run == False):
+                    runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self, file_id[1])
+                    #print("{0}:  runMe.runMe".format(time.time()-T0))
+                    #T0 = time.time()
+                    # only add to runme list if it can be run
+                    if runme.ableToRun and (runme not in self.runme_list):
+                        self.runme_list.append(runme)
+                        DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
+                else:
+                    DBlogging.dblogger.info("Process: {} not being run because RUN timebase".\
+                                            format(self.dbu.getTraceback('process',42)['process'].process_name))
 
     def onStartup(self):
         """

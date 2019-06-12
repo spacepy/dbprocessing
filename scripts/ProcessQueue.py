@@ -25,12 +25,15 @@ if __name__ == "__main__":
         -p -> process
         -m -> selects mission
         -d -> dryrun
+        -s -> skip run timebase
     """
     parser = OptionParser(usage=usage)
     parser.add_option("-i", "", dest="i", action="store_true",
                       help="ingest mode", default=False)
     parser.add_option("-p", "", dest="p", action="store_true",
                       help="process mode", default=False)
+    parser.add_option("-s", "", dest="s", action="store_true",
+                      help="Skip run-time processes", default=False)
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission database", default=None)
     parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
@@ -53,6 +56,8 @@ if __name__ == "__main__":
 
     if options.i and options.p:
         parser.error("options -i and -p are mutually exclusive")
+    if options.i and options.s:
+        parser.error("options -i and -s are mutually exclusive")
     if not options.i and not options.p:
         parser.error("either -i or -p must be specified")
 
@@ -156,7 +161,7 @@ if __name__ == "__main__":
                     #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
                     #if f is None:
                     #    continue
-                    pq.buildChildren(f)
+                    pq.buildChildren(f, skip_run = options.s)
                     tmp_ind += 1
                     Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress: {0}:{1}'.format(tmp_ind, totalsize))
 
