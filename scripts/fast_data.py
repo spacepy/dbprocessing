@@ -153,10 +153,10 @@ if __name__ == '__main__':
 
     fd = get_fastdata_participants(G, cut_date)
 
-    if options.files:
+    if options.files and fd:
         reap_files(G, fd)
 
-    if options.records:
+    if options.records and fd:
         reap_records(G, fd)
 
     dbu.closeDB()
