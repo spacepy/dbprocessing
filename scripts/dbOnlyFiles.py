@@ -37,6 +37,8 @@ if __name__ == "__main__":
                       help="The File id to start on", default=1)
     parser.add_option("-v", "--verbose", dest="verbose", action='store_true',
                       help="Print out each file as it is checked", default=False)
+    parser.add_option("-p", "--path", dest="path", action="store_true",
+                      help="Print full file path of missing files", default=False)
 
     
     (options, args) = parser.parse_args()
@@ -66,6 +68,10 @@ if __name__ == "__main__":
         if options.verbose:
             print("{0} is being checked".format(f))
         if not dbu.checkDiskForFile(f, options.fix):
-            print("{0} is missing".format(f))
+            if options.path:
+                print("{0} is missing".format(dbu.getFileFullPath(f)))
+            else:
+                print("{0} is missing".format(f))
+
 
     dbu.closeDB()
