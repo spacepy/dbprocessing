@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser.add_option("-p", "", dest="p", action="store_true",
                       help="process mode", default=False)
     parser.add_option("-s", "", dest="s", action="store_true",
-                      help="Skip run-time processes", default=False)
+                      help="Skip run timebase processes", default=False)
     parser.add_option("-o", "--only", dest="o", type="string",
                       help='Run only listed processes (either id or name)', default = None)
     parser.add_option("-m", "--mission", dest="mission",
