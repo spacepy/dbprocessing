@@ -21,13 +21,13 @@ from dbprocessing import __version__
 if __name__ == "__main__":
     usage = \
     """
-    Usage: %prog [-i] [-p] [-d] [-m Test]
+    Usage: %prog [-i|-p [-d] [-s] [-o process[,process...]]] -m database
         -i -> import
         -p -> process
         -m -> selects mission
         -d -> dryrun
         -s -> skip run timebase
-        -f -> files (processes) to run
+        -o -> only run listed processes
     """
     parser = OptionParser(usage=usage)
     parser.add_option("-i", "", dest="i", action="store_true",
@@ -35,9 +35,9 @@ if __name__ == "__main__":
     parser.add_option("-p", "", dest="p", action="store_true",
                       help="process mode", default=False)
     parser.add_option("-s", "", dest="s", action="store_true",
-                      help="Skip run-time processes", default=False)
-    parser.add_option("-f", "--files", dest="f", type="string",
-                      help='Processes to run (either id or name)', default = None)
+                      help="Skip run timebase processes", default=False)
+    parser.add_option("-o", "--only", dest="o", type="string",
+                      help='Run only listed processes (either id or name)', default = None)
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission database", default=None)
     parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
@@ -62,8 +62,8 @@ if __name__ == "__main__":
         parser.error("options -i and -p are mutually exclusive")
     if options.i and options.s:
         parser.error("options -i and -s are mutually exclusive")
-    if options.i and options.f:
-        parser.error("options -i and -f are mutually exclusive")
+    if options.i and options.o:
+        parser.error("options -i and -o are mutually exclusive")
     if not options.i and not options.p:
         parser.error("either -i or -p must be specified")
 
@@ -167,7 +167,8 @@ if __name__ == "__main__":
                     #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
                     #if f is None:
                     #    continue
-                    pq.buildChildren(f, skip_run = options.s, run_procs = options.f)
+                    pq.buildChildren(f, skip_run=options.s,
+                                     run_procs=options.o)
                     tmp_ind += 1
                     Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress: {0}:{1}'.format(tmp_ind, totalsize))
 

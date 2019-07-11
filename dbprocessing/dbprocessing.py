@@ -4,7 +4,6 @@ from __future__ import print_function
 import datetime
 import imp
 import os
-import pdb
 import shutil
 import sys
 import tempfile
@@ -335,24 +334,20 @@ class ProcessQueue(object):
             raise (ValueError('Bad timebase for product: {0}'.format(process_id)))
         return files, input_product_id
 
-    def buildChildren(self, file_id, debug=False, skip_run=False, run_procs = None):
+    def buildChildren(self, file_id, debug=False, skip_run=False, run_procs=None):
         """
         go through and all the runMe's and add to the runme_list variable
-        param skip_run is set to skip runtime processes (eg make plots)
+        param skip_run is set to skip run timebase processes (eg make plots)
         param run_procs is a string which is a comma separated list of processes to run:
            either ids or names
         """
 
         # if processes to run specified, turn into list of IDs
-        # assume names are > 4 characters
-        if run_procs:
-            run_procs = run_procs.split(',')
-            for ii in range(len(run_procs)):
-                if len(run_procs[ii]) > 4:
-                    run_procs[ii] = self.dbu.getProcessID(run_procs[ii])
-                else:
-                    run_procs[ii] = int(run_procs[ii])
-        
+        # getProcessID accepts either ID or name and returns ID
+        if run_procs is not None:
+            run_procs = [self.dbu.getProcessID(rp)
+                         for rp in run_procs.split(',')]
+
         T0 = time.time()
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
         if debug: print("Entered buildChildren: file_id={0}".format(file_id))
@@ -401,18 +396,26 @@ class ProcessQueue(object):
                     continue
                 DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
 
-                if ((self.dbu.getProcessTimebase(child_process) == 'DAILY') or \
-                   (skip_run == False)) and ((run_procs == None) or (child_process in run_procs)) :
-                    runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self, file_id[1])
-                    #print("{0}:  runMe.runMe".format(time.time()-T0))
-                    #T0 = time.time()
-                    # only add to runme list if it can be run
-                    if runme.ableToRun and (runme not in self.runme_list):
-                        self.runme_list.append(runme)
-                        DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
-                else:
-                    DBlogging.dblogger.info("Process: {} not being run because RUN timebase".\
-                                            format(self.dbu.getEntry('Process',child_process).process_name))
+                if skip_run \
+                   and self.dbu.getProcessTimebase(child_process) == 'RUN':
+                    DBlogging.dblogger.info(
+                        "Process: {} skipping because RUN timebase"
+                        .format(self.dbu.getEntry('Process', child_process)
+                                .process_name))
+                    continue
+                if run_procs is not None and child_process not in run_procs:
+                    DBlogging.dblogger.info(
+                        "Process: {} skipping because not in run-only list"
+                        .format(self.dbu.getEntry('Process', child_process)
+                                .process_name))
+                    continue
+                runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self, file_id[1])
+                #print("{0}:  runMe.runMe".format(time.time()-T0))
+                #T0 = time.time()
+                # only add to runme list if it can be run
+                if runme.ableToRun and (runme not in self.runme_list):
+                    self.runme_list.append(runme)
+                    DBlogging.dblogger.info("Filename: {0} is not in the DB, can process".format(runme.filename))
 
     def onStartup(self):
         """
