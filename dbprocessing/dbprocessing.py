@@ -343,15 +343,11 @@ class ProcessQueue(object):
         """
 
         # if processes to run specified, turn into list of IDs
-        # assume names are > 4 characters
-        if run_procs:
-            run_procs = run_procs.split(',')
-            for ii in range(len(run_procs)):
-                if len(run_procs[ii]) > 4:
-                    run_procs[ii] = self.dbu.getProcessID(run_procs[ii])
-                else:
-                    run_procs[ii] = int(run_procs[ii])
-        
+        # getProcessID accepts either ID or name and returns ID
+        if run_procs is not None:
+            run_procs = [self.dbu.getProcessID(rp)
+                         for rp in run_procs.split(',')]
+
         T0 = time.time()
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
         if debug: print("Entered buildChildren: file_id={0}".format(file_id))
