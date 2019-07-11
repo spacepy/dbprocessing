@@ -65,8 +65,11 @@ def reap_files(graph, participants):
     nodes.sort(key=lambda file: (
         file['product_id'], file['utc_file_date'], file['version']))
 
-    last_node = nodes[0]
-    for node in reversed(nodes):
+    #Last one in the list is always newest version
+    last_node = nodes[-1]
+    #So work backwards and see if each is just an older version of
+    #previous one we checked
+    for node in reversed(nodes[:-1]):
         print("{}".format(dbu.getFileFullPath(node['file_id'])))
         print("{} {}".format(node['product_id'], last_node['product_id']))
         print("{} {}".format(node['utc_file_date'], last_node['utc_file_date']))
@@ -89,10 +92,10 @@ def reap_files(graph, participants):
 def reap_records(graph, participants):
     nodes = [graph.nodes[x] for x in participants]
     nodes.sort(key=lambda file: (
-        file.product_id, file.utc_file_date, file.version))
+        file['product_id'], file['utc_file_date'], file['version']))
 
-    last_node = nodes[0]
-    for node in reversed(nodes):
+    last_node = nodes[-1]
+    for node in reversed(nodes[:-1]):
         if (node['product_id'] == last_node['product_id'] and
                 node['utc_file_date'] == last_node['utc_file_date'] and
                 node['version'] < last_node['version']):
