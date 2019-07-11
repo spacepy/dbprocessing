@@ -52,37 +52,33 @@ def get_fastdata_participants(graph, cutoff):
     Returns:
         set(dict) -- Set of the file records
     """
-    #l0 = [n for n, d in graph.in_degree() if d == 0]
-    #fast0 = set([x for x in l0 if graph.nodes[x]['utc_file_date'] > cutoff])
-    l0 = [ii for ii in graph.in_degree() if graph.in_degree(ii) == 0]
-    fast0 = [ii[0] for ii in graph.nodes(True) if ii[0] in l0 and \
-             ii[1]['utc_file_date'] < cutoff]
+    #https://networkx.github.io/documentation/stable/release/migration_guide_from_1.x_to_2.0.html
+    l0 = [ii for ii in graph if graph.in_degree(ii) == 0]
+    fast0 = set([x for x in l0 if graph.node[x]['utc_file_date'] > cutoff])
     fast0_children_lists = [networkx.descendants(graph, x) for x in fast0]
     fast0_children = set(itertools.chain.from_iterable(fast0_children_lists))
-
-    return fast0_children | set(fast0)
+    return fast0_children | fast0
 
 
 def reap_files(graph, participants):
-
-    nodes = [ii for ii in graph.nodes(True) if ii[0] in participants]
+    nodes = [graph.node[x] for x in participants]
     nodes.sort(key=lambda file: (
-        file[1]['product_id'], file[1]['utc_file_date'], file[1]['version']))
+        file['product_id'], file['utc_file_date'], file['version']))
 
     last_node = nodes[0]
     for node in reversed(nodes):
-        print("{} {}".format(node[0], dbu.getFileFullPath(node[1]['file_id'])))
-        print("{} {}".format(node[1]['product_id'], last_node[1]['product_id']))
-        print("{} {}".format(node[1]['utc_file_date'], last_node[1]['utc_file_date']))
-        print("{} {}".format(node[1]['version'], last_node[1]['version']))
+        print("{}".format(dbu.getFileFullPath(node['file_id'])))
+        print("{} {}".format(node['product_id'], last_node['product_id']))
+        print("{} {}".format(node['utc_file_date'], last_node['utc_file_date']))
+        print("{} {}".format(node['version'], last_node['version']))
         print(" ")
-        if (node[1]['product_id'] == last_node[1]['product_id'] and
-                node[1]['utc_file_date'] == last_node[1]['utc_file_date'] and
-                node[1]['version'] < last_node[1]['version']):
+        if (node['product_id'] == last_node['product_id'] and
+                node['utc_file_date'] == last_node['utc_file_date'] and
+                node['version'] < last_node['version']):
             pdb.set_trace()
-            os.remove(dbu.getFileFullPath(node[1]['file_id']))
+            os.remove(dbu.getFileFullPath(node['file_id']))
             # This is slow, and we(I.E. not me) can fix it later if its too slow. - Myles 6/5/2018
-            dbu.getEntry('File', node[1]['file_id']).exists_on_disk = False
+            dbu.getEntry('File', node['file_id']).exists_on_disk = False
 
         last_node = node
     print("finished")
