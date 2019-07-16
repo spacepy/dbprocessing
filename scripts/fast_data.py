@@ -70,27 +70,18 @@ def reap_files(graph, participants):
     #So work backwards and see if each is just an older version of
     #previous one we checked
     for node in reversed(nodes[:-1]):
-        print("{}".format(dbu.getFileFullPath(node['file_id'])))
-        print("{} {}".format(node['product_id'], last_node['product_id']))
-        print("{} {}".format(node['utc_file_date'], last_node['utc_file_date']))
-        print("{} {}".format(node['version'], last_node['version']))
-        print(" ")
         if (node['product_id'] == last_node['product_id'] and
                 node['utc_file_date'] == last_node['utc_file_date'] and
                 node['version'] < last_node['version']):
-            pdb.set_trace()
             os.remove(dbu.getFileFullPath(node['file_id']))
             # This is slow, and we(I.E. not me) can fix it later if its too slow. - Myles 6/5/2018
             dbu.getEntry('File', node['file_id']).exists_on_disk = False
 
         last_node = node
-    print("finished")
-    pdb.set_trace()
-    print("here")
 
 
 def reap_records(graph, participants):
-    nodes = [graph.nodes[x] for x in participants]
+    nodes = [graph.node[x] for x in participants]
     nodes.sort(key=lambda file: (
         file['product_id'], file['utc_file_date'], file['version']))
 
@@ -99,7 +90,7 @@ def reap_records(graph, participants):
         if (node['product_id'] == last_node['product_id'] and
                 node['utc_file_date'] == last_node['utc_file_date'] and
                 node['version'] < last_node['version']):
-            if not node.exists_on_disk:
+            if not node['exists_on_disk']:
                 dbu._purgeFileFromDB(node['file_id'], trust_id=True)
             
         last_node = node
@@ -158,4 +149,5 @@ if __name__ == '__main__':
     if options.records and fd:
         reap_records(G, fd)
 
+    dbu.commitDB()
     dbu.closeDB()
