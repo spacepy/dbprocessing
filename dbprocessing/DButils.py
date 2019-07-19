@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import datetime
+import pdb
 import glob
 import itertools
 import os.path
@@ -1777,12 +1778,12 @@ class DButils(object):
 
     def getActiveInspectors(self):
         """
-        Query the db and return a list of all the active inspector file names [(filename, arguments, product), ...]
+        Query the db and return a list of all the active inspector file names [(filename, description, arguments, product), ...]
         """
-        activeInspector = namedtuple('activeInspector', 'path arguments product_id')
+        activeInspector = namedtuple('activeInspector', 'path description arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
-        return [activeInspector(os.path.join(self.InspectorDirectory, ans.relative_path, ans.filename), ans.arguments,
-                                ans.product) for ans in sq]
+        return [activeInspector(os.path.join(self.InspectorDirectory, ans.relative_path, ans.filename), ans.description,
+                                ans.arguments, ans.product) for ans in sq]
 
     def getChildrenProcesses(self, file_id):
         """
