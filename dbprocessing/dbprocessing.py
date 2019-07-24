@@ -223,7 +223,7 @@ class ProcessQueue(object):
             filename = self.filename
         act_insp = self.dbu.getActiveInspectors()
         claimed = []
-        for code, arg, product in act_insp:
+        for code, desc, arg, product in act_insp:
             try:
                 inspect = imp.load_source('inspect', code)
             except IOError as msg:
