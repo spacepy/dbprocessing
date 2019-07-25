@@ -1008,6 +1008,42 @@ class DButils(object):
         else:
             self.commitDB()
 
+    def delProduct(self, pp):
+        """
+        Removes a product from the db
+        Note: untested!
+        """
+        prod = self.getEntry('Product', pp)
+        self.session.delete(prod)
+        self.commitDB()
+
+    def delProductProcessLink(self, ll):
+        """
+        Removes a product from the db
+        :param list ll: two element list: process_id, product_id
+        Note: untested!
+        """
+        link = self.getEntry('Productprocesslink', ll)
+        self.session.delete(link)
+        self.commitDB()
+
+    def purgeProcess(self, proc, commit = True):
+        """
+        Remove process and productprocesslink
+        :param DButils.Process proc: ID for process to be deleted.
+        """
+        sq=self.session.query(self.Productprocesslink.input_product_id)\
+                       .filter_by(process_id=proc.process_id)
+        prod_ids = [ii for ii, in sq]
+        for prod_id in prod_ids:
+            link = self.getEntry('Productprocesslink',[proc.process_id, prod_id])
+            self.session.delete(link)
+
+        self.session.delete(proc)
+        if commit:
+            self.commitDB()
+        
+
     def addFilefilelink(self,
                         resulting_file_id,
                         source_file, ):
