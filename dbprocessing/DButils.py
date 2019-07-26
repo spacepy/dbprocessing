@@ -380,7 +380,7 @@ class DButils(object):
         DBlogging.dblogger.info("Processqueue was cleared")
         return length
 
-    def _processqueueRemoveItem(self, item):
+    def _processqueueRemoveItem(self, item, commit = True):
         """
         remove a file from the queue by name or number
         """
@@ -392,7 +392,7 @@ class DButils(object):
         sq = self.session.query(self.Processqueue).filter(self.Processqueue.file_id.in_(item))
         for v in sq:
             self.session.delete(v)
-        if sq:
+        if sq and commit:
             self.commitDB()
 
     def _processqueueGetAll(self, version_bump=False):
@@ -461,7 +461,7 @@ class DButils(object):
         #        pqid = self.session.query(self.Processqueue.file_id).all()
         return outval
 
-    def _processqueueRawadd(self, fileid, version_bump=None):
+    def _processqueueRawadd(self, fileid, version_bump=None, commit=True):
         """
         raw add file ids to the process queue
         *** this might break things if an id is added that does not exist
@@ -495,7 +495,9 @@ class DButils(object):
                 pq1.version_bump = version_bump
                 self.session.add(pq1)
                 DBlogging.dblogger.debug("File added to process queue {0}:{1}".format(fileid, '---'))
-            self.commitDB()  # commit once for all the adds
+                
+            if commit:
+                self.commitDB()  # commit once for all the adds
         return len(files_to_add)
 
     def _processqueueLen(self):
@@ -645,7 +647,7 @@ class DButils(object):
         if debug: print('latest_id', latest_id)
         return file_id == latest_id
 
-    def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False, trust_id=False):
+    def _purgeFileFromDB(self, filename=None, recursive=False, verbose=False, trust_id=False, commit=True):
         """
         removes a file from the DB
 
@@ -699,7 +701,8 @@ class DButils(object):
 
             DBlogging.dblogger.info("File removed from db {0}".format(f))
 
-        self.commitDB()
+        if commit:
+            self.commitDB()
 
     def getAllSatellites(self):
         """
@@ -985,7 +988,7 @@ class DButils(object):
         self.session.delete(insp)
         self.commitDB()
 
-    def delFilefilelink(self, f):
+    def delFilefilelink(self, f, commit = True):
         """
         Remove entries from Filefilelink, it will remove if the file is in either column
         """
@@ -994,10 +997,10 @@ class DButils(object):
         n2 = self.session.query(self.Filefilelink).filter_by(resulting_file=f).delete()
         if n1 + n2 == 0:
             raise (DBNoData("No entry for ID={0} found".format(f)))
-        else:
+        elif commit:
             self.commitDB()
 
-    def delFilecodelink(self, f):
+    def delFilecodelink(self, f, commit = True):
         """
         Remove entries from Filecodelink fore a Given file
         """
@@ -1005,7 +1008,7 @@ class DButils(object):
         n2 = self.session.query(self.Filecodelink).filter_by(resulting_file=f).delete()
         if n2 == 0:
             raise (DBNoData("No entry for ID={0} found".format(f)))
-        else:
+        elif commit:
             self.commitDB()
 
     def delProduct(self, pp):
