@@ -69,8 +69,12 @@ if __name__ == '__main__':
         procs = sorted(procs, key=lambda x: x.process_id)
         for p in procs:
             prod_id = p.output_product
-            prod_name = dbu.getEntry('Product', prod_id).product_name
-            prod = dbu.getEntry('Product', prod_id)
+            if p.output_timebase == 'RUN':
+                prod_name = 'N/A'
+                prod = -1 #Not actually used below anyhow....
+            else:
+                prod_name = dbu.getEntry('Product', prod_id).product_name
+                prod = dbu.getEntry('Product', prod_id)
             print("{0:4} {1:40} {2:10} {3:45}".format(p.process_id,
                                                       p.process_name,
                                                       p.output_timebase,
