@@ -40,7 +40,7 @@ class ProductMoveApp(object):
             if not os.path.isdir(newdir):
                 os.makedirs(newdir)
             os.rename(oldpath, newpath)
-        self.dbu.closeDBU()
+        self.dbu.closeDB()
 
     @classmethod
     def from_args(cls):
