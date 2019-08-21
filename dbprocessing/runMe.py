@@ -4,6 +4,7 @@ import datetime
 import glob
 from operator import itemgetter, attrgetter
 import os
+import pdb
 import shutil
 import subprocess
 import tempfile
@@ -628,15 +629,24 @@ class runMe(object):
 
         NOTE: creates a temp directory that needs to be cleaned!!
         """
-
+        # get code version string
+        if '{CODE_VERSION}' in self.codepath:
+            version = self.dbu.getCodeVersion(self.code_id)
+            self.codepath = self.codepath.replace('{CODE_VERSION}','{}.{}.{}'\
+                                                  .format(version.interface,\
+                                                          version.quality,\
+                                                          version.revision))
         # build the command line we are to run
         cmdline = [self.codepath]
         # get extra_params from the process
         if self.extra_params:
             cmdline.extend(self.extra_params)
         # figure out how to put the arguments together
-        if self.args:
-            cmdline.extend(self.args)
+        for ii in range(len(self.args)):
+            self.args[ii] = self.args[ii].replace('{CODE_RELATIVE_PATH}','{}'\
+                                                  .format(self.codepath))
+
+        cmdline.extend(self.args)
         # put all the input files on the command line (order is not set)
         for i_fid in self.input_files:
             cmdline.append(self.dbu.getFileFullPath(i_fid))
