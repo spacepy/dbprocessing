@@ -310,7 +310,15 @@ class runMe(object):
         if self.codepath is None: # there is no code to actually run we are done
             DBlogging.dblogger.debug("Codepath is None: can't run")
             return
+        # get code version string
+        if '{CODE_VERSION}' in self.codepath:
+            version = self.dbu.getCodeVersion(self.code_id)
+            self.codepath = self.codepath.replace('{CODE_VERSION}','{}.{}.{}'\
+                                                  .format(version.interface,\
+                                                          version.quality,\
+                                                          version.revision))
         DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(self.code_id, self.codepath))
+        self.codedir = os.path.dirname(self.codepath)
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
         code_entry = self.dbu.getEntry('Code', self.code_id)
@@ -392,14 +400,15 @@ class runMe(object):
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
+            args = args.replace('{CODE_RELATIVE_PATH}','{}'.format(self.codedir))
             args = args.split('|')
             self.extra_params = args
-
         ## get arguments from the code
         args = code_entry.arguments
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
+            args = args.replace('{CODE_RELATIVE_PATH}','{}'.format(self.codedir))
             args = args.split()
             for arg in args:
                 # if 'input' not in arg and 'output' not in arg:
@@ -629,23 +638,12 @@ class runMe(object):
 
         NOTE: creates a temp directory that needs to be cleaned!!
         """
-        # get code version string
-        if '{CODE_VERSION}' in self.codepath:
-            version = self.dbu.getCodeVersion(self.code_id)
-            self.codepath = self.codepath.replace('{CODE_VERSION}','{}.{}.{}'\
-                                                  .format(version.interface,\
-                                                          version.quality,\
-                                                          version.revision))
         # build the command line we are to run
         cmdline = [self.codepath]
         # get extra_params from the process
         if self.extra_params:
             cmdline.extend(self.extra_params)
         # figure out how to put the arguments together
-        for ii in range(len(self.args)):
-            self.args[ii] = self.args[ii].replace('{CODE_RELATIVE_PATH}','{}'\
-                                                  .format(self.codepath))
-
         cmdline.extend(self.args)
         # put all the input files on the command line (order is not set)
         for i_fid in self.input_files:
