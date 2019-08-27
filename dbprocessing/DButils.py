@@ -2144,18 +2144,25 @@ class DButils(object):
 
             in_id = self.getCodeID(in_id)
 
-            sq = (self.session.query(self.Code, self.Process,
-                                     self.Product, self.Instrument,
-                                     self.Instrumentproductlink, self.Satellite,
-                                     self.Mission)
-                  .filter_by(code_id=in_id)
-                  .join((self.Process, self.Code.process_id == self.Process.process_id))
-                  .join((self.Product, self.Product.product_id == self.Process.output_product))
-                  .join((self.Inspector, self.Product.product_id == self.Inspector.product))
-                  .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
-                  .join((self.Instrument, self.Instrumentproductlink.instrument_id == self.Instrument.instrument_id))
-                  .join((self.Satellite, self.Instrument.satellite_id == self.Satellite.satellite_id))
-                  .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+            if 'make_plot' in os.path.basename(self.getCodePath(in_id)):
+                # symplified version for plots (where there is no output product)
+                vars = ['code', 'process']
+                sq = (self.session.query(self.Code, self.Process)
+                      .filter_by(code_id=in_id)
+                      .join((self.Process, self.Code.process_id == self.Process.process_id)).all())
+            else:
+                sq = (self.session.query(self.Code, self.Process,
+                                         self.Product, self.Instrument,
+                                         self.Instrumentproductlink, self.Satellite,
+                                         self.Mission)
+                      .filter_by(code_id=in_id)
+                      .join((self.Process, self.Code.process_id == self.Process.process_id))
+                      .join((self.Product, self.Product.product_id == self.Process.output_product))
+                      .join((self.Inspector, self.Product.product_id == self.Inspector.product))
+                      .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
+                      .join((self.Instrument, self.Instrumentproductlink.instrument_id == self.Instrument.instrument_id))
+                      .join((self.Satellite, self.Instrument.satellite_id == self.Satellite.satellite_id))
+                      .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
 
             if not sq:  # did not find a match this is a dberror
                 raise (DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id)))
