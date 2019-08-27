@@ -68,6 +68,11 @@ class DBFormatterTests(unittest.TestCase):
                     'datetime': dt, 'DATE': '20100102', 'b': 'Jan'}
         self.assertEqual(expected, kwargs)
 
+    def testDatetimeRe(self):
+        """Expand a simple datetime reference to regex"""
+        self.assertEqual('stuff((19|2\d)\d\d(0\d|1[0-2])[0-3]\d)',
+                         self.fmtr.re('stuff{datetime}'))
+
     def testFormat(self):
         """Format a string from a datetime"""
         dt = datetime.datetime(2010, 1, 2, 3, 44, 59, 123456)
