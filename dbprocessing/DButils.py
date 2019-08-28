@@ -2139,18 +2139,21 @@ class DButils(object):
                 retval[v] = sq[0][ii]
 
         elif table.capitalize() == 'Code':
-            vars = ['code', 'process', 'product', 'instrument',
-                    'instrumentproductlink', 'satellite', 'mission']
-
+            
             in_id = self.getCodeID(in_id)
+            
+            # symplified version for plots (where there is no output product)
+            vars = ['code', 'process']
+            sq = (self.session.query(self.Code, self.Process)
+                  .filter_by(code_id=in_id)
+                  .join((self.Process, self.Code.process_id == self.Process.process_id)).all())
 
-            if 'make_plot' in os.path.basename(self.getCodePath(in_id)):
-                # symplified version for plots (where there is no output product)
-                vars = ['code', 'process']
-                sq = (self.session.query(self.Code, self.Process)
-                      .filter_by(code_id=in_id)
-                      .join((self.Process, self.Code.process_id == self.Process.process_id)).all())
-            else:
+            if not sq:  # did not find a match this is a dberror
+                raise (DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+            
+            if sq[0][1].output_timebase != 'RUN':
+                vars = ['code', 'process', 'product', 'instrument',
+                        'instrumentproductlink', 'satellite', 'mission']
                 sq = (self.session.query(self.Code, self.Process,
                                          self.Product, self.Instrument,
                                          self.Instrumentproductlink, self.Satellite,
