@@ -5,6 +5,7 @@ import glob
 from operator import itemgetter, attrgetter
 import os
 import pdb
+import re
 import shutil
 import subprocess
 import tempfile
@@ -311,14 +312,15 @@ class runMe(object):
             DBlogging.dblogger.debug("Codepath is None: can't run")
             return
         # get code version string
-        if '{CODE_VERSION}' in self.codepath:
-            version = self.dbu.getCodeVersion(self.code_id)
-            self.codepath = self.codepath.replace('{CODE_VERSION}','{}.{}.{}'\
-                                                  .format(version.interface,\
-                                                          version.quality,\
-                                                          version.revision))
+        version = self.dbu.getCodeVersion(self.code_id)
+        version_st = '_v{}.{}.{}'.format(version.interface, version.quality,\
+                                       version.revision)
         DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(self.code_id, self.codepath))
         self.codedir = os.path.dirname(self.codepath)
+        # put version before suffix
+        temp_split = os.path.basename(self.codepath).rsplit('.',1)
+        self.codepath = os.path.join(self.codedir+version_st,
+                                     temp_split[0]+version_st+'.'+temp_split[1])
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
         code_entry = self.dbu.getEntry('Code', self.code_id)
@@ -400,7 +402,7 @@ class runMe(object):
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
-            args = args.replace('{CODE_RELATIVE_PATH}','{}'.format(self.codedir))
+            args = args.replace('{CODEDIR}','{}'.format(self.codedir))
             args = args.split('|')
             self.extra_params = args
         ## get arguments from the code
@@ -408,7 +410,7 @@ class runMe(object):
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
-            args = args.replace('{CODE_RELATIVE_PATH}','{}'.format(self.codedir))
+            args = args.replace('{CODEDIR}','{}'.format(self.codedir))
             args = args.split()
             for arg in args:
                 # if 'input' not in arg and 'output' not in arg:
@@ -657,4 +659,5 @@ class runMe(object):
         # and make sure to expand any path variables
         cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]
         DBlogging.dblogger.debug("built command: {0}".format(' '.join(cmdline)))
+        pdb.set_trace()
         self.cmdline = cmdline
