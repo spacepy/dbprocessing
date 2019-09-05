@@ -316,10 +316,10 @@ class runMe(object):
         version_st = '_v{}.{}.{}'.format(version.interface, version.quality,\
                                        version.revision)
         DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(self.code_id, self.codepath))
-        self.codedir = os.path.dirname(self.codepath)
+        self.codedir = os.path.dirname(self.codepath)+version_st
         # put version before suffix
         temp_split = os.path.basename(self.codepath).rsplit('.',1)
-        self.codepath = os.path.join(self.codedir+version_st,
+        self.codepath = os.path.join(self.codedir,
                                      temp_split[0]+version_st+'.'+temp_split[1])
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
@@ -342,7 +342,8 @@ class runMe(object):
             format_str = ptb['product'].format
             # get the process_keywords from the file if there are any
             try:
-                process_keywords = Utils.strargs_to_args([self.dbu.getEntry('File', fid).process_keywords for fid in input_files])
+                process_keywords = Utils.strargs_to_args([self.dbu.getEntry('File', fid).\
+                                                          process_keywords for fid in input_files])
                 for key in process_keywords:
                     format_str = format_str.replace('{'+key+'}', process_keywords[key])
             except TypeError:
@@ -469,7 +470,8 @@ class runMe(object):
         DBlogging.dblogger.debug("f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
         if db_code_id is None:
             # I think things will also crash here
-            DBlogging.dblogger.error("Database inconsistency found!! A generated file {0} does not have a filecodelink".format(self.filename))
+            DBlogging.dblogger.error("Database inconsistency found!! A generated file {0} does not have a filecodelink".\
+                                     format(self.filename))
 
             #attempt to figure it out and add one
             tb = self.dbu.getTraceback('File', self.filename)
@@ -479,15 +481,18 @@ class runMe(object):
             #print("self.dbu.addFilecodelink(tb['file'].file_id, code_id)", tb['file'].file_id, code_id)
             self.dbu.addFilecodelink(tb['file'].file_id, code_id)
             db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
-            DBlogging.dblogger.info("added a file code link!!  f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
+            DBlogging.dblogger.info("added a file code link!!  f_id_db: {0}   db_code_id: {1}".\
+                                    format(f_id_db, db_code_id))
 
         # Go through an look to see if the code version changed
         if db_code_id != self.code_id: # did the code change
             DBlogging.dblogger.debug("code_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id))
             ver_diff = (self.dbu.getCodeVersion(self.code_id) - self.dbu.getCodeVersion(db_code_id))
             if ver_diff == [0,0,0]:
-                DBlogging.dblogger.error("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id))
-                raise(DButils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".format(self.code_id, db_code_id)))
+                DBlogging.dblogger.error("two different codes with the same version ode_id: {0}   db_code_id: {1}".\
+                                         format(self.code_id, db_code_id))
+                raise(DButils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".\
+                                      format(self.code_id, db_code_id)))
             self._incVersion(ver_diff)
             return True
         else:
@@ -543,7 +548,8 @@ class runMe(object):
             parent_max = max(parents_all, key=lambda x: self.dbu.getFileVersion(x))
 
             DBlogging.dblogger.debug("parent: {0} version: {1} parent_max {2} version {3}".format(
-                parent.file_id, self.dbu.getFileVersion(parent), parent_max.file_id, self.dbu.getFileVersion(parent_max)))
+                parent.file_id, self.dbu.getFileVersion(parent), parent_max.file_id,
+                self.dbu.getFileVersion(parent_max)))
 
 
             # if a parent is no longer newest we need to inc
@@ -558,10 +564,12 @@ class runMe(object):
 
                 if df[1]:
                     quality_diff = True
-                    DBlogging.dblogger.debug("parent: {0} had a quality difference, will reprocess child".format(parent.file_id))
+                    DBlogging.dblogger.debug("parent: {0} had a quality difference, will reprocess child".\
+                                             format(parent.file_id))
                 elif df[2]:
                     revision_diff = True
-                    DBlogging.dblogger.debug("parent: {0} had a revision difference, will reprocess child".format(parent.file_id))
+                    DBlogging.dblogger.debug("parent: {0} had a revision difference, will reprocess child".\
+                                             format(parent.file_id))
         if quality_diff:
             self._incVersion([0,1,0])
         elif revision_diff:
@@ -605,13 +613,16 @@ class runMe(object):
         if os.path.isfile(os.path.join(path, os.path.basename(fname) ) ):
         #TODO do I really want to remove old version:?
             os.remove( os.path.join(path, os.path.basename(fname) ) )
-            DBlogging.dblogger.warning("removed {0}, as it was under a copy".format(os.path.join(path, os.path.basename(fname) )))
+            DBlogging.dblogger.warning("removed {0}, as it was under a copy".\
+                                       format(os.path.join(path, os.path.basename(fname) )))
+                                                                                                 
         if path[-1] != os.sep:
             path = path+os.sep
         try:
             shutil.move(fname, path)
         except IOError:
-            DBlogging.dblogger.error("file {0} was not successfully moved to error".format(os.path.join(path, os.path.basename(fname) )))
+            DBlogging.dblogger.error("file {0} was not successfully moved to error".\
+                                     format(os.path.join(path, os.path.basename(fname) )))
         else:
             DBlogging.dblogger.info("moveToError {0} moved to {1}".format(fname, path))
 
@@ -659,5 +670,5 @@ class runMe(object):
         # and make sure to expand any path variables
         cmdline = [os.path.expanduser(os.path.expandvars(v)) for v in cmdline]
         DBlogging.dblogger.debug("built command: {0}".format(' '.join(cmdline)))
-        pdb.set_trace()
+
         self.cmdline = cmdline
