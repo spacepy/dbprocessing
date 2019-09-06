@@ -2388,3 +2388,29 @@ class DButils(object):
         for p in prods:
             tree.append([p.product_id, self.getChildTree(p.product_id)])
         return tree
+
+    def updateCodeNewestVersion(self, code_id, is_newest = False):
+        """
+        For given code_id, update newest_version and active_code fields.
+        They are assumed to be the same.
+        param int code_id: id for code
+        param bool is_newest: Whether it should be labeled newest_version.
+                              Default is false.
+        """
+        DBlogging.dblogger.debug\
+            ("Entered updateCodeNewestVersion: code_id={0}, is_newest={1}"\
+             .format(code_id, is_newest))
+        sq = self.session.query(self.Code).filter_by(code_id=code_id).all()
+
+        if len(sq) != 1:
+            raise (DBNoData("More than one row found with code id".format(code_id)))
+        if is_newest:
+            sq[0].newest_version = 1
+            sq[0].active_code = 1
+        else:
+            sq[0].newest_version = 0
+            sq[0].active_code = 0
+
+        self.session.commit()
+        
+
