@@ -2027,6 +2027,15 @@ class DButils(object):
         except TypeError:
             return None
 
+    def getFilecodelink_bycode(self, code_id):
+        """
+        Given a file_id return the code_id associated with it, or None
+        """
+        DBlogging.dblogger.debug("Entered getFilecodelink_bycode: code_id={0}".format(code_id))
+        code_id = self.getCodeID(code_id)
+        sq = self.session.query(self.Filecodelink.resulting_file).filter_by(source_code=code_id)
+        return sq
+
     def getMissionID(self, mission_name):
         """
         Given a mission name return its ID
@@ -2400,6 +2409,7 @@ class DButils(object):
         DBlogging.dblogger.debug\
             ("Entered updateCodeNewestVersion: code_id={0}, is_newest={1}"\
              .format(code_id, is_newest))
+        code_id = self.getCodeID(code_id)
         sq = self.session.query(self.Code).filter_by(code_id=code_id).all()
 
         if len(sq) != 1:
