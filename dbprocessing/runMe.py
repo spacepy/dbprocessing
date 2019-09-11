@@ -404,6 +404,7 @@ class runMe(object):
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
             args = args.replace('{CODEDIR}','{}'.format(self.codedir))
+            args = args.replace('{CODEVERSION}','{}'.format(version_st))
             args = args.split('|')
             self.extra_params = args
         ## get arguments from the code
@@ -412,6 +413,7 @@ class runMe(object):
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
             args = args.replace('{CODEDIR}','{}'.format(self.codedir))
+            args = args.replace('{CODEVERSION}','{}'.format(version_st))
             args = args.split()
             for arg in args:
                 # if 'input' not in arg and 'output' not in arg:
