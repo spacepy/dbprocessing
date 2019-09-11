@@ -313,14 +313,14 @@ class runMe(object):
             return
         # get code version string
         version = self.dbu.getCodeVersion(self.code_id)
-        version_st = '_v{}.{}.{}'.format(version.interface, version.quality,\
+        version_st = '{}.{}.{}'.format(version.interface, version.quality,\
                                        version.revision)
         DBlogging.dblogger.debug("Going to run code: {0}:{1}".format(self.code_id, self.codepath))
-        self.codedir = os.path.dirname(self.codepath)+version_st
+        self.codedir = os.path.dirname(self.codepath)+'_v'+version_st
         # put version before suffix
         temp_split = os.path.basename(self.codepath).rsplit('.',1)
         self.codepath = os.path.join(self.codedir,
-                                     temp_split[0]+version_st+'.'+temp_split[1])
+                                     temp_split[0]+'_v'+version_st+'.'+temp_split[1])
 
         process_entry = self.dbu.getEntry('Process', self.process_id)
         code_entry = self.dbu.getEntry('Code', self.code_id)
@@ -404,6 +404,7 @@ class runMe(object):
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
             args = args.replace('{CODEDIR}','{}'.format(self.codedir))
+            args = args.replace('{CODEVERSION}','{}'.format(version_st))
             args = args.split('|')
             self.extra_params = args
         ## get arguments from the code
@@ -412,6 +413,7 @@ class runMe(object):
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
             args = args.replace('{CODEDIR}','{}'.format(self.codedir))
+            args = args.replace('{CODEVERSION}','{}'.format(version_st))
             args = args.split()
             for arg in args:
                 # if 'input' not in arg and 'output' not in arg:
