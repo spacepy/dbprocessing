@@ -406,6 +406,26 @@ class runMe(object):
             self.extra_params = args
         ## get arguments from the code
         args = code_entry.arguments
+        if '-e ' in args:
+            parts = args.split()
+            index = parts.index('-e')+1
+            sub_parts = (parts[index]).split(',')
+            codes = self.dbu.getAllCodes()
+            for ii in range(len(sub_parts)):
+                temp_ver = ['{}.{}.{}'.format(item['code'].interface_version,
+                                              item['code'].quality_version,
+                                              item['code'].revision_version) for item \
+                            in codes if (sub_parts[ii] in item['code'].arguments) and \
+                            (self.code_id != item['code'].code_id)]
+                if len(set(temp_ver)) != 1:
+                    raise RuntimeError('Only expect one other process with master {}'
+                                       .format(file))
+                sub_parts[ii] = sub_parts[ii].replace('{CODEVERSION}',temp_ver[0])
+
+            # outside for loop
+            parts[index] = ','.join(sub_parts)
+            args = ' '.join(parts)
+
         if args is not None:
             args = args.replace('{DATE}', utc_file_date.strftime('%Y%m%d'))
             args = args.replace('{ROOTDIR}', self.dbu.MissionDirectory)
