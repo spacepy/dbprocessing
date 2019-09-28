@@ -406,7 +406,7 @@ class runMe(object):
             self.extra_params = args
         ## get arguments from the code
         args = code_entry.arguments
-        if '-e ' in args:
+        if args and ('-e ' in args):
             parts = args.split()
             index = parts.index('-e')+1
             sub_parts = (parts[index]).split(',')
