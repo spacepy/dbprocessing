@@ -415,7 +415,8 @@ class runMe(object):
                 temp_ver = ['{}.{}.{}'.format(item['code'].interface_version,
                                               item['code'].quality_version,
                                               item['code'].revision_version) for item \
-                            in codes if (sub_parts[ii] in item['code'].arguments) and \
+                            in codes if (item['code'].arguments) and \
+                            (sub_parts[ii] in item['code'].arguments) and \
                             (self.code_id != item['code'].code_id)]
                 if len(set(temp_ver)) != 1:
                     raise RuntimeError('Only expect one other process with master {}'
