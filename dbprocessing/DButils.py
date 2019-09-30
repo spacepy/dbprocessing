@@ -2422,5 +2422,40 @@ class DButils(object):
             sq[0].active_code = 0
 
         self.session.commit()
+
+    def updateCodeAddVersion(self, code_id):
+        """
+        For given code_id, update filename, relative path, and aguments columns.
+        Add _v{CODEVERSION} and {CODEDIR}. 
+        param int code_id: id for code
+        """
+        DBlogging.dblogger.debug\
+            ("Entered updateCodeAddVersion: code_id={0}".format(code_id))
+        code_id = self.getCodeID(code_id)
+        sq = self.session.query(self.Code).filter_by(code_id=code_id).all()
+
+        if len(sq) != 1:
+            raise (DBNoData("More than one row found with code id".format(code_id)))
+
+        parts = (sq[0].filename).split('.')
+        if len(parts) != 2:
+            raise RuntimeError('Unexpected filename: {}'.format(sq[0].filename))
+        sq[0].filename = parts[0]+'_v{CODEVERSION}.'+parts[1]
+        sq[0].relative_path = (sq[0].relative_path)+'_v{CODEVERSION}'
+        line = (sq[0].arguments).replace('ROOTDIR','CODEDIR')
+        parts = line.split()
+        for ii in range(len(parts)):
+            if parts[ii] == '-m':
+                sub_parts = parts[ii+1].split(',')
+                for jj in range(len(sub_parts)):
+                    sub_parts[jj] = sub_parts[jj] + '_v{CODEVERSION}'
+
+                # outside for jj
+                parts[ii+1] = ','.join(sub_parts)
+
+        # matches for ii
+        sq[0].arguments = ' '.join(parts)
+
+        self.session.commit()
         
 
