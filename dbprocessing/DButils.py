@@ -2509,8 +2509,10 @@ class DButils(object):
                         del parts[indices[ii]+1]
                         del parts[indices[ii]]
             # matches if combine
-            else:
-                parts[parts.index(after_flag)+1].replace(old_str, new_str)
+            elif after_flag in parts:
+                parts[parts.index(after_flag)+1] \
+                    = parts[parts.index(after_flag)+1].replace(old_str, new_str)
+
             # matches if combine/else
             setattr(sq[0],column, ' '.join(parts))
             
@@ -2523,76 +2525,3 @@ class DButils(object):
                 pass
             
         self.session.commit()
-        
-
-        
-    def updateCodeAddVersion(self, code_id, codedir):
-        """
-        For given code_id, update filename, relative path, and aguments columns.
-        Add _v{CODEVERSION} and {CODEDIR}. 
-        param int code_id: id for code
-        param str codedir: string to add to relative_path
-        """
-        DBlogging.dblogger.debug\
-            ("Entered updateCodeAddVersion: code_id={0}".format(code_id))
-        code_id = self.getCodeID(code_id)
-        sq = self.session.query(self.Code).filter_by(code_id=code_id).all()
-
-        if len(sq) != 1:
-            raise (DBNoData("More than one row found with code id".format(code_id)))
-
-        parts = (sq[0].filename).split('.')
-        if len(parts) != 2:
-            raise RuntimeError('Unexpected filename: {}'.format(sq[0].filename))
-        sq[0].filename = parts[0]+'_v{CODEVERSION}.'+parts[1]
-        sq[0].relative_path = (sq[0].relative_path)+('/{}'.format(codedir))+'_v{CODEVERSION}'
-        if sq[0].arguments:
-            line = sq[0].arguments.replace('--master ','-m ').replace('--mCDF ','-m ').\
-                   replace('--masterCDF ','-m ').replace('--calfiles ','-c ').\
-                   replace('--caldir ','-c ').replace('--cal ','-c ')
-            parts = line.split()
-            combine = ['-m','-c']
-            for item in combine:
-                if parts.count(item) > 1:
-                    indices = [ii for ii in range(len(parts)) if parts[ii] == item]
-                    # go backwards so don't mess up order when deleting
-                    for ii in range(len(indices)-1,0,-1):
-                        parts[indices[0]+1] = parts[indices[0]+1]+','+parts[indices[ii]+1]
-                        del parts[indices[ii]+1]
-                        del parts[indices[ii]]
-
-            # matches for item in combine
-            for ii in range(len(parts)):
-                if parts[ii] == '-m':
-                    sub_parts = parts[ii+1].split(',')
-                    for jj in range(len(sub_parts)):
-                        sub_parts[jj] \
-                            = sub_parts[jj].\
-                            replace('{ROOTDIR}/EPIHi/masters/level1','{CODEDIR}').\
-                            replace('{ROOTDIR}/EPIHi/masters/level2','{CODEDIR}').\
-                            replace('{ROOTDIR}/EPILo/masters/level1','{CODEDIR}').\
-                            replace('{ROOTDIR}/EPILo/masters/level2','{CODEDIR}').\
-                            replace('{ROOTDIR}/ISOIS/masters/level1','{CODEDIR}').\
-                            replace('{ROOTDIR}/ISOIS/masters/level2','{CODEDIR}').\
-                            replace('0.0.0','{CODEVERSION}')
-
-                    # outside for jj
-                    parts[ii+1] = ','.join(sub_parts)
-
-                # matches if parts[ii]
-                elif parts[ii] == '-c':
-                    sub_parts = parts[ii+1].split(',')
-                    for jj in range(len(sub_parts)):
-                        sub_parts[jj] = sub_parts[jj].\
-                                        replace('{ROOTDIR}/EPIHi','{CODEDIR}'). \
-                                        replace('{ROOTDIR}/EPILo','{CODEDIR}')
-
-                    # outside for jj
-                    parts[ii+1] = ','.join(sub_parts)
-                    
-            # matches for ii
-            sq[0].arguments = ' '.join(parts)
-
-        self.session.commit()
-        
-
