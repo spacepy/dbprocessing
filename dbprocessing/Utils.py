@@ -4,7 +4,10 @@ Class to hold random utilities of use throughout this code
 """
 from __future__ import print_function
 
-import ConfigParser
+try:
+    import ConfigParser
+except ImportError:
+    import configparser as ConfigParser
 import collections
 import datetime
 import os

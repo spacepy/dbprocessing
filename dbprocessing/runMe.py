@@ -1,4 +1,6 @@
 from __future__ import print_function
+from __future__ import absolute_import
+
 from collections import namedtuple
 import datetime
 import glob
@@ -11,13 +13,13 @@ import tempfile
 import time
 import traceback
 
-import DBlogging
-import DBstrings
-import DButils
-from inspector import extract_Version
-import Utils
-from Utils import dateForPrinting as DFP
-import Version
+from . import DBlogging
+from . import DBstrings
+from . import DButils
+from .inspector import extract_Version
+from . import Utils
+from .Utils import dateForPrinting as DFP
+from . import Version
 
 
 runObj = namedtuple('runObj', 'runme time probfile')

@@ -22,6 +22,7 @@ Inspector requirements:
             * self.diskfile.params['quality_checked'] : bool (optional)
             * self.diskfile.params['process_keywords'] : str (optional)
 """
+from __future__ import absolute_import
 from __future__ import print_function
 
 from abc import ABCMeta, abstractmethod
@@ -30,10 +31,10 @@ import os
 import re
 import warnings
 
-import DBlogging
-import Diskfile
-import Version
-import DBstrings
+from . import DBlogging
+from . import Diskfile
+from . import Version
+from . import DBstrings
 
 def EphemeralCallable(basetype=type):
     def _new_caller(cls, *args, **kwargs):
