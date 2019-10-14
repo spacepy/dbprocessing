@@ -12,3 +12,5 @@ fi
 ~/dbUtils/addFromConfig.py -m testDB.sqlite config/testDB.conf
 ~/dbUtils/ProcessQueue.py -i -m testDB.sqlite
 ~/dbUtils/ProcessQueue.py -p --num-proc 1 -m testDB.sqlite
+
+#The unit tests run with the state of the db AFTER the functional
