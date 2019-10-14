@@ -5,6 +5,6 @@
 # thoroughly test everything.
 
 cd functional_test
-bash ./functionalTest.sh
+python ./functionalTest.py
 cd ..
 python unit_tests/test_all.py

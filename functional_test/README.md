@@ -14,21 +14,20 @@ testDB_{set}.rot format.
 How to run this:
 ----------------
 Eventually, this will be a full unittest suite and will simply be run that way,
-but for now scripts/functionalTest.sh will execute the needed scripts to run the
+but for now functionalTest.py will execute the needed scripts to run the
 entire dbprocessing chain.
 
 Relation to unit tests:
 -----------------------
-The unit tests run assuming the state of the database AFTER the functional
-tests are run. This is the state that's checked in to the repository. The
-first step of the functional test is to remove the output files and db, and
-create new ones.
-
-Ultimately the functional test should be updated to not affect the state of
-the working directory and the unit tests updated to match appropriately.
-
+The unit tests run assuming the state of the database and directories
+AFTER the functional tests are run. This is the state that's checked
+in to the repository. The functional test does not use the actual
+state in the repo (it works in a temporary directory.) The relevant
+state can be copied from the temporary directory after a functional
+run if necessary
 
 Revisions:
 ----------
 1-June-2016 Myles Johnson: Initial revision
-14-October-2019 Jon Niehof: Notes on relationship to unit tests.
+14-October-2019 Jon Niehof: Notes on relationship to unit tests; updated
+                            for new isolated functional test.
