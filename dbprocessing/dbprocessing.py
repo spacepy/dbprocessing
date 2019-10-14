@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
 from __future__ import print_function
 
 import datetime
@@ -11,13 +12,13 @@ import time
 import traceback
 from operator import itemgetter
 
-import DBfile
-import DBlogging
-import DBqueue
-import DButils
-import Utils
-import runMe
-from Utils import strargs_to_args
+from . import DBfile
+from . import DBlogging
+from . import DBqueue
+from . import DButils
+from . import Utils
+from . import runMe
+from .Utils import strargs_to_args
 
 from sqlalchemy.exc import IntegrityError
 

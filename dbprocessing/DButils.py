@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from __future__ import print_function
 
 import datetime
@@ -22,7 +23,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
 from sqlalchemy import and_
 
-from Diskfile import calcDigest, DigestError
+from .Diskfile import calcDigest, DigestError
 from . import DBlogging
 from . import DBstrings
 from . import Version
