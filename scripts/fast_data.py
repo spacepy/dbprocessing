@@ -4,7 +4,7 @@ import datetime
 import itertools
 import os
 from optparse import OptionParser
-import pdb
+import warnings
 
 import networkx
 from dbprocessing import DButils, Version
@@ -60,7 +60,20 @@ def get_fastdata_participants(graph, cutoff):
     return fast0_children | fast0
 
 
-def reap_files(graph, participants):
+def reap(graph, participants, dofiles=False, dorecords=False, verbose=False):
+    """Reap files and/or records from fileids in a set
+
+    Arguments:
+        graph: the full graph of file relationships
+        participants: Nodes (file IDs) that meet the fast data criteria
+                      (from get_fastdata_participants). Set.
+        dofiles: remove files from disc
+        dorecords: remove records from db (only if the files do not exist)
+        verbose: print matching files (ones to delete)
+    """
+    if dofiles and dorecords:
+        #This is in theory possible but for now probably safer not to
+        raise ValueError('Cannot reap files and records in one call')
     nodes = [graph.node[x] for x in participants]
     nodes.sort(key=lambda file: (
         file['product_id'], file['utc_file_date'], file['version']))
@@ -73,31 +86,20 @@ def reap_files(graph, participants):
         if (node['product_id'] == last_node['product_id'] and
                 node['utc_file_date'] == last_node['utc_file_date'] and
                 node['version'] < last_node['version']):
-            os.remove(dbu.getFileFullPath(node['file_id']))
-            # This is slow, and we(I.E. not me) can fix it later if its too slow. - Myles 6/5/2018
-            dbu.getEntry('File', node['file_id']).exists_on_disk = False
-
-        last_node = node
-
-
-def reap_records(graph, participants):
-    nodes = [graph.node[x] for x in participants]
-    nodes.sort(key=lambda file: (
-        file['product_id'], file['utc_file_date'], file['version']))
-
-    last_node = nodes[-1]
-    for node in reversed(nodes[:-1]):
-        if (node['product_id'] == last_node['product_id'] and
-                node['utc_file_date'] == last_node['utc_file_date'] and
-                node['version'] < last_node['version']):
-            if not node['exists_on_disk']:
-                dbu._purgeFileFromDB(node['file_id'], trust_id=True)
-            
+            if verbose:
+                print(node['filename'])
+            if dofiles:
+                os.remove(dbu.getFileFullPath(node['file_id']))
+                # This is slow, and we(I.E. not me) can fix it later if its too slow. - Myles 6/5/2018
+                dbu.getEntry('File', node['file_id']).exists_on_disk = False
+            if dorecords:
+                if not node['exists_on_disk']:
+                    dbu._purgeFileFromDB(node['file_id'], trust_id=True)
         last_node = node
 
 
 if __name__ == '__main__':
-    usage = "usage: %prog -m database -d YYYY-MM-DD --reap-files --reap-records"
+    usage = "usage: %prog -m database -d YYYY-MM-DD [--reap-files] [--reap-records] [--verbose]"
     parser = OptionParser(usage=usage)
     parser.add_option(
         "-m",
@@ -113,13 +115,19 @@ if __name__ == '__main__':
         "--reap-files",
         dest="files",
         action='store_true',
-        help="Removes all Level0 files, and all of their children, that are not the newest version and are older than the cut off date. It will still keep the records of the files in the dbprocessing database, but sets exists_on_disk to false.",
+        help="Removes all Level0 files, and all of their children, that are not the newest version and are newer than the cut off date. It will still keep the records of the files in the dbprocessing database, but sets exists_on_disk to false.",
         default=False)
     parser.add_option(
         "--reap-records",
         dest="records",
         action='store_true',
         help="Removes any file records that are marked as not exists_on_disk, and will sanity check that none of its children are still on disk. It also removes the corresponding file_file_links and file_code_links.",
+        default=False)
+    parser.add_option(
+        "--verbose",
+        dest="verbose",
+        action='store_true',
+        help="Prints names of files that will be deleted",
         default=False)
 
     (options, args) = parser.parse_args()
@@ -136,18 +144,17 @@ if __name__ == '__main__':
         parser.error(err.message)
 
     if not (options.files or options.records):
-        parser.error("Must use --reap-files and/or --reap-records")
+        warnings.warn("Will not take any action without --reap-files or"
+                      " --reap-records")
 
     dbu = DButils.DButils(options.mission)
     G = build_graph(dbu)
 
     fd = get_fastdata_participants(G, cut_date)
 
-    if options.files and fd:
-        reap_files(G, fd)
-
-    if options.records and fd:
-        reap_records(G, fd)
+    if fd:
+        reap(G, fd, dofiles=options.files, dorecords=options.records,
+             verbose=options.verbose)
 
     dbu.commitDB()
     dbu.closeDB()
