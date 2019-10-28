@@ -27,6 +27,8 @@ def build_graph(dbu):
     G.add_nodes_from([(i, {
         'file_id': i,
         'filename': a,
+        'in_release': False, #Assume false, correct below
+        'newest': False, #Assume false, correct below
         'product_id': b,
         'utc_file_date': c,
         'exists_on_disk': d,
@@ -36,28 +38,48 @@ def build_graph(dbu):
         utc_file_date, dbu.File.exists_on_disk, dbu.File.interface_version,
         dbu.File.quality_version, dbu.File.revision_version).all()])
 
+    for f in dbu.getFiles(newest_version=True):
+        G.node[f.file_id]['newest'] = True
+    for f in dbu.session.query(dbu.Release.file_id):
+        G.node[f[0]]['in_release'] = True
+
     G.add_edges_from(
         dbu.session.query(dbu.Filefilelink.source_file,
                           dbu.Filefilelink.resulting_file).all())
     return G
 
 
-def get_fastdata_participants(graph, cutoff):
-    """Get all file records that meet the fast data participant requirements
+def filter_graph(graph, cutoff):
+    """Filter files from the graph that we don't want to delete
 
-    Arguments:
-        graph {networkx.Graph} -- A graph of file records and their parent-child relationships
-        cutoff {datetime.date} -- Date to use as the fast data cut off
+    All files that are the newest version, or in a release, and any
+    of their inputs should be kept (i.e. removed from consideration
+    for deletion.)
 
-    Returns:
-        set(dict) -- Set of the file records
+    Also any level0 files that are older than our cutoff (and thus
+    out of the "fast" regime), and their descendents.
+
+    Why not outputs for newest/release? Because one file might be the
+    latest and have multiple outputs for same day/product due to
+    reprocessing, and we only want the latest of those, and it will be
+    retained in its own right. Similarly for the release...just
+    because something was built from a file in the release doesn't
+    mean it needs to be kept.
+
+    Note this will keep inputs to "latest" even if the inputs themselves
+    aren't the latest (i.e. the database is in an inconsistent state).
+    Earlier version of fast_data would not keep those inputs, so this
+    is a little more paranoid.
     """
-    #https://networkx.github.io/documentation/stable/release/migration_guide_from_1.x_to_2.0.html
-    l0 = [ii for ii in graph if graph.in_degree(ii) == 0]
-    fast0 = set([x for x in l0 if graph.node[x]['utc_file_date'] > cutoff])
-    fast0_children_lists = [networkx.descendants(graph, x) for x in fast0]
-    fast0_children = set(itertools.chain.from_iterable(fast0_children_lists))
-    return fast0_children | fast0
+    removenodes = set()
+    for i in graph:
+        if graph.node[i]['newest'] or graph.node[i]['in_release']:
+            removenodes.add(i)
+            removenodes.update(networkx.ancestors(graph, i))
+        if graph.in_degree(i) == 0 and graph.node[i]['utc_file_date'] <= cutoff:
+            removenodes.add(i)
+            removenodes.update(networkx.descendants(graph, i))
+    graph.remove_nodes_from(removenodes)
 
 
 def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False):
@@ -78,24 +100,16 @@ def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False
     nodes.sort(key=lambda file: (
         file['product_id'], file['utc_file_date'], file['version']))
 
-    #Last one in the list is always newest version
-    last_node = nodes[-1]
-    #So work backwards and see if each is just an older version of
-    #previous one we checked
     for node in reversed(nodes[:-1]):
-        if (node['product_id'] == last_node['product_id'] and
-                node['utc_file_date'] == last_node['utc_file_date'] and
-                node['version'] < last_node['version']):
-            if verbose:
-                print(node['filename'])
-            if dofiles:
-                os.remove(dbu.getFileFullPath(node['file_id']))
-                # This is slow, and we(I.E. not me) can fix it later if its too slow. - Myles 6/5/2018
-                dbu.getEntry('File', node['file_id']).exists_on_disk = False
-            if dorecords:
-                if not node['exists_on_disk']:
-                    dbu._purgeFileFromDB(node['file_id'], trust_id=True)
-        last_node = node
+        if verbose:
+            print(node['filename'])
+        if dofiles:
+            os.remove(dbu.getFileFullPath(node['file_id']))
+            # This is slow, and we(I.E. not me) can fix it later if its too slow. - Myles 6/5/2018
+            dbu.getEntry('File', node['file_id']).exists_on_disk = False
+        if dorecords:
+            if not node['exists_on_disk']:
+                dbu._purgeFileFromDB(node['file_id'], trust_id=True)
 
 
 if __name__ == '__main__':
@@ -150,7 +164,8 @@ if __name__ == '__main__':
     dbu = DButils.DButils(options.mission)
     G = build_graph(dbu)
 
-    fd = get_fastdata_participants(G, cut_date)
+    filter_graph(G, cut_date)
+    fd = set(G)
 
     if fd:
         reap(dbu, G, fd, dofiles=options.files, dorecords=options.records,
