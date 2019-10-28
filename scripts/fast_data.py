@@ -60,7 +60,7 @@ def get_fastdata_participants(graph, cutoff):
     return fast0_children | fast0
 
 
-def reap(graph, participants, dofiles=False, dorecords=False, verbose=False):
+def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False):
     """Reap files and/or records from fileids in a set
 
     Arguments:
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     fd = get_fastdata_participants(G, cut_date)
 
     if fd:
-        reap(G, fd, dofiles=options.files, dorecords=options.records,
+        reap(dbu, G, fd, dofiles=options.files, dorecords=options.records,
              verbose=options.verbose)
 
     dbu.commitDB()
