@@ -754,6 +754,17 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(190, len(tmp))
         self.assertTrue([1, [10, 8, 39, 76]] in tmp)
 
+    def test_getProcessTraceback(self):
+        """Traceback for a process"""
+        result = self.dbu.getTraceback('Process', 4)
+        self.assertEqual(4, result['process'].process_id)
+        self.assertEqual(4, result['code'].code_id)
+        input_product = result['input_product']
+        self.assertEqual(1, len(input_product))
+        input_product, optional = input_product[0]
+        self.assertEqual(83, input_product.product_id)
+        self.assertFalse(optional)
+
 
 class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
 
