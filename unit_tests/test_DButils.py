@@ -754,6 +754,17 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(190, len(tmp))
         self.assertTrue([1, [10, 8, 39, 76]] in tmp)
 
+    def test_getProcessTraceback(self):
+        """Traceback for a process"""
+        result = self.dbu.getTraceback('Process', 4)
+        self.assertEqual(4, result['process'].process_id)
+        self.assertEqual(4, result['code'].code_id)
+        input_product = result['input_product']
+        self.assertEqual(1, len(input_product))
+        input_product, optional = input_product[0]
+        self.assertEqual(83, input_product.product_id)
+        self.assertFalse(optional)
+
 
 class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
 
@@ -1080,7 +1091,7 @@ class TestWithtestDB(unittest.TestCase):
         cID = self.dbu.addCode(filename="run_test.py",
                                relative_path="scripts",
                                code_start_date="2010-09-01",
-                               code_stop_date="2020-01-01",
+                               code_stop_date="2099-01-01",
                                code_description="Desc",
                                process_id=processID,
                                version="1.2.3",
@@ -1163,7 +1174,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual("run_test.py", c.filename)
         self.assertEqual("scripts", c.relative_path)
         self.assertEqual(datetime.date(2010, 9, 1), c.code_start_date)
-        self.assertEqual(datetime.date(2020, 1, 1), c.code_stop_date)
+        self.assertEqual(datetime.date(2099, 1, 1), c.code_stop_date)
         self.assertEqual("Desc", c.code_description)
         self.assertEqual(1, c.process_id)
         self.assertEqual(1, c.interface_version)
@@ -1375,12 +1386,18 @@ class TestWithtestDB(unittest.TestCase):
         prID = self.dbu.addProcess(process_name="testing_process_{PRODUCT}_{INSTRUMENT}_{SATELLITE}_{MISSION}",
                                    output_product=pID,
                                    output_timebase="FILE")
-        self.addGenericCode(prID)
+        cID = self.addGenericCode(prID)
         self.dbu.addproductprocesslink(input_product_id=1,
                                        process_id=prID,
                                        optional=0
                                        )
-
+        #Make sure the code was appropriately associated with the process
+        #(test of the test before we rely on it)
+        code = self.dbu.getEntry('Code', cID)
+        self.assertEqual(prID, code.process_id)
+        self.assertEqual(
+            cID,
+            self.dbu.getCodeFromProcess(prID, datetime.date.today()))
         self.dbu.updateProcessSubs(prID)
         p = self.dbu.getEntry('Process', prID)
         self.assertEqual('testing_process_testDB_rot13_L1_rot13_testDB-a_testDB', p.process_name)
