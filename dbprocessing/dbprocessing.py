@@ -338,9 +338,13 @@ class ProcessQueue(object):
     def buildChildren(self, file_id, debug=False, skip_run=False, run_procs=None):
         """
         go through and all the runMe's and add to the runme_list variable
-        param skip_run is set to skip run timebase processes (eg make plots)
-        param run_procs is a string which is a comma separated list of processes to run:
-           either ids or names
+
+        :param int file_id: file ID of the file for which children will be built
+        :param bool skip_run: Skip RUN timebase processes if True
+                              (default False)
+        :param str run_procs: If provided, comma-separated list of process IDs
+                              or process names to run; other processes are
+                              ignored. (Default: all possible processes).
         """
 
         # if processes to run specified, turn into list of IDs
