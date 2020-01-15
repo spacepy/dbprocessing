@@ -2403,9 +2403,10 @@ class DButils(object):
         """
         For given code_id, update newest_version and active_code fields.
         They are assumed to be the same.
-        param int code_id: id for code
-        param bool is_newest: Whether it should be labeled newest_version.
-                              Default is false.
+
+        :param int code_id: id for code
+        :param bool is_newest: Whether it should be labeled newest_version.
+                               Default is false.
         """
         DBlogging.dblogger.debug\
             ("Entered updateCodeNewestVersion: code_id={0}, is_newest={1}"\
@@ -2442,16 +2443,16 @@ class DButils(object):
         NOTE: This was written and tested for code table. Not thoroughly tested
         for others.
         
-        param str table: table name
-        param int my_id: id for code
-        param str column: name of column to edit
-        param str my_str: Optional. String to add or replace.
-        param str after_flag: Optional. If set, only replace string in argument 
-                              after this flag.
-        param str ins_after: Optional. If set, insert my_str after ins_after.
-        param str ins_before: Optional. If set, insert my_str before ins_before.
-        param str replace_str: Optional. If set, replace replace_str with my_str
-        param bool combine: Default False. If True, combine arguments with after_flag.
+        :param str table: table name
+        :param int my_id: id for code
+        :param str column: name of column to edit
+        :param str my_str: Optional. String to add or replace.
+        :param str after_flag: Optional. If set, only replace string in argument
+                               after this flag.
+        :param str ins_after: Optional. If set, insert my_str after ins_after.
+        :param str ins_before: Optional. If set, insert my_str before ins_before.
+        :param str replace_str: Optional. If set, replace replace_str with my_str
+        :param bool combine: Default False. If True, combine arguments with after_flag.
         """
         DBlogging.dblogger.debug\
             ("Entered edit_table: my_id={0}".format(my_id))
