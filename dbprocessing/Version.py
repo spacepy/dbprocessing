@@ -74,8 +74,7 @@ class Version(object):
         :param inval: String in the form xx.yy.zz
         :type inval: str
         :return: Version instance created from the string
-        :rtype: Version
-
+        :rtype: :class:`Version`
         """
         return Version(*inval.split('.'))
 
