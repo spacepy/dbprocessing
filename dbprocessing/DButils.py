@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
+import collections
 import datetime
 import pdb
 import glob
@@ -2399,12 +2400,12 @@ class DButils(object):
             tree.append([p.product_id, self.getChildTree(p.product_id)])
         return tree
 
-    def updateCodeNewestVersion(self, code_id, is_newest = False):
+    def updateCodeNewestVersion(self, code_id, is_newest=False):
         """
         For given code_id, update newest_version and active_code fields.
         They are assumed to be the same.
 
-        :param int code_id: id for code
+        :param int code_id: ID or filename (str) of the code to change.
         :param bool is_newest: Whether it should be labeled newest_version.
                                Default is false.
         """
@@ -2412,6 +2413,8 @@ class DButils(object):
             ("Entered updateCodeNewestVersion: code_id={0}, is_newest={1}"\
              .format(code_id, is_newest))
         code_id = self.getCodeID(code_id)
+        if isinstance(code_id, collections.Sequence):
+            code_id = code_id[0]
         sq = self.session.query(self.Code).filter_by(code_id=code_id).all()
 
         if len(sq) != 1:

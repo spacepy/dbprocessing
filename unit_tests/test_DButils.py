@@ -1547,6 +1547,11 @@ class TestWithtestDB(unittest.TestCase):
         self.dbu.updateCodeNewestVersion(1, False)
         self.assertFalse(code.newest_version)
         self.assertFalse(code.active_code)
+        #Test with the name instead of ID
+        self.dbu.updateCodeNewestVersion('run_rot13_L0toL1.py', True)
+        self.assertTrue(code.newest_version)
+        self.assertTrue(code.active_code)
+
 
 if __name__ == "__main__":
     unittest.main()
