@@ -1525,5 +1525,28 @@ class TestWithtestDB(unittest.TestCase):
 
         self.assertTrue(all([self.tempD in v for v in out]))
 
+    def testUpdateCodeNewestVersion(self):
+        """Set the newest version flag on a code"""
+        #Test precondition
+        code = self.dbu.getEntry('Code', 1)
+        self.assertTrue(code.newest_version)
+        self.assertTrue(code.active_code)
+        #Test default
+        self.dbu.updateCodeNewestVersion(1)
+        self.assertFalse(code.newest_version)
+        self.assertFalse(code.active_code)
+        #Specify
+        self.dbu.updateCodeNewestVersion(1, True)
+        self.assertTrue(code.newest_version)
+        self.assertTrue(code.active_code)
+        #Test the no-op version
+        self.dbu.updateCodeNewestVersion(1, True)
+        self.assertTrue(code.newest_version)
+        self.assertTrue(code.active_code)
+        #And specify false
+        self.dbu.updateCodeNewestVersion(1, False)
+        self.assertFalse(code.newest_version)
+        self.assertFalse(code.active_code)
+
 if __name__ == "__main__":
     unittest.main()
