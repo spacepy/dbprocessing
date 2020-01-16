@@ -2412,22 +2412,9 @@ class DButils(object):
         DBlogging.dblogger.debug\
             ("Entered updateCodeNewestVersion: code_id={0}, is_newest={1}"\
              .format(code_id, is_newest))
-        code_id = self.getCodeID(code_id)
-        if isinstance(code_id, collections.Sequence):
-            code_id = code_id[0]
-        sq = self.session.query(self.Code).filter_by(code_id=code_id).all()
-
-        if len(sq) != 1:
-            raise (DBNoData("More than one row found with code id".format(code_id)))
-        if is_newest:
-            sq[0].newest_version = 1
-            sq[0].active_code = 1
-        else:
-            sq[0].newest_version = 0
-            sq[0].active_code = 0
-
-        self.session.commit()
-
+        code = self.getEntry('Code', code_id)
+        code.newest_version = code.active_code = int(bool(is_newest))
+        self.commitDB()
 
     def editTable(self, table, my_id, column, my_str = None, after_flag = None,
                   ins_after = None, ins_before = None, replace_str = None,
