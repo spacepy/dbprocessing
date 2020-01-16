@@ -2402,12 +2402,15 @@ class DButils(object):
 
     def updateCodeNewestVersion(self, code_id, is_newest=False):
         """
-        For given code_id, update newest_version and active_code fields.
-        They are assumed to be the same.
+        Update a code to indicate whether it's the newest version.
+
+        Assumption is that the newest version of a code should be the
+        only active one, so sets both ``newest_version`` and
+        ``active_code`` fields in the database.
 
         :param int code_id: ID or filename (str) of the code to change.
-        :param bool is_newest: Whether it should be labeled newest_version.
-                               Default is false.
+        :param bool is_newest: Set to newest (True) or not-newest, inactive
+                               (False, default).
         """
         DBlogging.dblogger.debug\
             ("Entered updateCodeNewestVersion: code_id={0}, is_newest={1}"\
