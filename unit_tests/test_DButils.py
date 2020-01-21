@@ -1552,6 +1552,51 @@ class TestWithtestDB(unittest.TestCase):
         self.assertTrue(code.newest_version)
         self.assertTrue(code.active_code)
 
+    def testEditTableReplace(self):
+        """Test editTable with simple string replace"""
+        self.dbu.editTable('code', 1, 'relative_path',
+                           my_str='newscripts', replace_str='scripts')
+        code = self.dbu.getEntry('Code', 1)
+        self.assertEqual('newscripts', code.relative_path)
+
+    def testEditTableReplaceAfter(self):
+        """Test editTable with a replace only after a flag"""
+        code = self.dbu.getEntry('Code', 1)
+        code.arguments = '-i foobar -j foobar -k foobar'
+        self.dbu.editTable('code', 1, 'arguments',
+                           my_str='baz', replace_str='bar',
+                           after_flag='-j')
+        self.assertEqual('-i foobar -j foobaz -k foobar',
+                         code.arguments)
+
+    def testEditTableCombine(self):
+        """Test editTable argument combination"""
+        code = self.dbu.getEntry('Code', 1)
+        code.arguments = '-i foo -i bar -j baz'
+        self.dbu.editTable('code', 1, 'arguments', combine=True,
+                           after_flag='-i')
+        self.assertEqual('-i foo,bar -j baz', code.arguments)
+        code.arguments = '-i foo -i bar -j baz'
+        self.dbu.editTable('code', 1, 'arguments', combine=True,
+                           after_flag='-j')
+        self.assertEqual('-i foo -i bar -j baz', code.arguments)
+
+    def testEditTableInsertBefore(self):
+        """Test editTable inserting before a string"""
+        code = self.dbu.getEntry('Code', 1)
+        code.arguments = '-i foo -j bar -k baz'
+        self.dbu.editTable('code', 1, 'arguments', my_str='test_',
+                           ins_before='foo')
+        self.assertEqual('-i test_foo -j bar -k baz', code.arguments)
+
+    def testEditTableInsertAfter(self):
+        """Test editTable inserting after a string"""
+        code = self.dbu.getEntry('Code', 1)
+        code.arguments = '-i foo -j foobar -k baz'
+        self.dbu.editTable('code', 1, 'arguments', my_str='2',
+                           ins_after='foo')
+        self.assertEqual('-i foo2 -j foo2bar -k baz', code.arguments)
+
 
 if __name__ == "__main__":
     unittest.main()
