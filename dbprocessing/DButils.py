@@ -2419,18 +2419,21 @@ class DButils(object):
         code.newest_version = code.active_code = int(bool(is_newest))
         self.commitDB()
 
-    def editTable(self, table, my_id, column, my_str = None, after_flag = None,
-                  ins_after = None, ins_before = None, replace_str = None,
-                  combine = False):
+    def editTable(self, table, my_id, column, my_str=None, after_flag=None,
+                  ins_after=None, ins_before=None, replace_str=None,
+                  combine=False):
         """
         For given my_id in given table, update entry in given column. 
+
         If after_flag set, then only do the replacement or addition
         in the argument after a given flag (used only in the arguments column).
         If ins_after or ins_before are set, then insert my_str as indicated.
         If replace_str is set, replace this string with my_str. 
         If combine is set, then combine arguments with after_flag (this is used
-        in cases where we had two masters, for example. Combine to a comma-delimited list.)
-        Only one of the ins_after, ins_before, replace_str and combine flags should be set.
+        in cases where we had two masters, for example. Combine to a
+        comma-delimited list.)
+        Only one of the ins_after, ins_before, replace_str and combine flags
+        should be set.
         If ins_after, ins_before, or replace_str is set, then my_str must be set.
 
         NOTE: This was written and tested for code table. Not thoroughly tested
@@ -2445,68 +2448,72 @@ class DButils(object):
         :param str ins_after: Optional. If set, insert my_str after ins_after.
         :param str ins_before: Optional. If set, insert my_str before ins_before.
         :param str replace_str: Optional. If set, replace replace_str with my_str
-        :param bool combine: Default False. If True, combine arguments with after_flag.
+        :param bool combine: Default False. If True, combine arguments with
+                             after_flag.
         """
-        DBlogging.dblogger.debug\
-            ("Entered edit_table: my_id={0}".format(my_id))
+        DBlogging.dblogger.debug("Entered edit_table: my_id={0}".format(my_id))
         if not ins_after and not ins_before and not replace_str and not combine:
             raise RuntimeError('Invalid call. Nothing to be done.')
-        if not combine and (sum(item is not None for item in \
+        if not combine and (sum(item is not None for item in
                                 [ins_after, ins_before, replace_str]) != 1):
-            raise RuntimeError\
-                ('Invalid call. Only use one of ins_after, '\
-                 'ins_before, and replace_str.')
+            raise RuntimeError('Invalid call. Only use one of ins_after, '
+                               'ins_before, and replace_str.')
         if (ins_after or ins_before or replace_str) and not my_str:
             raise RuntimeError('Invalid call. Need my_str.')
         if combine and (sum(item is not None for item in \
                             [ins_after, ins_before, replace_str]) != 0):
-            raise RuntimeError\
-                ('Invalid call. Combine flag cannot be used with ins_after, '\
-                 'ins_before, or replace_str.')
+            raise RuntimeError('Invalid call. Combine flag cannot be used with'
+                               ' ins_after, ins_before, or replace_str.')
         if combine and my_str:
             raise RuntimeError('Invalid call. Do not need my_str with combine.')
         if after_flag and (column != 'arguments'):
-            raise RuntimeError\
-                ('Invalid call. Only use after_flag with arguments column.')
+            raise RuntimeError('Invalid call. Only use after_flag with'
+                               ' arguments column.')
         if combine and not after_flag:
-            raise RuntimeError('Invalid call. Must specify after_flag with combine.')
+            raise RuntimeError('Invalid call. Must specify after_flag with'
+                               ' combine.')
 
         if table.lower() == 'code':
             table = 'Code'
             my_id = self.getCodeID(my_id)
             my_filter = {'code_id' : my_id}
         else:
-            raise RuntimeError('Need to edit procedure for table {}'.format(table))
+            raise RuntimeError('Need to edit procedure for table {}'.format(
+                table))
             
-        sq = self.session.query(getattr(self, table)).filter_by(**my_filter).all()
+        sq = self.session.query(getattr(self, table)).filter_by(**my_filter)\
+             .all()
 
         if len(sq) != 1:
             raise (DBNoData("More than one row found with id".format(my_id)))
 
         if ins_before:
-                  old_str = ins_before
-                  new_str = my_str + ins_before
+            old_str = ins_before
+            new_str = my_str + ins_before
         elif ins_after:
-                  old_str = ins_after
-                  new_str = ins_after + my_str
+            old_str = ins_after
+            new_str = ins_after + my_str
         else:
-                  old_str = replace_str
-                  new_str = my_str
+            old_str = replace_str
+            new_str = my_str
 
         if after_flag and getattr(sq[0],column):
             parts = getattr(sq[0],column).split()
             if combine:
                 if parts.count(after_flag) > 1:
-                    indices = [ii for ii in range(len(parts)) if parts[ii] == after_flag]
+                    indices = [ii for ii in range(len(parts))
+                               if parts[ii] == after_flag]
                     # go backwards so don't mess up order when deleting
-                    for ii in range(len(indices)-1,0,-1):
-                        parts[indices[0]+1] = parts[indices[0]+1]+','+parts[indices[ii]+1]
-                        del parts[indices[ii]+1]
+                    for ii in range(len(indices) - 1, 0, -1):
+                        parts[indices[0]+1] = parts[indices[0] + 1] + ',' \
+                                              + parts[indices[ii] + 1]
+                        del parts[indices[ii] + 1]
                         del parts[indices[ii]]
             # matches if combine
             elif after_flag in parts:
-                parts[parts.index(after_flag)+1] \
-                    = parts[parts.index(after_flag)+1].replace(old_str, new_str)
+                parts[parts.index(after_flag) + 1] \
+                    = parts[parts.index(after_flag) + 1].replace(
+                        old_str, new_str)
 
             # matches if combine/else
             setattr(sq[0],column, ' '.join(parts))
@@ -2514,7 +2521,8 @@ class DButils(object):
         # matches after_flag
         else:
             try:
-                setattr(sq[0],column, getattr(sq[0],column).replace(old_str, new_str))
+                setattr(sq[0], column, getattr(sq[0], column).replace(
+                    old_str, new_str))
             except:
                 # OK to pass, might call when nothing to do
                 pass
