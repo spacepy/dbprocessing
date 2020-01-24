@@ -1597,6 +1597,47 @@ class TestWithtestDB(unittest.TestCase):
                            ins_after='foo')
         self.assertEqual('-i foo2 -j foo2bar -k baz', code.arguments)
 
+    def testEditTableExceptions(self):
+        """Test editTable with bad arguments"""
+        #Each test case is a tuple of kwargs for the call and expected
+        #error message from the exception.
+        test_cases = [
+            ({},
+             'Invalid call. Nothing to be done.'),
+            ({'ins_after': 'foo', 'ins_before': 'bar', 'my_str': 'baz'},
+             'Invalid call. Only use one of ins_after, ins_before,'
+                 ' and replace_str.'),
+            ({'ins_after': 'foo'},
+             'Invalid call. Need my_str.'),
+            ({'combine': True, 'ins_after': 'foo', 'my_str': 'bar',
+              'after_flag': '-f' },
+             'Invalid call. Combine flag cannot be used with ins_after,'
+                 ' ins_before, or replace_str.'),
+            ({'combine': True, 'my_str': 'bar', 'after_flag': '-f'},
+             'Invalid call. Do not need my_str with combine.'),
+            ({'combine': True},
+             'Invalid call. Must specify after_flag with combine.'),
+            ]
+        for kwargs, msg in test_cases:
+            with self.assertRaises(RuntimeError) as cm:
+                self.dbu.editTable('code', 1, 'arguments', **kwargs)
+            self.assertEqual(msg, cm.exception.message)
+
+        #Tests that don't fit exactly the same pattern
+        with self.assertRaises(RuntimeError) as cm:
+            self.dbu.editTable('code', 1, 'filename', combine=True,
+                               after_flag='-f')
+        self.assertEqual(
+            'Invalid call. Only use after_flag with arguments column.',
+            cm.exception.message)
+
+        with self.assertRaises(RuntimeError) as cm:
+            self.dbu.editTable('process', 1, 'process_name',
+                               ins_after='L1', my_str='_new')
+        self.assertEqual(
+            'Need to edit procedure for table process',
+            cm.exception.message)
+
 
 if __name__ == "__main__":
     unittest.main()
