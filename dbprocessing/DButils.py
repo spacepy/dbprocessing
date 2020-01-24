@@ -2454,36 +2454,34 @@ class DButils(object):
                                 with my_str
         :param bool combine: Default False. If True, combine arguments
                              with after_flag.
+        :raises ValueError: for any invalid combination of arguments.
         """
         DBlogging.dblogger.debug("Entered edit_table: my_id={0}".format(my_id))
         if not ins_after and not ins_before and not replace_str and not combine:
-            raise RuntimeError('Invalid call. Nothing to be done.')
+            raise ValueError('Nothing to be done.')
         if not combine and (sum(item is not None for item in
                                 [ins_after, ins_before, replace_str]) != 1):
-            raise RuntimeError('Invalid call. Only use one of ins_after, '
-                               'ins_before, and replace_str.')
+            raise ValueError('Only use one of ins_after, '
+                             'ins_before, and replace_str.')
         if (ins_after or ins_before or replace_str) and not my_str:
-            raise RuntimeError('Invalid call. Need my_str.')
+            raise ValueError('Need my_str.')
         if combine and (sum(item is not None for item in \
                             [ins_after, ins_before, replace_str]) != 0):
-            raise RuntimeError('Invalid call. Combine flag cannot be used with'
-                               ' ins_after, ins_before, or replace_str.')
+            raise ValueError('Combine flag cannot be used with'
+                             ' ins_after, ins_before, or replace_str.')
         if combine and my_str:
-            raise RuntimeError('Invalid call. Do not need my_str with combine.')
+            raise ValueError('Do not need my_str with combine.')
         if after_flag and (column != 'arguments'):
-            raise RuntimeError('Invalid call. Only use after_flag with'
-                               ' arguments column.')
+            raise ValueError('Only use after_flag with arguments column.')
         if combine and not after_flag:
-            raise RuntimeError('Invalid call. Must specify after_flag with'
-                               ' combine.')
+            raise ValueError('Must specify after_flag with combine.')
 
         if table.lower() == 'code':
             table = 'Code'
             my_id = self.getCodeID(my_id)
             my_filter = {'code_id' : my_id}
         else:
-            raise RuntimeError('Need to edit procedure for table {}'.format(
-                table))
+            raise NotImplementedError('Table {} not supported.'.format(table))
             
         sq = self.session.query(getattr(self, table)).filter_by(**my_filter)\
              .all()
