@@ -2509,17 +2509,12 @@ class DButils(object):
                                               + parts[indices[ii] + 1]
                         del parts[indices[ii] + 1]
                         del parts[indices[ii]]
-            # matches if combine
-            elif after_flag in parts:
+            elif after_flag in parts: #combine is false
                 parts[parts.index(after_flag) + 1] \
                     = parts[parts.index(after_flag) + 1].replace(
                         old_str, new_str)
-
-            # matches if combine/else
             setattr(sq[0],column, ' '.join(parts))
-            
-        # matches after_flag
-        else:
+        else: #no after_flag provided, or the column is empty in db
             setattr(sq[0], column, getattr(sq[0], column).replace(
                 old_str, new_str))
             
