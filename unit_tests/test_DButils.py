@@ -1651,7 +1651,7 @@ class TestWithtestDB(unittest.TestCase):
             self.dbu.editTable('process', 1, 'process_name',
                                ins_after='L1', my_str='_new')
         self.assertEqual(
-            'Table process not supported.', cm.exception.message)
+            'Table Process not supported.', cm.exception.message)
 
 
 if __name__ == "__main__":

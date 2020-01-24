@@ -2476,8 +2476,8 @@ class DButils(object):
         if combine and not after_flag:
             raise ValueError('Must specify after_flag with combine.')
 
-        if table.lower() == 'code':
-            table = 'Code'
+        table = table.title()
+        if table == 'Code':
             my_id = self.getCodeID(my_id)
             my_filter = {'code_id' : my_id}
         else:
@@ -2485,7 +2485,6 @@ class DButils(object):
             
         sq = self.session.query(getattr(self, table)).filter_by(**my_filter)\
              .all()
-
         if len(sq) != 1:
             raise (DBNoData("More than one row found with id".format(my_id)))
 
