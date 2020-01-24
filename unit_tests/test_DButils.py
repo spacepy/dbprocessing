@@ -1597,6 +1597,22 @@ class TestWithtestDB(unittest.TestCase):
                            ins_after='foo')
         self.assertEqual('-i foo2 -j foo2bar -k baz', code.arguments)
 
+    def testEditTableNoChange(self):
+        """Test editTable with no actual change"""
+        code = self.dbu.getEntry('Code', 1)
+        code.arguments = '-i foo -j foobar -k baz'
+        self.dbu.editTable('code', 1, 'arguments', my_str='2',
+                           replace_str='nothing')
+        self.assertEqual('-i foo -j foobar -k baz', code.arguments)
+
+    def testEditTableNoChange2(self):
+        """Test editTable with identical replacement"""
+        code = self.dbu.getEntry('Code', 1)
+        code.arguments = '-i foo -j foobar -k baz'
+        self.dbu.editTable('code', 1, 'arguments', my_str='foo',
+                           replace_str='foo')
+        self.assertEqual('-i foo -j foobar -k baz', code.arguments)
+
     def testEditTableExceptions(self):
         """Test editTable with bad arguments"""
         #Each test case is a tuple of kwargs for the call and expected

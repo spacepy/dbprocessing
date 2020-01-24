@@ -2520,11 +2520,7 @@ class DButils(object):
             
         # matches after_flag
         else:
-            try:
-                setattr(sq[0], column, getattr(sq[0], column).replace(
-                    old_str, new_str))
-            except:
-                # OK to pass, might call when nothing to do
-                pass
+            setattr(sq[0], column, getattr(sq[0], column).replace(
+                old_str, new_str))
             
         self.session.commit()
