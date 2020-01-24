@@ -2424,38 +2424,95 @@ class DButils(object):
                   ins_after=None, ins_before=None, replace_str=None,
                   combine=False):
         """
-        For given my_id in given table, update entry in given column. 
+        Apply string editing operations on a single row, column of a table
 
-        If after_flag set, then only do the replacement or addition
-        in the argument after a given flag (used only in the arguments
-        column).
-        If ins_after or ins_before are set, then insert my_str as indicated.
-        If replace_str is set, replace this string with my_str. 
-        If combine is set, then combine arguments with after_flag (this
-        is used in cases where we had two masters, for example. Combine
-        to a comma-delimited list.)
-        Only one of the ins_after, ins_before, replace_str and combine flags
-        should be set.
-        If ins_after, ins_before, or replace_str is set, then my_str must
-        be set.
+        For a specified row and column of a table, update the value according
+        to operations specified by the combination of the kwargs.
 
-        NOTE: This was written and tested for code table. Not thoroughly
-        tested for others.
+        To replace all instances of a string with another, set
+        ``replace_str`` to the string to replace and ``my_str`` to the
+        new value to replace it with.
+
+        To append a string to all instance of a string, set ``ins_after``
+        to the existing string and ``my_str`` to the value to append.
+
+        To prepend a string to all instance of a string, set ``ins_after``
+        to the existing string and ``my_str`` to the value to prepend.
+
+        When operating on the ``arguments`` column of the ``code`` table,
+        and ``after_flag`` is specified, all three of these operations
+        will only apply to the "word" (whitespace-separated) after the
+        "word" in ``after_flag``. See examples.
+
+        When operating on the ``arguments`` column of the ``code`` table,
+        ``combine`` may be set to ``True`` to combine every word that
+        follows each instance of ``after_flag`` into a comma-separated list
+        after a single instance of ``after_flag``. See examples.
+
+        One and only one of ``ins_after``, ``ins_before``, ``replace_str``
+        and ``combine`` can be specified; there is no default operation. If
+        ``ins_after``, ``ins_before``, or ``replace_str`` are specified,
+        ``my_str`` must be.
+
+        .. note:: Written and tested for code table. Not thoroughly
+                  tested for others.
         
-        :param str table: table name
-        :param int my_id: id for code
+        :param str table: Name of the table to edit.
+        :param int my_id: Specifies row to edit; most commonly the numerical
+                          ID (primary key) but also supports string matching
+                          on other columns as provided by :meth:`getEntry`.
         :param str column: name of column to edit
-        :param str my_str: Optional. String to add or replace.
-        :param str after_flag: Optional. If set, only replace string in
-                               argument after this flag.
-        :param str ins_after: Optional. If set, insert my_str after ins_after.
-        :param str ins_before: Optional. If set, insert my_str before
-                               ins_before.
-        :param str replace_str: Optional. If set, replace replace_str
-                                with my_str
-        :param bool combine: Default False. If True, combine arguments
-                             with after_flag.
+        :param str my_str: String to add or replace. (Optional; required with
+                           ``ins_after``, ``ins_before``, ``replace_str``).
+        :param str after_flag: Only replace string in words immediately
+                               following this word. Only supported in
+                               ``arguments`` column of ``code`` table
+                               (optional; default: replace in all).
+        :param str ins_after: Value to insert ``my_str`` after.
+                              (Optional; conflicts with ``ins_before``,
+                              ``replace_str``, ``combine``).
+        :param str ins_before: Value to insert ``my_str`` before.
+                               (Optional; conflicts with ``ins_after``,
+                               ``replace_str``, ``combine``).
+        :param str replace_str: Value to replace with ``my_str``.
+                                (Optional; conflicts with ``ins_after``,
+                                ``ins_before``, ``combine``).
+        :param bool combine: If true, combine all instances of words after
+                             the word in ``after_flag``. (Optional;
+                             conflicts with ``ins_after``, ``ins_before``,
+                             ``replace_str``).
         :raises ValueError: for any invalid combination of arguments.
+        :raises RuntimeError: if multiple rows match ``my_id``.
+
+        :examples:
+
+        All examples assume an open :class:`DButils` instance in ``dbu`` and
+        an existing code of ID 1. These examples use command line flags
+        but the treatment of strings is general.
+
+        >>> #Replace a string after a flag
+        >>> code = dbu.getEntry('Code', 1)
+        >>> code.arguments = '-i foobar -j foobar -k foobar'
+        >>> dbu.editTable('code', 1, 'arguments', my_str='baz',
+        ...               replace_str='bar', after_flag='-j')
+        >>> code.arguments
+        -i foobar -j foobaz -k foobar
+
+        >>> #Combine multiple instances of a flag into one
+        >>> code = dbu.getEntry('Code', 1)
+        >>> code.arguments = '-i foo -i bar -j baz'
+        >>> dbu.editTable('code', 1, 'arguments', after_flag='-i',
+        ...               combine=True)
+        >>> code.arguments
+        -i foo,bar -j baz
+
+        >>> #Append a string to every instance
+        >>> code = dbu.getEntry('Code', 1)
+        >>> code.relative_path = 'scripts'
+        >>> dbu.editTable('code', 1, 'relative_path', ins_after='scripts',
+        ...               my_str='2.0')
+        >>> code.relative_path
+        scripts2.0
         """
         DBlogging.dblogger.debug("Entered edit_table: my_id={0}".format(my_id))
         table = table.title()
