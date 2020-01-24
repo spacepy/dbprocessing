@@ -11,14 +11,7 @@ import tempfile
 import unittest
 from distutils.dir_util import copy_tree, remove_tree
 
-try:  # new version changed this annoyingly
-    from sqlalchemy.exceptions import IntegrityError
-    from sqlalchemy.exceptions import ArgumentError
-    from sqlalchemy.orm.exceptions import NoResultFound
-except ImportError:
-    from sqlalchemy.exc import IntegrityError
-    from sqlalchemy.exc import ArgumentError
-    from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound
 
 from dbprocessing import DButils
 from dbprocessing import Version
