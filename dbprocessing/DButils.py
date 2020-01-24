@@ -2426,30 +2426,34 @@ class DButils(object):
         For given my_id in given table, update entry in given column. 
 
         If after_flag set, then only do the replacement or addition
-        in the argument after a given flag (used only in the arguments column).
+        in the argument after a given flag (used only in the arguments
+        column).
         If ins_after or ins_before are set, then insert my_str as indicated.
         If replace_str is set, replace this string with my_str. 
-        If combine is set, then combine arguments with after_flag (this is used
-        in cases where we had two masters, for example. Combine to a
-        comma-delimited list.)
+        If combine is set, then combine arguments with after_flag (this
+        is used in cases where we had two masters, for example. Combine
+        to a comma-delimited list.)
         Only one of the ins_after, ins_before, replace_str and combine flags
         should be set.
-        If ins_after, ins_before, or replace_str is set, then my_str must be set.
+        If ins_after, ins_before, or replace_str is set, then my_str must
+        be set.
 
-        NOTE: This was written and tested for code table. Not thoroughly tested
-        for others.
+        NOTE: This was written and tested for code table. Not thoroughly
+        tested for others.
         
         :param str table: table name
         :param int my_id: id for code
         :param str column: name of column to edit
         :param str my_str: Optional. String to add or replace.
-        :param str after_flag: Optional. If set, only replace string in argument
-                               after this flag.
+        :param str after_flag: Optional. If set, only replace string in
+                               argument after this flag.
         :param str ins_after: Optional. If set, insert my_str after ins_after.
-        :param str ins_before: Optional. If set, insert my_str before ins_before.
-        :param str replace_str: Optional. If set, replace replace_str with my_str
-        :param bool combine: Default False. If True, combine arguments with
-                             after_flag.
+        :param str ins_before: Optional. If set, insert my_str before
+                               ins_before.
+        :param str replace_str: Optional. If set, replace replace_str
+                                with my_str
+        :param bool combine: Default False. If True, combine arguments
+                             with after_flag.
         """
         DBlogging.dblogger.debug("Entered edit_table: my_id={0}".format(my_id))
         if not ins_after and not ins_before and not replace_str and not combine:
@@ -2497,15 +2501,15 @@ class DButils(object):
             old_str = replace_str
             new_str = my_str
 
-        if after_flag and getattr(sq[0],column):
-            parts = getattr(sq[0],column).split()
+        if after_flag and getattr(sq[0], column):
+            parts = getattr(sq[0], column).split()
             if combine:
                 if parts.count(after_flag) > 1:
                     indices = [ii for ii in range(len(parts))
                                if parts[ii] == after_flag]
                     # go backwards so don't mess up order when deleting
                     for ii in range(len(indices) - 1, 0, -1):
-                        parts[indices[0]+1] = parts[indices[0] + 1] + ',' \
+                        parts[indices[0] + 1] = parts[indices[0] + 1] + ',' \
                                               + parts[indices[ii] + 1]
                         del parts[indices[ii] + 1]
                         del parts[indices[ii]]
@@ -2513,7 +2517,7 @@ class DButils(object):
                 parts[parts.index(after_flag) + 1] \
                     = parts[parts.index(after_flag) + 1].replace(
                         old_str, new_str)
-            setattr(sq[0],column, ' '.join(parts))
+            setattr(sq[0], column, ' '.join(parts))
         else: #no after_flag provided, or the column is empty in db
             setattr(sq[0], column, getattr(sq[0], column).replace(
                 old_str, new_str))
