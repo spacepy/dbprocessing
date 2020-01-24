@@ -1559,6 +1559,13 @@ class TestWithtestDB(unittest.TestCase):
         code = self.dbu.getEntry('Code', 1)
         self.assertEqual('newscripts', code.relative_path)
 
+    def testEditTableReplaceProcess(self):
+        """Test editTable with simple string replace on process table"""
+        self.dbu.editTable('process', 1, 'process_name',
+                           my_str='L5', replace_str='L1')
+        process = self.dbu.getEntry('Process', 1)
+        self.assertEqual('rot_L0toL5', process.process_name)
+
     def testEditTableReplaceMultipleCodes(self):
         """Test editTable with multiple matches for the code"""
         #Make multiple codes with same script name
@@ -1655,14 +1662,21 @@ class TestWithtestDB(unittest.TestCase):
             self.dbu.editTable('code', 1, 'filename', combine=True,
                                after_flag='-f')
         self.assertEqual(
-            'Only use after_flag with arguments column.',
+            'Only use after_flag with arguments column in Code table.',
+            cm.exception.message)
+        with self.assertRaises(ValueError) as cm:
+            self.dbu.editTable('process', 1, 'arguments', combine=True,
+                               after_flag='-f')
+        self.assertEqual(
+            'Only use after_flag with arguments column in Code table.',
             cm.exception.message)
 
-        with self.assertRaises(NotImplementedError) as cm:
-            self.dbu.editTable('process', 1, 'process_name',
+        with self.assertRaises(AttributeError) as cm:
+            self.dbu.editTable('nonexistent', 1, 'process_name',
                                ins_after='L1', my_str='_new')
         self.assertEqual(
-            'Table Process not supported.', cm.exception.message)
+            "'DButils' object has no attribute 'Nonexistent'",
+            cm.exception.message)
 
 
 if __name__ == "__main__":

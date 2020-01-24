@@ -2458,6 +2458,7 @@ class DButils(object):
         :raises ValueError: for any invalid combination of arguments.
         """
         DBlogging.dblogger.debug("Entered edit_table: my_id={0}".format(my_id))
+        table = table.title()
         if not ins_after and not ins_before and not replace_str and not combine:
             raise ValueError('Nothing to be done.')
         if not combine and (sum(item is not None for item in
@@ -2472,14 +2473,12 @@ class DButils(object):
                              ' ins_after, ins_before, or replace_str.')
         if combine and my_str:
             raise ValueError('Do not need my_str with combine.')
-        if after_flag and (column != 'arguments'):
-            raise ValueError('Only use after_flag with arguments column.')
+        if after_flag and (column != 'arguments' or table != 'Code'):
+            raise ValueError('Only use after_flag with arguments column'
+                             ' in Code table.')
         if combine and not after_flag:
             raise ValueError('Must specify after_flag with combine.')
 
-        table = table.title()
-        if table != 'Code':
-            raise NotImplementedError('Table {} not supported.'.format(table))
         try:
             entry = self.getEntry(table, my_id)
         except InvalidRequestError: #multiple matches for my_id, usually
