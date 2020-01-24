@@ -19,6 +19,7 @@ from sqlalchemy.orm import mapper
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy.orm.exc
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.exc import ArgumentError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
@@ -2477,16 +2478,12 @@ class DButils(object):
             raise ValueError('Must specify after_flag with combine.')
 
         table = table.title()
-        if table == 'Code':
-            my_id = self.getCodeID(my_id)
-            my_filter = {'code_id' : my_id}
-        else:
+        if table != 'Code':
             raise NotImplementedError('Table {} not supported.'.format(table))
-            
-        sq = self.session.query(getattr(self, table)).filter_by(**my_filter)\
-             .all()
-        if len(sq) != 1:
-            raise (DBNoData("More than one row found with id".format(my_id)))
+        try:
+            entry = self.getEntry(table, my_id)
+        except InvalidRequestError: #multiple matches for my_id, usually
+            raise RuntimeError('Multiple rows match {}'.format(my_id))
 
         if ins_before:
             old_str = ins_before
@@ -2498,8 +2495,8 @@ class DButils(object):
             old_str = replace_str
             new_str = my_str
 
-        if after_flag and getattr(sq[0], column):
-            parts = getattr(sq[0], column).split()
+        if after_flag and getattr(entry, column):
+            parts = getattr(entry, column).split()
             if combine:
                 if parts.count(after_flag) > 1:
                     indices = [ii for ii in range(len(parts))
@@ -2514,9 +2511,9 @@ class DButils(object):
                 parts[parts.index(after_flag) + 1] \
                     = parts[parts.index(after_flag) + 1].replace(
                         old_str, new_str)
-            setattr(sq[0], column, ' '.join(parts))
+            setattr(entry, column, ' '.join(parts))
         else: #no after_flag provided, or the column is empty in db
-            setattr(sq[0], column, getattr(sq[0], column).replace(
+            setattr(entry, column, getattr(entry, column).replace(
                 old_str, new_str))
             
         self.session.commit()

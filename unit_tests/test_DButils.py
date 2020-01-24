@@ -1559,6 +1559,17 @@ class TestWithtestDB(unittest.TestCase):
         code = self.dbu.getEntry('Code', 1)
         self.assertEqual('newscripts', code.relative_path)
 
+    def testEditTableReplaceMultipleCodes(self):
+        """Test editTable with multiple matches for the code"""
+        #Make multiple codes with same script name
+        self.addGenericCode()
+        self.addGenericCode()
+        with self.assertRaises(RuntimeError) as cm:
+            self.dbu.editTable('code', 'run_test.py', 'relative_path',
+                               my_str='newscripts', replace_str='scripts')
+        self.assertEqual(
+            'Multiple rows match run_test.py', cm.exception.message)
+
     def testEditTableReplaceAfter(self):
         """Test editTable with a replace only after a flag"""
         code = self.dbu.getEntry('Code', 1)
