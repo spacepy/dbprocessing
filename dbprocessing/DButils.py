@@ -2572,4 +2572,4 @@ class DButils(object):
             setattr(entry, column, getattr(entry, column).replace(
                 old_str, new_str))
             
-        self.session.commit()
+        self.commitDB()
