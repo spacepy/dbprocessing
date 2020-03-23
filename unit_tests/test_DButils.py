@@ -1624,6 +1624,14 @@ class TestWithtestDB(unittest.TestCase):
                            replace_str='foo')
         self.assertEqual('-i foo -j foobar -k baz', code.arguments)
 
+    def testEditTableNULL(self):
+        """Test editTable with NULL string"""
+        code = self.dbu.getEntry('Code', 1)
+        code.arguments = None
+        self.dbu.editTable('code', 1, 'arguments', my_str='2',
+                           replace_str='nothing')
+        self.assertEqual(None, code.arguments)
+
     def testEditTableExceptions(self):
         """Test editTable with bad arguments"""
         #Each test case is a tuple of kwargs for the call and expected

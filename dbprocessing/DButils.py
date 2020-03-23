@@ -2540,6 +2540,9 @@ class DButils(object):
             entry = self.getEntry(table, my_id)
         except InvalidRequestError: #multiple matches for my_id, usually
             raise RuntimeError('Multiple rows match {}'.format(my_id))
+        original = getattr(entry, column)
+        if original is None: #nothing to do
+            return
 
         if ins_before:
             old_str = ins_before
@@ -2551,8 +2554,8 @@ class DButils(object):
             old_str = replace_str
             new_str = my_str
 
-        if after_flag and getattr(entry, column):
-            parts = getattr(entry, column).split()
+        if after_flag and original:
+            parts = original.split()
             if combine:
                 if parts.count(after_flag) > 1:
                     indices = [ii for ii in range(len(parts))
@@ -2569,7 +2572,6 @@ class DButils(object):
                         old_str, new_str)
             setattr(entry, column, ' '.join(parts))
         else: #no after_flag provided, or the column is empty in db
-            setattr(entry, column, getattr(entry, column).replace(
-                old_str, new_str))
+            setattr(entry, column, original.replace(old_str, new_str))
             
         self.commitDB()
