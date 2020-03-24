@@ -2567,9 +2567,9 @@ class DButils(object):
                         del parts[indices[ii] + 1]
                         del parts[indices[ii]]
             elif after_flag in parts: #combine is false
-                parts[parts.index(after_flag) + 1] \
-                    = parts[parts.index(after_flag) + 1].replace(
-                        old_str, new_str)
+                for i, x in enumerate(parts[:-1]):
+                    if x == after_flag:
+                        parts[i + 1] = parts[i + 1].replace(old_str, new_str)
             setattr(entry, column, ' '.join(parts))
         else: #no after_flag provided, or the column is empty in db
             setattr(entry, column, original.replace(old_str, new_str))

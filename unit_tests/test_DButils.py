@@ -1580,6 +1580,16 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual('-i foobar -j foobaz -k foobar',
                          code.arguments)
 
+    def testEditTableReplaceAfterMultiple(self):
+        """Test editTable with a replace-after-flag, flag happens many times"""
+        code = self.dbu.getEntry('Code', 1)
+        code.arguments = '-i foobar -j foobar -k foobar -j goobar'
+        self.dbu.editTable('code', 1, 'arguments',
+                           my_str='baz', replace_str='bar',
+                           after_flag='-j')
+        self.assertEqual('-i foobar -j foobaz -k foobar -j goobaz',
+                         code.arguments)
+
     def testEditTableCombine(self):
         """Test editTable argument combination"""
         code = self.dbu.getEntry('Code', 1)
