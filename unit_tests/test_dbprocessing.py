@@ -168,7 +168,8 @@ class BuildChildrenTests(unittest.TestCase):
         l1pid = self.addProduct('level 1', level=1)
         l01process, l01code = self.addProcess('level 0-1', l1pid)
         self.addProductProcessLink(l0pid, l01process)
-        fid = self.addFile('level_0_20120101_v1.0.0', l0pid, datetime.datetime(2012, 1, 1))
+        fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                           datetime.datetime(2012, 1, 1))
         expected = [[
             '{}/codes/scripts/junk.py'.format(self.td),
             'level_0-1_args',
