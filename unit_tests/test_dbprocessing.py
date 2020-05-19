@@ -119,9 +119,14 @@ class BuildChildrenTests(unittest.TestCase):
         self.dbu.addproductprocesslink(product_id, process_id, optional,
                                        yesterday, tomorrow)
 
-    def addFile(self, filename, product_id, utc_date, version='1.0.0',
+    def addFile(self, filename, product_id, utc_date=None, version=None,
                 utc_start=None, utc_stop=None):
         """Add a file to the database"""
+        if utc_date is None:
+            utc_date = datetime.datetime.strptime(
+                filename.split('_')[-2], '%Y%m%d')
+        if version is None:
+            version = filename.split('_v')[-1]
         level = self.dbu.getEntry('Product', product_id).level
         if utc_start is None:
             utc_start = utc_date.replace(
@@ -168,8 +173,7 @@ class BuildChildrenTests(unittest.TestCase):
         l1pid = self.addProduct('level 1', level=1)
         l01process, l01code = self.addProcess('level 0-1', l1pid)
         self.addProductProcessLink(l0pid, l01process)
-        fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
-                           datetime.datetime(2012, 1, 1))
+        fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
         expected = [[
             '{}/codes/scripts/junk.py'.format(self.td),
             'level_0-1_args',
@@ -183,17 +187,14 @@ class BuildChildrenTests(unittest.TestCase):
         l1pid = self.addProduct('level 1', level=1)
         l01process, l01code = self.addProcess('level 0-1', l1pid)
         self.addProductProcessLink(l0pid, l01process)
-        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
-                             datetime.datetime(2012, 1, 1))
-        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid,
-                             datetime.datetime(2012, 1, 1))
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid)
         self.dbu.addFilefilelink(l1fid, l0fid)
         expected = []
         # Should be up to date
         self.checkCommandLines(l0fid, expected)
         #Updated version of L0
-        fid = self.addFile('level_0_20120101_v1.1.0', l0pid,
-                           datetime.datetime(2012, 1, 1), version='1.1.0')
+        fid = self.addFile('level_0_20120101_v1.1.0', l0pid)
         expected = [[
             '{}/codes/scripts/junk.py'.format(self.td),
             'level_0-1_args',
@@ -209,8 +210,7 @@ class BuildChildrenTests(unittest.TestCase):
         l1pid = self.addProduct('level 1', level=1)
         l01process, l01code = self.addProcess('level 0-1', l1pid)
         self.addProductProcessLink(l0pid, l01process, yesterday=1)
-        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
-                             datetime.datetime(2012, 1, 1))
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
         expected = [
             ['{}/codes/scripts/junk.py'.format(self.td),
             'level_0-1_args',
@@ -235,10 +235,8 @@ class BuildChildrenTests(unittest.TestCase):
         l1pid = self.addProduct('level 1', level=1)
         l01process, l01code = self.addProcess('level 0-1', l1pid)
         self.addProductProcessLink(l0pid, l01process, yesterday=1)
-        l0fid1 = self.addFile('level_0_20120101_v1.0.0', l0pid,
-                              datetime.datetime(2012, 1, 1))
-        l0fid2 = self.addFile('level_0_20120102_v1.0.0', l0pid,
-                              datetime.datetime(2012, 1, 2))
+        l0fid1 = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        l0fid2 = self.addFile('level_0_20120102_v1.0.0', l0pid)
         # Precondition: two subsequent L0 days, L1 not made yet.
         expected = [
             ['{}/codes/scripts/junk.py'.format(self.td),
@@ -279,13 +277,11 @@ class BuildChildrenTests(unittest.TestCase):
         l1pid = self.addProduct('level 1', level=1)
         l01process, l01code = self.addProcess('level 0-1', l1pid)
         self.addProductProcessLink(l0pid, l01process, yesterday=1)
-        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
-                             datetime.datetime(2012, 1, 1))
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
         l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid,
                              datetime.datetime(2012, 1, 1))
         self.dbu.addFilefilelink(l1fid, l0fid)
-        newfid = self.addFile('level_0_20120101_v1.1.0', l0pid,
-                              datetime.datetime(2012, 1, 1), version='1.1.0')
+        newfid = self.addFile('level_0_20120101_v1.1.0', l0pid)
         expected = [
             ['{}/codes/scripts/junk.py'.format(self.td),
             'level_0-1_args',
@@ -310,22 +306,17 @@ class BuildChildrenTests(unittest.TestCase):
         l1pid = self.addProduct('level 1', level=1)
         l01process, l01code = self.addProcess('level 0-1', l1pid)
         self.addProductProcessLink(l0pid, l01process, yesterday=1)
-        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
-                             datetime.datetime(2012, 1, 1))
-        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid,
-                             datetime.datetime(2012, 1, 1))
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid)
         self.dbu.addFilefilelink(l1fid, l0fid)
         # This file has "yesterday" and "today" inputs
-        l1fid = self.addFile('level_1_20120102_v1.0.0', l1pid,
-                             datetime.datetime(2012, 1, 2))
+        l1fid = self.addFile('level_1_20120102_v1.0.0', l1pid)
         self.dbu.addFilefilelink(l1fid, l0fid)
-        l0fid = self.addFile('level_0_20120102_v1.0.0', l0pid,
-                             datetime.datetime(2012, 1, 2))
+        l0fid = self.addFile('level_0_20120102_v1.0.0', l0pid)
         self.dbu.addFilefilelink(l1fid, l0fid)
         # Precondition: both yesterday and today have L0 and L1, and up to date
         # Perturbation: Add new "yesterday"
-        newfid = self.addFile('level_0_20120101_v1.1.0', l0pid,
-                              datetime.datetime(2012, 1, 1), version='1.1.0')
+        newfid = self.addFile('level_0_20120101_v1.1.0', l0pid)
         expected = [
             ['{}/codes/scripts/junk.py'.format(self.td),
             'level_0-1_args',
