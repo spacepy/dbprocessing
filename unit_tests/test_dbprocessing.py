@@ -148,10 +148,9 @@ class BuildChildrenTests(unittest.TestCase):
         fid is the (single) file ID
 
         expected is a list-of-lists, all the expected commands to be called.
-
-        Note that, since last arg of expected is the output file, the runMe
-        tmp dir will be added to it.
         """
+        # Clear any pending runMes from prior subtests
+        del self.pq.runme_list[:]
         self.pq.buildChildren([fid, None])
         self.assertEqual(
             len(self.pq.runme_list), len(expected))
@@ -177,6 +176,170 @@ class BuildChildrenTests(unittest.TestCase):
             'level_1_20120101_v1.0.0']]
         self.checkCommandLines(fid, expected)
         
+    def testSingleDailyUpdate(self):
+        """Single daily file making another, new version appears"""
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process)
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                             datetime.datetime(2012, 1, 1))
+        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid,
+                             datetime.datetime(2012, 1, 1))
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        expected = []
+        # Should be up to date
+        self.checkCommandLines(l0fid, expected)
+        #Updated version of L0
+        fid = self.addFile('level_0_20120101_v1.1.0', l0pid,
+                           datetime.datetime(2012, 1, 1), version='1.1.0')
+        expected = [[
+            '{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+            '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+            'level_1_20120101_v1.1.0']]
+
+    def testYesterdayNewFile(self):
+        """Daily file, use yesterday
+
+        Does not make the day with only yesterday as input
+        """
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process, yesterday=1)
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                             datetime.datetime(2012, 1, 1))
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120101_v1.0.0'
+            ],
+# Yesterday-only is not made
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             'level_1_20120102_v1.0.0'
+#            ],
+        ]
+        self.checkCommandLines(l0fid, expected)
+
+    def testYesterdayNewFileTwoDays(self):
+        """Two daily files, use yesterday
+
+        Both days are made; second day has yesterday input
+        """
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process, yesterday=1)
+        l0fid1 = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                              datetime.datetime(2012, 1, 1))
+        l0fid2 = self.addFile('level_0_20120102_v1.0.0', l0pid,
+                              datetime.datetime(2012, 1, 2))
+        # Precondition: two subsequent L0 days, L1 not made yet.
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120101_v1.0.0'
+            ],
+# 2012-01-02 not triggered on "yesterday" even though it has "today"
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             'level_1_20120102_v1.0.0'
+#            ],
+        ]
+        self.checkCommandLines(l0fid1, expected)
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120102_v1.0.0'
+            ],
+# 2012-01-03 yesterday-only, not triggered
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+#             'level_1_20120103_v1.0.0'
+#            ],
+        ]
+        self.checkCommandLines(l0fid2, expected)
+
+    def testYesterdayUpdate(self):
+        """Daily file, use yesterday, new file yesterday, no today yet
+
+        Does not make the day with only yesterday as input
+        """
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process, yesterday=1)
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                             datetime.datetime(2012, 1, 1))
+        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid,
+                             datetime.datetime(2012, 1, 1))
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        newfid = self.addFile('level_0_20120101_v1.1.0', l0pid,
+                              datetime.datetime(2012, 1, 1), version='1.1.0')
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+             'level_1_20120101_v1.1.0'
+            ],
+# Yesterday-only is not made
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+#             'level_1_20120102_v1.0.0'
+#            ],
+        ]
+        self.checkCommandLines(newfid, expected)
+
+    def testYesterdayUpdateTodayExists(self):
+        """Daily file, use yesterday, new file yesterday, today exists
+
+        Does not make the day with only yesterday updated
+        """
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process, yesterday=1)
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                             datetime.datetime(2012, 1, 1))
+        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid,
+                             datetime.datetime(2012, 1, 1))
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        # This file has "yesterday" and "today" inputs
+        l1fid = self.addFile('level_1_20120102_v1.0.0', l1pid,
+                             datetime.datetime(2012, 1, 2))
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        l0fid = self.addFile('level_0_20120102_v1.0.0', l0pid,
+                             datetime.datetime(2012, 1, 2))
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        # Precondition: both yesterday and today have L0 and L1, and up to date
+        # Perturbation: Add new "yesterday"
+        newfid = self.addFile('level_0_20120101_v1.1.0', l0pid,
+                              datetime.datetime(2012, 1, 1), version='1.1.0')
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+             'level_1_20120101_v1.1.0'
+            ],
+# Date with only yesterday not updated.
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+#             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+#             'level_1_20120102_v1.1.0'
+#            ],
+        ]
+        self.checkCommandLines(newfid, expected)
 
 
 if __name__ == '__main__':
