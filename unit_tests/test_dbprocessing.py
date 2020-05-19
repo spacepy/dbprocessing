@@ -256,6 +256,7 @@ class BuildChildrenTests(unittest.TestCase):
             ['{}/codes/scripts/junk.py'.format(self.td),
             'level_0-1_args',
              '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             # Yesterday is included in the command build
              '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
              'level_1_20120102_v1.0.0'
             ],
@@ -278,8 +279,7 @@ class BuildChildrenTests(unittest.TestCase):
         l01process, l01code = self.addProcess('level 0-1', l1pid)
         self.addProductProcessLink(l0pid, l01process, yesterday=1)
         l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
-        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid,
-                             datetime.datetime(2012, 1, 1))
+        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid)
         self.dbu.addFilefilelink(l1fid, l0fid)
         newfid = self.addFile('level_0_20120101_v1.1.0', l0pid)
         expected = [
@@ -323,12 +323,145 @@ class BuildChildrenTests(unittest.TestCase):
              '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
              'level_1_20120101_v1.1.0'
             ],
-# Date with only yesterday not updated.
+# Date with only yesterday changed is not updated.
 #            ['{}/codes/scripts/junk.py'.format(self.td),
 #            'level_0-1_args',
 #             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
 #             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
 #             'level_1_20120102_v1.1.0'
+#            ],
+        ]
+        self.checkCommandLines(newfid, expected)
+
+    def testTomorrowNewFile(self):
+        """Daily file, use tomorrow
+
+        Does not make the day with only tomorrow as input
+        """
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process, tomorrow=1)
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120101_v1.0.0'
+            ],
+# Tomorrow-only is not made
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             'level_1_20111231_v1.0.0'
+#            ],
+        ]
+        self.checkCommandLines(l0fid, expected)
+
+    def testTomorrowNewFileTwoDays(self):
+        """Two daily files, use tomorrow
+
+        Both days are made; first day has tomorrow input
+        """
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process, tomorrow=1)
+        l0fid1 = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        l0fid2 = self.addFile('level_0_20120102_v1.0.0', l0pid)
+        # Precondition: two subsequent L0 days, L1 not made yet.
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             # Tomorrow is included in the command build
+             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120101_v1.0.0'
+            ],
+# 2011-12-31 tomorrow-only, not triggered
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             'level_1_20111231_v1.0.0'
+#            ],
+        ]
+        self.checkCommandLines(l0fid1, expected)
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             'level_1_20120102_v1.0.0'
+            ],
+# 2012-01-01 not triggered by "tomorrow" even though have "today"
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+#             'level_1_20120101_v1.0.0'
+#            ],
+        ]
+        self.checkCommandLines(l0fid2, expected)
+
+    def testTomorrowUpdate(self):
+        """Daily file, use tomorrow, new file tomorrow, no today yet
+
+        Does not make the day with only tomorrow as input
+        """
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process, tomorrow=1)
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid)
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        newfid = self.addFile('level_0_20120101_v1.1.0', l0pid)
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+             'level_1_20120101_v1.1.0'
+            ],
+# Tomorrow-only is not made
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+#             'level_1_20111231_v1.0.0'
+#            ],
+        ]
+        self.checkCommandLines(newfid, expected)
+
+    def testTomorrowUpdateTodayExists(self):
+        """Daily file, use tomorow, new file tomorrow, today exists
+
+        Does not make the day with only tomorrow updated
+        """
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process, tomorrow=1)
+        l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        l1fid = self.addFile('level_1_20120101_v1.0.0', l1pid)
+        # This file has "tomorrow" and "today" inputs
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        l0fid = self.addFile('level_0_20120102_v1.0.0', l0pid)
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        l1fid = self.addFile('level_1_20120102_v1.0.0', l1pid)
+        self.dbu.addFilefilelink(l1fid, l0fid)
+        # Precondition: both tomorrow and today have L0 and L1, and up to date
+        # Perturbation: Add new "tomorrow"
+        newfid = self.addFile('level_0_20120102_v1.1.0', l0pid)
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+            'level_0-1_args',
+             '{}/data/junk/level_0_20120102_v1.1.0'.format(self.td),
+             'level_1_20120102_v1.1.0'
+            ],
+# Date with only tomorrow changed is not updated.
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             '{}/data/junk/level_0_20120102_v1.1.0'.format(self.td),
+#             'level_1_20120101_v1.1.0'
 #            ],
         ]
         self.checkCommandLines(newfid, expected)
