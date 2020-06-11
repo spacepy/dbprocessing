@@ -13,6 +13,10 @@ from distutils.dir_util import copy_tree, remove_tree
 
 from sqlalchemy.orm.exc import NoResultFound
 
+#The log is opened on import, so need to quarantine the log directory
+#right away
+os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
+                                                  'unittestlogs')
 from dbprocessing import DButils
 from dbprocessing import Version
 
@@ -473,6 +477,25 @@ class DBUtilsGetTests(TestSetup):
         self.assertRaises(DButils.DBNoData, self.dbu.getFileDates, 343423)
         self.assertEqual([datetime.date(2013, 9, 8), datetime.date(2013, 9, 8)],
                          self.dbu.getFileDates(2))
+
+    def test_getFileDatesSpan(self):
+        """getFileDates for a file that spans days"""
+        fid = self.dbu.addFile(
+            filename='rbsp-a_magnetometer_uvw_emfisis-Quick-Look'
+            '_20120101_v99.99.99.cdf',
+            data_level=0,
+            version=Version.Version(99, 99, 99),
+            product_id=1,
+            # Pretend this is a product where the actual timespan is shifted
+            # by an hour from "characteristic" date
+            utc_file_date=datetime.datetime(2012, 1, 1),
+            utc_start_time=datetime.datetime(2012, 1, 1, 1),
+            utc_stop_time=datetime.datetime(2012, 1, 2, 1),
+            file_create_date=datetime.datetime.now(),
+            exists_on_disk=True)
+        self.assertEqual(
+            [datetime.date(2012, 1, 1), datetime.date(2012, 1, 2)],
+            self.dbu.getFileDates(fid))
 
     def test_getInputProductID(self):
         """getInputProductID"""
