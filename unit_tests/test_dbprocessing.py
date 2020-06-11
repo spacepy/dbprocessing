@@ -22,6 +22,11 @@ import dbprocessing.dbprocessing
 import dbprocessing.Version
 
 
+# Many of these tests do not work as expected. The tests that fail with
+# the current code (but are expected to succeed) are commented out, with
+# notation on the expected and actual behavior.
+# Thus these tests "succeeding" indicates consistency, and as the desired
+# behavior is fixed, should be updated to match.
 class BuildChildrenTests(unittest.TestCase):
     """Tests of ProcessQueue.buildChildren, checking what runMes are made"""
 
@@ -465,6 +470,88 @@ class BuildChildrenTests(unittest.TestCase):
 #            ],
         ]
         self.checkCommandLines(newfid, expected)
+
+    def testChangeTimebase(self):
+        """L0 file that spans days should have L1 that spans days"""
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process)
+        fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                           utc_start=datetime.datetime(2012, 1, 1, 1),
+                           utc_stop=datetime.datetime(2012, 1, 2, 1))
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+             'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120101_v1.0.0'],
+# l1 "tomorrow" not built even though l0 "today" includes data for it
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#             'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             'level_1_20120102_v1.0.0']
+        ]
+        self.checkCommandLines(fid, expected)
+
+    def testChangeTimebaseMultiDays(self):
+        """L0 files straddle days, should give both files input to L1 day"""
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process)
+        fid1 = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                           utc_start=datetime.datetime(2012, 1, 1, 1),
+                           utc_stop=datetime.datetime(2012, 1, 2, 1))
+        fid2 = self.addFile('level_0_20120102_v1.0.0', l0pid,
+                            utc_start=datetime.datetime(2012, 1, 2, 1),
+                            utc_stop=datetime.datetime(2012, 1, 3, 1))
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+             'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120101_v1.0.0'],
+            ['{}/codes/scripts/junk.py'.format(self.td),
+             'level_0-1_args',
+# l0 "previous day" with data for l1 "today" is not included
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             'level_1_20120102_v1.0.0']
+        ]
+        self.checkCommandLines(fid1, expected)
+        expected = [
+            ['{}/codes/scripts/junk.py'.format(self.td),
+             'level_0-1_args',
+             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             'level_1_20120102_v1.0.0'],
+# l1 "tomorrow" not built even though l0 "today" includes data for it
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#             'level_0-1_args',
+#             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+#             'level_1_20120103_v1.0.0']
+        ]
+        self.checkCommandLines(fid2, expected)
+
+    def testChangeTimebaseYesterday(self):
+        """L0 file has a little "yesterday" should have L1 that spans days"""
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process)
+        fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                           utc_start=datetime.datetime(2011, 12, 31, 23),
+                           utc_stop=datetime.datetime(2012, 1, 1, 23))
+        expected = [
+# l1 "yesterday" not built even though l0 "today" includes data for it
+#            ['{}/codes/scripts/junk.py'.format(self.td),
+#             'level_0-1_args',
+#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             'level_1_20111231_v1.0.0'],
+            ['{}/codes/scripts/junk.py'.format(self.td),
+             'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120101_v1.0.0'],
+        ]
+        self.checkCommandLines(fid, expected)
 
 
 if __name__ == '__main__':
