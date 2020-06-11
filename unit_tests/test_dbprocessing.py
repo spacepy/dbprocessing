@@ -480,6 +480,9 @@ class BuildChildrenTests(unittest.TestCase):
         fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
                            utc_start=datetime.datetime(2012, 1, 1, 1),
                            utc_stop=datetime.datetime(2012, 1, 2, 1))
+        self.assertEqual(
+            [datetime.date(2012, 1, 1), datetime.date(2012, 1, 2)],
+            self.dbu.getFileDates(fid))
         expected = [
             ['{}/codes/scripts/junk.py'.format(self.td),
              'level_0-1_args',
@@ -502,9 +505,15 @@ class BuildChildrenTests(unittest.TestCase):
         fid1 = self.addFile('level_0_20120101_v1.0.0', l0pid,
                            utc_start=datetime.datetime(2012, 1, 1, 1),
                            utc_stop=datetime.datetime(2012, 1, 2, 1))
+        self.assertEqual(
+            [datetime.date(2012, 1, 1), datetime.date(2012, 1, 2)],
+            self.dbu.getFileDates(fid1))
         fid2 = self.addFile('level_0_20120102_v1.0.0', l0pid,
                             utc_start=datetime.datetime(2012, 1, 2, 1),
                             utc_stop=datetime.datetime(2012, 1, 3, 1))
+        self.assertEqual(
+            [datetime.date(2012, 1, 2), datetime.date(2012, 1, 3)],
+            self.dbu.getFileDates(fid2))
         expected = [
             ['{}/codes/scripts/junk.py'.format(self.td),
              'level_0-1_args',
@@ -540,6 +549,9 @@ class BuildChildrenTests(unittest.TestCase):
         fid = self.addFile('level_0_20120101_v1.0.0', l0pid,
                            utc_start=datetime.datetime(2011, 12, 31, 23),
                            utc_stop=datetime.datetime(2012, 1, 1, 23))
+        self.assertEqual(
+            [datetime.date(2011, 12, 31), datetime.date(2012, 1, 1)],
+            self.dbu.getFileDates(fid))
         expected = [
 # l1 "yesterday" not built even though l0 "today" includes data for it
 #            ['{}/codes/scripts/junk.py'.format(self.td),
