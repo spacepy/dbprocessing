@@ -1754,7 +1754,7 @@ class DButils(object):
 
     def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
-        Return the files in the db by product id that have data in the date specified
+        Return the files in the db by product id with utc_file_date in range specified
         """
         return self.getFiles(startDate=min(daterange),
                              endDate=max(daterange),
@@ -1763,7 +1763,7 @@ class DButils(object):
 
     def getFilesByDate(self, daterange, newest_version=False):
         """
-        Return the files in the db that have data in the date specified
+        Return files in the db with utc_file_date in the range specified
         """
         return self.getFiles(startDate=min(daterange),
                              endDate=max(daterange),
