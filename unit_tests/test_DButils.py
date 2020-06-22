@@ -505,6 +505,56 @@ class DBUtilsGetTests(TestSetup):
         self.assertFalse(self.dbu.getInputProductID(2343))
         self.assertEqual([], self.dbu.getInputProductID(2343))
 
+    def test_getFilesEndDate(self):
+        """getFiles with only end date specified"""
+        val = self.dbu.getFiles(endDate='2013-09-14', product=138)
+        expected = ['rbspb_pre_MagEphem_OP77Q_201309{:02d}_v1.0.0.txt'.format(i)
+                    for i in range(1, 15)]
+        actual = sorted([v.filename for v in val])
+        self.assertEqual(expected, actual)
+
+    def test_getFilesStartDate(self):
+        """getFiles with only start date specified"""
+        val = self.dbu.getFiles(startDate='2013-09-14', product=138)
+        expected = ['rbspb_pre_MagEphem_OP77Q_201309{:02d}_v1.0.0.txt'.format(i)
+                    for i in range(14, 31)]
+        actual = sorted([v.filename for v in val])
+        self.assertEqual(expected, actual)
+
+    def test_getFilesBeyondMagicDate(self):
+        """getFiles with a date past magic values for date"""
+        self.dbu.addFile(
+            filename='rbspb_pre_MagEphem_OP77Q_20990101_v1.0.0.txt',
+            data_level=0, version=Version.Version(1, 0, 0),
+            file_create_date=datetime.date(2010, 1, 1),
+            exists_on_disk=False, utc_file_date=datetime.date(2099, 1, 1),
+            utc_start_time=datetime.datetime(2099, 1, 1),
+            utc_stop_time=datetime.datetime(2099, 1, 1, 23, 59, 59),
+            product_id=138, shasum='0')
+        val = self.dbu.getFiles(startDate='2013-09-14', product=138)
+        expected = ['rbspb_pre_MagEphem_OP77Q_201309{:02d}_v1.0.0.txt'.format(i)
+                    for i in range(14, 31)]
+        expected += ['rbspb_pre_MagEphem_OP77Q_20990101_v1.0.0.txt']
+        actual = sorted([v.filename for v in val])
+        self.assertEqual(expected, actual)
+
+    def test_getFilesBeforeMagicDate(self):
+        """getFiles with a date before magic values for date"""
+        self.dbu.addFile(
+            filename='rbspb_pre_MagEphem_OP77Q_19590101_v1.0.0.txt',
+            data_level=0, version=Version.Version(1, 0, 0),
+            file_create_date=datetime.date(2010, 1, 1),
+            exists_on_disk=False, utc_file_date=datetime.date(1959, 1, 1),
+            utc_start_time=datetime.datetime(1959, 1, 1),
+            utc_stop_time=datetime.datetime(1959, 1, 1, 23, 59, 59),
+            product_id=138, shasum='0')
+        val = self.dbu.getFiles(endDate='2013-09-14', product=138)
+        expected = ['rbspb_pre_MagEphem_OP77Q_19590101_v1.0.0.txt'] + [
+            'rbspb_pre_MagEphem_OP77Q_201309{:02d}_v1.0.0.txt'.format(i)
+            for i in range(1, 15)]
+        actual = sorted([v.filename for v in val])
+        self.assertEqual(expected, actual)
+
     def test_getFilesByProductDate(self):
         """getFilesByProductDate"""
         self.assertFalse(self.dbu.getFilesByProductDate(1, [datetime.date(2013, 12, 12)] * 2))

@@ -441,8 +441,8 @@ class ProcessQueue(object):
         raise (NotImplementedError('Not yet implemented'))
 
     def _reprocessBy(self,
-                     startDate="1970-01-01",
-                     endDate="2070-01-01",
+                     startDate=None,
+                     endDate=None,
                      level=None,
                      product=None,
                      code=None,

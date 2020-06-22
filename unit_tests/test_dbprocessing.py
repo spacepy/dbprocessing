@@ -22,17 +22,12 @@ import dbprocessing.dbprocessing
 import dbprocessing.Version
 
 
-# Many of these tests do not work as expected. The tests that fail with
-# the current code (but are expected to succeed) are commented out, with
-# notation on the expected and actual behavior.
-# Thus these tests "succeeding" indicates consistency, and as the desired
-# behavior is fixed, should be updated to match.
-class BuildChildrenTests(unittest.TestCase):
-    """Tests of ProcessQueue.buildChildren, checking what runMes are made"""
+class ProcessQueueTestsBase(unittest.TestCase):
+    """Base class for tests that require ProcessQueue setup"""
 
     def setUp(self):
-        """Make a copy of db and open it so have something to work with"""
-        super(BuildChildrenTests, self).setUp()
+        """Make a db and open it so have something to work with"""
+        super(ProcessQueueTestsBase, self).setUp()
         self.td = tempfile.mkdtemp()
         shutil.copy2(
             os.path.join(os.path.dirname(__file__), 'emptyDB.sqlite'),
@@ -59,11 +54,11 @@ class BuildChildrenTests(unittest.TestCase):
         self.dbu = self.pq.dbu
 
     def tearDown(self):
-        """Remove the copy of db"""
+        """Remove the db and working tree"""
         # Unfortunately all the cleanup is in the destructor
         del self.pq
         shutil.rmtree(self.td)
-        super(BuildChildrenTests, self).tearDown()
+        super(ProcessQueueTestsBase, self).tearDown()
 
     def addProduct(self, product_name, instrument_id=None, level=0):
         """Add a product to database (incl. inspector)
@@ -151,6 +146,15 @@ class BuildChildrenTests(unittest.TestCase):
             exists_on_disk=True,
         )
         return fid
+
+
+# Many of these tests do not work as expected. The tests that fail with
+# the current code (but are expected to succeed) are commented out, with
+# notation on the expected and actual behavior.
+# Thus these tests "succeeding" indicates consistency, and as the desired
+# behavior is fixed, should be updated to match.
+class BuildChildrenTests(ProcessQueueTestsBase):
+    """Tests of ProcessQueue.buildChildren, checking what runMes are made"""
 
     def checkCommandLines(self, fid, expected):
         """Check the command line built for a file ID
@@ -564,6 +568,17 @@ class BuildChildrenTests(unittest.TestCase):
              'level_1_20120101_v1.0.0'],
         ]
         self.checkCommandLines(fid, expected)
+
+
+class ProcessQueueTests(ProcessQueueTestsBase):
+    """Other tests of ProcessQueue"""
+
+    def testReprocessByNoDate(self):
+        """Do _reprocessBy without a specific date"""
+        l0pid = self.addProduct('level 0')
+        fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        self.assertEqual(1, self.pq._reprocessBy())
+        self.assertEqual((fid, None), self.dbu.Processqueue.pop())
 
 
 if __name__ == '__main__':

@@ -745,8 +745,8 @@ class DButils(object):
 
     def getAllFilenames(self,
                         fullPath=True,
-                        startDate="1970-01-01",
-                        endDate="2070-01-01",
+                        startDate=None,
+                        endDate=None,
                         level=None,
                         product=None,
                         code=None,
@@ -1705,8 +1705,8 @@ class DButils(object):
         return sq
 
     def getFiles(self,
-                 startDate="1970-01-01",
-                 endDate="2070-01-01",
+                 startDate=None,
+                 endDate=None,
                  level=None,
                  product=None,
                  code=None,
@@ -1738,9 +1738,14 @@ class DButils(object):
                                 self.File.product_id == self.Instrumentproductlink.product_id) \
                 .filter_by(instrument_id=instrument)
 
-        if (startDate != "1970-01-01" and startDate is not None) or (endDate != "2070-01-01" and endDate is not None):
-            # I.E, they changed atleast one of the date parameters from "all"
-            files = files.filter(self.File.utc_file_date.between(startDate, endDate))
+        if startDate is not None:
+            if endDate is not None:
+                files = files.filter(self.File.utc_file_date.between(
+                    startDate, endDate))
+            else: # Start date only
+                files = files.filter(self.File.utc_file_date >= startDate)
+        elif endDate is not None: # End date only
+            files = files.filter(self.File.utc_file_date <= endDate)
 
         if newest_version:
             files = files.order_by(self.File.interface_version, self.File.quality_version, self.File.revision_version)
@@ -1801,8 +1806,8 @@ class DButils(object):
 
     def getAllFileIds(self,
                       fullPath=True,
-                      startDate="1970-01-01",
-                      endDate="2070-01-01",
+                      startDate=None,
+                      endDate=None,
                       level=None,
                       product=None,
                       code=None,
