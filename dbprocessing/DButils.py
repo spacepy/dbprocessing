@@ -1713,7 +1713,9 @@ class DButils(object):
                  instrument=None,
                  exists=None,
                  newest_version=False,
-                 limit=None):
+                 limit=None,
+                 startTime=None,
+                 endTime=None):
         # if a datetime.datetime comes in this does not work, make them datetime.date
         startDate = Utils.datetimeToDate(startDate)
         endDate = Utils.datetimeToDate(endDate)
@@ -1747,6 +1749,11 @@ class DButils(object):
         elif endDate is not None: # End date only
             files = files.filter(self.File.utc_file_date <= endDate)
 
+        if startTime is not None:
+            files = files.filter(self.File.utc_stop_time >= Utils.toDatetime(startTime))
+        if endTime is not None:
+            files = files.filter(self.File.utc_start_time <= Utils.toDatetime(endTime, end=True))
+
         if newest_version:
             files = files.order_by(self.File.interface_version, self.File.quality_version, self.File.revision_version)
             x = files.limit(limit).all()
@@ -1763,6 +1770,15 @@ class DButils(object):
         """
         return self.getFiles(startDate=min(daterange),
                              endDate=max(daterange),
+                             product=product_id,
+                             newest_version=newest_version)
+
+    def getFilesByProductTime(self, product_id, daterange, newest_version=False):
+        """
+        Return the files in the db by product id with any data in range specified
+        """
+        return self.getFiles(startTime=min(daterange),
+                             endTime=max(daterange),
                              product=product_id,
                              newest_version=newest_version)
 

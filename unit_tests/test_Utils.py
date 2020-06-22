@@ -199,6 +199,34 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual(Utils.datetimeToDate(datetime.date(2016, 12, 10)), datetime.date(2016, 12, 10))
         self.assertEqual(Utils.datetimeToDate(datetime.datetime(2016, 12, 10, 11, 5)), datetime.date(2016, 12, 10))
 
+    def test_toDatetime(self):
+        """Test toDatetime"""
+        self.assertEqual(
+            datetime.datetime(2010, 1, 1),
+            Utils.toDatetime('2010-1-1'))
+        self.assertEqual(
+            datetime.datetime(2010, 1, 1),
+            Utils.toDatetime(datetime.datetime(2010, 1, 1)))
+        self.assertEqual(
+            datetime.datetime(2010, 1, 1, 5),
+            Utils.toDatetime(datetime.datetime(2010, 1, 1, 5)))
+        self.assertEqual(
+            datetime.datetime(2010, 1, 1),
+            Utils.toDatetime(datetime.date(2010, 1, 1)))
+
+        self.assertEqual(
+            datetime.datetime(2010, 1, 1, 23, 59, 59, 999999),
+            Utils.toDatetime('2010-1-1', end=True))
+        self.assertEqual(
+            datetime.datetime(2010, 1, 1),
+            Utils.toDatetime(datetime.datetime(2010, 1, 1), end=True))
+        self.assertEqual(
+            datetime.datetime(2010, 1, 1, 5),
+            Utils.toDatetime(datetime.datetime(2010, 1, 1, 5), end=True))
+        self.assertEqual(
+            datetime.datetime(2010, 1, 1, 23, 59, 59, 999999),
+            Utils.toDatetime(datetime.date(2010, 1, 1), end=True))
+
 
 if __name__ == "__main__":
     unittest.main()

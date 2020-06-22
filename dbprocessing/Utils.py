@@ -18,6 +18,11 @@ import dateutil.rrule  # do this long so where it is from is remembered
 
 from . import Version
 
+try:
+    str_classes = (str, bytes, unicode)
+except NameError:
+    str_classes = (str, bytes)
+
 
 def datetimeToDate(dt):
     """
@@ -32,6 +37,30 @@ def datetimeToDate(dt):
         return dt.date()
     else:
         return dt
+
+
+def toDatetime(dt, end=False):
+    """
+    Convert a date, date string, or datetime to a datetime
+
+    If a time is provided, passed through; otherwise set to start/end
+    of day.
+
+    :param dt: input to convert
+    :type dt: datetime.datetime, datetime.date, or str
+    :param bool end: If input has no time, set to end of day
+                     (default to start of day)
+    :return: datetime.date
+    :rtype: datetime.date
+    """
+    if hasattr(dt, 'hour'): # Already datetime
+        return dt # Already datetime
+    dt = datetime.datetime.strptime(dt, '%Y-%m-%d') \
+         if isinstance(dt, str_classes) \
+         else datetime.datetime(*dt.timetuple()[:3])
+    if end: # Last representable time in Python
+        dt += datetime.timedelta(seconds=86399, microseconds=999999)
+    return dt
 
 
 def dateForPrinting(dt=None, microseconds=False, brackets='[]'):

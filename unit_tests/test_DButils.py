@@ -555,6 +555,46 @@ class DBUtilsGetTests(TestSetup):
         actual = sorted([v.filename for v in val])
         self.assertEqual(expected, actual)
 
+    def test_getFilesUTCDay(self):
+        """getFiles with a single UTC day time"""
+        expected = ['ect_rbspb_0186_381_01.ptp.gz',
+                    'ect_rbspb_0186_381_02.ptp.gz']
+        val = self.dbu.getFiles(
+            startTime='2013-03-02', endTime='2013-03-02', product=187)
+        actual = sorted([v.filename for v in val])
+        self.assertEqual(expected, actual)
+        expected = ['ect_rbspb_0186_381_02.ptp.gz']
+        val = self.dbu.getFiles(
+            startTime='2013-03-02', endTime='2013-03-02',
+            product=187, newest_version=True)
+        actual = sorted([v.filename for v in val])
+        self.assertEqual(expected, actual)
+
+    def test_getFilesStartTime(self):
+        """getFiles with a start time"""
+        expected = [
+            # V01 ends earlier in the day than the start time
+            'ect_rbspb_0388_381_02.ptp.gz',
+            'ect_rbspb_0388_381_03.ptp.gz',
+            'ect_rbspb_0389_381_01.ptp.gz',
+            'ect_rbspb_0389_381_02.ptp.gz',
+            'ect_rbspb_0389_381_03.ptp.gz',
+            ]
+        val = self.dbu.getFiles(
+            startTime=datetime.datetime(2013, 9, 21, 12), product=187)
+        actual = sorted([v.filename for v in val])
+        self.assertEqual(expected, actual)
+
+    def test_getFilesByProductTime(self):
+        """getFiles by the UTC date of data"""
+        expected = ['ect_rbspb_0382_381_04.ptp.gz',
+                    'ect_rbspb_0383_381_03.ptp.gz',
+        ]
+        val = self.dbu.getFilesByProductTime(187, ['2013-9-15', '2013-9-15'],
+                                             newest_version=True)
+        actual = sorted([v.filename for v in val])
+        self.assertEqual(expected, actual)
+
     def test_getFilesByProductDate(self):
         """getFilesByProductDate"""
         self.assertFalse(self.dbu.getFilesByProductDate(1, [datetime.date(2013, 12, 12)] * 2))
