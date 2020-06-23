@@ -296,7 +296,10 @@ class ProcessQueue(object):
                 start = dt - datetime.timedelta(days=y)
                 end = dt + datetime.timedelta(days=t)
 
-                tmp_files = self.dbu.getFilesByProductDate(iprod_id, [start, end], newest_version=True)
+                filegetter = self.dbu.getFilesByProductTime \
+                             if timebase in ('DAILY',) \
+                             else self.dbu.getFilesByProductDate
+                tmp_files = filegetter(iprod_id, [start, end], newest_version=True)
                 if debug: print("23:    {0}: self.dbu.getFilesByProductDate, {1} {2} {3}".format(time.time() - T0, iprod_id, dt, tmp_files))
                 T0 = time.time()
 

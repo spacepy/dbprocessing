@@ -155,6 +155,7 @@ class ProcessQueueTestsBase(unittest.TestCase):
 # behavior is fixed, should be updated to match.
 class BuildChildrenTests(ProcessQueueTestsBase):
     """Tests of ProcessQueue.buildChildren, checking what runMes are made"""
+    longMessage = True
 
     def checkCommandLines(self, fid, expected):
         """Check the command line built for a file ID
@@ -172,9 +173,8 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         for rm in self.pq.runme_list:
             rm.make_command_line(rundir='')
             actual.append(rm.cmdline)
-        actual.sort()
-        for e, a in zip(sorted(expected), actual):
-            self.assertEqual(e, a)
+        for i, (e, a) in enumerate(zip(expected, actual)):
+            self.assertEqual(e, a, 'Command {}'.format(i))
 
     def testSimple(self):
         """Single daily file making another single daily file"""
@@ -492,11 +492,11 @@ class BuildChildrenTests(ProcessQueueTestsBase):
              'level_0-1_args',
              '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
              'level_1_20120101_v1.0.0'],
-# l1 "tomorrow" not built even though l0 "today" includes data for it
-#            ['{}/codes/scripts/junk.py'.format(self.td),
-#             'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
-#             'level_1_20120102_v1.0.0']
+# l1 "tomorrow" built because l0 "today" includes data for it
+            ['{}/codes/scripts/junk.py'.format(self.td),
+             'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20120102_v1.0.0']
         ]
         self.checkCommandLines(fid, expected)
 
@@ -525,9 +525,9 @@ class BuildChildrenTests(ProcessQueueTestsBase):
              'level_1_20120101_v1.0.0'],
             ['{}/codes/scripts/junk.py'.format(self.td),
              'level_0-1_args',
-# l0 "previous day" with data for l1 "today" is not included
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
              '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+# l0 "previous day" with data for l1 "today" is included
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
              'level_1_20120102_v1.0.0']
         ]
         self.checkCommandLines(fid1, expected)
@@ -535,12 +535,14 @@ class BuildChildrenTests(ProcessQueueTestsBase):
             ['{}/codes/scripts/junk.py'.format(self.td),
              'level_0-1_args',
              '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+# l0 "next day" with data for l1 "today" is included
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
              'level_1_20120102_v1.0.0'],
-# l1 "tomorrow" not built even though l0 "today" includes data for it
-#            ['{}/codes/scripts/junk.py'.format(self.td),
-#             'level_0-1_args',
-#             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
-#             'level_1_20120103_v1.0.0']
+# l1 "tomorrow" built because l0 "today" includes data for it
+            ['{}/codes/scripts/junk.py'.format(self.td),
+             'level_0-1_args',
+             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             'level_1_20120103_v1.0.0']
         ]
         self.checkCommandLines(fid2, expected)
 
@@ -557,11 +559,11 @@ class BuildChildrenTests(ProcessQueueTestsBase):
             [datetime.date(2011, 12, 31), datetime.date(2012, 1, 1)],
             self.dbu.getFileDates(fid))
         expected = [
-# l1 "yesterday" not built even though l0 "today" includes data for it
-#            ['{}/codes/scripts/junk.py'.format(self.td),
-#             'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
-#             'level_1_20111231_v1.0.0'],
+# l1 "yesterday" built because l0 "today" includes data for it
+            ['{}/codes/scripts/junk.py'.format(self.td),
+             'level_0-1_args',
+             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             'level_1_20111231_v1.0.0'],
             ['{}/codes/scripts/junk.py'.format(self.td),
              'level_0-1_args',
              '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
@@ -579,6 +581,69 @@ class ProcessQueueTests(ProcessQueueTestsBase):
         fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
         self.assertEqual(1, self.pq._reprocessBy())
         self.assertEqual((fid, None), self.dbu.Processqueue.pop())
+
+
+class GetRequiredProductsTests(ProcessQueueTestsBase):
+    """Tests of the _getRequiredProducts method"""
+
+    def testSimple(self):
+        """Single file, only itself as input"""
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process)
+        fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
+        files, input_products = self.pq._getRequiredProducts(
+            l01process, fid, datetime.datetime(2012, 1, 1))
+        self.assertEqual(1, len(input_products))
+        prodid, optional, yesterday, tomorrow = input_products[0]
+        self.assertEqual(l0pid, prodid)
+        self.assertEqual(False, optional)
+        self.assertEqual(0, yesterday)
+        self.assertEqual(0, tomorrow)
+        self.assertEqual(1, len(files))
+        self.assertEqual(fid, files[0].file_id)
+
+    def testOverlapDays(self):
+        """Single file, input crosses two days"""
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process)
+        fid0 = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                            utc_start=datetime.datetime(2012, 1, 1, 1),
+                            utc_stop=datetime.datetime(2012, 1, 2, 0, 59))
+        fid1 = self.addFile('level_0_20120102_v1.0.0', l0pid,
+                            utc_start=datetime.datetime(2012, 1, 2, 1),
+                            utc_stop=datetime.datetime(2012, 1, 3, 0, 59))
+        files, input_products = self.pq._getRequiredProducts(
+            l01process, fid1, datetime.datetime(2012, 1, 2))
+        self.assertEqual(1, len(input_products))
+        self.assertEqual(l0pid,
+                         input_products[0][0])
+        self.assertEqual(2, len(files))
+        self.assertEqual([fid0, fid1],
+                         sorted([f.file_id for f in files]))
+
+    def testOverlapDaysRun(self):
+        """Single file, input crosses two days, but RUN timebase"""
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid,
+                                              output_timebase='RUN')
+        self.addProductProcessLink(l0pid, l01process)
+        fid0 = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                            utc_start=datetime.datetime(2012, 1, 1, 1),
+                            utc_stop=datetime.datetime(2012, 1, 2, 0, 59))
+        fid1 = self.addFile('level_0_20120102_v1.0.0', l0pid,
+                            utc_start=datetime.datetime(2012, 1, 2, 1),
+                            utc_stop=datetime.datetime(2012, 1, 3, 0, 59))
+        files, input_products = self.pq._getRequiredProducts(
+            l01process, fid1, datetime.datetime(2012, 1, 2))
+        self.assertEqual(1, len(input_products))
+        self.assertEqual(l0pid, input_products[0][0])
+        self.assertEqual(1, len(files))
+        self.assertEqual(fid1, files[0].file_id)
 
 
 if __name__ == '__main__':
