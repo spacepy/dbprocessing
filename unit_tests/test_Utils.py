@@ -4,6 +4,7 @@ from __future__ import print_function
 import datetime
 from distutils.dir_util import copy_tree, remove_tree
 import os
+import os.path
 import sys
 import tempfile
 import unittest
@@ -27,9 +28,9 @@ class UtilsTests(unittest.TestCase):
         # Would need to at least update DB path if we wanted to
         # do more than vanilla dirSubs
         self.tempD = tempfile.mkdtemp()
-        copy_tree(os.path.dirname(__file__) + '/../functional_test/', self.tempD)
+        copy_tree(os.path.join(os.path.dirname(__file__), '..', 'functional_test'), self.tempD)
 
-        self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
+        self.dbu = DButils.DButils(os.path.join(self.tempD, 'testDB.sqlite'))
 
     def tearDown(self):
         super(UtilsTests, self).tearDown()
@@ -192,7 +193,7 @@ class UtilsTests(unittest.TestCase):
 
     def test_readconfig(self):
         """test readconfig"""
-        self.assertEqual({'section2': {'sect2a': 'sect2_value1'}, 'section1': {'sect1a': 'sect1_value1', 'sect1b': 'sect1_value2'}}, Utils.readconfig(os.path.dirname(__file__) + '/testconfig.txt'))
+        self.assertEqual({'section2': {'sect2a': 'sect2_value1'}, 'section1': {'sect1a': 'sect1_value1', 'sect1b': 'sect1_value2'}}, Utils.readconfig(os.path.join(os.path.dirname(__file__), 'testconfig.txt')))
 
     def test_datetimeToDate(self):
         """test datetimeToDate"""
