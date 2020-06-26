@@ -63,8 +63,9 @@ if __name__ == "__main__":
 
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
 
-    dates = Utils.expandDates(startDate, endDate)
-    print('dates', list(dates))
+    dates = [Utils.datetimeToDate(d)
+             for d in Utils.expandDates(startDate, endDate)]
+    print('dates', dates)
 
     inproc = args[0]
     timebase = pq.dbu.getProcessTimebase(inproc)
