@@ -6,6 +6,7 @@ dbprocessing
    developer/index
    scripts
    ConfigurationFiles
+   CODE_OF_CONDUCT
 
 API documentation
 -----------------
