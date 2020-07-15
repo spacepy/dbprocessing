@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.Utils.chunker &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../index.html" />
+    <link rel="up" title="Utils" href="../Utils.html" />
+    <link rel="next" title="dbprocessing.Utils.daterange_to_dates" href="dbprocessing.Utils.daterange_to_dates.html" />
+    <link rel="prev" title="Utils" href="../Utils.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Utils.daterange_to_dates.html" title="dbprocessing.Utils.daterange_to_dates"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../Utils.html" title="Utils"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../Utils.html" accesskey="U">Utils</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../Utils.html"
+                        title="previous chapter">Utils</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dbprocessing.Utils.daterange_to_dates.html"
+                        title="next chapter">dbprocessing.Utils.daterange_to_dates</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/autosummary/dbprocessing.Utils.chunker.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dbprocessing-utils-chunker">
+<h1>dbprocessing.Utils.chunker<a class="headerlink" href="#dbprocessing-utils-chunker" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="dbprocessing.Utils.chunker">
+<code class="descclassname">dbprocessing.Utils.</code><code class="descname">chunker</code><span class="sig-paren">(</span><em>seq</em>, <em>size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Utils.html#chunker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Utils.chunker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a long iterable in a tuple of shorter lists.
+Taken from <a class="reference external" href="http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks">http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>seq</strong> (<em>iterable</em>) &#8211; Iterable to split up</li>
+<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; Size of each split in the output, last one has the remaining elements of <cite>seq</cite></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A tuple of lists of the iterable <cite>seq</cite> split into len(seq)/<cite>size</cite> segments</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Utils.daterange_to_dates.html" title="dbprocessing.Utils.daterange_to_dates"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../Utils.html" title="Utils"
+             >previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../Utils.html" >Utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

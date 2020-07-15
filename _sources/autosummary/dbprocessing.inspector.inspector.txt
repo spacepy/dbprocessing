@@ -1,0 +1,24 @@
+dbprocessing.inspector.inspector
+================================
+
+.. currentmodule:: dbprocessing.inspector
+
+.. autoclass:: inspector
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

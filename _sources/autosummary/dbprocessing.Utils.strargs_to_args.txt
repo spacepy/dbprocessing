@@ -1,0 +1,6 @@
+dbprocessing.Utils.strargs_to_args
+==================================
+
+.. currentmodule:: dbprocessing.Utils
+
+.. autofunction:: strargs_to_args

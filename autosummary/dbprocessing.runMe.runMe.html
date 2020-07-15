@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.runMe.runMe &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../index.html" />
+    <link rel="up" title="runMe" href="../runMe.html" />
+    <link rel="next" title="dbprocessing.runMe.mk_tempdir" href="dbprocessing.runMe.mk_tempdir.html" />
+    <link rel="prev" title="runMe" href="../runMe.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.runMe.mk_tempdir.html" title="dbprocessing.runMe.mk_tempdir"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../runMe.html" title="runMe"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../runMe.html" accesskey="U">runMe</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../runMe.html"
+                        title="previous chapter">runMe</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dbprocessing.runMe.mk_tempdir.html"
+                        title="next chapter">dbprocessing.runMe.mk_tempdir</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/autosummary/dbprocessing.runMe.runMe.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dbprocessing-runme-runme">
+<h1>dbprocessing.runMe.runMe<a class="headerlink" href="#dbprocessing-runme-runme" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dbprocessing.runMe.runMe">
+<em class="property">class </em><code class="descclassname">dbprocessing.runMe.</code><code class="descname">runMe</code><span class="sig-paren">(</span><em>dbu</em>, <em>utc_file_date</em>, <em>process_id</em>, <em>input_files</em>, <em>pq</em>, <em>version_bump=None</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/runMe.html#runMe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.runMe.runMe" title="Permalink to this definition">¶</a></dt>
+<dd><p>class holds all the info it takes to run a process</p>
+<p>dbu - DButils instance
+utc_file_date - datetime.date
+process_id - process to run (int)
+input_files - the files that exist to run with (list of int)</p>
+<dl class="method">
+<dt id="dbprocessing.runMe.runMe.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>dbu</em>, <em>utc_file_date</em>, <em>process_id</em>, <em>input_files</em>, <em>pq</em>, <em>version_bump=None</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/runMe.html#runMe.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.runMe.runMe.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.runMe.runMe.make_command_line" title="dbprocessing.runMe.runMe.make_command_line"><code class="xref py py-obj docutils literal"><span class="pre">make_command_line</span></code></a>([force,&nbsp;rundir])</td>
+<td>make a command line for actually doing this running</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.runMe.runMe.moveToError" title="dbprocessing.runMe.runMe.moveToError"><code class="xref py py-obj docutils literal"><span class="pre">moveToError</span></code></a>(fname)</td>
+<td>Moves a file from incoming to error</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.runMe.runMe.moveToIncoming" title="dbprocessing.runMe.runMe.moveToIncoming"><code class="xref py py-obj docutils literal"><span class="pre">moveToIncoming</span></code></a>(fname)</td>
+<td>Moves a file from location to incoming</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dbprocessing.runMe.runMe.make_command_line">
+<code class="descname">make_command_line</code><span class="sig-paren">(</span><em>force=False</em>, <em>rundir=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/runMe.html#runMe.make_command_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.runMe.runMe.make_command_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>make a command line for actually doing this running</p>
+<p>NOTE: creates a temp directory that needs to be cleaned!!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.runMe.runMe.moveToError">
+<code class="descname">moveToError</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/runMe.html#runMe.moveToError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.runMe.runMe.moveToError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves a file from incoming to error</p>
+<p>&#64;author: Brian Larsen
+&#64;organization: Los Alamos National Lab
+&#64;contact: <a class="reference external" href="mailto:balarsen&#37;&#52;&#48;lanl&#46;gov">balarsen<span>&#64;</span>lanl<span>&#46;</span>gov</a></p>
+<p>&#64;version: V1: 02-Dec-2010 (BAL)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.runMe.runMe.moveToIncoming">
+<code class="descname">moveToIncoming</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/runMe.html#runMe.moveToIncoming"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.runMe.runMe.moveToIncoming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves a file from location to incoming</p>
+<p>&#64;author: Brian Larsen
+&#64;organization: Los Alamos National Lab
+&#64;contact: <a class="reference external" href="mailto:balarsen&#37;&#52;&#48;lanl&#46;gov">balarsen<span>&#64;</span>lanl<span>&#46;</span>gov</a></p>
+<p>&#64;version: V1: 18-Apr-2012 (BAL)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.runMe.mk_tempdir.html" title="dbprocessing.runMe.mk_tempdir"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../runMe.html" title="runMe"
+             >previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../runMe.html" >runMe</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

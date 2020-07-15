@@ -1,0 +1,6 @@
+dbprocessing.Utils.chunker
+==========================
+
+.. currentmodule:: dbprocessing.Utils
+
+.. autofunction:: chunker

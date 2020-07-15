@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.Version.Version &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../index.html" />
+    <link rel="up" title="Version" href="../Version.html" />
+    <link rel="prev" title="Version" href="../Version.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../Version.html" title="Version"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../Version.html" accesskey="U">Version</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../Version.html"
+                        title="previous chapter">Version</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/autosummary/dbprocessing.Version.Version.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dbprocessing-version-version">
+<h1>dbprocessing.Version.Version<a class="headerlink" href="#dbprocessing-version-version" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dbprocessing.Version.Version">
+<em class="property">class </em><code class="descclassname">dbprocessing.Version.</code><code class="descname">Version</code><span class="sig-paren">(</span><em>interface_version</em>, <em>quality_version</em>, <em>revision_version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Version.html#Version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Version.Version" title="Permalink to this definition">¶</a></dt>
+<dd><p>A version class to simplify pushing around version information
+Handles Boolean operators (&gt;, &lt;, =, !=) and database interface for version is also implemented in another module</p>
+<p>The version scheme is X,Y,Z where:
+* X is the interface version, incremented only when the interface to a file or code changes
+* Y is the quality version, incremented when a change is made to a file that affects quality
+* Z is the revision version, incremented when a revision has been done to a code or file, as minor as fixing a typo</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The interface version starts at 1</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Attribute interface:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">The interface version for the object</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Attribute quality:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">The quality version for the object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Attribute revision:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">The revision version for the object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">Version</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Version</span><span class="o">.</span><span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="go">1.1.1</span>
+</pre></div>
+</div>
+<p>Version objects can perform Boolean operations</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">=</span> <span class="n">Version</span><span class="o">.</span><span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">v2</span> <span class="o">&gt;</span> <span class="n">v</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Increment the version</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">incQuality</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="go">1.2.1</span>
+</pre></div>
+</div>
+<p>Same version is equal</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">==</span> <span class="n">v2</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="dbprocessing.Version.Version.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>interface_version</em>, <em>quality_version</em>, <em>revision_version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Version.html#Version.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Version.Version.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the class attributes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>interface_version</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; The interface version for the object</li>
+<li><strong>quality_version</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; The quality version for the object</li>
+<li><strong>revision_version</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; The revision version for the object</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.Version.Version.fromString" title="dbprocessing.Version.Version.fromString"><code class="xref py py-obj docutils literal"><span class="pre">fromString</span></code></a>(inval)</td>
+<td>Given a string of the form x.y.z return a Version object</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.Version.Version.incInterface" title="dbprocessing.Version.Version.incInterface"><code class="xref py py-obj docutils literal"><span class="pre">incInterface</span></code></a>()</td>
+<td>Increment the interface version and reset the other two</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.Version.Version.incQuality" title="dbprocessing.Version.Version.incQuality"><code class="xref py py-obj docutils literal"><span class="pre">incQuality</span></code></a>()</td>
+<td>Increment the quality version and reset the revision</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.Version.Version.incRevision" title="dbprocessing.Version.Version.incRevision"><code class="xref py py-obj docutils literal"><span class="pre">incRevision</span></code></a>()</td>
+<td>Increment the revision version</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="dbprocessing.Version.Version.fromString">
+<em class="property">static </em><code class="descname">fromString</code><span class="sig-paren">(</span><em>inval</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Version.html#Version.fromString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Version.Version.fromString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a string of the form x.y.z return a Version object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inval</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; String in the form xx.yy.zz</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Version instance created from the string</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><code class="xref py py-class docutils literal"><span class="pre">Version</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.Version.Version.incInterface">
+<code class="descname">incInterface</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Version.html#Version.incInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Version.Version.incInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increment the interface version and reset the other two</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.Version.Version.incQuality">
+<code class="descname">incQuality</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Version.html#Version.incQuality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Version.Version.incQuality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increment the quality version and reset the revision</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.Version.Version.incRevision">
+<code class="descname">incRevision</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Version.html#Version.incRevision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Version.Version.incRevision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increment the revision version</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../Version.html" title="Version"
+             >previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../Version.html" >Version</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

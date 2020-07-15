@@ -1,0 +1,6 @@
+dbprocessing.Utils.expandDates
+==============================
+
+.. currentmodule:: dbprocessing.Utils
+
+.. autofunction:: expandDates

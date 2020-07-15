@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.inspector &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+       <li><a href="../../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dbprocessing.inspector</h1><div class="highlight"><pre>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Inspector requirements:</span>
+<span class="sd">    - One product per inspector file</span>
+<span class="sd">    - Must implement a class called Inspector(inspector.inspector)</span>
+<span class="sd">    - Must implement the abstract method inspect(kwargs)</span>
+<span class="sd">    - Must implement code_name = &#39;codename.py&#39; at the self level</span>
+<span class="sd">    - inspect() must return anything that is not None for a valid match</span>
+<span class="sd">        - It also must populate the following items:</span>
+<span class="sd">            * self.diskfile.params[&#39;utc_file_date&#39;] : date object</span>
+<span class="sd">            * self.diskfile.params[&#39;utc_start_time&#39;] : datetime object</span>
+<span class="sd">            * self.diskfile.params[&#39;utc_stop_time&#39;] : datetime object</span>
+<span class="sd">            * self.diskfile.params[&#39;version&#39;] : Version object</span>
+<span class="sd">            * self.diskfile.params[&#39;check_date&#39;] : None (optional)</span>
+<span class="sd">            * self.diskfile.params[&#39;verbose_provenance&#39;] : string (optional)</span>
+<span class="sd">            * self.diskfile.params[&#39;quality_comment&#39;] : string (optional)</span>
+<span class="sd">            * self.diskfile.params[&#39;caveats&#39;] : string (optional)</span>
+<span class="sd">            * self.diskfile.params[&#39;release_number&#39;] : int (optional)</span>
+<span class="sd">            * self.diskfile.params[&#39;met_start_time&#39;] : long (optional)</span>
+<span class="sd">            * self.diskfile.params[&#39;met_stop_time&#39;] : long (optional)</span>
+<span class="sd">            * self.diskfile.params[&#39;quality_checked&#39;] : bool (optional)</span>
+<span class="sd">            * self.diskfile.params[&#39;process_keywords&#39;] : str (optional)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">DBlogging</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Diskfile</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">DBstrings</span>
+
+<div class="viewcode-block" id="EphemeralCallable"><a class="viewcode-back" href="../../autosummary/dbprocessing.inspector.EphemeralCallable.html#dbprocessing.inspector.EphemeralCallable">[docs]</a><span class="k">def</span> <span class="nf">EphemeralCallable</span><span class="p">(</span><span class="n">basetype</span><span class="o">=</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_new_caller</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__ephemeral_encapsulated__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)()</span>
+    <span class="k">class</span> <span class="nc">_EphemeralMetaclass</span><span class="p">(</span><span class="n">basetype</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
+            <span class="n">encbases</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">__ephemeral_encapsulated__</span>
+                              <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;__ephemeral_encapsulated__&#39;</span><span class="p">)</span>
+                              <span class="k">else</span> <span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">])</span>
+            <span class="n">encaps</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">_EphemeralMetaclass</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span>
+                <span class="n">cls</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_ephemeral_encapsulated&#39;</span><span class="p">,</span> <span class="n">encbases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">_EphemeralMetaclass</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span>
+                <span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span>
+                <span class="p">{</span><span class="s1">&#39;__new__&#39;</span><span class="p">:</span> <span class="n">_new_caller</span><span class="p">,</span>
+                 <span class="s1">&#39;__ephemeral_encapsulated__&#39;</span><span class="p">:</span> <span class="n">encaps</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">_EphemeralMetaclass</span></div>
+
+<span class="k">class</span> <span class="nc">inspector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ABC for inspectors to be sure the user has implemented what is required</span>
+<span class="sd">    and to provide for utility routes common to many inspectors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">EphemeralCallable</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">dbu</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Entered inspector {0} with kwargs: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span> <span class="o">=</span> <span class="n">dbu</span> <span class="c1"># give us access to DButils</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">product</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filenameformat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;Product&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+        <span class="n">DBformatter</span> <span class="o">=</span> <span class="n">DBstrings</span><span class="o">.</span><span class="n">DBformatter</span><span class="p">()</span> <span class="c1">#must instantiate class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filenameregex</span> <span class="o">=</span> <span class="n">DBformatter</span><span class="o">.</span><span class="n">re</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filenameformat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span> <span class="o">=</span> <span class="n">Diskfile</span><span class="o">.</span><span class="n">Diskfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="p">)</span>
+        <span class="n">insp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inspect</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">insp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_populate</span><span class="p">()</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">inspect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        required method to populate the DiskFile object</span>
+<span class="sd">        can take in some keyword arguments specified in the db</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">_populate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        populate the rest of the information to the diskfile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ptb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getTraceback</span><span class="p">(</span><span class="s1">&#39;Product&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">mission</span> <span class="o">=</span> <span class="n">ptb</span><span class="p">[</span><span class="s1">&#39;mission&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mission_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;file_create_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">infile</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;exists_on_disk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># we are parsing it so it exists_on_disk</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;shasum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Diskfile</span><span class="o">.</span><span class="n">calcDigest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">infile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;product_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;data_level&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  set level to {1}, this is ignored and set by the product definition&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;data_level&#39;</span><span class="p">]))</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  set level to {1}, this is ignored and set by the product definition&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;data_level&#39;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;data_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;Product&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="p">)</span><span class="o">.</span><span class="n">level</span>
+
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        do the check if the file is of the given type</span>
+<span class="sd">        return None if not or the Diskfile object if so</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span>
+        <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Checking the inspector has filled all the values: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">mission</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.mission is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;filename&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_file_date&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;utc_file_date&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_start_time&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;utc_start_time&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_stop_time&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;utc_stop_time&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;data_level&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;data_level&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;file_create_date&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;file_create_date&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;exists_on_disk&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;exists_on_disk&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;product_id&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;product_id&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector {0}:  self.diskfile.params[&#39;version&#39;] is None&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No match found for inspector {0}: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Match found for inspector {0}: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">match</span>
+
+    <span class="c1">#==============================================================================</span>
+    <span class="c1"># Helper routines</span>
+    <span class="c1">#==============================================================================</span>
+    <span class="k">def</span> <span class="nf">extract_YYYYMMDD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        go through the filename and extract the first valid YYYYMMDD as a datetime</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">extract_YYYYMMDD</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="extract_YYYYMMDD"><a class="viewcode-back" href="../../autosummary/dbprocessing.inspector.extract_YYYYMMDD.html#dbprocessing.inspector.extract_YYYYMMDD">[docs]</a><span class="k">def</span> <span class="nf">extract_YYYYMMDD</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Go through the filename and extract the first valid YYYYMMDD as a datetime</span>
+
+<span class="sd">    :param filename: Filename to parse for a YYYYMMDD format</span>
+<span class="sd">    :type filename: str</span>
+
+<span class="sd">    :return: The datetime found in the filename or None</span>
+<span class="sd">    :rtype: datetime.datetime or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># cmp = re.compile(&quot;[12][90]\d2[01]\d[0-3]\d&quot;)</span>
+    <span class="c1"># return a datetime if there is one from YYYYMMDD</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;[12][90]\d\d[01]\d[0-3]\d&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(),</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span> <span class="c1"># there is not one</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1957</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">34</span><span class="p">):</span> <span class="c1"># Sputnik 1 launch datetime</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c1"># better not still be using this... present to help with random numbers combinations</span>
+    <span class="k">elif</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2050</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">dt</span></div>
+
+<div class="viewcode-block" id="extract_YYYYMM"><a class="viewcode-back" href="../../autosummary/dbprocessing.inspector.extract_YYYYMM.html#dbprocessing.inspector.extract_YYYYMM">[docs]</a><span class="k">def</span> <span class="nf">extract_YYYYMM</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Go through the filename and extract the first valid YYYYMM as a datetime</span>
+
+<span class="sd">    :param filename: Filename to parse for a YYYYMM format</span>
+<span class="sd">    :type filename: str</span>
+
+<span class="sd">    :return: The date found in the filename or None</span>
+<span class="sd">    :rtype: datetime.date or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># cmp = re.compile(&quot;[12][90]\d2[01]\d[0-3]\d&quot;)</span>
+    <span class="c1"># return a datetime if there is one from YYYYMMDD</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;[12][90]\d\d[01]\d&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(),</span> <span class="s2">&quot;%Y%m&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span> <span class="c1"># there is not one</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1957</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">34</span><span class="p">):</span> <span class="c1"># Sputnik 1 launch datetime</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="c1"># better not still be using this... present to help with random numbers combinations</span>
+    <span class="k">elif</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2050</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="valid_YYYYMMDD"><a class="viewcode-back" href="../../autosummary/dbprocessing.inspector.valid_YYYYMMDD.html#dbprocessing.inspector.valid_YYYYMMDD">[docs]</a><span class="k">def</span> <span class="nf">valid_YYYYMMDD</span><span class="p">(</span><span class="n">inval</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if input is valid YYYYMMDD</span>
+
+<span class="sd">    :param inval: Input to check if valid</span>
+<span class="sd">    :type inval: str</span>
+<span class="sd">    :return: Return True if valid, False otherwise</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">inval</span><span class="p">,</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+<div class="viewcode-block" id="extract_Version"><a class="viewcode-back" href="../../autosummary/dbprocessing.inspector.extract_Version.html#dbprocessing.inspector.extract_Version">[docs]</a><span class="k">def</span> <span class="nf">extract_Version</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">basename</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Go through the filename and pull out the first valid vX.Y.Z</span>
+
+<span class="sd">    :param filename: Filename to check for version</span>
+<span class="sd">    :type filename: str</span>
+<span class="sd">    :keyword basename: True if to return version and the basename, false if just version</span>
+<span class="sd">    :type basename: bool</span>
+
+<span class="sd">    :return: The first valid version string as an object</span>
+<span class="sd">    :rtype: :class:`.Version` or tuple(:class:`.Version`, base)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;[vV]\d+\.\d+\.\d+\.&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="n">ver</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">res</span><span class="p">:</span>
+        <span class="n">verstring</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">verstring</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">ver</span> <span class="o">=</span> <span class="n">Version</span><span class="o">.</span><span class="n">Version</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:],</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">basename</span><span class="p">:</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">verstring</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">ver</span><span class="p">,</span> <span class="n">base</span>
+
+    <span class="k">return</span> <span class="n">ver</span></div>
+
+
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+       <li><a href="../../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

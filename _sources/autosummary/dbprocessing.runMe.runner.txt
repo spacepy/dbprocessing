@@ -1,0 +1,6 @@
+dbprocessing.runMe.runner
+=========================
+
+.. currentmodule:: dbprocessing.runMe
+
+.. autofunction:: runner

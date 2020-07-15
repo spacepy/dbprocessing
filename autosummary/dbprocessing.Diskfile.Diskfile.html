@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.Diskfile.Diskfile &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../index.html" />
+    <link rel="up" title="Diskfile" href="../Diskfile.html" />
+    <link rel="next" title="dbprocessing.Diskfile.calcDigest" href="dbprocessing.Diskfile.calcDigest.html" />
+    <link rel="prev" title="Diskfile" href="../Diskfile.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Diskfile.calcDigest.html" title="dbprocessing.Diskfile.calcDigest"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../Diskfile.html" title="Diskfile"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../Diskfile.html" accesskey="U">Diskfile</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../Diskfile.html"
+                        title="previous chapter">Diskfile</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dbprocessing.Diskfile.calcDigest.html"
+                        title="next chapter">dbprocessing.Diskfile.calcDigest</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/autosummary/dbprocessing.Diskfile.Diskfile.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dbprocessing-diskfile-diskfile">
+<h1>dbprocessing.Diskfile.Diskfile<a class="headerlink" href="#dbprocessing-diskfile-diskfile" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dbprocessing.Diskfile.Diskfile">
+<em class="property">class </em><code class="descclassname">dbprocessing.Diskfile.</code><code class="descname">Diskfile</code><span class="sig-paren">(</span><em>infile</em>, <em>dbu</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Diskfile.html#Diskfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Diskfile.Diskfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Diskfile class contains methods for dealing with files on disk,
+all parsing for what mission files belong to is continued in here
+to add a new mission code must be added here.</p>
+<dl class="method">
+<dt id="dbprocessing.Diskfile.Diskfile.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>infile</em>, <em>dbu</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Diskfile.html#Diskfile.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Diskfile.Diskfile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>setup a Diskfile class, takes in a filename and creates a params dict to hold information about the file
+then tests to see what mission the file is from</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; a file to create a Diskfile around</li>
+<li><strong>dbu</strong> (<a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal"><span class="pre">DButils</span></code></a>) &#8211; pass in the current session so that a new connection is not made</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.Diskfile.Diskfile.checkAccess" title="dbprocessing.Diskfile.Diskfile.checkAccess"><code class="xref py py-obj docutils literal"><span class="pre">checkAccess</span></code></a>()</td>
+<td>A few simple tests of the input file to be sure the script has the correct access</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dbprocessing.Diskfile.Diskfile.checkAccess">
+<code class="descname">checkAccess</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/Diskfile.html#Diskfile.checkAccess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.Diskfile.Diskfile.checkAccess" title="Permalink to this definition">¶</a></dt>
+<dd><p>A few simple tests of the input file to be sure the script has the correct access</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Diskfile.calcDigest.html" title="dbprocessing.Diskfile.calcDigest"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../Diskfile.html" title="Diskfile"
+             >previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../Diskfile.html" >Diskfile</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

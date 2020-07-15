@@ -1,0 +1,596 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.dbprocessing &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+       <li><a href="../../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dbprocessing.dbprocessing</h1><div class="highlight"><pre>
+<span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">DBfile</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">DBlogging</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">DBqueue</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">DButils</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Utils</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">runMe</span>
+<span class="kn">from</span> <span class="nn">.Utils</span> <span class="kn">import</span> <span class="n">strargs_to_args</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">IntegrityError</span>
+
+
+<div class="viewcode-block" id="ProcessQueue"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue">[docs]</a><span class="k">class</span> <span class="nc">ProcessQueue</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main code used to process the Queue, looks in incoming and builds all</span>
+<span class="sd">    possible files</span>
+
+<span class="sd">    @author: Brian Larsen</span>
+<span class="sd">    @organization: Los Alamos National Lab</span>
+<span class="sd">    @contact: balarsen@lanl.gov</span>
+
+<span class="sd">    @version: V1: 02-Dec-2010 (BAL)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ProcessQueue.__init__"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">mission</span><span class="p">,</span> <span class="n">dryrun</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dryrun</span> <span class="o">=</span> <span class="n">dryrun</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mission</span> <span class="o">=</span> <span class="n">mission</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">dbu</span> <span class="o">=</span> <span class="n">DButils</span><span class="o">.</span><span class="n">DButils</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="n">echo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runme_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span> <span class="o">=</span> <span class="n">dbu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">childrenQueue</span> <span class="o">=</span> <span class="n">DBqueue</span><span class="o">.</span><span class="n">DBqueue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moved</span> <span class="o">=</span> <span class="n">DBqueue</span><span class="o">.</span><span class="n">DBqueue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depends</span> <span class="o">=</span> <span class="n">DBqueue</span><span class="o">.</span><span class="n">DBqueue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">DBqueue</span><span class="o">.</span><span class="n">DBqueue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">findChildren</span> <span class="o">=</span> <span class="n">DBqueue</span><span class="o">.</span><span class="n">DBqueue</span><span class="p">()</span>
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Entering ProcessQueue&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        attempt a bit of up</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rm_tempdir</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="ProcessQueue.set_filename"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.set_filename">[docs]</a>    <span class="k">def</span> <span class="nf">set_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for filename, this is cleaner than just random sets</span>
+
+<span class="sd">        :param filename: filename to set to self.filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.rm_tempdir"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.rm_tempdir">[docs]</a>    <span class="k">def</span> <span class="nf">rm_tempdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        remove the temp directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Temp dir deleted: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.mk_tempdir"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.mk_tempdir">[docs]</a>    <span class="k">def</span> <span class="nf">mk_tempdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_dbprocessing_{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        create a secure temp directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.checkIncoming"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.checkIncoming">[docs]</a>    <span class="k">def</span> <span class="nf">checkIncoming</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glb</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Goes out to incoming and grabs all files there adding them to self.queue</span>
+
+<span class="sd">        @author: Brian Larsen</span>
+<span class="sd">        @organization: Los Alamos National Lab</span>
+<span class="sd">        @contact: balarsen@lanl.gov</span>
+
+<span class="sd">        @version: V1: 02-Dec-2010 (BAL)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Entered checkIncoming:&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">extendleft</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">checkIncoming</span><span class="p">(</span><span class="n">glb</span><span class="o">=</span><span class="n">glb</span><span class="p">))</span>
+        <span class="c1"># step through and remove duplicates</span>
+        <span class="c1"># if python 2.7 deque has a .count() otherwise have to use</span>
+        <span class="c1">#  this workaround</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># this means it was shortened</span>
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Queue contains (</span><span class="si">%d</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">),</span>
+                                                              <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.moveToError"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.moveToError">[docs]</a>    <span class="k">def</span> <span class="nf">moveToError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Moves a file from incoming to error</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Entered moveToError: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getErrorPath</span><span class="p">()</span>
+        <span class="c1"># if the file is a link then don;t move it to incoming just delete the link</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>  <span class="c1"># Remove a file (same as remove(path)).</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;moveToError file {0} was a link, so link removed not moved to error&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname</span><span class="p">)))</span>
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;file {0} was not successfully moved to error&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname</span><span class="p">))))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;moveToError {0} moved to {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.diskfileToDB"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.diskfileToDB">[docs]</a>    <span class="k">def</span> <span class="nf">diskfileToDB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        given a diskfile go through and do all the steps to add it into the db</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Found no product moving to error, {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">moveToError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;&lt;dryrun&gt; Found no product moving to error, {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="c1"># create the DBfile</span>
+        <span class="n">dbf</span> <span class="o">=</span> <span class="n">DBfile</span><span class="o">.</span><span class="n">DBfile</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+                <span class="n">f_id</span> <span class="o">=</span> <span class="n">dbf</span><span class="o">.</span><span class="n">addFileToDB</span><span class="p">()</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;File {0} entered in DB, f_id={1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">f_id</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;&lt;dryrun&gt; File {0} entered in DB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">DButils</span><span class="o">.</span><span class="n">DBError</span><span class="p">)</span> <span class="k">as</span> <span class="n">errmsg</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Except adding file to db so&quot;</span> <span class="o">+</span> \
+                                           <span class="s2">&quot; moving to error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">errmsg</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">moveToError</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;&lt;dryrun&gt; Except adding file to db so&#39;</span> <span class="o">+</span>
+                      <span class="s1">&#39; moving to error: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">errmsg</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="c1"># move the file to the its correct home</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+            <span class="n">dbf</span><span class="o">.</span><span class="n">move</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">IE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="p">(</span><span class="n">DButils</span><span class="o">.</span><span class="n">DBError</span><span class="p">(</span><span class="n">IE</span><span class="p">))</span>
+            <span class="c1"># add to processqueue for later processing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">Processqueue</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">f_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">f_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.importFromIncoming"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.importFromIncoming">[docs]</a>    <span class="k">def</span> <span class="nf">importFromIncoming</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Import a file from incoming into the database</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Entering importFromIncoming, {0} to import&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">popleftiter</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span>
+
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_filename</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;popped &#39;{0}&#39; from the queue: {1} left&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)))</span>
+            <span class="c1"># see if the file is in the db, if so then don&#39;t call the inspectors</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getFileID</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">)</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s1">&#39;File {0}:{1} was already in DB, not inspecting&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">moveToError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+                <span class="n">T1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">T0</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{1}:{2} Removed from incoming: {0} - already present  {3:.2f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">),</span> <span class="n">T1</span><span class="p">))</span>
+                <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="k">continue</span>
+            <span class="k">except</span> <span class="n">DButils</span><span class="o">.</span><span class="n">DBNoData</span><span class="p">:</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;File {0} was not in DB, inspecting&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">))</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figureProduct</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">df</span> <span class="o">!=</span> <span class="p">[]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diskfileToDB</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                <span class="n">T1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">T0</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{1}:{2} Removed from incoming: {0} - ingested   {3:.2f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">),</span> <span class="n">T1</span><span class="p">))</span>
+                <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.figureProduct"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.figureProduct">[docs]</a>    <span class="k">def</span> <span class="nf">figureProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function imports the inspectors and figures out which inspectors claim the file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span>
+        <span class="n">act_insp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getActiveInspectors</span><span class="p">()</span>
+        <span class="n">claimed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">act_insp</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">inspect</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="s1">&#39;inspect&#39;</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Inspector: &quot;{0}&quot; not found: {1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">code</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">):</span>
+                    <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---&gt; However inspector: &quot;{0}&quot; was found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;---&gt; However inspector: &quot;{0}&quot; was found.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="n">strargs_to_args</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Inspector</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+                    <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="s2">&quot;File {0} inspector threw an exception: {1} {2} {3}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc_type</span><span class="p">),</span> <span class="n">exc_value</span><span class="p">,</span>
+                                                                                    <span class="n">traceback</span><span class="o">.</span><span class="n">print_tb</span><span class="p">(</span>
+                                                                                        <span class="n">exc_traceback</span><span class="p">)))</span>  <span class="c1"># exc_traceback.tb_lineno))</span>
+                    <span class="k">continue</span>  <span class="c1"># try the next inspector</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Inspector</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;File {0} inspector threw an exception&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+                    <span class="k">continue</span>  <span class="c1"># try the next inspector</span>
+            <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">claimed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Match found: {0}: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="p">))</span>
+                <span class="k">break</span>  <span class="c1"># lets call it done after we find one</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">claimed</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># no match</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;File {0} found no inspector match&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">claimed</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;File {0} matched more than one product, there is a DB error&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="p">(</span><span class="n">DButils</span><span class="o">.</span><span class="n">DBError</span><span class="p">(</span><span class="s2">&quot;File {0} matched more than one product, there is a DB error&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">claimed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># return the diskfile</span></div>
+
+    <span class="k">def</span> <span class="nf">_getRequiredProducts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_id</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="c1">#####################################################</span>
+        <span class="c1">## get all the input products for that process, and if they are optional</span>
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">input_product_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getInputProductID</span><span class="p">(</span><span class="n">process_id</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>  <span class="c1"># this is a list of tuples (id, optional, yesterday, tommorow)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;21:    {0}: self.dbu.getInputProductID: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">T0</span><span class="p">,</span> <span class="n">input_product_id</span><span class="p">))</span>
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Finding input files for file_id:{0} process_id:{1} date:{2}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">,</span> <span class="n">process_id</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="p">))</span>
+
+        <span class="c1">## here decide how we build output and do it.</span>
+
+        <span class="n">timebase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getProcessTimebase</span><span class="p">(</span><span class="n">process_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;22:    {0}: self.dbu.getProcessTimebase: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">T0</span><span class="p">,</span> <span class="n">timebase</span><span class="p">))</span>
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Doing {0} based processing&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timebase</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">timebase</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;DAILY&#39;</span><span class="p">,</span> <span class="s1">&#39;RUN&#39;</span><span class="p">]:</span>  <span class="c1"># taking one file to the next file</span>
+            <span class="c1"># for file based processing we are going to look to the &quot;process_keywords&quot; and cull the</span>
+            <span class="c1">#   returned files based on making sure they are all the same</span>
+            <span class="c1">#   If process_keywords is none it will fall back to current behavior (since they will all be the same)</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># get all the possible files based on dates that we might want to put into the process now</span>
+
+            <span class="k">for</span> <span class="n">iprod_id</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">input_product_id</span><span class="p">:</span>
+                <span class="c1"># accept a datetime.datetime or datetime.date</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="n">Utils</span><span class="o">.</span><span class="n">datetimeToDate</span><span class="p">(</span><span class="n">utc_file_date</span><span class="p">)</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+
+                <span class="n">filegetter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getFilesByProductTime</span> \
+                             <span class="k">if</span> <span class="n">timebase</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;DAILY&#39;</span><span class="p">,)</span> \
+                             <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getFilesByProductDate</span>
+                <span class="n">tmp_files</span> <span class="o">=</span> <span class="n">filegetter</span><span class="p">(</span><span class="n">iprod_id</span><span class="p">,</span> <span class="p">[</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">],</span> <span class="n">newest_version</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;23:    {0}: self.dbu.getFilesByProductDate, {1} {2} {3}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">T0</span><span class="p">,</span> <span class="n">iprod_id</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tmp_files</span><span class="p">))</span>
+                <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">tmp_files</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">None</span><span class="p">,</span> <span class="n">input_product_id</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">files</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tmp_files</span><span class="p">)</span>
+
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;buildChildren files: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">)))</span>
+
+            <span class="c1">###############</span>
+            <span class="c1"># BAL 30 March 2017, dropping this clean step as they should all be newest version per above</span>
+            <span class="c1"># remove all the files that are not the newest version, they all should be</span>
+            <span class="c1"># files = self.dbu.file_id_Clean(files)</span>
+            <span class="c1">###############</span>
+
+            <span class="k">if</span> <span class="n">timebase</span> <span class="o">==</span> <span class="s1">&#39;FILE&#39;</span><span class="p">:</span>  <span class="c1"># taking one file to the next file</span>
+                <span class="n">files_out</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="c1"># grab the process_keywords column for the file_id and all the possible other files</span>
+                <span class="c1">#   they have to match in order for the file to be the same</span>
+                <span class="n">infile_process_keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;File&#39;</span><span class="p">,</span> <span class="n">file_id</span><span class="p">)</span><span class="o">.</span><span class="n">process_keywords</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">files_process_keywords</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">process_keywords</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">files_process_keywords</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="c1"># now if the process_keywords in files_process_keywords does not match that in infile_process_keywords</span>
+                <span class="c1">#   drop it</span>
+                <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files_process_keywords</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">infile_process_keywords</span><span class="p">:</span>
+                        <span class="n">files_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+                <span class="c1"># and give it the right name</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="n">files_out</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Not implemented yet: {0} based processing&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timebase</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Bad timebase for product: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">process_id</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">files</span><span class="p">,</span> <span class="n">input_product_id</span>
+
+<div class="viewcode-block" id="ProcessQueue.buildChildren"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.buildChildren">[docs]</a>    <span class="k">def</span> <span class="nf">buildChildren</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_id</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">skip_run</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">run_procs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        go through and all the runMe&#39;s and add to the runme_list variable</span>
+
+<span class="sd">        :param int file_id: file ID of the file for which children will be built</span>
+<span class="sd">        :param bool skip_run: Skip RUN timebase processes if True</span>
+<span class="sd">                              (default False)</span>
+<span class="sd">        :param str run_procs: If provided, comma-separated list of process IDs</span>
+<span class="sd">                              or process names to run; other processes are</span>
+<span class="sd">                              ignored. (Default: all possible processes).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># if processes to run specified, turn into list of IDs</span>
+        <span class="c1"># getProcessID accepts either ID or name and returns ID</span>
+        <span class="k">if</span> <span class="n">run_procs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">run_procs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getProcessID</span><span class="p">(</span><span class="n">rp</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">run_procs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Entered buildChildren: file_id={0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Entered buildChildren: file_id={0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">))</span>
+        <span class="c1"># if this file is not a newest_version we do not ant to run</span>
+        <span class="c1">#print(&quot;{1}: Entered buildChildren: file_id={0}&quot;.format(file_id, time.time()-T0))</span>
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">fileIsNewest</span><span class="p">(</span><span class="n">file_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Was not newest version in buildChildren: file_id={0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;    Was not newest version in buildChildren: file_id={0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">))</span>
+            <span class="k">return</span>  <span class="c1"># do nothing</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;    {1}: was newest moving on in buildChildren: file_id={0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">T0</span><span class="p">))</span>
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getChildrenProcesses</span><span class="p">(</span><span class="n">file_id</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># returns process</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;11:   {1}: done self.dbu.getChildrenProcesses buildChildren: file_id={0} : {2}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">T0</span><span class="p">,</span> <span class="n">children</span><span class="p">))</span>
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">daterange</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getFileDates</span><span class="p">(</span><span class="n">file_id</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># this is the dates that this file spans</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;12:   {1}: done self.dbu.getFileDates  buildChildren: file_id={0} : {2}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">T0</span><span class="p">,</span> <span class="n">daterange</span><span class="p">))</span>
+        <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;children: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">children</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">child_process</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+
+            <span class="c1"># iterate over all the days between the start and stop date from above (including stop date)</span>
+            <span class="k">for</span> <span class="n">utc_file_date</span> <span class="ow">in</span> <span class="n">Utils</span><span class="o">.</span><span class="n">expandDates</span><span class="p">(</span><span class="o">*</span><span class="n">daterange</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;    utc_file_date: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">utc_file_date</span><span class="p">))</span>
+                <span class="n">files</span><span class="p">,</span> <span class="n">input_product_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getRequiredProducts</span><span class="p">(</span><span class="n">child_process</span><span class="p">,</span> <span class="n">file_id</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">utc_file_date</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s2">&quot;13:   {0}: self._getRequiredProducts   {1} {2}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">T0</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">input_product_id</span><span class="p">))</span>
+                <span class="n">T0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="c1"># figure out the missing products</span>
+                    <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;For file: {0} date: {1} required files not present {2}&quot;</span>
+                                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">utc_file_date</span><span class="p">,</span> <span class="n">input_product_id</span><span class="p">))</span>
+                    <span class="k">continue</span>  <span class="c1"># go on to the next file</span>
+
+                    <span class="c1"># ==============================================================================</span>
+                    <span class="c1"># do we have the required files to do the build?</span>
+                    <span class="c1"># ==============================================================================</span>
+                    <span class="c1">##             if not self._requiredFilesPresent(files, input_product_id, process_id):</span>
+                    <span class="c1">##                 DBlogging.dblogger.debug(&quot;For file: {0} date: {1} required files not present&quot;.format(file_id[0], utc_file_date))</span>
+                    <span class="c1">##                 continue # go on to the next file</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">input_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">file_id</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Input files found, {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">input_files</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">skip_run</span> \
+                   <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getProcessTimebase</span><span class="p">(</span><span class="n">child_process</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;RUN&#39;</span><span class="p">:</span>
+                    <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Process: {} skipping because RUN timebase&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;Process&#39;</span><span class="p">,</span> <span class="n">child_process</span><span class="p">)</span>
+                                <span class="o">.</span><span class="n">process_name</span><span class="p">))</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">run_procs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">child_process</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">run_procs</span><span class="p">:</span>
+                    <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Process: {} skipping because not in run-only list&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;Process&#39;</span><span class="p">,</span> <span class="n">child_process</span><span class="p">)</span>
+                                <span class="o">.</span><span class="n">process_name</span><span class="p">))</span>
+                    <span class="k">continue</span>
+                <span class="n">runme</span> <span class="o">=</span> <span class="n">runMe</span><span class="o">.</span><span class="n">runMe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="p">,</span> <span class="n">child_process</span><span class="p">,</span> <span class="n">input_files</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">file_id</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="c1">#print(&quot;{0}:  runMe.runMe&quot;.format(time.time()-T0))</span>
+                <span class="c1">#T0 = time.time()</span>
+                <span class="c1"># only add to runme list if it can be run</span>
+                <span class="k">if</span> <span class="n">runme</span><span class="o">.</span><span class="n">ableToRun</span> <span class="ow">and</span> <span class="p">(</span><span class="n">runme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runme_list</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">runme_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">runme</span><span class="p">)</span>
+                    <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Filename: {0} is not in the DB, can process&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">runme</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.onStartup"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.onStartup">[docs]</a>    <span class="k">def</span> <span class="nf">onStartup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes can be defined as output timebase &quot;STARTUP&quot; which means to run</span>
+<span class="sd">        them each time to processing chain is run</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getAllProcesses</span><span class="p">(</span><span class="n">timebase</span><span class="o">=</span><span class="s1">&#39;STARTUP&#39;</span><span class="p">)</span>
+        <span class="c1"># TODO just going to run there here for now.  This should move to runMe</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">proc</span><span class="p">:</span>  <span class="c1"># run them all</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;Code&#39;</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">process_id</span><span class="p">)</span>
+            <span class="c1"># print code.codename</span>
+
+        <span class="c1"># need to call a &quot;runner&quot; with these processes</span>
+        <span class="c1">######</span>
+        <span class="c1">##</span>
+        <span class="c1"># not sure how to deal with having to specify a filename and handle that in the DB</span>
+        <span class="c1"># things made here will also have to have inspectors</span>
+        <span class="k">raise</span> <span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Not yet implemented&#39;</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_reprocessBy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">startDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                     <span class="n">endDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                     <span class="n">level</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                     <span class="n">product</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                     <span class="n">code</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                     <span class="n">instrument</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                     <span class="n">incVersion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given parameters, add all files to processqueue so that next</span>
+<span class="sd">        -p run they will be reprocessed</span>
+
+<span class="sd">        incVersion sets which of the version numbers to increment {0}.{1}.{2}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">startDate</span> <span class="o">=</span> <span class="n">Utils</span><span class="o">.</span><span class="n">datetimeToDate</span><span class="p">(</span><span class="n">startDate</span><span class="p">)</span>
+        <span class="n">endDate</span> <span class="o">=</span> <span class="n">Utils</span><span class="o">.</span><span class="n">datetimeToDate</span><span class="p">(</span><span class="n">endDate</span><span class="p">)</span>
+        <span class="n">f_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="o">.</span><span class="n">file_id</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getFiles</span><span class="p">(</span><span class="n">startDate</span><span class="o">=</span><span class="n">startDate</span><span class="p">,</span>
+                                                          <span class="n">endDate</span><span class="o">=</span><span class="n">endDate</span><span class="p">,</span>
+                                                          <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span>
+                                                          <span class="n">product</span><span class="o">=</span><span class="n">product</span><span class="p">,</span>
+                                                          <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">,</span>
+                                                          <span class="n">instrument</span><span class="o">=</span><span class="n">instrument</span><span class="p">,</span>
+                                                          <span class="n">newest_version</span><span class="o">=</span><span class="bp">True</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">Processqueue</span><span class="o">.</span><span class="n">rawadd</span><span class="p">(</span><span class="n">f_ids</span><span class="p">,</span> <span class="n">incVersion</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProcessQueue.reprocessByCode"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.reprocessByCode">[docs]</a>    <span class="k">def</span> <span class="nf">reprocessByCode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_in</span><span class="p">,</span> <span class="n">startDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">endDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">incVersion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">code_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getCodeID</span><span class="p">(</span><span class="n">id_in</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprocessBy</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">code_id</span><span class="p">,</span> <span class="n">startDate</span><span class="o">=</span><span class="n">startDate</span><span class="p">,</span> <span class="n">endDate</span><span class="o">=</span><span class="n">endDate</span><span class="p">,</span>
+                                     <span class="n">incVersion</span><span class="o">=</span><span class="n">incVersion</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DButils</span><span class="o">.</span><span class="n">DBNoData</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No code_id {0} found in the DB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id_in</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.reprocessByProduct"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.reprocessByProduct">[docs]</a>    <span class="k">def</span> <span class="nf">reprocessByProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_in</span><span class="p">,</span> <span class="n">startDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">endDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">incVersion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">prod_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getProductID</span><span class="p">(</span><span class="n">id_in</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprocessBy</span><span class="p">(</span><span class="n">product</span><span class="o">=</span><span class="n">prod_id</span><span class="p">,</span> <span class="n">startDate</span><span class="o">=</span><span class="n">startDate</span><span class="p">,</span> <span class="n">endDate</span><span class="o">=</span><span class="n">endDate</span><span class="p">,</span>
+                                     <span class="n">incVersion</span><span class="o">=</span><span class="n">incVersion</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DButils</span><span class="o">.</span><span class="n">DBNoData</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No product_id {0} found in the DB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id_in</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.reprocessByDate"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.reprocessByDate">[docs]</a>    <span class="k">def</span> <span class="nf">reprocessByDate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">endDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">incVersion</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprocessBy</span><span class="p">(</span><span class="n">startDate</span><span class="o">=</span><span class="n">startDate</span><span class="p">,</span> <span class="n">endDate</span><span class="o">=</span><span class="n">endDate</span><span class="p">,</span>
+                                 <span class="n">incVersion</span><span class="o">=</span><span class="n">incVersion</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessQueue.reprocessByInstrument"><a class="viewcode-back" href="../../autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.reprocessByInstrument">[docs]</a>    <span class="k">def</span> <span class="nf">reprocessByInstrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_in</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">startDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">endDate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">incVersion</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">inst_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbu</span><span class="o">.</span><span class="n">getInstrumentID</span><span class="p">(</span><span class="n">id_in</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprocessBy</span><span class="p">(</span><span class="n">instrument</span><span class="o">=</span><span class="n">inst_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">startDate</span><span class="o">=</span><span class="n">startDate</span><span class="p">,</span> <span class="n">endDate</span><span class="o">=</span><span class="n">endDate</span><span class="p">,</span>
+                                     <span class="n">incVersion</span><span class="o">=</span><span class="n">incVersion</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DButils</span><span class="o">.</span><span class="n">DBNoData</span><span class="p">:</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No inst_id {0} found in the DB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id_in</span><span class="p">))</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+       <li><a href="../../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

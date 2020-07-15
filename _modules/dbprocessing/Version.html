@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.Version &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+       <li><a href="../../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dbprocessing.Version</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">total_ordering</span>
+
+
+<span class="k">class</span> <span class="nc">VersionError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error class for Version that calls out that an invalid version has been specified&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="nd">@total_ordering</span>
+<div class="viewcode-block" id="Version"><a class="viewcode-back" href="../../autosummary/dbprocessing.Version.Version.html#dbprocessing.Version.Version">[docs]</a><span class="k">class</span> <span class="nc">Version</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A version class to simplify pushing around version information</span>
+<span class="sd">    Handles Boolean operators (&gt;, &lt;, =, !=) and database interface for version is also implemented in another module</span>
+
+<span class="sd">    The version scheme is X,Y,Z where:</span>
+<span class="sd">    * X is the interface version, incremented only when the interface to a file or code changes</span>
+<span class="sd">    * Y is the quality version, incremented when a change is made to a file that affects quality</span>
+<span class="sd">    * Z is the revision version, incremented when a revision has been done to a code or file, as minor as fixing a typo</span>
+
+<span class="sd">    .. note:: The interface version starts at 1</span>
+
+<span class="sd">    :attribute interface: The interface version for the object</span>
+<span class="sd">    :attribute quality: The quality version for the object</span>
+<span class="sd">    :attribute revision: The revision version for the object</span>
+
+<span class="sd">    :Example:</span>
+
+<span class="sd">    &gt;&gt;&gt; import Version</span>
+<span class="sd">    &gt;&gt;&gt; v = Version.Version(1,1,1)</span>
+<span class="sd">    &gt;&gt;&gt; print(v)</span>
+<span class="sd">    1.1.1</span>
+
+<span class="sd">    Version objects can perform Boolean operations</span>
+
+<span class="sd">    &gt;&gt;&gt; v2 = Version.Version(1,2,1)</span>
+<span class="sd">    &gt;&gt;&gt; print(v2 &gt; v)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    Increment the version</span>
+
+<span class="sd">    &gt;&gt;&gt; v.incQuality()</span>
+<span class="sd">    &gt;&gt;&gt; print(v)</span>
+<span class="sd">    1.2.1</span>
+
+<span class="sd">    Same version is equal</span>
+
+<span class="sd">    &gt;&gt;&gt; v == v2</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Version.__init__"><a class="viewcode-back" href="../../autosummary/dbprocessing.Version.Version.html#dbprocessing.Version.Version.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface_version</span><span class="p">,</span> <span class="n">quality_version</span><span class="p">,</span> <span class="n">revision_version</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the class attributes</span>
+
+<span class="sd">        :param interface_version: The interface version for the object</span>
+<span class="sd">        :type interface_version: int</span>
+<span class="sd">        :param quality_version: The quality version for the object</span>
+<span class="sd">        :type quality_version: int</span>
+<span class="sd">        :param revision_version: The revision version for the object</span>
+<span class="sd">        :type revision_version: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">interface_version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">revision</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">revision_version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">quality_version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkVersion</span><span class="p">()</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Version.fromString"><a class="viewcode-back" href="../../autosummary/dbprocessing.Version.Version.html#dbprocessing.Version.Version.fromString">[docs]</a>    <span class="k">def</span> <span class="nf">fromString</span><span class="p">(</span><span class="n">inval</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a string of the form x.y.z return a Version object</span>
+
+<span class="sd">        :param inval: String in the form xx.yy.zz</span>
+<span class="sd">        :type inval: str</span>
+<span class="sd">        :return: Version instance created from the string</span>
+<span class="sd">        :rtype: :class:`Version`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Version</span><span class="p">(</span><span class="o">*</span><span class="n">inval</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_checkVersion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check a version to make sure it is valid, works on current object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interface</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="p">(</span><span class="n">VersionError</span><span class="p">(</span><span class="s2">&quot;interface_version starts at 1&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Version: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quality</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> \
+               <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">revision</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Version.incInterface"><a class="viewcode-back" href="../../autosummary/dbprocessing.Version.Version.html#dbprocessing.Version.Version.incInterface">[docs]</a>    <span class="k">def</span> <span class="nf">incInterface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Increment the interface version and reset the other two&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">revision</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkVersion</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Version.incQuality"><a class="viewcode-back" href="../../autosummary/dbprocessing.Version.Version.html#dbprocessing.Version.Version.incQuality">[docs]</a>    <span class="k">def</span> <span class="nf">incQuality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Increment the quality version and reset the revision&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">revision</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkVersion</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Version.incRevision"><a class="viewcode-back" href="../../autosummary/dbprocessing.Version.Version.html#dbprocessing.Version.Version.incRevision">[docs]</a>    <span class="k">def</span> <span class="nf">incRevision</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Increment the revision version&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">revision</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkVersion</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">revision</span><span class="p">)</span> <span class="o">==</span> \
+                <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">interface</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">revision</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">revision</span><span class="p">)</span> <span class="o">&lt;</span> \
+                <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">interface</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">revision</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Subtract works on each version number</span>
+
+<span class="sd">        :param other: The other Version object</span>
+<span class="sd">        :type other: Version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">interface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">revision</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">revision</span><span class="p">]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+       <li><a href="../../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

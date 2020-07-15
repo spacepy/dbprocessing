@@ -1,0 +1,6 @@
+dbprocessing.Utils.progressbar
+==============================
+
+.. currentmodule:: dbprocessing.Utils
+
+.. autofunction:: progressbar

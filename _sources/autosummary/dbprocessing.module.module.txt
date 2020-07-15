@@ -1,0 +1,39 @@
+dbprocessing.module.module
+==========================
+
+.. currentmodule:: dbprocessing.module
+
+.. autoclass:: module
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+   
+   
+      ~module.get_env
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+   
+   
+   .. automethod::  get_env
+   
+   
+   
+
+   
+   
+   

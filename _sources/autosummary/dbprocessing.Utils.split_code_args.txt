@@ -1,0 +1,6 @@
+dbprocessing.Utils.split_code_args
+==================================
+
+.. currentmodule:: dbprocessing.Utils
+
+.. autofunction:: split_code_args

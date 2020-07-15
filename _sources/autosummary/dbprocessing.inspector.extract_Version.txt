@@ -1,0 +1,6 @@
+dbprocessing.inspector.extract_Version
+======================================
+
+.. currentmodule:: dbprocessing.inspector
+
+.. autofunction:: extract_Version

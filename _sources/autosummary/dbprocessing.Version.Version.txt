@@ -1,0 +1,57 @@
+dbprocessing.Version.Version
+============================
+
+.. currentmodule:: dbprocessing.Version
+
+.. autoclass:: Version
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+   
+   
+      ~Version.fromString
+   
+   
+      ~Version.incInterface
+   
+   
+      ~Version.incQuality
+   
+   
+      ~Version.incRevision
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+   
+   
+   .. automethod::  fromString
+   
+   
+   .. automethod::  incInterface
+   
+   
+   .. automethod::  incQuality
+   
+   
+   .. automethod::  incRevision
+   
+   
+   
+
+   
+   
+   

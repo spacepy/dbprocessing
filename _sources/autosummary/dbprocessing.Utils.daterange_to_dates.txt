@@ -1,0 +1,6 @@
+dbprocessing.Utils.daterange_to_dates
+=====================================
+
+.. currentmodule:: dbprocessing.Utils
+
+.. autofunction:: daterange_to_dates

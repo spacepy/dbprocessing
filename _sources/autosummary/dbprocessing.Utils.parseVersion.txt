@@ -1,0 +1,6 @@
+dbprocessing.Utils.parseVersion
+===============================
+
+.. currentmodule:: dbprocessing.Utils
+
+.. autofunction:: parseVersion

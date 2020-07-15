@@ -1,0 +1,39 @@
+dbprocessing.Diskfile.Diskfile
+==============================
+
+.. currentmodule:: dbprocessing.Diskfile
+
+.. autoclass:: Diskfile
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+   
+   
+      ~Diskfile.checkAccess
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+   
+   
+   .. automethod::  checkAccess
+   
+   
+   
+
+   
+   
+   

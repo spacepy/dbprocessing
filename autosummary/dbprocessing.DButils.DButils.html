@@ -1,0 +1,1619 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.DButils.DButils &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../index.html" />
+    <link rel="up" title="DButils" href="../DButils.html" />
+    <link rel="next" title="Diskfile" href="../Diskfile.html" />
+    <link rel="prev" title="DButils" href="../DButils.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../Diskfile.html" title="Diskfile"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../DButils.html" title="DButils"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../DButils.html" accesskey="U">DButils</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../DButils.html"
+                        title="previous chapter">DButils</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../Diskfile.html"
+                        title="next chapter">Diskfile</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/autosummary/dbprocessing.DButils.DButils.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dbprocessing-dbutils-dbutils">
+<h1>dbprocessing.DButils.DButils<a class="headerlink" href="#dbprocessing-dbutils-dbutils" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dbprocessing.DButils.DButils">
+<em class="property">class </em><code class="descclassname">dbprocessing.DButils.</code><code class="descname">DButils</code><span class="sig-paren">(</span><em>mission='Test'</em>, <em>db_var=None</em>, <em>echo=False</em>, <em>engine='sqlite'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility routines for the DBProcessing class, all of these may be user called but are meant to
+be internal routines for DBProcessing</p>
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mission='Test'</em>, <em>db_var=None</em>, <em>echo=False</em>, <em>engine='sqlite'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the DButils class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mission</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; Name of the mission</li>
+<li><strong>db_var</strong> &#8211; Does nothing.</li>
+<li><strong>echo</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; if True, the Engine will log all statements as well as a repr() of their parameter lists to the logger</li>
+<li><strong>engine</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; DB engine to connect to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addCode" title="dbprocessing.DButils.DButils.addCode"><code class="xref py py-obj docutils literal"><span class="pre">addCode</span></code></a>(filename,&nbsp;relative_path,&nbsp;...[,&nbsp;...])</td>
+<td>Add an executable code to the DB</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addFile" title="dbprocessing.DButils.DButils.addFile"><code class="xref py py-obj docutils literal"><span class="pre">addFile</span></code></a>([filename,&nbsp;data_level,&nbsp;version,&nbsp;...])</td>
+<td>Add a datafile to the database</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addFilecodelink" title="dbprocessing.DButils.DButils.addFilecodelink"><code class="xref py py-obj docutils literal"><span class="pre">addFilecodelink</span></code></a>(resulting_file_id,&nbsp;source_code)</td>
+<td>Add a file code  link to the database</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addFilefilelink" title="dbprocessing.DButils.DButils.addFilefilelink"><code class="xref py py-obj docutils literal"><span class="pre">addFilefilelink</span></code></a>(resulting_file_id,&nbsp;source_file)</td>
+<td>Add a file file  link to the database</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addInspector" title="dbprocessing.DButils.DButils.addInspector"><code class="xref py py-obj docutils literal"><span class="pre">addInspector</span></code></a>(filename,&nbsp;relative_path,&nbsp;...[,&nbsp;...])</td>
+<td>Add an executable code to the DB</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addInstrument" title="dbprocessing.DButils.DButils.addInstrument"><code class="xref py py-obj docutils literal"><span class="pre">addInstrument</span></code></a>(instrument_name,&nbsp;satellite_id)</td>
+<td>Add a Instrument to the database</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addInstrumentproductlink" title="dbprocessing.DButils.DButils.addInstrumentproductlink"><code class="xref py py-obj docutils literal"><span class="pre">addInstrumentproductlink</span></code></a>(instrument_id,&nbsp;...)</td>
+<td>Add a instrument product  link to the database</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addLogging" title="dbprocessing.DButils.DButils.addLogging"><code class="xref py py-obj docutils literal"><span class="pre">addLogging</span></code></a>(currently_processing,&nbsp;...[,&nbsp;pid,&nbsp;...])</td>
+<td>Add an entry to the logging table</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addMission" title="dbprocessing.DButils.DButils.addMission"><code class="xref py py-obj docutils literal"><span class="pre">addMission</span></code></a>(mission_name,&nbsp;rootdir,&nbsp;...)</td>
+<td>Add a mission to the database</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addProcess" title="dbprocessing.DButils.DButils.addProcess"><code class="xref py py-obj docutils literal"><span class="pre">addProcess</span></code></a>(process_name,&nbsp;output_product,&nbsp;...)</td>
+<td>Add a process to the database</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addProduct" title="dbprocessing.DButils.DButils.addProduct"><code class="xref py py-obj docutils literal"><span class="pre">addProduct</span></code></a>(product_name,&nbsp;instrument_id,&nbsp;...)</td>
+<td>Add a product to the database</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addRelease" title="dbprocessing.DButils.DButils.addRelease"><code class="xref py py-obj docutils literal"><span class="pre">addRelease</span></code></a>(filename,&nbsp;release[,&nbsp;commit])</td>
+<td>Given a filename or file_id add an entry to the release table</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addSatellite" title="dbprocessing.DButils.DButils.addSatellite"><code class="xref py py-obj docutils literal"><span class="pre">addSatellite</span></code></a>(satellite_name,&nbsp;mission_id)</td>
+<td>Add a satellite to the database</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.addproductprocesslink" title="dbprocessing.DButils.DButils.addproductprocesslink"><code class="xref py py-obj docutils literal"><span class="pre">addproductprocesslink</span></code></a>(input_product_id,&nbsp;...)</td>
+<td>Add a product process link to the database</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.checkDiskForFile" title="dbprocessing.DButils.DButils.checkDiskForFile"><code class="xref py py-obj docutils literal"><span class="pre">checkDiskForFile</span></code></a>(file_id[,&nbsp;fix])</td>
+<td>Check the file system to see if the file exits or not as it says in the db</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.checkFileSHA" title="dbprocessing.DButils.DButils.checkFileSHA"><code class="xref py py-obj docutils literal"><span class="pre">checkFileSHA</span></code></a>(file_id)</td>
+<td>Given a file id or name check the db checksum and the file checksum</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.checkFiles" title="dbprocessing.DButils.DButils.checkFiles"><code class="xref py py-obj docutils literal"><span class="pre">checkFiles</span></code></a>([limit])</td>
+<td>Check files in the DB, return inconsistent files and why</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.checkIncoming" title="dbprocessing.DButils.DButils.checkIncoming"><code class="xref py py-obj docutils literal"><span class="pre">checkIncoming</span></code></a>([glb])</td>
+<td>Check the incoming directory for the current mission and add those files to the getting list</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.closeDB" title="dbprocessing.DButils.DButils.closeDB"><code class="xref py py-obj docutils literal"><span class="pre">closeDB</span></code></a>()</td>
+<td>Close the database connection</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.codeIsActive" title="dbprocessing.DButils.DButils.codeIsActive"><code class="xref py py-obj docutils literal"><span class="pre">codeIsActive</span></code></a>(ec_id,&nbsp;date)</td>
+<td>Given a ec_id and a date is that code active for that date and is newest version</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.commitDB" title="dbprocessing.DButils.DButils.commitDB"><code class="xref py py-obj docutils literal"><span class="pre">commitDB</span></code></a>()</td>
+<td>Do the commit to the DB</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.currentlyProcessing" title="dbprocessing.DButils.DButils.currentlyProcessing"><code class="xref py py-obj docutils literal"><span class="pre">currentlyProcessing</span></code></a>()</td>
+<td>Checks the db to see if it is currently processing, don&#8217;t want to do 2 at the same time</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.delFilecodelink" title="dbprocessing.DButils.DButils.delFilecodelink"><code class="xref py py-obj docutils literal"><span class="pre">delFilecodelink</span></code></a>(f[,&nbsp;commit])</td>
+<td>Remove entries from Filecodelink fore a Given file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.delFilefilelink" title="dbprocessing.DButils.DButils.delFilefilelink"><code class="xref py py-obj docutils literal"><span class="pre">delFilefilelink</span></code></a>(f[,&nbsp;commit])</td>
+<td>Remove entries from Filefilelink, it will remove if the file is in either column</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.delInspector" title="dbprocessing.DButils.DButils.delInspector"><code class="xref py py-obj docutils literal"><span class="pre">delInspector</span></code></a>(i)</td>
+<td>Removes an inspector form the db</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.delProduct" title="dbprocessing.DButils.DButils.delProduct"><code class="xref py py-obj docutils literal"><span class="pre">delProduct</span></code></a>(pp)</td>
+<td>Removes a product from the db</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.delProductProcessLink" title="dbprocessing.DButils.DButils.delProductProcessLink"><code class="xref py py-obj docutils literal"><span class="pre">delProductProcessLink</span></code></a>(ll)</td>
+<td>Removes a product from the db</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.editTable" title="dbprocessing.DButils.DButils.editTable"><code class="xref py py-obj docutils literal"><span class="pre">editTable</span></code></a>(table,&nbsp;my_id,&nbsp;column[,&nbsp;my_str,&nbsp;...])</td>
+<td>Apply string editing operations on a single row, column of a table</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.fileIsNewest" title="dbprocessing.DButils.DButils.fileIsNewest"><code class="xref py py-obj docutils literal"><span class="pre">fileIsNewest</span></code></a>(filename[,&nbsp;debug])</td>
+<td>quesry the database, is this filename or file_id newest version?</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.file_id_Clean" title="dbprocessing.DButils.DButils.file_id_Clean"><code class="xref py py-obj docutils literal"><span class="pre">file_id_Clean</span></code></a>(invals)</td>
+<td>Given a list of file objects clean out older versions of matching files</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getActiveInspectors" title="dbprocessing.DButils.DButils.getActiveInspectors"><code class="xref py py-obj docutils literal"><span class="pre">getActiveInspectors</span></code></a>()</td>
+<td>Query the db and return a list of all the active inspector file names [(filename, description, arguments, product), ...]</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getAllCodes" title="dbprocessing.DButils.DButils.getAllCodes"><code class="xref py py-obj docutils literal"><span class="pre">getAllCodes</span></code></a>([active])</td>
+<td>Return a list of all codes</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getAllCodesFromProcess" title="dbprocessing.DButils.DButils.getAllCodesFromProcess"><code class="xref py py-obj docutils literal"><span class="pre">getAllCodesFromProcess</span></code></a>(proc_id)</td>
+<td>Given a process id return the code ids that performs that process and the valid dates</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getAllFileIds" title="dbprocessing.DButils.DButils.getAllFileIds"><code class="xref py py-obj docutils literal"><span class="pre">getAllFileIds</span></code></a>([fullPath,&nbsp;startDate,&nbsp;...])</td>
+<td>Return all the file ids in the database</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getAllFilenames" title="dbprocessing.DButils.DButils.getAllFilenames"><code class="xref py py-obj docutils literal"><span class="pre">getAllFilenames</span></code></a>([fullPath,&nbsp;startDate,&nbsp;...])</td>
+<td>Return all the file names in the database</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getAllInstruments" title="dbprocessing.DButils.DButils.getAllInstruments"><code class="xref py py-obj docutils literal"><span class="pre">getAllInstruments</span></code></a>()</td>
+<td>Return dictionaries of instrument traceback dictionaries</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getAllProcesses" title="dbprocessing.DButils.DButils.getAllProcesses"><code class="xref py py-obj docutils literal"><span class="pre">getAllProcesses</span></code></a>([timebase])</td>
+<td>Get all processes</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getAllProducts" title="dbprocessing.DButils.DButils.getAllProducts"><code class="xref py py-obj docutils literal"><span class="pre">getAllProducts</span></code></a>([id_only])</td>
+<td>Return a list of all products as instances</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getAllSatellites" title="dbprocessing.DButils.DButils.getAllSatellites"><code class="xref py py-obj docutils literal"><span class="pre">getAllSatellites</span></code></a>()</td>
+<td>Return dictionaries of satellite, mission objects</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getChildTree" title="dbprocessing.DButils.DButils.getChildTree"><code class="xref py py-obj docutils literal"><span class="pre">getChildTree</span></code></a>(inprod)</td>
+<td>Given an input product return a list of its output product ids</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getChildrenProcesses" title="dbprocessing.DButils.DButils.getChildrenProcesses"><code class="xref py py-obj docutils literal"><span class="pre">getChildrenProcesses</span></code></a>(file_id)</td>
+<td>Given a file ID return all the processes that use this as input</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getCodeDirectory" title="dbprocessing.DButils.DButils.getCodeDirectory"><code class="xref py py-obj docutils literal"><span class="pre">getCodeDirectory</span></code></a>()</td>
+<td>Return the base directory for the current mission</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getCodeFromProcess" title="dbprocessing.DButils.DButils.getCodeFromProcess"><code class="xref py py-obj docutils literal"><span class="pre">getCodeFromProcess</span></code></a>(proc_id,&nbsp;utc_file_date)</td>
+<td>Given a process id return the code id that makes performs that process</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getCodeID" title="dbprocessing.DButils.DButils.getCodeID"><code class="xref py py-obj docutils literal"><span class="pre">getCodeID</span></code></a>(codename)</td>
+<td>Return the codeID for the input code</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getCodePath" title="dbprocessing.DButils.DButils.getCodePath"><code class="xref py py-obj docutils literal"><span class="pre">getCodePath</span></code></a>(code_id)</td>
+<td>Given a code_id list return the full name (path and all) of the code</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getCodeVersion" title="dbprocessing.DButils.DButils.getCodeVersion"><code class="xref py py-obj docutils literal"><span class="pre">getCodeVersion</span></code></a>(code_id)</td>
+<td>Given a code_id the code version</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getDirectory" title="dbprocessing.DButils.DButils.getDirectory"><code class="xref py py-obj docutils literal"><span class="pre">getDirectory</span></code></a>(column[,&nbsp;default])</td>
+<td>Generic directory lookup function, gives directory for the specified column.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getEntry" title="dbprocessing.DButils.DButils.getEntry"><code class="xref py py-obj docutils literal"><span class="pre">getEntry</span></code></a>(table,&nbsp;args)</td>
+<td>Master method to return a entry instance from any table in the db</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getErrorPath" title="dbprocessing.DButils.DButils.getErrorPath"><code class="xref py py-obj docutils literal"><span class="pre">getErrorPath</span></code></a>()</td>
+<td>Return the error path for the current mission</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFileDates" title="dbprocessing.DButils.DButils.getFileDates"><code class="xref py py-obj docutils literal"><span class="pre">getFileDates</span></code></a>(file_id)</td>
+<td>Given a file_id or name return the dates it spans</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFileFullPath" title="dbprocessing.DButils.DButils.getFileFullPath"><code class="xref py py-obj docutils literal"><span class="pre">getFileFullPath</span></code></a>(filename)</td>
+<td>Return the full path to a file Given the name or id</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFileID" title="dbprocessing.DButils.DButils.getFileID"><code class="xref py py-obj docutils literal"><span class="pre">getFileID</span></code></a>(filename)</td>
+<td>Return the fileID for the input filename</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFileParents" title="dbprocessing.DButils.DButils.getFileParents"><code class="xref py py-obj docutils literal"><span class="pre">getFileParents</span></code></a>(file_id[,&nbsp;id_only])</td>
+<td>Given a file_id (or filename) return the files that went into making it</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFileVersion" title="dbprocessing.DButils.DButils.getFileVersion"><code class="xref py py-obj docutils literal"><span class="pre">getFileVersion</span></code></a>(fileid)</td>
+<td>Return the version instance for a file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFilecodelink_bycode" title="dbprocessing.DButils.DButils.getFilecodelink_bycode"><code class="xref py py-obj docutils literal"><span class="pre">getFilecodelink_bycode</span></code></a>(code_id)</td>
+<td>Given a file_id return the code_id associated with it, or None</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFilecodelink_byfile" title="dbprocessing.DButils.DButils.getFilecodelink_byfile"><code class="xref py py-obj docutils literal"><span class="pre">getFilecodelink_byfile</span></code></a>(file_id)</td>
+<td>Given a file_id return the code_id associated with it, or None</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFiles" title="dbprocessing.DButils.DButils.getFiles"><code class="xref py py-obj docutils literal"><span class="pre">getFiles</span></code></a>([startDate,&nbsp;endDate,&nbsp;level,&nbsp;...])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFilesByCode" title="dbprocessing.DButils.DButils.getFilesByCode"><code class="xref py py-obj docutils literal"><span class="pre">getFilesByCode</span></code></a>(code_id[,&nbsp;newest_version,&nbsp;...])</td>
+<td>Given a code_id (or name) return the files that were created using it</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFilesByDate" title="dbprocessing.DButils.DButils.getFilesByDate"><code class="xref py py-obj docutils literal"><span class="pre">getFilesByDate</span></code></a>(daterange[,&nbsp;newest_version])</td>
+<td>Return files in the db with utc_file_date in the range specified</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFilesByInstrument" title="dbprocessing.DButils.DButils.getFilesByInstrument"><code class="xref py py-obj docutils literal"><span class="pre">getFilesByInstrument</span></code></a>(inst_id[,&nbsp;level,&nbsp;...])</td>
+<td>Given an instrument_if return all the file instances associated with it</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFilesByProduct" title="dbprocessing.DButils.DButils.getFilesByProduct"><code class="xref py py-obj docutils literal"><span class="pre">getFilesByProduct</span></code></a>(prod_id[,&nbsp;newest_version])</td>
+<td>Given a product_id or name return all the file instances associated with it</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFilesByProductDate" title="dbprocessing.DButils.DButils.getFilesByProductDate"><code class="xref py py-obj docutils literal"><span class="pre">getFilesByProductDate</span></code></a>(product_id,&nbsp;daterange)</td>
+<td>Return the files in the db by product id with utc_file_date in range specified</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getFilesByProductTime" title="dbprocessing.DButils.DButils.getFilesByProductTime"><code class="xref py py-obj docutils literal"><span class="pre">getFilesByProductTime</span></code></a>(product_id,&nbsp;daterange)</td>
+<td>Return the files in the db by product id with any data in range specified</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getIncomingPath" title="dbprocessing.DButils.DButils.getIncomingPath"><code class="xref py py-obj docutils literal"><span class="pre">getIncomingPath</span></code></a>()</td>
+<td>Return the incoming path for the current mission</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getInputProductID" title="dbprocessing.DButils.DButils.getInputProductID"><code class="xref py py-obj docutils literal"><span class="pre">getInputProductID</span></code></a>(process_id[,&nbsp;range])</td>
+<td>Return the fileID for the input filename</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getInspectorDirectory" title="dbprocessing.DButils.DButils.getInspectorDirectory"><code class="xref py py-obj docutils literal"><span class="pre">getInspectorDirectory</span></code></a>()</td>
+<td>Return the base directory for the current mission</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getInstrumentID" title="dbprocessing.DButils.DButils.getInstrumentID"><code class="xref py py-obj docutils literal"><span class="pre">getInstrumentID</span></code></a>(name[,&nbsp;satellite_id])</td>
+<td>Return the instrument_id for a Given instrument</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getMissionDirectory" title="dbprocessing.DButils.DButils.getMissionDirectory"><code class="xref py py-obj docutils literal"><span class="pre">getMissionDirectory</span></code></a>()</td>
+<td>Return the base directory for the current mission</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getMissionID" title="dbprocessing.DButils.DButils.getMissionID"><code class="xref py py-obj docutils literal"><span class="pre">getMissionID</span></code></a>(mission_name)</td>
+<td>Given a mission name return its ID</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getMissions" title="dbprocessing.DButils.DButils.getMissions"><code class="xref py py-obj docutils literal"><span class="pre">getMissions</span></code></a>()</td>
+<td>Return a list of all the missions</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getProcessFromInputProduct" title="dbprocessing.DButils.DButils.getProcessFromInputProduct"><code class="xref py py-obj docutils literal"><span class="pre">getProcessFromInputProduct</span></code></a>(product)</td>
+<td>Given a product id return all the processes that use that as an input</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getProcessFromOutputProduct" title="dbprocessing.DButils.DButils.getProcessFromOutputProduct"><code class="xref py py-obj docutils literal"><span class="pre">getProcessFromOutputProduct</span></code></a>(outProd)</td>
+<td>Gets process from the db that have the output product</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getProcessID" title="dbprocessing.DButils.DButils.getProcessID"><code class="xref py py-obj docutils literal"><span class="pre">getProcessID</span></code></a>(proc_name)</td>
+<td>Given a process name return its id</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getProcessTimebase" title="dbprocessing.DButils.DButils.getProcessTimebase"><code class="xref py py-obj docutils literal"><span class="pre">getProcessTimebase</span></code></a>(process_id)</td>
+<td>Return the timebase for a product</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getProductID" title="dbprocessing.DButils.DButils.getProductID"><code class="xref py py-obj docutils literal"><span class="pre">getProductID</span></code></a>(product_name)</td>
+<td>Return the product ID for an input product name</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getProductParentTree" title="dbprocessing.DButils.DButils.getProductParentTree"><code class="xref py py-obj docutils literal"><span class="pre">getProductParentTree</span></code></a>()</td>
+<td>go through the db and return a tree of all products and their parents</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getProductsByInstrument" title="dbprocessing.DButils.DButils.getProductsByInstrument"><code class="xref py py-obj docutils literal"><span class="pre">getProductsByInstrument</span></code></a>(inst_id)</td>
+<td>Get all the products for a Given instrument</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getProductsByLevel" title="dbprocessing.DButils.DButils.getProductsByLevel"><code class="xref py py-obj docutils literal"><span class="pre">getProductsByLevel</span></code></a>(level)</td>
+<td>Get all the products for a Given level</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getRunProcess" title="dbprocessing.DButils.DButils.getRunProcess"><code class="xref py py-obj docutils literal"><span class="pre">getRunProcess</span></code></a>()</td>
+<td>Return a list of the processes who&#8217;s output_timebase is &#8220;RUN&#8221;</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getSatelliteID" title="dbprocessing.DButils.DButils.getSatelliteID"><code class="xref py py-obj docutils literal"><span class="pre">getSatelliteID</span></code></a>(sat_name)</td>
+<td>Returns the satellite ID for an input satellite name</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getSatelliteMission" title="dbprocessing.DButils.DButils.getSatelliteMission"><code class="xref py py-obj docutils literal"><span class="pre">getSatelliteMission</span></code></a>(sat_name)</td>
+<td>Given a satellite or satellite id return the mission</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.getTraceback" title="dbprocessing.DButils.DButils.getTraceback"><code class="xref py py-obj docutils literal"><span class="pre">getTraceback</span></code></a>(table,&nbsp;in_id[,&nbsp;in_id2])</td>
+<td>Master routine for all the getXXXTraceback functions, this will make for less code</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.list_release" title="dbprocessing.DButils.DButils.list_release"><code class="xref py py-obj docutils literal"><span class="pre">list_release</span></code></a>(rel_num[,&nbsp;fullpath])</td>
+<td>Given a release number return a list of all the filenames with the release</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.openDB" title="dbprocessing.DButils.DButils.openDB"><code class="xref py py-obj docutils literal"><span class="pre">openDB</span></code></a>(engine[,&nbsp;db_var,&nbsp;verbose,&nbsp;echo])</td>
+<td>Setup python to talk to the database, this is where it is, name and password.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.purgeProcess" title="dbprocessing.DButils.DButils.purgeProcess"><code class="xref py py-obj docutils literal"><span class="pre">purgeProcess</span></code></a>(proc[,&nbsp;commit])</td>
+<td>Remove process and productprocesslink :param DButils.Process proc: ID for process to be deleted.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.renameFile" title="dbprocessing.DButils.DButils.renameFile"><code class="xref py py-obj docutils literal"><span class="pre">renameFile</span></code></a>(filename,&nbsp;newname)</td>
+<td>Rename a file in the db</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.resetProcessingFlag" title="dbprocessing.DButils.DButils.resetProcessingFlag"><code class="xref py py-obj docutils literal"><span class="pre">resetProcessingFlag</span></code></a>(comment)</td>
+<td>Query the db and reset a processing flag</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.startLogging" title="dbprocessing.DButils.DButils.startLogging"><code class="xref py py-obj docutils literal"><span class="pre">startLogging</span></code></a>()</td>
+<td>Add an entry to the logging table in the DB, logging</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.stopLogging" title="dbprocessing.DButils.DButils.stopLogging"><code class="xref py py-obj docutils literal"><span class="pre">stopLogging</span></code></a>(comment)</td>
+<td>Finish the entry to the processing table in the DB, logging</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.tag_release" title="dbprocessing.DButils.DButils.tag_release"><code class="xref py py-obj docutils literal"><span class="pre">tag_release</span></code></a>(rel_num)</td>
+<td>Tag all the newest versions of files to a release number (integer)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.updateCodeNewestVersion" title="dbprocessing.DButils.DButils.updateCodeNewestVersion"><code class="xref py py-obj docutils literal"><span class="pre">updateCodeNewestVersion</span></code></a>(code_id[,&nbsp;is_newest])</td>
+<td>Update a code to indicate whether it&#8217;s the newest version.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.updateInspectorSubs" title="dbprocessing.DButils.DButils.updateInspectorSubs"><code class="xref py py-obj docutils literal"><span class="pre">updateInspectorSubs</span></code></a>(insp_id)</td>
+<td>Update an existing inspector performing the {} replacements</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.updateProcessSubs" title="dbprocessing.DButils.DButils.updateProcessSubs"><code class="xref py py-obj docutils literal"><span class="pre">updateProcessSubs</span></code></a>(proc_id)</td>
+<td>Update an existing product performing the {} replacements</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#dbprocessing.DButils.DButils.updateProductSubs" title="dbprocessing.DButils.DButils.updateProductSubs"><code class="xref py py-obj docutils literal"><span class="pre">updateProductSubs</span></code></a>(product_id)</td>
+<td>Update an existing product performing the {} replacements</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addCode">
+<code class="descname">addCode</code><span class="sig-paren">(</span><em>filename</em>, <em>relative_path</em>, <em>code_start_date</em>, <em>code_stop_date</em>, <em>code_description</em>, <em>process_id</em>, <em>version</em>, <em>active_code</em>, <em>date_written</em>, <em>output_interface_version</em>, <em>newest_version</em>, <em>arguments=None</em>, <em>cpu=1</em>, <em>ram=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addCode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an executable code to the DB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the filename of the code</li>
+<li><strong>relative_path</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the relative path (relative to mission base dir)</li>
+<li><strong>code_start_date</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#module-datetime" title="(in Python v3.8)"><em>datetime</em></a>) &#8211; start of validity of the code (datetime)</li>
+<li><strong>code_stop_date</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#module-datetime" title="(in Python v3.8)"><em>datetime</em></a>) &#8211; end of validity of the code (datetime)</li>
+<li><strong>code_description</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; description of the code (50 char)</li>
+<li><strong>process_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the id of the process this code is part of</li>
+<li><strong>version</strong> (<a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><em>Version.Version</em></a>) &#8211; the version of the code</li>
+<li><strong>active_code</strong> (<em>Boolean</em>) &#8211; Boolean True means the code is active</li>
+<li><strong>date_written</strong> (<em>date</em>) &#8211; the date the cod was written</li>
+<li><strong>output_interface_version</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the interface version of the output (effects the data file names)</li>
+<li><strong>newest_version</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; is this code the newest version in the DB?</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the code_id of the newly inserted code</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">long</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addFile">
+<code class="descname">addFile</code><span class="sig-paren">(</span><em>filename=None</em>, <em>data_level=None</em>, <em>version=None</em>, <em>file_create_date=None</em>, <em>exists_on_disk=None</em>, <em>utc_file_date=None</em>, <em>utc_start_time=None</em>, <em>utc_stop_time=None</em>, <em>check_date=None</em>, <em>verbose_provenance=None</em>, <em>quality_comment=None</em>, <em>caveats=None</em>, <em>met_start_time=None</em>, <em>met_stop_time=None</em>, <em>product_id=None</em>, <em>shasum=None</em>, <em>process_keywords=None</em>, <em>quality_checked=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a datafile to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; filename to add</li>
+<li><strong>data_level</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) &#8211; the data level of the file</li>
+<li><strong>version</strong> (<a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><em>Version.Version</em></a>) &#8211; the version of te file to create</li>
+<li><strong>file_create_date</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><em>datetime.datetime</em></a>) &#8211; date the fie was created</li>
+<li><strong>exists_on_disk</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; does the file exist on disk?</li>
+<li><strong>product_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the product id of he product he file belongs to</li>
+<li><strong>utc_file_date</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#datetime.date" title="(in Python v3.8)"><em>datetime.date</em></a>) &#8211; The UTC date of the file</li>
+<li><strong>utc_start_time</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><em>datetime.datetime</em></a>) &#8211; utc start time of the file</li>
+<li><strong>utc_end_time</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><em>datetime.datetime</em></a>) &#8211; utc end time of the file</li>
+<li><strong>check_date</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><em>datetime.datetime</em></a>) &#8211; the date the file was quality checked</li>
+<li><strong>verbose_provenance</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; Verbose provenafnce of the file</li>
+<li><strong>quality_comment</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; comment on quality from quality check</li>
+<li><strong>caveats</strong> &#8211; caveats associated with the file</li>
+<li><strong>met_start_time</strong> (<em>long</em>) &#8211; met start time of the file</li>
+<li><strong>met_stop_time</strong> (<em>long</em>) &#8211; met stop time of the file</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">file_id of the newly inserted file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">long</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addFilecodelink">
+<code class="descname">addFilecodelink</code><span class="sig-paren">(</span><em>resulting_file_id</em>, <em>source_code</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addFilecodelink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addFilecodelink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a file code  link to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>resulting_file_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the product to link</li>
+<li><strong>source_code</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the code</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addFilefilelink">
+<code class="descname">addFilefilelink</code><span class="sig-paren">(</span><em>resulting_file_id</em>, <em>source_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addFilefilelink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addFilefilelink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a file file  link to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>source_file</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the product to link</li>
+<li><strong>resulting_file_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the process to link</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addInspector">
+<code class="descname">addInspector</code><span class="sig-paren">(</span><em>filename</em>, <em>relative_path</em>, <em>description</em>, <em>version</em>, <em>active_code</em>, <em>date_written</em>, <em>output_interface_version</em>, <em>newest_version</em>, <em>product</em>, <em>arguments=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addInspector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addInspector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an executable code to the DB</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the filename of the code</li>
+<li><strong>relative_path</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the relative path (relative to mission base dir)</li>
+<li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; description of the code (50 char)</li>
+<li><strong>product</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the id of the product this inspector finds</li>
+<li><strong>version</strong> (<a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><em>Version.Version</em></a>) &#8211; the version of the code</li>
+<li><strong>active_code</strong> (<em>Boolean</em>) &#8211; Boolean True means the code is active</li>
+<li><strong>date_written</strong> (<em>date</em>) &#8211; the date the cod was written</li>
+<li><strong>output_interface_version</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the interface version of the output (effects the data file names)</li>
+<li><strong>newest_version</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; is this code the newest version in the DB?</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the inspector_id of the newly inserted code</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">long</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addInstrument">
+<code class="descname">addInstrument</code><span class="sig-paren">(</span><em>instrument_name</em>, <em>satellite_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addInstrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addInstrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a Instrument to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instrument_name</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the name of the mission</li>
+<li><strong>satellite_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the root directory of the mission</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addInstrumentproductlink">
+<code class="descname">addInstrumentproductlink</code><span class="sig-paren">(</span><em>instrument_id</em>, <em>product_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addInstrumentproductlink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addInstrumentproductlink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a instrument product  link to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the instrument to link</li>
+<li><strong>product_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the product to link</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addLogging">
+<code class="descname">addLogging</code><span class="sig-paren">(</span><em>currently_processing</em>, <em>processing_start_time</em>, <em>mission_id</em>, <em>user</em>, <em>hostname</em>, <em>pid=None</em>, <em>processing_end_time=None</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addLogging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addLogging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an entry to the logging table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>currently_processing</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; is the db currently processing?</li>
+<li><strong>processing_start_time</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><em>datetime.datetime</em></a>) &#8211; the time the processing started</li>
+<li><strong>mission_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the mission id the processing if for</li>
+<li><strong>user</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the user doing the processing</li>
+<li><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the hostname that initiated the processing</li>
+<li><strong>pid</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the process id that id the processing</li>
+<li><strong>processing_end_time</strong> (<a class="reference external" href="https://docs.python.org/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><em>datetime.datetime</em></a>) &#8211; the time the processing stopped</li>
+<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; comment about the processing run</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">instance of the Logging class</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Logging</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addMission">
+<code class="descname">addMission</code><span class="sig-paren">(</span><em>mission_name</em>, <em>rootdir</em>, <em>incoming_dir</em>, <em>codedir</em>, <em>inspectordir</em>, <em>errordir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addMission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addMission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a mission to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mission_name</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the name of the mission</li>
+<li><strong>rootdir</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the root directory of the mission</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addProcess">
+<code class="descname">addProcess</code><span class="sig-paren">(</span><em>process_name</em>, <em>output_product</em>, <em>output_timebase</em>, <em>extra_params=None</em>, <em>trigger=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a process to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>process_name</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the name of the process</li>
+<li><strong>output_product</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the output product id</li>
+<li><strong>extra_params</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; extra parameters to pass to the code</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addProduct">
+<code class="descname">addProduct</code><span class="sig-paren">(</span><em>product_name</em>, <em>instrument_id</em>, <em>relative_path</em>, <em>format</em>, <em>level</em>, <em>product_description</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a product to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>product_name</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the name of the product</li>
+<li><strong>instrument_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; the instrument   the product is from</li>
+<li><strong>relative_path</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; relative path for the product</li>
+<li><strong>format</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the format of the product files</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addRelease">
+<code class="descname">addRelease</code><span class="sig-paren">(</span><em>filename</em>, <em>release</em>, <em>commit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addRelease"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addRelease" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a filename or file_id add an entry to the release table</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addSatellite">
+<code class="descname">addSatellite</code><span class="sig-paren">(</span><em>satellite_name</em>, <em>mission_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addSatellite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addSatellite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a satellite to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>satellite_name</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the name of the mission</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.addproductprocesslink">
+<code class="descname">addproductprocesslink</code><span class="sig-paren">(</span><em>input_product_id</em>, <em>process_id</em>, <em>optional</em>, <em>yesterday=0</em>, <em>tomorrow=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.addproductprocesslink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.addproductprocesslink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a product process link to the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>input_product_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the product to link</li>
+<li><strong>process_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the process to link</li>
+<li><strong>optional</strong> (<em>boolean</em>) &#8211; if the input product is necessary</li>
+<li><strong>yesterday</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; How many extra days back do you need</li>
+<li><strong>tomorrow</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; How many extra days forward do you need</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.checkDiskForFile">
+<code class="descname">checkDiskForFile</code><span class="sig-paren">(</span><em>file_id</em>, <em>fix=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.checkDiskForFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.checkDiskForFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the file system to see if the file exits or not as it says in the db</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>file_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; id of the file to check</li>
+<li><strong>fix</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; (optional) set to have the DB fixed to match the file system
+this is <strong>NOT</strong> sure to be safe</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Return true is consistent, False otherwise</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.checkFileSHA">
+<code class="descname">checkFileSHA</code><span class="sig-paren">(</span><em>file_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.checkFileSHA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.checkFileSHA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a file id or name check the db checksum and the file checksum</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.checkFiles">
+<code class="descname">checkFiles</code><span class="sig-paren">(</span><em>limit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.checkFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.checkFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check files in the DB, return inconsistent files and why</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of tuple with the results. 1 is a bad checksum, 2 is not found</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.checkIncoming">
+<code class="descname">checkIncoming</code><span class="sig-paren">(</span><em>glb='*'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.checkIncoming"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.checkIncoming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the incoming directory for the current mission and add those files to the getting list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">processing list of file ids</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.8)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.closeDB">
+<code class="descname">closeDB</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.closeDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.closeDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the database connection</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>verbose</strong> &#8211; (optional) print information out to the command line</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span> <span class="n">pnl</span><span class="o">.</span><span class="n">closeDB</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.codeIsActive">
+<code class="descname">codeIsActive</code><span class="sig-paren">(</span><em>ec_id</em>, <em>date</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.codeIsActive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.codeIsActive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a ec_id and a date is that code active for that date and is newest version</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ec_id</strong> &#8211; executable code id to see if is active</li>
+<li><strong>date</strong> &#8211; date object to use when checking</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True if the code is active for that date, False otherwise</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.commitDB">
+<code class="descname">commitDB</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.commitDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.commitDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do the commit to the DB</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.currentlyProcessing">
+<code class="descname">currentlyProcessing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.currentlyProcessing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.currentlyProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the db to see if it is currently processing, don&#8217;t want to do 2 at the same time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">false or the pid</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool or long</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span> <span class="n">pnl</span><span class="o">.</span><span class="n">currentlyProcessing</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.delFilecodelink">
+<code class="descname">delFilecodelink</code><span class="sig-paren">(</span><em>f</em>, <em>commit=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.delFilecodelink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.delFilecodelink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove entries from Filecodelink fore a Given file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.delFilefilelink">
+<code class="descname">delFilefilelink</code><span class="sig-paren">(</span><em>f</em>, <em>commit=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.delFilefilelink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.delFilefilelink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove entries from Filefilelink, it will remove if the file is in either column</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.delInspector">
+<code class="descname">delInspector</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.delInspector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.delInspector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes an inspector form the db</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.delProduct">
+<code class="descname">delProduct</code><span class="sig-paren">(</span><em>pp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.delProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.delProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a product from the db
+Note: untested!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.delProductProcessLink">
+<code class="descname">delProductProcessLink</code><span class="sig-paren">(</span><em>ll</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.delProductProcessLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.delProductProcessLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a product from the db
+:param list ll: two element list: process_id, product_id
+Note: untested!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.editTable">
+<code class="descname">editTable</code><span class="sig-paren">(</span><em>table</em>, <em>my_id</em>, <em>column</em>, <em>my_str=None</em>, <em>after_flag=None</em>, <em>ins_after=None</em>, <em>ins_before=None</em>, <em>replace_str=None</em>, <em>combine=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.editTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.editTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply string editing operations on a single row, column of a table</p>
+<p>For a specified row and column of a table, update the value according
+to operations specified by the combination of the kwargs.</p>
+<p>To replace all instances of a string with another, set
+<code class="docutils literal"><span class="pre">replace_str</span></code> to the string to replace and <code class="docutils literal"><span class="pre">my_str</span></code> to the
+new value to replace it with.</p>
+<p>To append a string to all instance of a string, set <code class="docutils literal"><span class="pre">ins_after</span></code>
+to the existing string and <code class="docutils literal"><span class="pre">my_str</span></code> to the value to append.</p>
+<p>To prepend a string to all instance of a string, set <code class="docutils literal"><span class="pre">ins_after</span></code>
+to the existing string and <code class="docutils literal"><span class="pre">my_str</span></code> to the value to prepend.</p>
+<p>When operating on the <code class="docutils literal"><span class="pre">arguments</span></code> column of the <code class="docutils literal"><span class="pre">code</span></code> table,
+and <code class="docutils literal"><span class="pre">after_flag</span></code> is specified, all three of these operations
+will only apply to the &#8220;word&#8221; (whitespace-separated) after the
+&#8220;word&#8221; in <code class="docutils literal"><span class="pre">after_flag</span></code>. See examples.</p>
+<p>When operating on the <code class="docutils literal"><span class="pre">arguments</span></code> column of the <code class="docutils literal"><span class="pre">code</span></code> table,
+<code class="docutils literal"><span class="pre">combine</span></code> may be set to <code class="docutils literal"><span class="pre">True</span></code> to combine every word that
+follows each instance of <code class="docutils literal"><span class="pre">after_flag</span></code> into a comma-separated list
+after a single instance of <code class="docutils literal"><span class="pre">after_flag</span></code>. See examples.</p>
+<p>One and only one of <code class="docutils literal"><span class="pre">ins_after</span></code>, <code class="docutils literal"><span class="pre">ins_before</span></code>, <code class="docutils literal"><span class="pre">replace_str</span></code>
+and <code class="docutils literal"><span class="pre">combine</span></code> can be specified; there is no default operation. If
+<code class="docutils literal"><span class="pre">ins_after</span></code>, <code class="docutils literal"><span class="pre">ins_before</span></code>, or <code class="docutils literal"><span class="pre">replace_str</span></code> are specified,
+<code class="docutils literal"><span class="pre">my_str</span></code> must be.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Written and tested for code table. Not thoroughly
+tested for others.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>table</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; Name of the table to edit.</li>
+<li><strong>my_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; Specifies row to edit; most commonly the numerical
+ID (primary key) but also supports string matching
+on other columns as provided by <a class="reference internal" href="#dbprocessing.DButils.DButils.getEntry" title="dbprocessing.DButils.DButils.getEntry"><code class="xref py py-meth docutils literal"><span class="pre">getEntry()</span></code></a>.</li>
+<li><strong>column</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; name of column to edit</li>
+<li><strong>my_str</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; String to add or replace. (Optional; required with
+<code class="docutils literal"><span class="pre">ins_after</span></code>, <code class="docutils literal"><span class="pre">ins_before</span></code>, <code class="docutils literal"><span class="pre">replace_str</span></code>).</li>
+<li><strong>after_flag</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; Only replace string in words immediately
+following this word. Only supported in
+<code class="docutils literal"><span class="pre">arguments</span></code> column of <code class="docutils literal"><span class="pre">code</span></code> table
+(optional; default: replace in all).</li>
+<li><strong>ins_after</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; Value to insert <code class="docutils literal"><span class="pre">my_str</span></code> after.
+(Optional; conflicts with <code class="docutils literal"><span class="pre">ins_before</span></code>,
+<code class="docutils literal"><span class="pre">replace_str</span></code>, <code class="docutils literal"><span class="pre">combine</span></code>).</li>
+<li><strong>ins_before</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; Value to insert <code class="docutils literal"><span class="pre">my_str</span></code> before.
+(Optional; conflicts with <code class="docutils literal"><span class="pre">ins_after</span></code>,
+<code class="docutils literal"><span class="pre">replace_str</span></code>, <code class="docutils literal"><span class="pre">combine</span></code>).</li>
+<li><strong>replace_str</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; Value to replace with <code class="docutils literal"><span class="pre">my_str</span></code>.
+(Optional; conflicts with <code class="docutils literal"><span class="pre">ins_after</span></code>,
+<code class="docutils literal"><span class="pre">ins_before</span></code>, <code class="docutils literal"><span class="pre">combine</span></code>).</li>
+<li><strong>combine</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; If true, combine all instances of words after
+the word in <code class="docutils literal"><span class="pre">after_flag</span></code>. (Optional;
+conflicts with <code class="docutils literal"><span class="pre">ins_after</span></code>, <code class="docutils literal"><span class="pre">ins_before</span></code>,
+<code class="docutils literal"><span class="pre">replace_str</span></code>).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
+<li><a class="reference external" href="https://docs.python.org/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> &#8211; for any invalid combination of arguments.</li>
+<li><a class="reference external" href="https://docs.python.org/library/exceptions.html#RuntimeError" title="(in Python v3.8)"><strong>RuntimeError</strong></a> &#8211; if multiple rows match <code class="docutils literal"><span class="pre">my_id</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Examples:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<p>All examples assume an open <a class="reference internal" href="#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal"><span class="pre">DButils</span></code></a> instance in <code class="docutils literal"><span class="pre">dbu</span></code> and
+an existing code of ID 1. These examples use command line flags
+but the treatment of strings is general.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c1">#Replace a string after a flag</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;Code&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="s1">&#39;-i foobar -j foobar -k foobar&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dbu</span><span class="o">.</span><span class="n">editTable</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;arguments&#39;</span><span class="p">,</span> <span class="n">my_str</span><span class="o">=</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">replace_str</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">after_flag</span><span class="o">=</span><span class="s1">&#39;-j&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span><span class="o">.</span><span class="n">arguments</span>
+<span class="go">-i foobar -j foobaz -k foobar</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c1">#Combine multiple instances of a flag into one</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;Code&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="s1">&#39;-i foo -i bar -j baz&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dbu</span><span class="o">.</span><span class="n">editTable</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;arguments&#39;</span><span class="p">,</span> <span class="n">after_flag</span><span class="o">=</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">combine</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span><span class="o">.</span><span class="n">arguments</span>
+<span class="go">-i foo,bar -j baz</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c1">#Append a string to every instance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="n">dbu</span><span class="o">.</span><span class="n">getEntry</span><span class="p">(</span><span class="s1">&#39;Code&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span><span class="o">.</span><span class="n">relative_path</span> <span class="o">=</span> <span class="s1">&#39;scripts&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dbu</span><span class="o">.</span><span class="n">editTable</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;relative_path&#39;</span><span class="p">,</span> <span class="n">ins_after</span><span class="o">=</span><span class="s1">&#39;scripts&#39;</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">my_str</span><span class="o">=</span><span class="s1">&#39;2.0&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">code</span><span class="o">.</span><span class="n">relative_path</span>
+<span class="go">scripts2.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.fileIsNewest">
+<code class="descname">fileIsNewest</code><span class="sig-paren">(</span><em>filename</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.fileIsNewest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.fileIsNewest" title="Permalink to this definition">¶</a></dt>
+<dd><p>quesry the database, is this filename or file_id newest version?</p>
+<p>&#64;param filename: filename or file_id
+&#64;return: Ture is file is lastest_version, False is not</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.file_id_Clean">
+<code class="descname">file_id_Clean</code><span class="sig-paren">(</span><em>invals</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.file_id_Clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.file_id_Clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of file objects clean out older versions of matching files
+matching is defined as same product_id and same utc_file_date</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getActiveInspectors">
+<code class="descname">getActiveInspectors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getActiveInspectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getActiveInspectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the db and return a list of all the active inspector file names [(filename, description, arguments, product), ...]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getAllCodes">
+<code class="descname">getAllCodes</code><span class="sig-paren">(</span><em>active=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getAllCodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getAllCodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all codes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getAllCodesFromProcess">
+<code class="descname">getAllCodesFromProcess</code><span class="sig-paren">(</span><em>proc_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getAllCodesFromProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getAllCodesFromProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a process id return the code ids that performs that process and the valid dates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Code id and dates that perform a process</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">truple(int, datetime.date, datetime.date)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getAllFileIds">
+<code class="descname">getAllFileIds</code><span class="sig-paren">(</span><em>fullPath=True</em>, <em>startDate=None</em>, <em>endDate=None</em>, <em>level=None</em>, <em>product=None</em>, <em>code=None</em>, <em>instrument=None</em>, <em>exists=None</em>, <em>newest_version=False</em>, <em>limit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getAllFileIds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getAllFileIds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the file ids in the database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getAllFilenames">
+<code class="descname">getAllFilenames</code><span class="sig-paren">(</span><em>fullPath=True</em>, <em>startDate=None</em>, <em>endDate=None</em>, <em>level=None</em>, <em>product=None</em>, <em>code=None</em>, <em>instrument=None</em>, <em>exists=None</em>, <em>newest_version=False</em>, <em>limit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getAllFilenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getAllFilenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all the file names in the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fullPath</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; Return the fullPath or just filename</li>
+<li><strong>level</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; Filter by given level</li>
+<li><strong>product</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; Filter by given product</li>
+<li><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; Limit number of results</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of strs with the filename</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getAllInstruments">
+<code class="descname">getAllInstruments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getAllInstruments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getAllInstruments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dictionaries of instrument traceback dictionaries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionaries of instrument traceback dictionaries</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getAllProcesses">
+<code class="descname">getAllProcesses</code><span class="sig-paren">(</span><em>timebase='all'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getAllProcesses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getAllProcesses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all processes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getAllProducts">
+<code class="descname">getAllProducts</code><span class="sig-paren">(</span><em>id_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getAllProducts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getAllProducts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all products as instances</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getAllSatellites">
+<code class="descname">getAllSatellites</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getAllSatellites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getAllSatellites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dictionaries of satellite, mission objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionaries of satellite, mission objects</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getChildTree">
+<code class="descname">getChildTree</code><span class="sig-paren">(</span><em>inprod</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getChildTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getChildTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an input product return a list of its output product ids</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getChildrenProcesses">
+<code class="descname">getChildrenProcesses</code><span class="sig-paren">(</span><em>file_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getChildrenProcesses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getChildrenProcesses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a file ID return all the processes that use this as input</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getCodeDirectory">
+<code class="descname">getCodeDirectory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getCodeDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getCodeDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the base directory for the current mission</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">base directory for current mission</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getCodeFromProcess">
+<code class="descname">getCodeFromProcess</code><span class="sig-paren">(</span><em>proc_id</em>, <em>utc_file_date</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getCodeFromProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getCodeFromProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a process id return the code id that makes performs that process</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Code id that performs the process</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getCodeID">
+<code class="descname">getCodeID</code><span class="sig-paren">(</span><em>codename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getCodeID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getCodeID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the codeID for the input code</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>codename</strong> &#8211; filename to return the fileid of</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">code_id: code_id of the input file</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">long</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getCodePath">
+<code class="descname">getCodePath</code><span class="sig-paren">(</span><em>code_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getCodePath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getCodePath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a code_id list return the full name (path and all) of the code</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getCodeVersion">
+<code class="descname">getCodeVersion</code><span class="sig-paren">(</span><em>code_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getCodeVersion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getCodeVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a code_id the code version</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getDirectory">
+<code class="descname">getDirectory</code><span class="sig-paren">(</span><em>column</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic directory lookup function, gives directory for the specified
+column.</p>
+<p>The mission rootdir may be absolute or relative to current path.
+Directory requested may be in db as absolute or relative to mission
+root. Home dir references are expanded.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getEntry">
+<code class="descname">getEntry</code><span class="sig-paren">(</span><em>table</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Master method to return a entry instance from any table in the db</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getErrorPath">
+<code class="descname">getErrorPath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getErrorPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getErrorPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the error path for the current mission</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFileDates">
+<code class="descname">getFileDates</code><span class="sig-paren">(</span><em>file_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFileDates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFileDates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a file_id or name return the dates it spans</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFileFullPath">
+<code class="descname">getFileFullPath</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFileFullPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFileFullPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the full path to a file Given the name or id
+(name or id is based on type)</p>
+<p>TODO, this is really slow, this query made it a lot faster but I bet it can get better</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFileID">
+<code class="descname">getFileID</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFileID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFileID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the fileID for the input filename</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; filename to return the fileid of</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">file_id: file_id of the input file</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">long</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFileParents">
+<code class="descname">getFileParents</code><span class="sig-paren">(</span><em>file_id</em>, <em>id_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFileParents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFileParents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a file_id (or filename) return the files that went into making it</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFileVersion">
+<code class="descname">getFileVersion</code><span class="sig-paren">(</span><em>fileid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFileVersion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFileVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the version instance for a file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFilecodelink_bycode">
+<code class="descname">getFilecodelink_bycode</code><span class="sig-paren">(</span><em>code_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFilecodelink_bycode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFilecodelink_bycode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a file_id return the code_id associated with it, or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFilecodelink_byfile">
+<code class="descname">getFilecodelink_byfile</code><span class="sig-paren">(</span><em>file_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFilecodelink_byfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFilecodelink_byfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a file_id return the code_id associated with it, or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFiles">
+<code class="descname">getFiles</code><span class="sig-paren">(</span><em>startDate=None</em>, <em>endDate=None</em>, <em>level=None</em>, <em>product=None</em>, <em>code=None</em>, <em>instrument=None</em>, <em>exists=None</em>, <em>newest_version=False</em>, <em>limit=None</em>, <em>startTime=None</em>, <em>endTime=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFilesByCode">
+<code class="descname">getFilesByCode</code><span class="sig-paren">(</span><em>code_id</em>, <em>newest_version=False</em>, <em>id_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFilesByCode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFilesByCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a code_id (or name) return the files that were created using it</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFilesByDate">
+<code class="descname">getFilesByDate</code><span class="sig-paren">(</span><em>daterange</em>, <em>newest_version=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFilesByDate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFilesByDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return files in the db with utc_file_date in the range specified</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFilesByInstrument">
+<code class="descname">getFilesByInstrument</code><span class="sig-paren">(</span><em>inst_id</em>, <em>level=None</em>, <em>newest_version=False</em>, <em>id_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFilesByInstrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFilesByInstrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an instrument_if return all the file instances associated with it</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFilesByProduct">
+<code class="descname">getFilesByProduct</code><span class="sig-paren">(</span><em>prod_id</em>, <em>newest_version=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFilesByProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFilesByProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a product_id or name return all the file instances associated with it</p>
+<p>if newest is set return only the newest files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFilesByProductDate">
+<code class="descname">getFilesByProductDate</code><span class="sig-paren">(</span><em>product_id</em>, <em>daterange</em>, <em>newest_version=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFilesByProductDate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFilesByProductDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the files in the db by product id with utc_file_date in range specified</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getFilesByProductTime">
+<code class="descname">getFilesByProductTime</code><span class="sig-paren">(</span><em>product_id</em>, <em>daterange</em>, <em>newest_version=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getFilesByProductTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getFilesByProductTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the files in the db by product id with any data in range specified</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getIncomingPath">
+<code class="descname">getIncomingPath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getIncomingPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getIncomingPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the incoming path for the current mission</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getInputProductID">
+<code class="descname">getInputProductID</code><span class="sig-paren">(</span><em>process_id</em>, <em>range=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getInputProductID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getInputProductID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the fileID for the input filename</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>process_id</strong> (<em>long</em>) &#8211; process_id to return the input_product_id for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of input_product_ids</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#list" title="(in Python v3.8)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getInspectorDirectory">
+<code class="descname">getInspectorDirectory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getInspectorDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getInspectorDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the base directory for the current mission</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">base directory for current mission</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getInstrumentID">
+<code class="descname">getInstrumentID</code><span class="sig-paren">(</span><em>name</em>, <em>satellite_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getInstrumentID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getInstrumentID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the instrument_id for a Given instrument</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">instrument_id - the instrument ID</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getMissionDirectory">
+<code class="descname">getMissionDirectory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getMissionDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getMissionDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the base directory for the current mission</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">base directory for current mission</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getMissionID">
+<code class="descname">getMissionID</code><span class="sig-paren">(</span><em>mission_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getMissionID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getMissionID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a mission name return its ID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getMissions">
+<code class="descname">getMissions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getMissions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getMissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all the missions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getProcessFromInputProduct">
+<code class="descname">getProcessFromInputProduct</code><span class="sig-paren">(</span><em>product</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getProcessFromInputProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getProcessFromInputProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a product id return all the processes that use that as an input</p>
+<p>Use getProductID if have a name (or not sure)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getProcessFromOutputProduct">
+<code class="descname">getProcessFromOutputProduct</code><span class="sig-paren">(</span><em>outProd</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getProcessFromOutputProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getProcessFromOutputProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets process from the db that have the output product</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getProcessID">
+<code class="descname">getProcessID</code><span class="sig-paren">(</span><em>proc_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getProcessID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getProcessID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a process name return its id</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getProcessTimebase">
+<code class="descname">getProcessTimebase</code><span class="sig-paren">(</span><em>process_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getProcessTimebase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getProcessTimebase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the timebase for a product</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getProductID">
+<code class="descname">getProductID</code><span class="sig-paren">(</span><em>product_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getProductID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getProductID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the product ID for an input product name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>product_name</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the name of the product to et the id of</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">product_id -the product  ID for the input product name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getProductParentTree">
+<code class="descname">getProductParentTree</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getProductParentTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getProductParentTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>go through the db and return a tree of all products and their parents</p>
+<p>This will allow for a run all the non done files script</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getProductsByInstrument">
+<code class="descname">getProductsByInstrument</code><span class="sig-paren">(</span><em>inst_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getProductsByInstrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getProductsByInstrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all the products for a Given instrument</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getProductsByLevel">
+<code class="descname">getProductsByLevel</code><span class="sig-paren">(</span><em>level</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getProductsByLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getProductsByLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all the products for a Given level</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getRunProcess">
+<code class="descname">getRunProcess</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getRunProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getRunProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the processes who&#8217;s output_timebase is &#8220;RUN&#8221;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getSatelliteID">
+<code class="descname">getSatelliteID</code><span class="sig-paren">(</span><em>sat_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getSatelliteID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getSatelliteID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the satellite ID for an input satellite name
+:param sat_name: the satellite name to look up the id
+:type sat_name: str</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">satellite_id - the requested satellite  ID</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getSatelliteMission">
+<code class="descname">getSatelliteMission</code><span class="sig-paren">(</span><em>sat_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getSatelliteMission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getSatelliteMission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a satellite or satellite id return the mission</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.getTraceback">
+<code class="descname">getTraceback</code><span class="sig-paren">(</span><em>table</em>, <em>in_id</em>, <em>in_id2=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.getTraceback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.getTraceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Master routine for all the getXXXTraceback functions, this will make for less code</p>
+<p>this is some large select statements with joins in them, these are tested and do work</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.list_release">
+<code class="descname">list_release</code><span class="sig-paren">(</span><em>rel_num</em>, <em>fullpath=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.list_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.list_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a release number return a list of all the filenames with the release</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.openDB">
+<code class="descname">openDB</code><span class="sig-paren">(</span><em>engine</em>, <em>db_var=None</em>, <em>verbose=False</em>, <em>echo=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.openDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.openDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup python to talk to the database, this is where it is, name and password.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>engine</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; DB engine to connect to</li>
+<li><strong>db_var</strong> &#8211; Does nothing.</li>
+<li><strong>echo</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; if True, the Engine will log all statements as well as a repr() of their parameter lists to the logger</li>
+<li><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; if True, will print out extra debugging</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.purgeProcess">
+<code class="descname">purgeProcess</code><span class="sig-paren">(</span><em>proc</em>, <em>commit=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.purgeProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.purgeProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove process and productprocesslink
+:param DButils.Process proc: ID for process to be deleted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.renameFile">
+<code class="descname">renameFile</code><span class="sig-paren">(</span><em>filename</em>, <em>newname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.renameFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.renameFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename a file in the db</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.resetProcessingFlag">
+<code class="descname">resetProcessingFlag</code><span class="sig-paren">(</span><em>comment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.resetProcessingFlag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.resetProcessingFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the db and reset a processing flag</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) &#8211; the comment to enter into the processing log DB</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True - Success, False - Failure</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.startLogging">
+<code class="descname">startLogging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.startLogging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.startLogging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an entry to the logging table in the DB, logging</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.stopLogging">
+<code class="descname">stopLogging</code><span class="sig-paren">(</span><em>comment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.stopLogging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.stopLogging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finish the entry to the processing table in the DB, logging</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>comment</strong> &#8211; (optional) a comment to insert into he DB</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.tag_release">
+<code class="descname">tag_release</code><span class="sig-paren">(</span><em>rel_num</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.tag_release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.tag_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tag all the newest versions of files to a release number (integer)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.updateCodeNewestVersion">
+<code class="descname">updateCodeNewestVersion</code><span class="sig-paren">(</span><em>code_id</em>, <em>is_newest=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.updateCodeNewestVersion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.updateCodeNewestVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update a code to indicate whether it&#8217;s the newest version.</p>
+<p>Assumption is that the newest version of a code should be the
+only active one, so sets both <code class="docutils literal"><span class="pre">newest_version</span></code> and
+<code class="docutils literal"><span class="pre">active_code</span></code> fields in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>code_id</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) &#8211; ID or filename (str) of the code to change.</li>
+<li><strong>is_newest</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) &#8211; Set to newest (True) or not-newest, inactive
+(False, default).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.updateInspectorSubs">
+<code class="descname">updateInspectorSubs</code><span class="sig-paren">(</span><em>insp_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.updateInspectorSubs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.updateInspectorSubs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update an existing inspector performing the {} replacements</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.updateProcessSubs">
+<code class="descname">updateProcessSubs</code><span class="sig-paren">(</span><em>proc_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.updateProcessSubs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.updateProcessSubs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update an existing product performing the {} replacements</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dbprocessing.DButils.DButils.updateProductSubs">
+<code class="descname">updateProductSubs</code><span class="sig-paren">(</span><em>product_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dbprocessing/DButils.html#DButils.updateProductSubs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dbprocessing.DButils.DButils.updateProductSubs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update an existing product performing the {} replacements</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../Diskfile.html" title="Diskfile"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../DButils.html" title="DButils"
+             >previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../DButils.html" >DButils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

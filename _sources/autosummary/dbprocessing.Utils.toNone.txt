@@ -1,0 +1,6 @@
+dbprocessing.Utils.toNone
+=========================
+
+.. currentmodule:: dbprocessing.Utils
+
+.. autofunction:: toNone

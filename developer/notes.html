@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Notes &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../index.html" />
+    <link rel="up" title="Developer Information" href="index.html" />
+    <link rel="next" title="Todo" href="todo.html" />
+    <link rel="prev" title="Database Structure" href="structure.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="todo.html" title="Todo"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="structure.html" title="Database Structure"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Information</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Notes</a><ul>
+<li><a class="reference internal" href="#ingest-and-process-steps">Ingest and Process steps</a><ul>
+<li><a class="reference internal" href="#ingest-i">Ingest(-i)</a></li>
+<li><a class="reference internal" href="#process-p">Process(-p)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="structure.html"
+                        title="previous chapter">Database Structure</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="todo.html"
+                        title="next chapter">Todo</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/developer/notes.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="notes">
+<h1>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="ingest-and-process-steps">
+<h2>Ingest and Process steps<a class="headerlink" href="#ingest-and-process-steps" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ingest-i">
+<h3>Ingest(-i)<a class="headerlink" href="#ingest-i" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>checkIncoming - Gets all files in incoming directory, and adds them to &#8216;queue&#8217;(removes duplicate files)</li>
+<li>importFromIncoming - Pops files off &#8216;queue&#8217;, checks that they don&#8217;t exist in the db already runs figureProduct() on them, then calls diskfileToDB().</li>
+<li>figureProduct - runs every inspector on the files, stops and returns the diskfile that is created by the inspector when one matches.</li>
+<li>diskfileToDB - Enters file into DB, moves the file to the its correct home, sets files in the db of the same product and same utc_file_date to not be newest version, adds to processqueue for later processing, and returns file_id</li>
+</ol>
+</div>
+<div class="section" id="process-p">
+<h3>Process(-p)<a class="headerlink" href="#process-p" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">_processqueueClean - Go through the process queue and clear out lower versions of the same files. Then, sort on dates, then sort on level. (some half baked newest_version stuff in here)</p>
+</li>
+<li><p class="first">buildChilden - Called on every item in the processqueue. Calculates all possible children products</p>
+</li>
+<li><p class="first">runMe.runner - Created for every item on the runme_list. Handles all the magic of running codes.</p>
+<blockquote>
+<div><ol class="upperalpha">
+<li><p class="first">Build up the command line and store in a commands list</p>
+</li>
+<li><p class="first">Loop over the commands</p>
+<blockquote>
+<div><ol class="loweralpha">
+<li><p class="first">Start up to MAX_PROC processes with subprocess.Popen</p>
+</li>
+<li><dl class="first docutils">
+<dt>Poll if they are done or not, and if they finished successfully</dt>
+<dd><ol class="first last lowerroman simple">
+<li>Success: Move output file to incoming dir, run all inspectors on it to see what product a file is(why?), diskfileToDB is run(see -i section)</li>
+<li>Failure: move stdout and stderr to errors</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="todo.html" title="Todo"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="structure.html" title="Database Structure"
+             >previous</a> |</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+       <li><a href="../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Information</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

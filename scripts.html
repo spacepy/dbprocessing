@@ -1,0 +1,752 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing Scripts &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="index.html" />
+    <link rel="next" title="Configuration Files" href="ConfigurationFiles.html" />
+    <link rel="prev" title="Todo" href="developer/todo.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ConfigurationFiles.html" title="Configuration Files"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="developer/todo.html" title="Todo"
+             accesskey="P">previous</a> |</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+       <li><a href="index.html">top</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">dbprocessing Scripts</a><ul>
+<li><a class="reference internal" href="#addfromconfig-py">addFromConfig.py</a></li>
+<li><a class="reference internal" href="#addverboseprovenance-py">addVerboseProvenance.py</a></li>
+<li><a class="reference internal" href="#clearprocessingflag-py">clearProcessingFlag.py</a></li>
+<li><a class="reference internal" href="#configfromdb-py">configFromDB.py</a></li>
+<li><a class="reference internal" href="#coverageplot-py">coveragePlot.py</a></li>
+<li><a class="reference internal" href="#createdb-py">CreateDB.py</a></li>
+<li><a class="reference internal" href="#datatoincoming-py">dataToIncoming.py</a></li>
+<li><a class="reference internal" href="#dbonlyfiles-py">dbOnlyFiles.py:</a></li>
+<li><a class="reference internal" href="#dbrunner-py">DBRunner.py:</a></li>
+<li><a class="reference internal" href="#deletealldbfiles-py">deleteAllDBFiles.py:</a></li>
+<li><a class="reference internal" href="#deletealldbproducts-py">deleteAllDBProducts.py:</a></li>
+<li><a class="reference internal" href="#deletefromdbifnotondisk-py">deleteFromDBifNotOnDisk.py:</a></li>
+<li><a class="reference internal" href="#flushprocessqueue-py">flushProcessQueue.py:</a></li>
+<li><a class="reference internal" href="#histogramcodes-py">histogramCodes.py:</a></li>
+<li><a class="reference internal" href="#hopecoveragehtml-py">hopeCoverageHTML.py:</a></li>
+<li><a class="reference internal" href="#hope-query-py">hope_query.py:</a></li>
+<li><a class="reference internal" href="#htmlcoverage-py">htmlCoverage.py:</a></li>
+<li><a class="reference internal" href="#link-missing-ql-mag-l2-mag-py">link_missing_ql_mag_l2_mag.py:</a></li>
+<li><a class="reference internal" href="#magephem-datatoincoming-py">magephem_dataToIncoming.py:</a></li>
+<li><a class="reference internal" href="#magephem-def-datatoincoming-py">magephem_def_dataToIncoming.py:</a></li>
+<li><a class="reference internal" href="#magephem-pre-coveragehtml-py">magephem-pre-CoverageHTML.py:</a></li>
+<li><a class="reference internal" href="#makelatestsymlinks-py">makeLatestSymlinks.py:</a></li>
+<li><a class="reference internal" href="#missingfilesbyproduct-py">missingFilesByProduct.py:</a></li>
+<li><a class="reference internal" href="#missingfiles-py">missingFiles.py:</a></li>
+<li><a class="reference internal" href="#possibleproblemdates-py">possibleProblemDates.py:</a></li>
+<li><a class="reference internal" href="#printinfo-py">printInfo.py:</a></li>
+<li><a class="reference internal" href="#printprocessqueue-py">printProcessQueue.py:</a></li>
+<li><a class="reference internal" href="#processqueue-py">ProcessQueue.py:</a></li>
+<li><a class="reference internal" href="#purgefilefromdb-py">purgeFileFromDB.py:</a></li>
+<li><a class="reference internal" href="#reprocessbyall-py">reprocessByAll.py:</a></li>
+<li><a class="reference internal" href="#reprocessbycode-py">reprocessByCode.py:</a></li>
+<li><a class="reference internal" href="#reprocessbydate-py">reprocessByDate.py:</a></li>
+<li><a class="reference internal" href="#reprocessbyinstrument-py">reprocessByInstrument.py:</a></li>
+<li><a class="reference internal" href="#reprocessbyproduct-py">reprocessByProduct.py:</a></li>
+<li><a class="reference internal" href="#updatecode-py">updateCode.py:</a></li>
+<li><a class="reference internal" href="#updateproducts-py">updateProducts.py:</a></li>
+<li><a class="reference internal" href="#updateshasum-py">updateSHAsum.py:</a></li>
+<li><a class="reference internal" href="#weeklyreport-py">weeklyReport.py:</a></li>
+<li><a class="reference internal" href="#writedbhtml-py">writeDBhtml.py:</a></li>
+<li><a class="reference internal" href="#writeprocessconf-py">writeProcessConf.py:</a></li>
+<li><a class="reference internal" href="#writeproductsconf-py">writeProductsConf.py:</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="developer/todo.html"
+                        title="previous chapter">Todo</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ConfigurationFiles.html"
+                        title="next chapter">Configuration Files</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/scripts.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dbprocessing-scripts">
+<h1>dbprocessing Scripts<a class="headerlink" href="#dbprocessing-scripts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="addfromconfig-py">
+<h2>addFromConfig.py<a class="headerlink" href="#addfromconfig-py" title="Permalink to this headline">¶</a></h2>
+<p>Adds data to a database from a config file. This is the second step in
+setting up a new processing chain.</p>
+<p>See <a class="reference internal" href="ConfigurationFiles.html"><em>Configuration Files</em></a> for a full description of the config file
+format and capability.</p>
+<dl class="option">
+<dt id="cmdoption-addFromConfig-arg-config_file">
+<code class="descname">config_file</code><code class="descclassname"> The name of the config file to ingest</code><a class="headerlink" href="#cmdoption-addFromConfig-arg-config_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-addFromConfig-m">
+<span id="cmdoption-addFromConfig--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; The database to apply the config file to</code><a class="headerlink" href="#cmdoption-addFromConfig-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-addFromConfig-v">
+<span id="cmdoption-addFromConfig--verify"></span><code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verify</code><code class="descclassname">  Verify the config file then stop</code><a class="headerlink" href="#cmdoption-addFromConfig-v" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="addverboseprovenance-py">
+<h2>addVerboseProvenance.py<a class="headerlink" href="#addverboseprovenance-py" title="Permalink to this headline">¶</a></h2>
+<p>Go into the database and get the verbose provenance for a file
+then add that to the global attrs for the file.
+Either putout to the same file or a different file</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This code has not been fully tested or used.</p>
+</div>
+</div>
+<div class="section" id="clearprocessingflag-py">
+<h2>clearProcessingFlag.py<a class="headerlink" href="#clearprocessingflag-py" title="Permalink to this headline">¶</a></h2>
+<p>Clear a processing flag (lock) on a database that has crashed.</p>
+<dl class="option">
+<dt id="cmdoption-clearProcessingFlag-arg-database">
+<code class="descname">database</code><code class="descclassname"> The name of the database to unlock</code><a class="headerlink" href="#cmdoption-clearProcessingFlag-arg-database" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-clearProcessingFlag-arg-message">
+<code class="descname">message</code><code class="descclassname"> Log message to insert into the database</code><a class="headerlink" href="#cmdoption-clearProcessingFlag-arg-message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="configfromdb-py">
+<h2>configFromDB.py<a class="headerlink" href="#configfromdb-py" title="Permalink to this headline">¶</a></h2>
+<p>Build a config file from an existing database.</p>
+<dl class="option">
+<dt id="cmdoption-configFromDB-arg-filename">
+<code class="descname">filename</code><code class="descclassname"> The filename to save the config</code><a class="headerlink" href="#cmdoption-configFromDB-arg-filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-configFromDB-m">
+<span id="cmdoption-configFromDB--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; The database to to connect to</code><a class="headerlink" href="#cmdoption-configFromDB-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-configFromDB-f">
+<span id="cmdoption-configFromDB--force"></span><span id="cmdoption-configFromDB-arg-allows"></span><code class="descname">-f</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--force</code><code class="descclassname"> Force the creation of the config file</code><code class="descclassname">, </code><code class="descname">allows</code><code class="descclassname"> overwrite</code><a class="headerlink" href="#cmdoption-configFromDB-f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-configFromDB-s">
+<span id="cmdoption-configFromDB--satellite"></span><code class="descname">-s</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--satellite</code><code class="descclassname"> The name of the satellite for the config file</code><a class="headerlink" href="#cmdoption-configFromDB-s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-configFromDB-i">
+<span id="cmdoption-configFromDB--instrument"></span><code class="descname">-i</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--instrument</code><code class="descclassname"> The name of the instrument for the config file</code><a class="headerlink" href="#cmdoption-configFromDB-i" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-configFromDB-c">
+<span id="cmdoption-configFromDB--nocomments"></span><code class="descname">-c</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--nocomments</code><code class="descclassname"> Make the config file without a comment header block on top</code><a class="headerlink" href="#cmdoption-configFromDB-c" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is untested and not fully useful yet.</p>
+</div>
+</div>
+<div class="section" id="coverageplot-py">
+<h2>coveragePlot.py<a class="headerlink" href="#coverageplot-py" title="Permalink to this headline">¶</a></h2>
+<p>Creates a coverage plot based on config file input. This script is useful for
+determining which files may be missing from a processing chain.</p>
+<dl class="option">
+<dt id="cmdoption-coveragePlot-arg-configfile">
+<code class="descname">configfile</code><code class="descclassname"> The config file to read.</code><a class="headerlink" href="#cmdoption-coveragePlot-arg-configfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Has some bugs. Doesn&#8217;t catch most recent files reliably or something.</p>
+</div>
+<p>See <a class="reference internal" href="ConfigurationFiles.html"><em>Configuration Files</em></a> for a full description of the config file
+format and capability.</p>
+</div>
+<div class="section" id="createdb-py">
+<h2>CreateDB.py<a class="headerlink" href="#createdb-py" title="Permalink to this headline">¶</a></h2>
+<p>Create an empty sqlite database for use in dbprocessing.
+(currently creates a RBSP database, this should be updated as an option).</p>
+<p>This is the first step in the setup of a new processing chain.</p>
+<dl class="option">
+<dt id="cmdoption-CreateDB-arg-dbname">
+<code class="descname">dbname</code><code class="descclassname"> The name of the database to create</code><a class="headerlink" href="#cmdoption-CreateDB-arg-dbname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="datatoincoming-py">
+<h2>dataToIncoming.py<a class="headerlink" href="#datatoincoming-py" title="Permalink to this headline">¶</a></h2>
+<p>Concept, never actually used. supposed to be one script + config file, but we wound up using separate scripts for everything</p>
+</div>
+<div class="section" id="dbonlyfiles-py">
+<h2>dbOnlyFiles.py:<a class="headerlink" href="#dbonlyfiles-py" title="Permalink to this headline">¶</a></h2>
+<p>Show files in database but not on disk. Additionally, this can remove files from the db that are only in the db.</p>
+<dl class="option">
+<dt id="cmdoption-dbOnlyFiles.py-s">
+<span id="cmdoption-dbOnlyFiles.py--startDate"></span><code class="descname">-s</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--startDate</code><code class="descclassname"> &lt;date&gt; Date to start reprocessing (e.g. 2012-10-02)</code><a class="headerlink" href="#cmdoption-dbOnlyFiles.py-s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-dbOnlyFiles.py-e">
+<span id="cmdoption-dbOnlyFiles.py--endDate"></span><code class="descname">-e</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--endDate</code><code class="descclassname"> &lt;date&gt; Date to end reprocessing (e.g. 2012-10-25)</code><a class="headerlink" href="#cmdoption-dbOnlyFiles.py-e" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-dbOnlyFiles.py-f">
+<span id="cmdoption-dbOnlyFiles.py--fix"></span><code class="descname">-f</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--fix</code><code class="descclassname"> Fix the database exists_on_disk field</code><a class="headerlink" href="#cmdoption-dbOnlyFiles.py-f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-dbOnlyFiles.py-m">
+<span id="cmdoption-dbOnlyFiles.py--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; elected mission database</code><a class="headerlink" href="#cmdoption-dbOnlyFiles.py-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-dbOnlyFiles.py--echo">
+<code class="descname">--echo</code><code class="descclassname"> echo sql queries for debugging</code><a class="headerlink" href="#cmdoption-dbOnlyFiles.py--echo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-dbOnlyFiles.py-n">
+<span id="cmdoption-dbOnlyFiles.py--newest"></span><code class="descname">-n</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--newest</code><code class="descclassname"> Only check the newest files</code><a class="headerlink" href="#cmdoption-dbOnlyFiles.py-n" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-dbOnlyFiles.py--startID">
+<code class="descname">--startID</code><code class="descclassname"> The File id to start on</code><a class="headerlink" href="#cmdoption-dbOnlyFiles.py--startID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-dbOnlyFiles.py-v">
+<span id="cmdoption-dbOnlyFiles.py--verbose"></span><code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"> Print out each file as it is checked</code><a class="headerlink" href="#cmdoption-dbOnlyFiles.py-v" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="dbrunner-py">
+<h2>DBRunner.py:<a class="headerlink" href="#dbrunner-py" title="Permalink to this headline">¶</a></h2>
+<p>Used to demo run codes for certain dates out of the database. This primarily used in testing can also be used to reprocess files as needed</p>
+<dl class="option">
+<dt id="cmdoption-DBRunner-arg-filename">
+<code class="descname">filename</code><code class="descclassname"> The filename to save the config</code><a class="headerlink" href="#cmdoption-DBRunner-arg-filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-DBRunner-d">
+<span id="cmdoption-DBRunner--dryrun"></span><code class="descname">-d</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--dryrun</code><code class="descclassname"> Only print what would be done</code><a class="headerlink" href="#cmdoption-DBRunner-d" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-DBRunner-m">
+<span id="cmdoption-DBRunner--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-DBRunner-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-DBRunner--echo">
+<code class="descname">--echo</code><code class="descclassname"> Start sqlalchemy with echo in place for debugging</code><a class="headerlink" href="#cmdoption-DBRunner--echo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-DBRunner-s">
+<span id="cmdoption-DBRunner--startDate"></span><code class="descname">-s</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--startDate</code><code class="descclassname"> &lt;date&gt; Date to start search (e.g. 2012-10-02 or 20121002)</code><a class="headerlink" href="#cmdoption-DBRunner-s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-DBRunner-e">
+<span id="cmdoption-DBRunner--endDate"></span><code class="descname">-e</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--endDate</code><code class="descclassname"> &lt;date&gt; Date to end search (e.g. 2012-10-25 or 20121025)</code><a class="headerlink" href="#cmdoption-DBRunner-e" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-DBRunner--nooptional">
+<code class="descname">--nooptional</code><code class="descclassname"> Do not include optional inputs</code><a class="headerlink" href="#cmdoption-DBRunner--nooptional" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-DBRunner-n">
+<span id="cmdoption-DBRunner--num-proc"></span><code class="descname">-n</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--num-proc</code><code class="descclassname"> Number of processes to run in parallel</code><a class="headerlink" href="#cmdoption-DBRunner-n" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="deletealldbfiles-py">
+<h2>deleteAllDBFiles.py:<a class="headerlink" href="#deletealldbfiles-py" title="Permalink to this headline">¶</a></h2>
+<p>Deletes all file entries in the database.</p>
+<dl class="option">
+<dt id="cmdoption-deleteAllDBFiles-m">
+<span id="cmdoption-deleteAllDBFiles--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-deleteAllDBFiles-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="deletealldbproducts-py">
+<h2>deleteAllDBProducts.py:<a class="headerlink" href="#deletealldbproducts-py" title="Permalink to this headline">¶</a></h2>
+<p>Doesn&#8217;t work, maybe should?</p>
+</div>
+<div class="section" id="deletefromdbifnotondisk-py">
+<h2>deleteFromDBifNotOnDisk.py:<a class="headerlink" href="#deletefromdbifnotondisk-py" title="Permalink to this headline">¶</a></h2>
+<p>Finds all files that are in the DB but not found on the DB</p>
+<dl class="option">
+<dt id="cmdoption-deleteFromDBifNotOnDisk-m">
+<span id="cmdoption-deleteFromDBifNotOnDisk--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-deleteFromDBifNotOnDisk-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-deleteFromDBifNotOnDisk--fix">
+<code class="descname">--fix</code><code class="descclassname"> Remove the files from the DB (make a backup first)</code><a class="headerlink" href="#cmdoption-deleteFromDBifNotOnDisk--fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-deleteFromDBifNotOnDisk--echo">
+<code class="descname">--echo</code><code class="descclassname"> Echo sql queries for debugging</code><a class="headerlink" href="#cmdoption-deleteFromDBifNotOnDisk--echo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="flushprocessqueue-py">
+<h2>flushProcessQueue.py:<a class="headerlink" href="#flushprocessqueue-py" title="Permalink to this headline">¶</a></h2>
+<p>Clears the ProcessQueue of a database.</p>
+<dl class="option">
+<dt id="cmdoption-flushProcessQueue-arg-Database">
+<code class="descname">Database</code><code class="descclassname"> The name of the database to wipe the ProcesQueue of.</code><a class="headerlink" href="#cmdoption-flushProcessQueue-arg-Database" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="histogramcodes-py">
+<h2>histogramCodes.py:<a class="headerlink" href="#histogramcodes-py" title="Permalink to this headline">¶</a></h2>
+<p>may or may not still work, read logs to find out what codes take a long time to run</p>
+</div>
+<div class="section" id="hopecoveragehtml-py">
+<h2>hopeCoverageHTML.py:<a class="headerlink" href="#hopecoveragehtml-py" title="Permalink to this headline">¶</a></h2>
+<p>delete</p>
+</div>
+<div class="section" id="hope-query-py">
+<h2>hope_query.py:<a class="headerlink" href="#hope-query-py" title="Permalink to this headline">¶</a></h2>
+<p>delete</p>
+</div>
+<div class="section" id="htmlcoverage-py">
+<h2>htmlCoverage.py:<a class="headerlink" href="#htmlcoverage-py" title="Permalink to this headline">¶</a></h2>
+<p>either this or coveragePlot works, not both.</p>
+</div>
+<div class="section" id="link-missing-ql-mag-l2-mag-py">
+<h2>link_missing_ql_mag_l2_mag.py:<a class="headerlink" href="#link-missing-ql-mag-l2-mag-py" title="Permalink to this headline">¶</a></h2>
+<p>QL &#8220;required,&#8221;, L2 &#8220;optional&#8221;. We don&#8217;t support &#8220;either or but prefer this one&#8221;, so this links them together and the wrapper handles the actual priority</p>
+</div>
+<div class="section" id="magephem-datatoincoming-py">
+<h2>magephem_dataToIncoming.py:<a class="headerlink" href="#magephem-datatoincoming-py" title="Permalink to this headline">¶</a></h2>
+<p>What it says on tin. Delete?</p>
+</div>
+<div class="section" id="magephem-def-datatoincoming-py">
+<h2>magephem_def_dataToIncoming.py:<a class="headerlink" href="#magephem-def-datatoincoming-py" title="Permalink to this headline">¶</a></h2>
+<p>What it says on tin. Delete?</p>
+</div>
+<div class="section" id="magephem-pre-coveragehtml-py">
+<h2>magephem-pre-CoverageHTML.py:<a class="headerlink" href="#magephem-pre-coveragehtml-py" title="Permalink to this headline">¶</a></h2>
+<p>Probably works. Delete?</p>
+</div>
+<div class="section" id="makelatestsymlinks-py">
+<h2>makeLatestSymlinks.py:<a class="headerlink" href="#makelatestsymlinks-py" title="Permalink to this headline">¶</a></h2>
+<p>In a given directory, make symlinks to all the newest versions of files into another directory</p>
+<dl class="option">
+<dt id="cmdoption-makeLatestSymlinks-arg-config">
+<code class="descname">config</code><code class="descclassname"> The config file</code><a class="headerlink" href="#cmdoption-makeLatestSymlinks-arg-config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-makeLatestSymlinks--verbose">
+<code class="descname">--verbose</code><code class="descclassname"> Print out verbose information</code><a class="headerlink" href="#cmdoption-makeLatestSymlinks--verbose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-makeLatestSymlinks-l">
+<span id="cmdoption-makeLatestSymlinks--list"></span><code class="descname">-l</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--list</code><code class="descclassname"> Instead of syncing list the sections of the conf file</code><a class="headerlink" href="#cmdoption-makeLatestSymlinks-l" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-makeLatestSymlinks-f">
+<span id="cmdoption-makeLatestSymlinks--filter"></span><code class="descname">-f</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--filter</code><code class="descclassname"> Comma separated list of strings that must be in the sync conf name (e.g. -f hope,rbspa)</code><a class="headerlink" href="#cmdoption-makeLatestSymlinks-f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">There&#8217;s no documentation on the config file</p>
+</div>
+</div>
+<div class="section" id="missingfilesbyproduct-py">
+<h2>missingFilesByProduct.py:<a class="headerlink" href="#missingfilesbyproduct-py" title="Permalink to this headline">¶</a></h2>
+<p>Attempt to reprocess files that are missing, 90% solution, not used much, but did work</p>
+</div>
+<div class="section" id="missingfiles-py">
+<h2>missingFiles.py:<a class="headerlink" href="#missingfiles-py" title="Permalink to this headline">¶</a></h2>
+<p>Prints out what&#8217;s missing, based on noncontiguous date ranges</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Maybe works, maybe not</p>
+</div>
+</div>
+<div class="section" id="possibleproblemdates-py">
+<h2>possibleProblemDates.py:<a class="headerlink" href="#possibleproblemdates-py" title="Permalink to this headline">¶</a></h2>
+<p>A database scrub/validation routine.</p>
+<dl class="option">
+<dt id="cmdoption-possibleProblemDates-m">
+<span id="cmdoption-possibleProblemDates--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-possibleProblemDates-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-possibleProblemDates--fix">
+<code class="descname">--fix</code><code class="descclassname"> Fix the issues (make a backup first)</code><a class="headerlink" href="#cmdoption-possibleProblemDates--fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-possibleProblemDates--echo">
+<code class="descname">--echo</code><code class="descclassname"> Echo sql queries for debugging</code><a class="headerlink" href="#cmdoption-possibleProblemDates--echo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Worth looking into and cleaning up a bit</p>
+</div>
+</div>
+<div class="section" id="printinfo-py">
+<h2>printInfo.py:<a class="headerlink" href="#printinfo-py" title="Permalink to this headline">¶</a></h2>
+<p>Prints a table of info about files or products or processes.</p>
+<dl class="option">
+<dt id="cmdoption-printInfo-arg-Database">
+<code class="descname">Database</code><code class="descclassname"> The name of the database to print table of</code><a class="headerlink" href="#cmdoption-printInfo-arg-Database" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-printInfo-arg-Field">
+<code class="descname">Field</code><code class="descclassname"> Either Product or Mission (more to come)</code><a class="headerlink" href="#cmdoption-printInfo-arg-Field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="printprocessqueue-py">
+<h2>printProcessQueue.py:<a class="headerlink" href="#printprocessqueue-py" title="Permalink to this headline">¶</a></h2>
+<p>Prints the process queue.</p>
+<dl class="option">
+<dt id="cmdoption-printProcessQueue-arg-Database">
+<code class="descname">Database</code><code class="descclassname"> The name of the database to print the queue of</code><a class="headerlink" href="#cmdoption-printProcessQueue-arg-Database" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-printProcessQueue-o">
+<span id="cmdoption-printProcessQueue--output"></span><span id="cmdoption-printProcessQueue-arg-print"></span><code class="descname">-o</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--output</code><code class="descclassname"> The name of the file to output to(if blank</code><code class="descclassname">, </code><code class="descname">print</code><code class="descclassname"> to stdout)</code><a class="headerlink" href="#cmdoption-printProcessQueue-o" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-printProcessQueue--html">
+<code class="descname">--html</code><code class="descclassname"> Output in HTML</code><a class="headerlink" href="#cmdoption-printProcessQueue--html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="processqueue-py">
+<h2>ProcessQueue.py:<a class="headerlink" href="#processqueue-py" title="Permalink to this headline">¶</a></h2>
+<p>The main thing</p>
+</div>
+<div class="section" id="purgefilefromdb-py">
+<h2>purgeFileFromDB.py:<a class="headerlink" href="#purgefilefromdb-py" title="Permalink to this headline">¶</a></h2>
+<p>Deletes individual files from the database.</p>
+<dl class="option">
+<dt id="cmdoption-purgeFileFromDB-m">
+<span id="cmdoption-purgeFileFromDB--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-purgeFileFromDB-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-purgeFileFromDB-r">
+<span id="cmdoption-purgeFileFromDB--recursive"></span><code class="descname">-r</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--recursive</code><code class="descclassname"> Recursive removal</code><a class="headerlink" href="#cmdoption-purgeFileFromDB-r" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="reprocessbyall-py">
+<h2>reprocessByAll.py:<a class="headerlink" href="#reprocessbyall-py" title="Permalink to this headline">¶</a></h2>
+<p>Goes through the database and adds all the files that are a certain level to the processqueue so that the next ProcessQueue -p will run them</p>
+<dl class="option">
+<dt id="cmdoption-reprocessByAll-s">
+<span id="cmdoption-reprocessByAll--startDate"></span><code class="descname">-s</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--startDate</code><code class="descclassname"> &lt;date&gt; Date to start reprocessing (e.g. 2012-10-02)</code><a class="headerlink" href="#cmdoption-reprocessByAll-s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByAll-e">
+<span id="cmdoption-reprocessByAll--endDate"></span><code class="descname">-e</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--endDate</code><code class="descclassname"> &lt;date&gt; Date to end reprocessing (e.g. 2012-10-25)</code><a class="headerlink" href="#cmdoption-reprocessByAll-e" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByAll-l">
+<span id="cmdoption-reprocessByAll--level"></span><code class="descname">-l</code><code class="descclassname"> &lt;level&gt;</code><code class="descclassname">, </code><code class="descname">--level</code><code class="descclassname"> &lt;level&gt; The level to reprocess for</code><a class="headerlink" href="#cmdoption-reprocessByAll-l" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByAll-m">
+<span id="cmdoption-reprocessByAll--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-reprocessByAll-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Should work, probably doesn&#8217;t</p>
+</div>
+</div>
+<div class="section" id="reprocessbycode-py">
+<h2>reprocessByCode.py:<a class="headerlink" href="#reprocessbycode-py" title="Permalink to this headline">¶</a></h2>
+<p>Goes through the database and adds all the files that went into the code to the processqueue so that the next ProcessQueue -p will run them</p>
+<dl class="option">
+<dt id="cmdoption-reprocessByCode-arg-codeID">
+<code class="descname">codeID</code><code class="descclassname"> code to reprocess for</code><a class="headerlink" href="#cmdoption-reprocessByCode-arg-codeID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByCode-s">
+<span id="cmdoption-reprocessByCode--startDate"></span><code class="descname">-s</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--startDate</code><code class="descclassname"> &lt;date&gt; Date to start reprocessing (e.g. 2012-10-02)</code><a class="headerlink" href="#cmdoption-reprocessByCode-s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByCode-e">
+<span id="cmdoption-reprocessByCode--endDate"></span><code class="descname">-e</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--endDate</code><code class="descclassname"> &lt;date&gt; Date to end reprocessing (e.g. 2012-10-25)</code><a class="headerlink" href="#cmdoption-reprocessByCode-e" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByCode-m">
+<span id="cmdoption-reprocessByCode--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-reprocessByCode-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByCode--force">
+<code class="descname">--force</code><code class="descclassname"> Force the reprocessing. Speicify which version number to increment (1,2,3)</code><a class="headerlink" href="#cmdoption-reprocessByCode--force" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Should work, probably doesn&#8217;t</p>
+</div>
+</div>
+<div class="section" id="reprocessbydate-py">
+<h2>reprocessByDate.py:<a class="headerlink" href="#reprocessbydate-py" title="Permalink to this headline">¶</a></h2>
+<p>Goes through the database and adds all the files that are in a date range to the processqueue so that the next ProcessQueue -p will run them</p>
+<dl class="option">
+<dt id="cmdoption-reprocessByDate-s">
+<span id="cmdoption-reprocessByDate--startDate"></span><code class="descname">-s</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--startDate</code><code class="descclassname"> &lt;date&gt; Date to start reprocessing (e.g. 2012-10-02)</code><a class="headerlink" href="#cmdoption-reprocessByDate-s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByDate-e">
+<span id="cmdoption-reprocessByDate--endDate"></span><code class="descname">-e</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--endDate</code><code class="descclassname"> &lt;date&gt; Date to end reprocessing (e.g. 2012-10-25)</code><a class="headerlink" href="#cmdoption-reprocessByDate-e" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByDate-m">
+<span id="cmdoption-reprocessByDate--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-reprocessByDate-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByDate--echo">
+<code class="descname">--echo</code><code class="descclassname"> Echo sql queries for debugging</code><a class="headerlink" href="#cmdoption-reprocessByDate--echo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByDate--force">
+<code class="descname">--force</code><code class="descclassname"> Force the reprocessing. Speicify which version number to increment (1,2,3)</code><a class="headerlink" href="#cmdoption-reprocessByDate--force" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="reprocessbyinstrument-py">
+<h2>reprocessByInstrument.py:<a class="headerlink" href="#reprocessbyinstrument-py" title="Permalink to this headline">¶</a></h2>
+<p>Goes through the database and adds all the files that are a certain instrument and level to the processqueue so that the next ProcessQueue -p will run them</p>
+<dl class="option">
+<dt id="cmdoption-reprocessByInstrument-s">
+<span id="cmdoption-reprocessByInstrument--startDate"></span><code class="descname">-s</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--startDate</code><code class="descclassname"> &lt;date&gt; Date to start reprocessing (e.g. 2012-10-02)</code><a class="headerlink" href="#cmdoption-reprocessByInstrument-s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByInstrument-e">
+<span id="cmdoption-reprocessByInstrument--endDate"></span><code class="descname">-e</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--endDate</code><code class="descclassname"> &lt;date&gt; Date to end reprocessing (e.g. 2012-10-25)</code><a class="headerlink" href="#cmdoption-reprocessByInstrument-e" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByInstrument-m">
+<span id="cmdoption-reprocessByInstrument--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-reprocessByInstrument-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByInstrument-l">
+<span id="cmdoption-reprocessByInstrument--level"></span><code class="descname">-l</code><code class="descclassname"> &lt;level&gt;</code><code class="descclassname">, </code><code class="descname">--level</code><code class="descclassname"> &lt;level&gt; The level to reprocess for the given instrument</code><a class="headerlink" href="#cmdoption-reprocessByInstrument-l" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByInstrument--echo">
+<code class="descname">--echo</code><code class="descclassname"> Echo sql queries for debugging</code><a class="headerlink" href="#cmdoption-reprocessByInstrument--echo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByInstrument--force">
+<code class="descname">--force</code><code class="descclassname"> Force the reprocessing. Specify which version number to increment (1,2,3)</code><a class="headerlink" href="#cmdoption-reprocessByInstrument--force" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="reprocessbyproduct-py">
+<h2>reprocessByProduct.py:<a class="headerlink" href="#reprocessbyproduct-py" title="Permalink to this headline">¶</a></h2>
+<p>Goes through the database and adds all the files that are a certain product and put then to the processqueue so that the next ProcessQueue -p will run them</p>
+<dl class="option">
+<dt id="cmdoption-reprocessByProduct.-s">
+<span id="cmdoption-reprocessByProduct.--startDate"></span><code class="descname">-s</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--startDate</code><code class="descclassname"> &lt;date&gt; Date to start reprocessing (e.g. 2012-10-02)</code><a class="headerlink" href="#cmdoption-reprocessByProduct.-s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByProduct.-e">
+<span id="cmdoption-reprocessByProduct.--endDate"></span><code class="descname">-e</code><code class="descclassname"> &lt;date&gt;</code><code class="descclassname">, </code><code class="descname">--endDate</code><code class="descclassname"> &lt;date&gt; Date to end reprocessing (e.g. 2012-10-25)</code><a class="headerlink" href="#cmdoption-reprocessByProduct.-e" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByProduct.-m">
+<span id="cmdoption-reprocessByProduct.--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-reprocessByProduct.-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByProduct.--echo">
+<code class="descname">--echo</code><code class="descclassname"> Echo sql queries for debugging</code><a class="headerlink" href="#cmdoption-reprocessByProduct.--echo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-reprocessByProduct.--force">
+<code class="descname">--force</code><code class="descclassname"> Force the reprocessing. Specify which version number to increment (1,2,3)</code><a class="headerlink" href="#cmdoption-reprocessByProduct.--force" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="updatecode-py">
+<h2>updateCode.py:<a class="headerlink" href="#updatecode-py" title="Permalink to this headline">¶</a></h2>
+<p>New version of code, rerun based on that, better done through config files (although can&#8217;t be done that way) and then run reprocessByCode</p>
+</div>
+<div class="section" id="updateproducts-py">
+<h2>updateProducts.py:<a class="headerlink" href="#updateproducts-py" title="Permalink to this headline">¶</a></h2>
+<p>probably broken</p>
+</div>
+<div class="section" id="updateshasum-py">
+<h2>updateSHAsum.py:<a class="headerlink" href="#updateshasum-py" title="Permalink to this headline">¶</a></h2>
+<p>Goes into the database and update the shasum entry for a file that is changed after ingestion.</p>
+<dl class="option">
+<dt id="cmdoption-updateSHAsum-arg-infile">
+<code class="descname">infile</code><code class="descclassname"> File to update the shasum of</code><a class="headerlink" href="#cmdoption-updateSHAsum-arg-infile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-updateSHAsum-m">
+<span id="cmdoption-updateSHAsum--mission"></span><code class="descname">-m</code><code class="descclassname"> &lt;dbname&gt;</code><code class="descclassname">, </code><code class="descname">--mission</code><code class="descclassname"> &lt;dbname&gt; Selected mission database</code><a class="headerlink" href="#cmdoption-updateSHAsum-m" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="weeklyreport-py">
+<h2>weeklyReport.py:<a class="headerlink" href="#weeklyreport-py" title="Permalink to this headline">¶</a></h2>
+<p>unused, probably broken, delete</p>
+</div>
+<div class="section" id="writedbhtml-py">
+<h2>writeDBhtml.py:<a class="headerlink" href="#writedbhtml-py" title="Permalink to this headline">¶</a></h2>
+<p>unused, probably broken, delete</p>
+</div>
+<div class="section" id="writeprocessconf-py">
+<h2>writeProcessConf.py:<a class="headerlink" href="#writeprocessconf-py" title="Permalink to this headline">¶</a></h2>
+<p>probably not used</p>
+</div>
+<div class="section" id="writeproductsconf-py">
+<h2>writeProductsConf.py:<a class="headerlink" href="#writeproductsconf-py" title="Permalink to this headline">¶</a></h2>
+<p>probably not used</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ConfigurationFiles.html" title="Configuration Files"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="developer/todo.html" title="Todo"
+             >previous</a> |</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+       <li><a href="index.html">top</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dbprocessing.Utils &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+       <li><a href="../../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dbprocessing.Utils</h1><div class="highlight"><pre>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Class to hold random utilities of use throughout this code</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">ConfigParser</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">configparser</span> <span class="kn">as</span> <span class="nn">ConfigParser</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">dateutil.rrule</span>  <span class="c1"># do this long so where it is from is remembered</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Version</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">str_classes</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">str_classes</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">datetimeToDate</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    given an input datetime.datetime or datetime.date return a datetime.date </span>
+<span class="sd">    </span>
+<span class="sd">    :param dt: input to convert </span>
+<span class="sd">    :type dt: datetime.datetime or datetime.date</span>
+<span class="sd">    :return: datetime.date</span>
+<span class="sd">    :rtype: datetime.date</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="s1">&#39;minute&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dt</span>
+
+
+<span class="k">def</span> <span class="nf">toDatetime</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a date, date string, or datetime to a datetime</span>
+
+<span class="sd">    If a time is provided, passed through; otherwise set to start/end</span>
+<span class="sd">    of day.</span>
+
+<span class="sd">    :param dt: input to convert</span>
+<span class="sd">    :type dt: datetime.datetime, datetime.date, or str</span>
+<span class="sd">    :param bool end: If input has no time, set to end of day</span>
+<span class="sd">                     (default to start of day)</span>
+<span class="sd">    :return: datetime.date</span>
+<span class="sd">    :rtype: datetime.date</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="s1">&#39;hour&#39;</span><span class="p">):</span> <span class="c1"># Already datetime</span>
+        <span class="k">return</span> <span class="n">dt</span> <span class="c1"># Already datetime</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span> \
+         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">str_classes</span><span class="p">)</span> \
+         <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="o">*</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()[:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">end</span><span class="p">:</span> <span class="c1"># Last representable time in Python</span>
+        <span class="n">dt</span> <span class="o">+=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">86399</span><span class="p">,</span> <span class="n">microseconds</span><span class="o">=</span><span class="mi">999999</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dt</span>
+
+
+<span class="k">def</span> <span class="nf">dateForPrinting</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">microseconds</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">brackets</span><span class="o">=</span><span class="s1">&#39;[]&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a string of the date format for printing on the screen, if dt is None return now.</span>
+
+<span class="sd">    :param dt: The datetime object to format, defaults to now()</span>
+<span class="sd">    :type dt: datetime.datetime</span>
+<span class="sd">    :param microseconds: Should the microseconds be included, default False</span>
+<span class="sd">    :type microseconds : bool</span>
+<span class="sd">    :param brackets: Which brackets to encase the time in, default (&#39;[&#39;, &#39;]&#39;)</span>
+<span class="sd">    :type brackets : str</span>
+
+<span class="sd">    :return: Iso formatted string</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :example:</span>
+
+<span class="sd">    &gt;&gt;&gt; from dbprocessing.Utils import dateForPrinting</span>
+<span class="sd">    &gt;&gt;&gt; print(&quot;{0} Something occurred&quot;.format(dateForPrinting()))</span>
+<span class="sd">    [2016-03-22T10:51:45]  Something occurred</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">microseconds</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">brackets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="o">+</span> <span class="n">brackets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="progressbar"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.progressbar.html#dbprocessing.Utils.progressbar">[docs]</a><span class="k">def</span> <span class="nf">progressbar</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">blocksize</span><span class="p">,</span> <span class="n">totalsize</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Download Progress&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print a progress bar with urllib.urlretrieve reporthook functionality</span>
+<span class="sd">    Taken from spacepy</span>
+
+<span class="sd">    :param count: The current count of the progressbar</span>
+<span class="sd">    :type count: float</span>
+<span class="sd">    :param blocksize: The size of each block (mostly useful for file downloads)</span>
+<span class="sd">    :type blocksize: float</span>
+<span class="sd">    :param totalsize: The total size of the job, progress is count*blocksize*100/totalsize</span>
+<span class="sd">    :type totalsize: float</span>
+<span class="sd">    :param text: The text to print in the progressbar, optional</span>
+<span class="sd">    :type text: str</span>
+
+<span class="sd">    :example:</span>
+
+<span class="sd">    &gt;&gt;&gt; import spacepy.toolbox as tb</span>
+<span class="sd">    &gt;&gt;&gt; import urllib</span>
+<span class="sd">    &gt;&gt;&gt; urllib.urlretrieve(config[&#39;psddata_url&#39;], PSDdata_fname, reporthook=tb.progressbar)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">percent</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">count</span> <span class="o">*</span> <span class="n">blocksize</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">/</span> <span class="n">totalsize</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">text</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;...</span><span class="si">%d%%</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">percent</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">percent</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="chunker"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.chunker.html#dbprocessing.Utils.chunker">[docs]</a><span class="k">def</span> <span class="nf">chunker</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a long iterable in a tuple of shorter lists.</span>
+<span class="sd">    Taken from http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks</span>
+
+<span class="sd">    :param seq: Iterable to split up</span>
+<span class="sd">    :type seq: iterable</span>
+<span class="sd">    :param size: Size of each split in the output, last one has the remaining elements of `seq`</span>
+<span class="sd">    :type size: int</span>
+
+<span class="sd">    :return: A tuple of lists of the iterable `seq` split into len(seq)/`size` segments</span>
+<span class="sd">    :rtype: tuple</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="n">size</span><span class="p">]</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">),</span> <span class="n">size</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="unique"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.unique.html#dbprocessing.Utils.unique">[docs]</a><span class="k">def</span> <span class="nf">unique</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take a list and return only the unique elements in the same order</span>
+
+<span class="sd">    :param seq: List to return the unique elements of</span>
+<span class="sd">    :type seq: list</span>
+
+<span class="sd">    :return: List with only the unique elements</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">seen_add</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">add</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">seq</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">seen_add</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="expandDates"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.expandDates.html#dbprocessing.Utils.expandDates">[docs]</a><span class="k">def</span> <span class="nf">expandDates</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">stop_time</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a start and a stop date make all the dates in between, inclusive on the ends</span>
+
+<span class="sd">    :param start_time: Date to start the list</span>
+<span class="sd">    :type start_time: datetime.datetime</span>
+<span class="sd">    :param stop_time: Date to end the list, inclusive</span>
+<span class="sd">    :type stop_time: datetime.datetime</span>
+
+<span class="sd">    :return: All the dates between start_time and stop_time</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">rrule</span><span class="o">.</span><span class="n">rrule</span><span class="p">(</span><span class="n">dateutil</span><span class="o">.</span><span class="n">rrule</span><span class="o">.</span><span class="n">DAILY</span><span class="p">,</span> <span class="n">dtstart</span><span class="o">=</span><span class="n">start_time</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="n">stop_time</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="daterange_to_dates"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.daterange_to_dates.html#dbprocessing.Utils.daterange_to_dates">[docs]</a><span class="k">def</span> <span class="nf">daterange_to_dates</span><span class="p">(</span><span class="n">daterange</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a daterange return the date objects for all days in the range</span>
+
+<span class="sd">    :param seq: Start and stop dates</span>
+<span class="sd">    :type seq: iterable of datetime.datetime</span>
+
+<span class="sd">    :return: All the dates between daterange[0] and daterange[1]</span>
+<span class="sd">    :rype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">daterange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span>
+            <span class="nb">xrange</span><span class="p">((</span><span class="n">daterange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">daterange</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="parseDate"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.parseDate.html#dbprocessing.Utils.parseDate">[docs]</a><span class="k">def</span> <span class="nf">parseDate</span><span class="p">(</span><span class="n">inval</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a date of the for yyyy-mm-dd parse to a datetime.</span>
+<span class="sd">    This is just a wrapper around datetime.datetime.strptime</span>
+<span class="sd">    If the format is wrong ValueError is raised. </span>
+
+<span class="sd">    :param inval: String date representation of the form YYYY-MM-DD</span>
+<span class="sd">    :type inval: str</span>
+
+<span class="sd">    :return: datetime object parsed from the string</span>
+<span class="sd">    :rtype: datetime.datetime</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">inval</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parseVersion"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.parseVersion.html#dbprocessing.Utils.parseVersion">[docs]</a><span class="k">def</span> <span class="nf">parseVersion</span><span class="p">(</span><span class="n">inval</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a format of the form x.y.z parse to a Version, this is a wrapper</span>
+<span class="sd">    around Version.Version.fromString()</span>
+
+<span class="sd">    :param inval: String Version representation of the form xx.yy.zz</span>
+<span class="sd">    :type inval: str</span>
+
+<span class="sd">    :returns: Version object parsed form the string</span>
+<span class="sd">    :rtype: Version.Version</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Version</span><span class="o">.</span><span class="n">Version</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">inval</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="flatten"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.flatten.html#dbprocessing.Utils.flatten">[docs]</a><span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Flatten an irregularly nested list of lists</span>
+<span class="sd">    Taken from http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python</span>
+
+<span class="sd">    :param l: Nested list of lists to flatten</span>
+<span class="sd">    :type l: list</span>
+
+<span class="sd">    :return: Flattened list</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Iterable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">el</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">sub</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">el</span></div>
+
+
+<div class="viewcode-block" id="toBool"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.toBool.html#dbprocessing.Utils.toBool">[docs]</a><span class="k">def</span> <span class="nf">toBool</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns true if passed &#39;True&#39;, &#39;true&#39;, True, 1, &#39;Yes&#39;, &#39;yes&#39;, &#39;Y&#39;, or &#39;y&#39;</span>
+
+<span class="sd">    :param value: Value to evaluate if true</span>
+<span class="sd">    :type value: any</span>
+
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="toNone"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.toNone.html#dbprocessing.Utils.toNone">[docs]</a><span class="k">def</span> <span class="nf">toNone</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns None if passed &#39;&#39;, &#39;None&#39;, &#39;none&#39;, or &#39;NONE</span>
+
+<span class="sd">    :param value: Value to evaluate if none</span>
+<span class="sd">    :type value: any</span>
+<span class="sd">    </span>
+<span class="sd">    :rtype: None or same type as value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="s1">&#39;NONE&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="strargs_to_args"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.strargs_to_args.html#dbprocessing.Utils.strargs_to_args">[docs]</a><span class="k">def</span> <span class="nf">strargs_to_args</span><span class="p">(</span><span class="n">strargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read in the arguments string from the db and change to a dict</span>
+
+<span class="sd">    :param strargs: A string of arguments(&quot;foo=bar baz=qux&quot;)</span>
+<span class="sd">    :type strargs: str</span>
+
+<span class="sd">    :return: A dictionary of the arugments are their values</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">strargs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strargs</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>  <span class="c1"># we have multiple to deal with</span>
+        <span class="c1"># TODO why was this needed?</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">strargs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="n">strargs_to_args</span><span class="p">(</span><span class="n">strargs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">kwargs</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">strargs</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">strargs_to_args</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">kwargs</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">strargs</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>  <span class="c1"># it was None</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="dirSubs"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.dirSubs.html#dbprocessing.Utils.dirSubs">[docs]</a><span class="k">def</span> <span class="nf">dirSubs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="p">,</span> <span class="n">utc_start_time</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">dbu</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Do any substitutions that are needed to put thing in the right place</span>
+<span class="sd">    Honored substitutions used as {Y}{PRODUCT}{DATE}</span>
+
+<span class="sd">    .. todo:: This may be useless/could be made more useful</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        Valid subsitutions are:</span>
+<span class="sd">            * Y: 4 digit year   </span>
+<span class="sd">            * m: 2 digit month  </span>
+<span class="sd">            * b: 3 character month (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)  </span>
+<span class="sd">            * d: 2 digit day</span>
+<span class="sd">            * y: 2 digit year</span>
+<span class="sd">            * j: 3 digit day of year</span>
+<span class="sd">            * H: 2 digit hour (24-hour time)</span>
+<span class="sd">            * M: 2 digit minute</span>
+<span class="sd">            * S: 2 digit second</span>
+<span class="sd">            * VERSION: version string, interface.quality.revision</span>
+<span class="sd">            * DATE: the UTC date from a file, same as Ymd</span>
+<span class="sd">            * MISSION: the mission name from the db</span>
+<span class="sd">            * SPACECRAFT: the spacecraft name from the db</span>
+<span class="sd">            * PRODUCT: the product name from the db</span>
+<span class="sd">    </span>
+<span class="sd">    :param path: Path to the file</span>
+<span class="sd">    :type path: str</span>
+
+<span class="sd">    :param filename: Name of the time</span>
+<span class="sd">    :type filename: str</span>
+
+<span class="sd">    :param utc_file_date: File&#39;s date</span>
+<span class="sd">    :type utc_file_date: datetime.datetime</span>
+
+<span class="sd">    :param utc_start_time: File&#39;s start time</span>
+<span class="sd">    :type utc_start_time: datetime.datetime</span>
+
+<span class="sd">    :param version:</span>
+<span class="sd">    :type version: :class:`.Version`</span>
+
+<span class="sd">    :param dbu: Pass in the current :class:`.DButils` session so that a new connection is not made</span>
+<span class="sd">    :type dbu: :class:`.DButils`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;{INSTRUMENT}&#39;</span> <span class="ow">in</span> <span class="n">path</span> <span class="ow">or</span> <span class="s1">&#39;{SATELLITE}&#39;</span> <span class="ow">in</span> <span class="n">path</span> <span class="ow">or</span> <span class="s1">&#39;{SPACECRAFT}&#39;</span> <span class="ow">in</span> <span class="n">path</span> <span class="ow">or</span> <span class="s1">&#39;{MISSION}&#39;</span> <span class="ow">in</span> <span class="n">path</span> <span class="ow">or</span> <span class="s1">&#39;{PRODUCT}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">ftb</span> <span class="o">=</span> <span class="n">dbu</span><span class="o">.</span><span class="n">getTraceback</span><span class="p">(</span><span class="s1">&#39;File&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;{INSTRUMENT}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>  <span class="c1"># need to replace with the instrument name</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{INSTRUMENT}&#39;</span><span class="p">,</span> <span class="n">ftb</span><span class="p">[</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">instrument_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;{SATELLITE}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>  <span class="c1"># need to replace with the instrument name</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{SATELLITE}&#39;</span><span class="p">,</span> <span class="n">ftb</span><span class="p">[</span><span class="s1">&#39;satellite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">satellite_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;{SPACECRAFT}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>  <span class="c1"># need to replace with the instrument name</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{SPACECRAFT}&#39;</span><span class="p">,</span> <span class="n">ftb</span><span class="p">[</span><span class="s1">&#39;satellite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">satellite_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;{MISSION}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{MISSION}&#39;</span><span class="p">,</span> <span class="n">ftb</span><span class="p">[</span><span class="s1">&#39;mission&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mission_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;{PRODUCT}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{PRODUCT}&#39;</span><span class="p">,</span> <span class="n">ftb</span><span class="p">[</span><span class="s1">&#39;product&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">product_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;{Y}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{Y}&#39;</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;{m}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{m}&#39;</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%m&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;{d}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{d}&#39;</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;{b}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">months</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;Jan&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;Feb&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;Mar&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;Apr&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;May&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="s1">&#39;Jun&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="s1">&#39;Jul&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="s1">&#39;Aug&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="s1">&#39;Sep&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span> <span class="s1">&#39;Oct&#39;</span><span class="p">,</span>
+                   <span class="mi">11</span><span class="p">:</span> <span class="s1">&#39;Nov&#39;</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="s1">&#39;Dec&#39;</span> <span class="p">}</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{b}&#39;</span><span class="p">,</span> <span class="n">months</span><span class="p">[</span><span class="n">utc_file_date</span><span class="o">.</span><span class="n">month</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s1">&#39;{y}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{y}&#39;</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;{j}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{j}&#39;</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%j&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;{H}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{H}&#39;</span><span class="p">,</span> <span class="n">utc_start_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;{M}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{M}&#39;</span><span class="p">,</span> <span class="n">utc_start_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%M&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;{S}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{S}&#39;</span><span class="p">,</span> <span class="n">utc_start_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%S&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;{VERSION}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="p">(</span><span class="nb">unicode</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="n">Version</span><span class="o">.</span><span class="n">Version</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{VERSION}&#39;</span><span class="p">,</span> <span class="s1">&#39;{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="s1">&#39;{DATE}&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;{DATE}&#39;</span><span class="p">,</span> <span class="n">utc_file_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+<div class="viewcode-block" id="split_code_args"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.split_code_args.html#dbprocessing.Utils.split_code_args">[docs]</a><span class="k">def</span> <span class="nf">split_code_args</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Split a string with a bunch of command line arguments into a list</span>
+<span class="sd">    as needed by Popen</span>
+
+<span class="sd">    This is different thatn just split() since we have to keep options</span>
+<span class="sd">    together with the flags</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    :example:</span>
+
+<span class="sd">    &gt;&gt;&gt; split_code_args(&quot;code -n hello outfile&quot;)</span>
+<span class="sd">    [code, -n hello, outfile]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># just do the spit</span>
+    <span class="n">ans</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="c1"># loop through and see if an index has just a -x (any letter)</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ans</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">r&#39;\-\S&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>  <span class="c1"># found a single letter option</span>
+            <span class="n">ans</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">ans</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">ans</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">ans</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">ans</span></div>
+
+
+<div class="viewcode-block" id="processRunning"><a class="viewcode-back" href="../../autosummary/dbprocessing.Utils.processRunning.html#dbprocessing.Utils.processRunning">[docs]</a><span class="k">def</span> <span class="nf">processRunning</span><span class="p">(</span><span class="n">pid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a PID see if it is currently running. Taken from from http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python</span>
+
+<span class="sd">    :param pid: a pid</span>
+<span class="sd">    :type pid: long</span>
+
+<span class="sd">    :return: True if pid is running, False otherwise</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+
+<span class="k">def</span> <span class="nf">readconfig</span><span class="p">(</span><span class="n">config_filepath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a ConfigParser object, to read the config file</span>
+
+<span class="sd">    :param config_filepath: full path to the config file</span>
+<span class="sd">    :type config_filepath: str</span>
+<span class="sd">    :return: Dictionary of key value pairs from config files</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">SafeConfigParser</span><span class="p">()</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config_filepath</span><span class="p">)</span>
+    <span class="n">sections</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">sections</span><span class="p">()</span>
+    <span class="c1"># Read each parameter in turn</span>
+    <span class="n">ans</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
+    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+        <span class="n">ans</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">section</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ans</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+       <li><a href="../../index.html">top</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

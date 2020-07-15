@@ -1,0 +1,424 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configuration Files &mdash; dbprocessing NMC_1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'NMC_1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <link rel="top" title="dbprocessing NMC_1 documentation" href="index.html" />
+    <link rel="next" title="dbprocessing Code of Conduct" href="CODE_OF_CONDUCT.html" />
+    <link rel="prev" title="dbprocessing Scripts" href="scripts.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="CODE_OF_CONDUCT.html" title="dbprocessing Code of Conduct"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="scripts.html" title="dbprocessing Scripts"
+             accesskey="P">previous</a> |</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+       <li><a href="index.html">top</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuration Files</a><ul>
+<li><a class="reference internal" href="#basics">Basics</a></li>
+<li><a class="reference internal" href="#coverageplot-py">coveragePlot.py</a></li>
+<li><a class="reference internal" href="#addfromconfig-py">addFromConfig.py</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="scripts.html"
+                        title="previous chapter">dbprocessing Scripts</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="CODE_OF_CONDUCT.html"
+                        title="next chapter">dbprocessing Code of Conduct</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ConfigurationFiles.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration-files">
+<h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
+<p>Configuration files in this project are INI files. The configuration file consists of sections,
+led by a [section] header and followed by name=value properties.</p>
+<p>Note that leading whitespace is removed from values.
+The optional values can contain format strings which refer to other values in the same section,
+or values in a special DEFAULT section. Additional defaults can be provided on initialization
+and retrieval.</p>
+<p>Note that leading whitespace is removed from values. Configuration files may include comments,
+prefixed by &#8216;#&#8217; or &#8216;;&#8217;. Comments may appear on their own in an otherwise empty line, or may be
+entered in lines holding values or section names. In the latter case, they need to be preceded
+by a whitespace character to be recognized as a comment. (For backwards compatibility, only ;
+starts an inline comment, while # does not.)</p>
+</div>
+<div class="section" id="coverageplot-py">
+<h2>coveragePlot.py<a class="headerlink" href="#coverageplot-py" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1">#############################</span>
+<span class="c1"># sample config file</span>
+<span class="c1">#############################</span>
+<span class="c1">## ##################</span>
+<span class="c1">## # Substitutions</span>
+<span class="c1">## # {TODAY}</span>
+<span class="c1">## # {N DAYS}  -&gt; add N days to the previous where N is an int</span>
+
+
+<span class="c1">## ##################</span>
+<span class="c1">## # Required elements</span>
+
+<span class="k">[settings]</span>
+<span class="na">mission</span> <span class="o">=</span> <span class="s">~/RBSP_MAGEIS.sqlite</span>
+<span class="na">outformat</span> <span class="o">=</span> <span class="s">pdf</span>
+<span class="na">filename_format</span> <span class="o">=</span> <span class="s">MagEIS_L3_Coverage_{TODAY}</span>
+<span class="na">startdate</span> <span class="o">=</span> <span class="s">20120901</span>
+<span class="na">enddate</span> <span class="o">=</span> <span class="s">{TODAY} + {7 DAYS}</span>
+
+
+<span class="c1">## ###############################################</span>
+<span class="c1">## # Plots</span>
+<span class="c1">## ###############################################</span>
+<span class="k">[panel]</span>
+<span class="c1">## # in the panel section we define what will be plotted</span>
+<span class="c1">## # N keys pf plotN define subplots</span>
+<span class="c1">## # daysperplot gives the days per plot that will be on each page</span>
+<span class="na">plot1</span> <span class="o">=</span> <span class="s">plot1</span>
+<span class="na">plot2</span> <span class="o">=</span> <span class="s">plot2</span>
+<span class="na">daysperplot</span> <span class="o">=</span> <span class="s">60</span>
+<span class="na">title</span> <span class="o">=</span> <span class="s">MagEIS L3 Coverage</span>
+<span class="na">preset</span> <span class="o">=</span> <span class="s">green</span>
+<span class="na">missing</span> <span class="o">=</span> <span class="s">red</span>
+<span class="na">expected</span> <span class="o">=</span> <span class="s">grey</span>
+
+<span class="c1">## [plot1]</span>
+<span class="c1">## # in the plot section rows are defined bottom up</span>
+<span class="c1">## # ylabel is what to put on the plot ylabel</span>
+<span class="c1">## # productN is the product to plot</span>
+<span class="c1">## # yticklabelN is what to call each product</span>
+<span class="c1">## # productN_glob is a glob that a file has to match in order to be valid</span>
+<span class="c1">## # productN_version is a minimum version allowed for files (e.g. 4.0.0)</span>
+<span class="na">ylabel</span> <span class="o">=</span> <span class="s">RBSP-A</span>
+<span class="na">product1</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageisLOW-L3</span>
+<span class="na">product2</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageisM35-L3</span>
+<span class="na">product3</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageisM75-L3</span>
+<span class="na">product4</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageisHIGH-L3</span>
+<span class="na">product5</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageis-L3</span>
+<span class="na">yticklabel1</span> <span class="o">=</span> <span class="s">LOW</span>
+<span class="na">yticklabel2</span> <span class="o">=</span> <span class="s">M35</span>
+<span class="na">yticklabel3</span> <span class="o">=</span> <span class="s">M75</span>
+<span class="na">yticklabel4</span> <span class="o">=</span> <span class="s">HIGH</span>
+<span class="na">yticklabel5</span> <span class="o">=</span> <span class="s">FULL</span>
+
+
+<span class="c1">## [plot2]</span>
+<span class="na">ylabel</span> <span class="o">=</span> <span class="s">RBSP-B</span>
+<span class="na">product1</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageisLOW-L3</span>
+<span class="na">product2</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageisM35-L3</span>
+<span class="na">product3</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageisM75-L3</span>
+<span class="na">product4</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageisHIGH-L3</span>
+<span class="na">product5</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageis-L3</span>
+<span class="na">yticklabel1</span> <span class="o">=</span> <span class="s">LOW</span>
+<span class="na">yticklabel2</span> <span class="o">=</span> <span class="s">M35</span>
+<span class="na">yticklabel3</span> <span class="o">=</span> <span class="s">M75</span>
+<span class="na">yticklabel4</span> <span class="o">=</span> <span class="s">HIGH</span>
+<span class="na">yticklabel5</span> <span class="o">=</span> <span class="s">FULL</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="addfromconfig-py">
+<h2>addFromConfig.py<a class="headerlink" href="#addfromconfig-py" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># Honored database substitutions used as {Y}{MILLI}{PRODUCT}</span>
+<span class="c1">#       Y: 4 digit year</span>
+<span class="c1">#       m: 2 digit month</span>
+<span class="c1">#       b: 3 character month (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)</span>
+<span class="c1">#       d: 2 digit day</span>
+<span class="c1">#       y: 2 digit year</span>
+<span class="c1">#       j: 3 digit day of year</span>
+<span class="c1">#       H: 2 digit hour (24-hour time)</span>
+<span class="c1">#       M: 2 digit minute</span>
+<span class="c1">#       S: 2 digit second</span>
+<span class="c1">#       MILLI: 3 digit millisecond</span>
+<span class="c1">#       MICRO: 3 digit microsecond</span>
+<span class="c1">#       QACODE: the QA code (ok|ignore|problem)</span>
+<span class="c1">#       VERSION: version string, interface.quality.revision</span>
+<span class="c1">#       DATE: the UTC date from a file, same as Ymd</span>
+<span class="c1">#       MISSION: the mission name from the db</span>
+<span class="c1">#       SPACECRAFT: the spacecraft name from the db</span>
+<span class="c1">#       PRODUCT: the product name from the db</span>
+
+
+<span class="c1">##########################</span>
+<span class="c1"># MANUAL</span>
+<span class="c1">#</span>
+<span class="c1"># Loops over the configuration file and if the DB does not have the mission,</span>
+<span class="c1"># satellite, instrument entries present they are added, skipped otherwise.</span>
+<span class="c1"># The product and process entries must be unique and not present.</span>
+<span class="c1">#</span>
+<span class="c1"># THERE IS CURRENTLY NO UPDATE IN THE DB BASED ON THIS CONFIG SCRIPT</span>
+
+
+<span class="c1">##################</span>
+<span class="c1"># Required elements</span>
+<span class="c1">#</span>
+<span class="c1"># [mission]  &lt;- once and only once with</span>
+<span class="c1">#   rootdir  (string)</span>
+<span class="c1">#   mission_name  (string)</span>
+<span class="c1">#   incoming_dir  (string)</span>
+<span class="c1"># [satellite] &lt;- once and only once with</span>
+<span class="c1">#   satellite_name  (string)</span>
+<span class="c1"># [instrument] &lt;- once and only once with</span>
+<span class="c1">#   instrument_name  (string)</span>
+<span class="c1">##### products and inspector are defined together since they are a one-to-one</span>
+<span class="c1"># [product] &lt;- multiple entries each starting with &quot;product&quot; then a unique identifer</span>
+<span class="c1">#   product_name  (string)</span>
+<span class="c1">#   relative_path  (string)</span>
+<span class="c1">#   level  (float)</span>
+<span class="c1">#   format  (string)</span>
+<span class="c1">#   product_description (string)</span>
+<span class="c1">#   inspector_filename (string)</span>
+<span class="c1">#   inspector_relative_path (string)</span>
+<span class="c1">#   inspector_description (string)</span>
+<span class="c1">#   inspector_version (version e.g. 1.0.0)</span>
+<span class="c1">#   inspector_output_interface (integer)</span>
+<span class="c1">#   inspector_active (Boolean e.g. True or 1 or False or 0)</span>
+<span class="c1">#   inspector_date_written (date e.g. 2013-07-12)</span>
+<span class="c1">#   inspector_newest_version  (Boolean e.g. True or 1 or False or 0)</span>
+<span class="c1">#   inspector_arguments (string)</span>
+<span class="c1">#### processes and codes operate on the names of the products, they can be in</span>
+<span class="c1">#### this config file or already in the db codes are one-to-one with processes</span>
+<span class="c1"># [process] &lt;- multiple entries each starting with &quot;process&quot; then a unique identifer</span>
+<span class="c1">#   process_name (string)</span>
+<span class="c1">#   output_product (string)  - identifer from section heading</span>
+<span class="c1">#   output_timebase  (string, FILE/DAILY/WEEKLY/MONTHLY/YEARLY)</span>
+<span class="c1">#   extra_params (string)</span>
+<span class="c1">## A collection of input names entered as such</span>
+<span class="c1">## the required portion is &quot;optional_input&quot; or &quot;required_input&quot; then some</span>
+<span class="c1">## unique identifer on the end</span>
+<span class="c1">#   optional_input1  (string) name of product - identifer from section heading</span>
+<span class="c1">#   optional_input2  (string) name of product - identifer from section heading</span>
+<span class="c1">#   optional_input3  (string) name of product - identifer from section heading</span>
+<span class="c1">#   required_input1  (string) name of product - identifer from section heading</span>
+<span class="c1">#   required_input2  (string) name of product - identifer from section heading</span>
+<span class="c1">#   required_input3  (string) name of product - identifer from section heading</span>
+<span class="c1">## code is entered as part of process</span>
+<span class="c1">#   code_filename (string)</span>
+<span class="c1">#   code_relative_path (string)</span>
+<span class="c1">#   code_start_date (date, 2000-01-01)</span>
+<span class="c1">#   code_stop_date  (date, 2050-12-31)</span>
+<span class="c1">#   code_description (string)</span>
+<span class="c1">#   code_version  (version e.g. 1.0.0)</span>
+<span class="c1">#   code_output_interface  (integer)</span>
+<span class="c1">#   code_active (Boolean e.g. True or 1 or False or 0)</span>
+<span class="c1">#   code_date_written   (date, 2050-12-31)</span>
+<span class="c1">#   code_newest_version (Boolean e.g. True or 1 or False or 0)</span>
+<span class="c1">#   code_arguments (string)</span>
+<span class="k">[mission]</span>
+<span class="na">mission_name</span> <span class="o">=</span> <span class="s">testDB</span>
+<span class="na">rootdir</span> <span class="o">=</span> <span class="s">/home/myles/dbprocessing/test_DB</span>
+<span class="na">incoming_dir</span> <span class="o">=</span> <span class="s">L0</span>
+
+<span class="k">[satellite]</span>
+<span class="na">satellite_name</span> <span class="o">=</span> <span class="s">{MISSION}-a</span>
+
+<span class="k">[instrument]</span>
+<span class="na">instrument_name</span> <span class="o">=</span> <span class="s">rot13</span>
+
+<span class="k">[product_input_first]</span>
+<span class="na">product_name</span> <span class="o">=</span> <span class="s">{MISSION}_rot13_L0_first</span>
+<span class="na">relative_path</span> <span class="o">=</span> <span class="s">L0</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">0.0</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">testDB_{nnn}_first.raw</span>
+<span class="na">product_description</span> <span class="o">=</span>
+<span class="na">inspector_filename</span> <span class="o">=</span> <span class="s">rot13_L0_first.py</span>
+<span class="na">inspector_relative_path</span> <span class="o">=</span> <span class="s">codes/inspectors</span>
+<span class="na">inspector_description</span> <span class="o">=</span> <span class="s">Level 0</span>
+<span class="na">inspector_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
+<span class="na">inspector_output_interface</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">inspector_active</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">inspector_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
+<span class="na">inspector_newest_version</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">inspector_arguments</span> <span class="o">=</span>
+
+<span class="k">[product_input_second]</span>
+<span class="na">product_name</span> <span class="o">=</span> <span class="s">{MISSION}_rot13_L0_second</span>
+<span class="na">relative_path</span> <span class="o">=</span> <span class="s">L0</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">0.0</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">testDB_{nnn}_sec.raw</span>
+<span class="na">product_description</span> <span class="o">=</span>
+<span class="na">inspector_filename</span> <span class="o">=</span> <span class="s">rot13_L0_second.py</span>
+<span class="na">inspector_relative_path</span> <span class="o">=</span> <span class="s">codes/inspectors</span>
+<span class="na">inspector_description</span> <span class="o">=</span> <span class="s">Level 0</span>
+<span class="na">inspector_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
+<span class="na">inspector_output_interface</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">inspector_active</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">inspector_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
+<span class="na">inspector_newest_version</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">inspector_arguments</span> <span class="o">=</span>
+
+<span class="k">[product_concat]</span>
+<span class="na">product_name</span> <span class="o">=</span> <span class="s">{MISSION}_rot13_L1</span>
+<span class="na">relative_path</span> <span class="o">=</span> <span class="s">L1</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">1.0</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">testDB_{nnn}.cat</span>
+<span class="na">product_description</span> <span class="o">=</span>
+<span class="na">inspector_filename</span> <span class="o">=</span> <span class="s">rot13_L1.py</span>
+<span class="na">inspector_relative_path</span> <span class="o">=</span> <span class="s">codes/inspectors</span>
+<span class="na">inspector_description</span> <span class="o">=</span> <span class="s">Level 1</span>
+<span class="na">inspector_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
+<span class="na">inspector_output_interface</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">inspector_active</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">inspector_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
+<span class="na">inspector_newest_version</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">inspector_arguments</span> <span class="o">=</span>
+
+<span class="k">[product_rot13]</span>
+<span class="na">product_name</span> <span class="o">=</span> <span class="s">{MISSION}_rot13_L2</span>
+<span class="na">relative_path</span> <span class="o">=</span> <span class="s">L2</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">2.0</span>
+<span class="na">format</span> <span class="o">=</span> <span class="s">testDB_{nnn}.rot</span>
+<span class="na">product_description</span> <span class="o">=</span>
+<span class="na">inspector_filename</span> <span class="o">=</span> <span class="s">rot13_L2.py</span>
+<span class="na">inspector_relative_path</span> <span class="o">=</span> <span class="s">codes/inspectors</span>
+<span class="na">inspector_description</span> <span class="o">=</span> <span class="s">Level 2</span>
+<span class="na">inspector_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
+<span class="na">inspector_output_interface</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">inspector_active</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">inspector_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
+<span class="na">inspector_newest_version</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">inspector_arguments</span> <span class="o">=</span>
+
+<span class="k">[process_rot13_L0-L1]</span>
+<span class="na">process_name</span> <span class="o">=</span> <span class="s">rot_L0toL1</span>
+<span class="na">output_product</span> <span class="o">=</span> <span class="s">product_concat</span>
+<span class="na">output_timebase</span> <span class="o">=</span> <span class="s">FILE</span>
+<span class="na">extra_params</span> <span class="o">=</span>
+<span class="na">required_input1</span> <span class="o">=</span> <span class="s">product_input_first</span>
+<span class="na">required_input2</span> <span class="o">=</span> <span class="s">product_input_second</span>
+<span class="na">code_filename</span> <span class="o">=</span> <span class="s">run_rot13_L0toL1.py</span>
+<span class="na">code_relative_path</span> <span class="o">=</span> <span class="s">scripts</span>
+<span class="na">code_start_date</span> <span class="o">=</span> <span class="s">2010-09-01</span>
+<span class="na">code_stop_date</span> <span class="o">=</span> <span class="s">2020-01-01</span>
+<span class="na">code_description</span> <span class="o">=</span> <span class="s">Python L0-&gt;L1</span>
+<span class="na">code_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
+<span class="na">code_output_interface</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">code_active</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">code_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
+<span class="na">code_newest_version</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">code_arguments</span> <span class="o">=</span>
+<span class="na">code_cpu</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">code_ram</span> <span class="o">=</span> <span class="s">1</span>
+
+<span class="k">[process_rot13_L1-L2]</span>
+<span class="na">process_name</span> <span class="o">=</span> <span class="s">rot_L1toL2</span>
+<span class="na">output_product</span> <span class="o">=</span> <span class="s">product_rot13</span>
+<span class="na">output_timebase</span> <span class="o">=</span> <span class="s">FILE</span>
+<span class="na">extra_params</span> <span class="o">=</span>
+<span class="na">required_input1</span> <span class="o">=</span> <span class="s">product_concat</span>
+<span class="na">code_filename</span> <span class="o">=</span> <span class="s">run_rot13_L1toL2.py</span>
+<span class="na">code_relative_path</span> <span class="o">=</span> <span class="s">scripts</span>
+<span class="na">code_start_date</span> <span class="o">=</span> <span class="s">2010-09-01</span>
+<span class="na">code_stop_date</span> <span class="o">=</span> <span class="s">2020-01-01</span>
+<span class="na">code_description</span> <span class="o">=</span> <span class="s">Python L1-&gt;L2</span>
+<span class="na">code_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
+<span class="na">code_output_interface</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">code_active</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">code_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
+<span class="na">code_newest_version</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">code_arguments</span> <span class="o">=</span>
+<span class="na">code_cpu</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">code_ram</span> <span class="o">=</span> <span class="s">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="CODE_OF_CONDUCT.html" title="dbprocessing Code of Conduct"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="scripts.html" title="dbprocessing Scripts"
+             >previous</a> |</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+       <li><a href="index.html">top</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>
