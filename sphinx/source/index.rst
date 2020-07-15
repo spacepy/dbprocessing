@@ -3,7 +3,7 @@ dbprocessing
 .. toctree::
    :maxdepth: 1
 
-   developer
+   developer/index
    scripts
    ConfigurationFiles
 
