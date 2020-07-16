@@ -67,3 +67,13 @@ print('sqlalchemy={0}'.format(sqlalchemy.__version__))
 <!-- What version of dbprocessing are you using and where did you
 download it from?
 -->
+
+### Closure condition
+<!--
+What condition would indicate this issue is "complete" and should be closed?
+For instance, it might be appropriate to close when documentation is
+updated to address a lack of clarity, or when a bugfix and appropriate
+test are merged. This doesn't have to be set in stone; the dbprocessing
+team can help with the decision after the issue is opened.
+-->
+This issue should be closed when:
