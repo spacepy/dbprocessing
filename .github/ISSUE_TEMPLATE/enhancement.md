@@ -1,6 +1,7 @@
 ---
 name: Enhancement
 about: Use to request an enhancement to dbprocessing
+labels: enhancement
 ---
 
 <!-- 
