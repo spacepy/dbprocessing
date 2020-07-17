@@ -9,7 +9,7 @@ import unittest
 thisdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(
     thisdir, '..', 'scripts')))
-from addFromConfig import readconfig, _sectionCheck, _keysCheck, _keysRemoveExtra, _keysPresentCheck, _fileTest
+from addFromConfig import configCheck, readconfig, _sectionCheck, _keysCheck, _keysRemoveExtra, _keysPresentCheck, _fileTest
 
 class addFromConfig(unittest.TestCase):
     """Tests for addFromConfig script"""
@@ -163,6 +163,31 @@ class addFromConfig(unittest.TestCase):
     def test_fileTest_Invalid(self):
         self.assertRaises(ValueError, _fileTest, os.path.join(
             thisdir, 'testing_configs', 'testDB_duplicateSection.conf'))
+
+    def test_NoInputs(self):
+        """Create a process with no inputs"""
+        conf = readconfig('testing_configs/testDB_processNoInputs.conf')
+        self.assertEqual(
+            {'code_active': 'True',
+             'code_arguments': '',
+             'code_cpu': '1',
+             'code_date_written': '2016-05-31',
+             'code_description': 'Creates magic output',
+             'code_filename': 'create_output.py',
+             'code_newest_version': 'True',
+             'code_output_interface': '1',
+             'code_ram': '1',
+             'code_relative_path': 'scripts',
+             'code_start_date': '2010-09-01',
+             'code_stop_date': '2020-01-01',
+             'code_version': '1.0.0',
+             'extra_params': '',
+             'output_product': 'product_triggered_output',
+             'output_timebase': 'DAILY',
+             'process_name': 'no_input'
+            },
+            conf['process_no_input'])
+        configCheck(conf)
 
 if __name__ == "__main__":
     unittest.main()
