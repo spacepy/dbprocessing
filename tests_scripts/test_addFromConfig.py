@@ -60,7 +60,7 @@ class addFromConfig(unittest.TestCase):
                 'code_stop_date': '2020-01-01',
                 'code_filename': 'run_rot13_L1toL2.py',
                 'code_relative_path': 'scripts',
-                'required_input1': 'product_concat',
+                'required_input1': ('product_concat', 0, 0),
                 'code_version': '1.0.0',
                 'process_name': 'rot_L1toL2',
                 'code_output_interface': '1',
