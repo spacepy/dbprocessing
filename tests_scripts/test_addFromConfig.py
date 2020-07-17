@@ -10,12 +10,76 @@ from addFromConfig import readconfig, _sectionCheck, _keysCheck, _keysRemoveExtr
 class addFromConfig(unittest.TestCase):
     """Tests for addFromConfig script"""
 
+    longMessage = True
+    maxDiff = None
+
     def test_readconfig(self):
         """Does readconfig match the expected output"""
 
         conf = readconfig('testing_configs/testDB.conf')
         # Regression testing, just copy-pasted from the actual output
-        ans = {'satellite': {'satellite_name': '{MISSION}-a'}, 'product_concat': {'inspector_output_interface': '1', 'inspector_version': '1.0.0', 'inspector_arguments': '-q', 'format': 'testDB_{nnn}.cat', 'level': '1.0', 'product_description': '', 'relative_path': 'L1', 'inspector_newest_version': 'True', 'inspector_relative_path': 'codes/inspectors', 'inspector_date_written': '2016-05-31', 'inspector_filename': 'rot13_L1.py', 'inspector_description': 'Level 1', 'inspector_active': 'True', 'product_name': '{MISSION}_rot13_L1'}, 'product_rot13': {'inspector_output_interface': '1', 'inspector_version': '1.0.0', 'inspector_arguments': '-q', 'format': 'testDB_{nnn}.rot', 'level': '2.0', 'product_description': '', 'relative_path': 'L2', 'inspector_newest_version': 'True', 'inspector_relative_path': 'codes/inspectors', 'inspector_date_written': '2016-05-31', 'inspector_filename': 'rot13_L2.py', 'inspector_description': 'Level 2', 'inspector_active': 'True', 'product_name': '{MISSION}_rot13_L2'}, 'mission': {'incoming_dir': 'L0', 'rootdir': '/home/myles/dbprocessing/test_DB', 'mission_name': 'testDB'}, 'instrument': {'instrument_name': 'rot13'}, 'process_rot13_L1-L2': {'code_cpu': '1', 'code_start_date': '2010-09-01', 'code_stop_date': '2020-01-01', 'code_filename': 'run_rot13_L1toL2.py', 'code_relative_path': 'scripts', 'required_input1': 'product_concat', 'code_version': '1.0.0', 'process_name': 'rot_L1toL2', 'code_output_interface': '1', 'code_newest_version': 'True', 'code_date_written': '2016-05-31', 'code_description': 'Python L1->L2', 'output_product': 'product_rot13', 'code_active': 'True', 'code_arguments': '', 'extra_params': '', 'output_timebase': 'FILE', 'code_ram': '1'}}
+        ans = {
+            'satellite': {'satellite_name': '{MISSION}-a'},
+            'product_concat': {
+                'inspector_output_interface': '1',
+                'inspector_version': '1.0.0',
+                'inspector_arguments': '-q',
+                'format': 'testDB_{nnn}.cat',
+                'level': '1.0',
+                'product_description': '',
+                'relative_path': 'L1',
+                'inspector_newest_version': 'True',
+                'inspector_relative_path': 'codes/inspectors',
+                'inspector_date_written': '2016-05-31',
+                'inspector_filename': 'rot13_L1.py',
+                'inspector_description': 'Level 1',
+                'inspector_active': 'True',
+                'product_name': '{MISSION}_rot13_L1'},
+            'product_rot13': {
+                'inspector_output_interface': '1',
+                'inspector_version': '1.0.0',
+                'inspector_arguments': '-q',
+                'format': 'testDB_{nnn}.rot',
+                'level': '2.0',
+                'product_description': '',
+                'relative_path': 'L2',
+                'inspector_newest_version': 'True',
+                'inspector_relative_path': 'codes/inspectors',
+                'inspector_date_written': '2016-05-31',
+                'inspector_filename': 'rot13_L2.py',
+                'inspector_description': 'Level 2',
+                'inspector_active': 'True',
+                'product_name': '{MISSION}_rot13_L2'},
+            'mission': {
+                'incoming_dir': 'L0',
+                'rootdir': '/home/myles/dbprocessing/test_DB',
+                'mission_name': 'testDB'},
+            'instrument': {'instrument_name': 'rot13'},
+            'process_rot13_L1-L2': {'code_cpu': '1',
+                'code_start_date': '2010-09-01',
+                'code_stop_date': '2020-01-01',
+                'code_filename': 'run_rot13_L1toL2.py',
+                'code_relative_path': 'scripts',
+                'required_input1': 'product_concat',
+                'code_version': '1.0.0',
+                'process_name': 'rot_L1toL2',
+                'code_output_interface': '1',
+                'code_newest_version': 'True',
+                'code_date_written': '2016-05-31',
+                'code_description': 'Python L1->L2',
+                'output_product': 'product_rot13',
+                'code_active': 'True',
+                'code_arguments': '',
+                'extra_params': '',
+                'output_timebase': 'FILE',
+                'code_ram': '1'}
+        }
+        key_diff = set(ans.keys()).symmetric_difference(conf.keys())
+        if key_diff:
+            self.fail('Keys in only one of actual/expected: '
+                      + ', '.join(key_diff))
+        for k in ans:
+            self.assertEqual(ans[k], conf[k], k)
         self.assertEqual(ans, conf)
 
     def test_sectionCheck_Valid(self):
