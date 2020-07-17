@@ -17,6 +17,7 @@
 # <- add the prod
 # <- create the inst_prod link
 
+import collections
 import ConfigParser
 import os
 import shutil
@@ -30,9 +31,13 @@ from sqlalchemy.orm.exc import NoResultFound
 from dbprocessing import DButils
 
 expected = ['mission', 'satellite', 'instrument', 'product', 'process']
+# All keywords that are permitted in a section (optional or required)
 expected_keyword = { }
+# Subset of expected_keyword that are permitted not required
+optional_keyword = collections.defaultdict(list)
 expected_keyword['mission'] = ['incoming_dir', 'mission_name', 'rootdir',
                                'codedir', 'inspectordir', 'errordir']
+optional_keyword['mission'] = ['codedir', 'inspectordir', 'errordir']
 expected_keyword['satellite'] = ['satellite_name']
 expected_keyword['instrument'] = ['instrument_name']
 expected_keyword['product'] = ['product_name', 'relative_path',
@@ -103,12 +108,13 @@ def _keysCheck(conf, section):
     else:
         section_ex = section
     keys = expected_keyword[section_ex]
+    optional = optional_keyword[section_ex]
     for k in keys:
-        if k.startswith('required_input') or k.startswith('optional_input'):
+        if k.startswith(('required_input', 'optional_input')) \
+           or k in optional:
             continue
-        else:
-            if k not in conf[section]:
-                raise (ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section)))
+        if k not in conf[section]:
+            raise (ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section)))
 
 
 def _keysRemoveExtra(conf, section):

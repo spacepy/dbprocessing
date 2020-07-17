@@ -780,17 +780,27 @@ class DButils(object):
                    mission_name,
                    rootdir,
                    incoming_dir,
-                   codedir,
-                   inspectordir,
-                   errordir):
+                   codedir=None,
+                   inspectordir=None,
+                   errordir=None):
         """
         Add a mission to the database
+
+        Optional directories which are not specified will be inserted
+        into the database as nulls, and the default will be determined
+        at runtime.
 
         :param mission_name: the name of the mission
         :type mission_name: str
         :param rootdir: the root directory of the mission
         :type rootdir: str
-
+        :param str incoming_dir: directory for incoming files
+        :param str codedir: directory containing codes (optional; see
+                            :meth:`getCodeDirectory`)
+        :param str inspectordir: directory containing product inspectors
+                                 (optional; see :meth:`getInspectorDirectory`)
+        :param str errordir: directory to contain error files (optional;
+                             see :meth:`getErrorPath`)
         """
         mission_name = str(mission_name)
         rootdir = str(rootdir)
@@ -802,12 +812,15 @@ class DButils(object):
         m1.mission_name = mission_name
         m1.rootdir = rootdir.replace('{MISSION}', mission_name)
         m1.incoming_dir = incoming_dir.replace('{MISSION}', mission_name)
-        m1.codedir = codedir.replace('{MISSION}', mission_name)
-        m1.inspectordir = inspectordir.replace('{MISSION}', mission_name)
+        m1.codedir = None if codedir is None \
+                     else codedir.replace('{MISSION}', mission_name)
+        m1.inspectordir = None if inspectordir is None\
+                          else inspectordir.replace('{MISSION}', mission_name)
 
         if hasattr(m1, 'newest_version'):
             # Old DBs will not have this, new ones will
-            m1.errordir = errordir
+            m1.errordir = None if errordir is None \
+                          else errordir.replace('{MISSION}', mission_name)
 
         self.session.add(m1)
         self.commitDB()
