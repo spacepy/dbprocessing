@@ -5,10 +5,12 @@ import os
 import tempfile
 import unittest
 import subprocess
+import sys
 
 from dbprocessing import DBfile
 from dbprocessing import DButils
-from ..scripts import CreateDB
+sys.path.append('../scripts') # Add scripts dir to the python path for the import
+import CreateDB
 
 filename = 'test_file.txt'
 
