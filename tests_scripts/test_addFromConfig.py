@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
+import os.path
 import sys
 import tempfile
 import unittest
 
-sys.path.append('../scripts') # Add scripts dir to the python path for the import
+# Add scripts dir to the python path for the import
+thisdir = os.path.dirname(__file__)
+sys.path.append(os.path.abspath(os.path.join(
+    thisdir, '..', 'scripts')))
 from addFromConfig import readconfig, _sectionCheck, _keysCheck, _keysRemoveExtra, _keysPresentCheck, _fileTest
 
 class addFromConfig(unittest.TestCase):
@@ -16,7 +20,8 @@ class addFromConfig(unittest.TestCase):
     def test_readconfig(self):
         """Does readconfig match the expected output"""
 
-        conf = readconfig('testing_configs/testDB.conf')
+        conf = readconfig(os.path.join(
+            thisdir, 'testing_configs', 'testDB.conf'))
         # Regression testing, just copy-pasted from the actual output
         ans = {
             'satellite': {'satellite_name': '{MISSION}-a'},
@@ -85,24 +90,28 @@ class addFromConfig(unittest.TestCase):
     def test_sectionCheck_Valid(self):
         """Make sure no Exceptions are thrown for a valid config"""
         try:
-            conf = readconfig('testing_configs/testDB.conf')
+            conf = readconfig(os.path.join(
+                thisdir, 'testing_configs', 'testDB.conf'))
             _sectionCheck(conf)
         except Exception as e:
             self.fail(e)
 
     def test_sectionCheck_MissingMission(self):
         """Make sure it notices Mission is missing"""
-        conf = readconfig('testing_configs/testDB_noMission.conf')
+        conf = readconfig(os.path.join(
+            thisdir, 'testing_configs', 'testDB_noMission.conf'))
         self.assertRaises(ValueError, _sectionCheck, conf)
 
     def test_sectionCheck_FakeSection(self):
         """Make sure it notices there's a fake section"""
-        conf = readconfig('testing_configs/testDB_fakeSection.conf')
+        conf = readconfig(os.path.join(
+            thisdir, 'testing_configs', 'testDB_fakeSection.conf'))
         self.assertRaises(ValueError, _sectionCheck, conf)
 
     def test_keysCheck_Valid(self):
         """Make sure no Exceptions are thrown for a valid config"""
-        conf = readconfig('testing_configs/testDB.conf')
+        conf = readconfig(os.path.join(
+            thisdir, 'testing_configs', 'testDB.conf'))
         try:
             for key in conf.keys():
                 _keysCheck(conf, key)
@@ -111,42 +120,49 @@ class addFromConfig(unittest.TestCase):
 
     def test_keysCheck_MissingRequired(self):
         """Make sure it notices missing required keys"""
-        conf = readconfig('testing_configs/testDB_missingKey.conf')
+        conf = readconfig(os.path.join(
+            thisdir, 'testing_configs', 'testDB_missingKey.conf'))
         self.assertRaises(ValueError, _keysCheck, conf, 'mission')
 
     def test_keysRemoveExtra(self):
         """Make sure it removes extra keys"""
-        validResult = readconfig('testing_configs/testDB.conf')
+        validResult = readconfig(os.path.join(
+            thisdir, 'testing_configs', 'testDB.conf'))
 
-        conf = _keysRemoveExtra(readconfig('testing_configs/testDB_extraKey.conf'), 'mission')
+        conf = _keysRemoveExtra(readconfig(os.path.join(
+            thisdir, 'testing_configs', 'testDB_extraKey.conf')), 'mission')
         self.assertEqual(validResult['mission'], conf)
 
     def test_keysPresentCheck_Valid(self):
         try:
-            conf = readconfig('testing_configs/testDB.conf')
+            conf = readconfig(os.path.join(
+                thisdir, 'testing_configs', 'testDB.conf'))
             _keysPresentCheck(conf)
         except Exception as e:
             self.fail(e)
 
     def test_keysPresentCheck_Invalid(self):
-        conf = readconfig('testing_configs/testDB_missingProduct.conf')
+        conf = readconfig(os.path.join(
+            thisdir, 'testing_configs', 'testDB_missingProduct.conf'))
         self.assertRaises(ValueError, _keysPresentCheck, conf)
 
     def test_keysPresentCheck_Trigger(self):
         try:
-            conf = readconfig('testing_configs/testDB_trigger.conf')
+            conf = readconfig(os.path.join(
+                thisdir, 'testing_configs', 'testDB_trigger.conf'))
             _keysPresentCheck(conf)
         except Exception as e:
             self.fail(e)
 
     def test_fileTest_Valid(self):
         try:
-            _fileTest('testing_configs/testDB.conf')
+            _fileTest(os.path.join(thisdir, 'testing_configs', 'testDB.conf'))
         except Exception as e:
             self.fail(e)
 
     def test_fileTest_Invalid(self):
-        self.assertRaises(ValueError, _fileTest, 'testing_configs/testDB_duplicateSection.conf')
+        self.assertRaises(ValueError, _fileTest, os.path.join(
+            thisdir, 'testing_configs', 'testDB_duplicateSection.conf'))
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,6 +2,7 @@
 
 import datetime
 import os
+import os.path
 import tempfile
 import unittest
 import subprocess
@@ -9,7 +10,9 @@ import sys
 
 from dbprocessing import DBfile
 from dbprocessing import DButils
-sys.path.append('../scripts') # Add scripts dir to the python path for the import
+# Add scripts dir to the python path for the import
+sys.path.append(os.path.abspath(os.path.join(
+    os.path.dirname(__file__), '..', 'scripts')))
 import CreateDB
 
 filename = 'test_file.txt'
