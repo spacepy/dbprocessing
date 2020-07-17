@@ -64,6 +64,27 @@ class DBUtilsEmptyTests(TestSetup):
     def test_empty_mission_dir(self):
         self.assertIsNone(self.dbu.getMissionDirectory())
 
+    def test_addMissionOptionals(self):
+        """Test addMission excluding optional inputs"""
+        self.assertEqual(self.dbu.addMission(
+            'name', '/rootdir/', '/root/incoming'), 1)
+        miss = self.dbu.getEntry('Mission', 1)
+        self.assertEqual(1, miss.mission_id)
+        self.assertTrue(miss.codedir is None)
+        self.assertTrue(miss.errordir is None)
+        self.assertTrue(miss.inspectordir is None)
+        self.assertEqual('/rootdir/', miss.rootdir)
+        self.assertEqual('/root/incoming', miss.incoming_dir)
+
+        # These are not exactly test of just the add, but they behave
+        # differently with this different add.
+        # Reload the mission
+        self.dbu.closeDB()
+        self.dbu = DButils.DButils(self.sqlworking)
+        self.assertEqual('/rootdir', self.dbu.getCodeDirectory())
+        self.assertEqual('/rootdir/errors', self.dbu.getErrorPath())
+        self.assertEqual('/rootdir', self.dbu.getInspectorDirectory())
+
 
 class DBUtilsOtherTests(TestSetup):
     """Tests that are not processqueue or get or add"""
