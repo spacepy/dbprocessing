@@ -237,6 +237,75 @@ class RunMeCmdArgTests(unittest.TestCase):
                          'rbspb_int_ect-mageis-L2_20130921_v3.0.1.cdf')
         ], rm.cmdline)
 
+    def testNoInputFiles(self):
+        """Check command line for a process with no inpout files"""
+        # Create a product to serve as the output of the process
+        prodid = self.dbu.addProduct(
+            product_name='triggered_output',
+            instrument_id=1,
+            relative_path='junk',
+            format='trigger_{Y}{m}{d}_v{VERSION}.out',
+            level=2,
+            product_description='Output created from a process with no input')
+        self.dbu.addInstrumentproductlink(1, prodid)
+        self.dbu.addInspector(
+            filename='fake.py',
+            relative_path='inspectors',
+            description='triggered output inspector',
+            version=dbprocessing.Version.Version(1, 0, 0),
+            active_code=True,
+            date_written='2010-01-01',
+            output_interface_version=1,
+            newest_version=True,
+            product=prodid,
+            arguments="foo=bar")
+        procid = self.dbu.addProcess(
+            'no_input',
+            output_product=prodid,
+            output_timebase='DAILY')
+        codeid = self.dbu.addCode(
+            filename='junk.py',
+            relative_path='scripts',
+            code_start_date='2010-01-01',
+            code_stop_date='2099-01-01',
+            code_description='triggered output code',
+            process_id=procid,
+            version='1.0.0',
+            active_code=1,
+            date_written='2010-01-01',
+            output_interface_version=1,
+            newest_version=1,
+            arguments='triggered_output_args')
+        # Fake the processqueue (None)
+        # Use no inputs
+        # Consider whether version bump should be forced
+        # (try both ways, with output existing and not existing)
+        rm = dbprocessing.runMe.runMe(
+            self.dbu, datetime.date(2013, 9, 21), procid,
+            [], None, version_bump=None)
+        #Make sure this is runnable
+        self.assertTrue(rm.ableToRun)
+        #Components of the command line
+        self.assertEqual(['triggered_output_args'], rm.args)
+        self.assertEqual([], rm.extra_params)
+        self.assertEqual(
+            '/n/space_data/cda/rbsp/scripts/junk.py',
+            rm.codepath)
+        self.assertEqual(
+            'trigger_20130921_v1.0.0.out',
+            rm.filename)
+        #And now the command line itself
+        rm.make_command_line()
+        shutil.rmtree(rm.tempdir) #remove the dir made for the command
+        self.assertEqual([
+            '/n/space_data/cda/rbsp/scripts/junk.py',
+            'triggered_output_args',
+            os.path.join(rm.tempdir,
+                         'trigger_20130921_v1.0.0.out')
+        ], rm.cmdline)
+        # Need to also test: output exists no force,
+        # output exists force, output exists but not latest code force,
+        # output exists but not latest code no force
 
 
 if __name__ == '__main__':
