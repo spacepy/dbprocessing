@@ -12,15 +12,13 @@ import shutil
 import tempfile
 import unittest
 
-#The log is opened on import, so need to quarantine the log directory
-#right away
-os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
-                                                  'unittestlogs')
+import dbp_testing
+
 import dbprocessing.DButils
 import dbprocessing.runMe
 
 
-class RunMeCmdArgTests(unittest.TestCase):
+class RunMeCmdArgTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """Tests command, argument, and command line building"""
 
     def setUp(self):
@@ -240,42 +238,12 @@ class RunMeCmdArgTests(unittest.TestCase):
     def testNoInputFiles(self):
         """Check command line for a process with no inpout files"""
         # Create a product to serve as the output of the process
-        prodid = self.dbu.addProduct(
+        prodid = self.addProduct(
             product_name='triggered_output',
             instrument_id=1,
-            relative_path='junk',
             format='trigger_{Y}{m}{d}_v{VERSION}.out',
-            level=2,
-            product_description='Output created from a process with no input')
-        self.dbu.addInstrumentproductlink(1, prodid)
-        self.dbu.addInspector(
-            filename='fake.py',
-            relative_path='inspectors',
-            description='triggered output inspector',
-            version=dbprocessing.Version.Version(1, 0, 0),
-            active_code=True,
-            date_written='2010-01-01',
-            output_interface_version=1,
-            newest_version=True,
-            product=prodid,
-            arguments="foo=bar")
-        procid = self.dbu.addProcess(
-            'no_input',
-            output_product=prodid,
-            output_timebase='DAILY')
-        codeid = self.dbu.addCode(
-            filename='junk.py',
-            relative_path='scripts',
-            code_start_date='2010-01-01',
-            code_stop_date='2099-01-01',
-            code_description='triggered output code',
-            process_id=procid,
-            version='1.0.0',
-            active_code=1,
-            date_written='2010-01-01',
-            output_interface_version=1,
-            newest_version=1,
-            arguments='triggered_output_args')
+            level=2)
+        procid, codeid = self.addProcess('no_input', output_product_id=prodid)
         # Fake the processqueue (None)
         # Use no inputs
         # Consider whether version bump should be forced
@@ -286,7 +254,7 @@ class RunMeCmdArgTests(unittest.TestCase):
         #Make sure this is runnable
         self.assertTrue(rm.ableToRun)
         #Components of the command line
-        self.assertEqual(['triggered_output_args'], rm.args)
+        self.assertEqual(['no_input_args'], rm.args)
         self.assertEqual([], rm.extra_params)
         self.assertEqual(
             '/n/space_data/cda/rbsp/scripts/junk.py',
@@ -299,7 +267,7 @@ class RunMeCmdArgTests(unittest.TestCase):
         shutil.rmtree(rm.tempdir) #remove the dir made for the command
         self.assertEqual([
             '/n/space_data/cda/rbsp/scripts/junk.py',
-            'triggered_output_args',
+            'no_input_args',
             os.path.join(rm.tempdir,
                          'trigger_20130921_v1.0.0.out')
         ], rm.cmdline)
