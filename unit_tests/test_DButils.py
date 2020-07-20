@@ -903,6 +903,20 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual(83, input_product.product_id)
         self.assertFalse(optional)
 
+    def test_getProcessTracebackNoInput(self):
+        """Traceback for a process without any input product"""
+        # Create a product to serve as the output of the process
+        prodid = self.addProduct(
+            product_name='triggered_output',
+            instrument_id=1,
+            format='trigger_{Y}{m}{d}_v{VERSION}.out',
+            level=2)
+        procid, codeid = self.addProcess('no_input', output_product_id=prodid)
+        res = self.dbu.getTraceback('Process', procid)
+        self.assertEqual(procid, res['process'].process_id)
+        self.assertEqual(codeid, res['code'].code_id)
+        self.assertEqual(0, len(res['input_product']))
+
     def test_getFileTraceback(self):
         """Get the full traceback for a file"""
         res = self.dbu.getTraceback('File', 573)
@@ -916,6 +930,28 @@ class DBUtilsGetTests(TestSetup):
             2, res['instrument'].instrument_id)
         self.assertEqual(
             2, res['satellite'].satellite_id)
+        self.assertEqual(
+            1, res['mission'].mission_id)
+
+    def test_getFileTracebackNoInput(self):
+        """Traceback for a file resulting from inputless product"""
+        prodid = self.addProduct(
+            product_name='triggered_output',
+            instrument_id=1,
+            format='trigger_{Y}{m}{d}_v{VERSION}.out',
+            level=2)
+        procid, codeid = self.addProcess('no_input', output_product_id=prodid)
+        fid = self.addFile('trigger_20130921_v1.0.0.out', prodid)
+        self.dbu.addFilecodelink(fid, codeid)
+        res = self.dbu.getTraceback('File', fid)
+        self.assertEqual(
+            fid, res['file'].file_id)
+        self.assertEqual(
+            prodid, res['product'].product_id)
+        self.assertEqual(
+            1, res['instrument'].instrument_id)
+        self.assertEqual(
+            1, res['satellite'].satellite_id)
         self.assertEqual(
             1, res['mission'].mission_id)
 
