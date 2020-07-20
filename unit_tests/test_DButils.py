@@ -13,10 +13,8 @@ from distutils.dir_util import copy_tree, remove_tree
 
 from sqlalchemy.orm.exc import NoResultFound
 
-#The log is opened on import, so need to quarantine the log directory
-#right away
-os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
-                                                  'unittestlogs')
+import dbp_testing
+
 from dbprocessing import DButils
 from dbprocessing import Version
 
@@ -31,7 +29,7 @@ def remove_tmpfile(fname):
     os.remove(fname)
 
 
-class TestSetupNoOpen(unittest.TestCase):
+class TestSetupNoOpen(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """
     master class for the setup and teardown, without opening db
     (so it can be altered first)
@@ -904,6 +902,22 @@ class DBUtilsGetTests(TestSetup):
         input_product, optional = input_product[0]
         self.assertEqual(83, input_product.product_id)
         self.assertFalse(optional)
+
+    def test_getFileTraceback(self):
+        """Get the full traceback for a file"""
+        res = self.dbu.getTraceback('File', 573)
+        self.assertEqual(
+            573, res['file'].file_id)
+        self.assertEqual(
+            137, res['product'].product_id)
+        self.assertEqual(
+            137, res['inspector'].inspector_id)
+        self.assertEqual(
+            2, res['instrument'].instrument_id)
+        self.assertEqual(
+            2, res['satellite'].satellite_id)
+        self.assertEqual(
+            1, res['mission'].mission_id)
 
 
 class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
