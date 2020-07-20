@@ -13,16 +13,13 @@ import shutil
 import tempfile
 import unittest
 
-#The log is opened on import, so need to quarantine the log directory
-#right away
-os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
-                                                  'unittestlogs')
+import dbp_testing
+
 import dbprocessing.DButils
 import dbprocessing.dbprocessing
-import dbprocessing.Version
 
 
-class ProcessQueueTestsBase(unittest.TestCase):
+class ProcessQueueTestsBase(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """Base class for tests that require ProcessQueue setup"""
 
     def setUp(self):
@@ -59,93 +56,6 @@ class ProcessQueueTestsBase(unittest.TestCase):
         del self.pq
         shutil.rmtree(self.td)
         super(ProcessQueueTestsBase, self).tearDown()
-
-    def addProduct(self, product_name, instrument_id=None, level=0):
-        """Add a product to database (incl. inspector)
-
-        Won't actually work, just getting the record in
-        """
-        if instrument_id is None:
-            instrument_id = self.instrument_ids[0]
-        pid = self.dbu.addProduct(
-            product_name=product_name,
-            instrument_id=instrument_id,
-            relative_path='junk',
-            format=product_name.replace(' ', '_') + '_{Y}{m}{d}_v{VERSION}',
-            level=level,
-            product_description='Test product {}'.format(product_name)
-            )
-        self.dbu.addInstrumentproductlink(instrument_id, pid)
-        self.dbu.addInspector(
-            filename='fake.py',
-            relative_path='inspectors',
-            description='{} inspector'.format(product_name),
-            version=dbprocessing.Version.Version(1, 0, 0),
-            active_code=True,
-            date_written='2010-01-01',
-            output_interface_version=1,
-            newest_version=True,
-            product=pid)
-        return pid
-
-    def addProcess(self, process_name, output_product_id,
-                   output_timebase='DAILY'):
-        """Add a process + code record to the database
-
-        Again, just the minimum to get the records in
-        """
-        process_id = self.dbu.addProcess(
-            process_name,
-            output_product=output_product_id,
-            output_timebase=output_timebase)
-        code_id = self.dbu.addCode(
-            filename='junk.py',
-            relative_path='scripts',
-            code_start_date='2010-01-01',
-            code_stop_date='2099-01-01',
-            code_description='{} code'.format(process_name),
-            process_id=process_id,
-            version='1.0.0',
-            active_code=1,
-            date_written='2010-01-01',
-            output_interface_version=1,
-            newest_version=1,
-            arguments=process_name.replace(' ', '_') + '_args')
-        return process_id, code_id
-
-    def addProductProcessLink(self, product_id, process_id, optional=False,
-                              yesterday=0, tomorrow=0):
-        """Minimum record for product-process link in db"""
-        self.dbu.addproductprocesslink(product_id, process_id, optional,
-                                       yesterday, tomorrow)
-
-    def addFile(self, filename, product_id, utc_date=None, version=None,
-                utc_start=None, utc_stop=None):
-        """Add a file to the database"""
-        if utc_date is None:
-            utc_date = datetime.datetime.strptime(
-                filename.split('_')[-2], '%Y%m%d')
-        if version is None:
-            version = filename.split('_v')[-1]
-        level = self.dbu.getEntry('Product', product_id).level
-        if utc_start is None:
-            utc_start = utc_date.replace(
-                hour=0, minute=0, second=0, microsecond=0)
-        if utc_stop is None:
-            utc_stop = utc_date.replace(
-                hour=23, minute=59, second=59, microsecond=999999)
-        fid = self.dbu.addFile(
-            filename=filename,
-            data_level=level,
-            version=dbprocessing.Version.Version.fromString(version),
-            product_id=product_id,
-            utc_file_date=utc_date,
-            utc_start_time=utc_start,
-            utc_stop_time=utc_stop,
-            file_create_date=datetime.datetime.now(),
-            exists_on_disk=True,
-        )
-        return fid
 
 
 # Many of these tests do not work as expected. The tests that fail with
