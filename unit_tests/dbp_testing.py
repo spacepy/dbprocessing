@@ -103,6 +103,8 @@ class AddtoDBMixin(object):
                 filename.split('_')[-2], '%Y%m%d')
         if version is None:
             version = filename.split('_v')[-1]
+            while version.count('.') > 2:
+                version = version[:version.rfind('.')]
         level = self.dbu.getEntry('Product', product_id).level
         if utc_start is None:
             utc_start = utc_date.replace(
