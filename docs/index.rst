@@ -8,6 +8,8 @@ dbprocessing
    scripts
    ConfigurationFiles
    CODE_OF_CONDUCT
+   LICENSE
+   COPYRIGHT
 
 API documentation
 -----------------
