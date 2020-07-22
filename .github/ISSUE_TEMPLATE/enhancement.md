@@ -5,7 +5,7 @@ labels: enhancement
 ---
 
 <!-- 
-Thank you for contributing to the SpacePy community by
+Thank you for contributing to the dbprocessing community by
 taking the time to suggest an enhancement. Please describe
 your desired enhancement in detail, including at least
 one possible use case.
