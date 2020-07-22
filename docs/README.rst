@@ -32,7 +32,7 @@ Funding and development
 -----------------------
 Development of ``dbprocessing`` is primarily supported by the projects
 which make use of it to deliver data. Development is performed in the public
-github repository at https://github.com/spacepy/dbprocessing/ .
+github repository at <https://github.com/spacepy/dbprocessing/>.
 
 Out of date information
 -----------------------

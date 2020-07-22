@@ -12,3 +12,4 @@ Developer Information
    structure
    notes	      
    todo
+   ../CONTRIBUTING

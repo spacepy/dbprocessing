@@ -81,13 +81,13 @@ Attribution
 -----------
 
 This Code of Conduct is adapted from the Contributor Covenant, version 1.4,
-available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
+available at <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>
 
-Translations in a wide range of languages are available from https://www.contributor-covenant.org/translations
+Translations in a wide range of languages are available from <https://www.contributor-covenant.org/translations>
 
 For answers to common questions about this code of conduct, see
-https://www.contributor-covenant.org/faq
+<https://www.contributor-covenant.org/faq>
 
 The preamble is adopted from the Python Software Foundation Code of Conduct,
-available at https://www.python.org/psf/conduct/
+available at <https://www.python.org/psf/conduct/>
 
