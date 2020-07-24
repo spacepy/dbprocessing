@@ -11,12 +11,15 @@ import tempfile
 import unittest
 from distutils.dir_util import copy_tree, remove_tree
 
-from sqlalchemy.orm.exc import NoResultFound
+try:  # new version changed this annoyingly
+    from sqlalchemy.exceptions import IntegrityError
+    from sqlalchemy.exceptions import ArgumentError
+    from sqlalchemy.orm.exceptions import NoResultFound
+except ImportError:
+    from sqlalchemy.exc import IntegrityError
+    from sqlalchemy.exc import ArgumentError
+    from sqlalchemy.orm.exc import NoResultFound
 
-#The log is opened on import, so need to quarantine the log directory
-#right away
-os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
-                                                  'unittestlogs')
 from dbprocessing import DButils
 from dbprocessing import Version
 
@@ -63,27 +66,6 @@ class DBUtilsEmptyTests(TestSetup):
 
     def test_empty_mission_dir(self):
         self.assertIsNone(self.dbu.getMissionDirectory())
-
-    def test_addMissionOptionals(self):
-        """Test addMission excluding optional inputs"""
-        self.assertEqual(self.dbu.addMission(
-            'name', '/rootdir/', '/root/incoming'), 1)
-        miss = self.dbu.getEntry('Mission', 1)
-        self.assertEqual(1, miss.mission_id)
-        self.assertTrue(miss.codedir is None)
-        self.assertTrue(miss.errordir is None)
-        self.assertTrue(miss.inspectordir is None)
-        self.assertEqual('/rootdir/', miss.rootdir)
-        self.assertEqual('/root/incoming', miss.incoming_dir)
-
-        # These are not exactly test of just the add, but they behave
-        # differently with this different add.
-        # Reload the mission
-        self.dbu.closeDB()
-        self.dbu = DButils.DButils(self.sqlworking)
-        self.assertEqual('/rootdir', self.dbu.getCodeDirectory())
-        self.assertEqual('/rootdir/errors', self.dbu.getErrorPath())
-        self.assertEqual('/rootdir', self.dbu.getInspectorDirectory())
 
 
 class DBUtilsOtherTests(TestSetup):
@@ -499,25 +481,6 @@ class DBUtilsGetTests(TestSetup):
         self.assertEqual([datetime.date(2013, 9, 8), datetime.date(2013, 9, 8)],
                          self.dbu.getFileDates(2))
 
-    def test_getFileDatesSpan(self):
-        """getFileDates for a file that spans days"""
-        fid = self.dbu.addFile(
-            filename='rbsp-a_magnetometer_uvw_emfisis-Quick-Look'
-            '_20120101_v99.99.99.cdf',
-            data_level=0,
-            version=Version.Version(99, 99, 99),
-            product_id=1,
-            # Pretend this is a product where the actual timespan is shifted
-            # by an hour from "characteristic" date
-            utc_file_date=datetime.datetime(2012, 1, 1),
-            utc_start_time=datetime.datetime(2012, 1, 1, 1),
-            utc_stop_time=datetime.datetime(2012, 1, 2, 1),
-            file_create_date=datetime.datetime.now(),
-            exists_on_disk=True)
-        self.assertEqual(
-            [datetime.date(2012, 1, 1), datetime.date(2012, 1, 2)],
-            self.dbu.getFileDates(fid))
-
     def test_getInputProductID(self):
         """getInputProductID"""
         self.assertEqual([(60, False)], self.dbu.getInputProductID(1))
@@ -525,96 +488,6 @@ class DBUtilsGetTests(TestSetup):
                          self.dbu.getInputProductID(2))
         self.assertFalse(self.dbu.getInputProductID(2343))
         self.assertEqual([], self.dbu.getInputProductID(2343))
-
-    def test_getFilesEndDate(self):
-        """getFiles with only end date specified"""
-        val = self.dbu.getFiles(endDate='2013-09-14', product=138)
-        expected = ['rbspb_pre_MagEphem_OP77Q_201309{:02d}_v1.0.0.txt'.format(i)
-                    for i in range(1, 15)]
-        actual = sorted([v.filename for v in val])
-        self.assertEqual(expected, actual)
-
-    def test_getFilesStartDate(self):
-        """getFiles with only start date specified"""
-        val = self.dbu.getFiles(startDate='2013-09-14', product=138)
-        expected = ['rbspb_pre_MagEphem_OP77Q_201309{:02d}_v1.0.0.txt'.format(i)
-                    for i in range(14, 31)]
-        actual = sorted([v.filename for v in val])
-        self.assertEqual(expected, actual)
-
-    def test_getFilesBeyondMagicDate(self):
-        """getFiles with a date past magic values for date"""
-        self.dbu.addFile(
-            filename='rbspb_pre_MagEphem_OP77Q_20990101_v1.0.0.txt',
-            data_level=0, version=Version.Version(1, 0, 0),
-            file_create_date=datetime.date(2010, 1, 1),
-            exists_on_disk=False, utc_file_date=datetime.date(2099, 1, 1),
-            utc_start_time=datetime.datetime(2099, 1, 1),
-            utc_stop_time=datetime.datetime(2099, 1, 1, 23, 59, 59),
-            product_id=138, shasum='0')
-        val = self.dbu.getFiles(startDate='2013-09-14', product=138)
-        expected = ['rbspb_pre_MagEphem_OP77Q_201309{:02d}_v1.0.0.txt'.format(i)
-                    for i in range(14, 31)]
-        expected += ['rbspb_pre_MagEphem_OP77Q_20990101_v1.0.0.txt']
-        actual = sorted([v.filename for v in val])
-        self.assertEqual(expected, actual)
-
-    def test_getFilesBeforeMagicDate(self):
-        """getFiles with a date before magic values for date"""
-        self.dbu.addFile(
-            filename='rbspb_pre_MagEphem_OP77Q_19590101_v1.0.0.txt',
-            data_level=0, version=Version.Version(1, 0, 0),
-            file_create_date=datetime.date(2010, 1, 1),
-            exists_on_disk=False, utc_file_date=datetime.date(1959, 1, 1),
-            utc_start_time=datetime.datetime(1959, 1, 1),
-            utc_stop_time=datetime.datetime(1959, 1, 1, 23, 59, 59),
-            product_id=138, shasum='0')
-        val = self.dbu.getFiles(endDate='2013-09-14', product=138)
-        expected = ['rbspb_pre_MagEphem_OP77Q_19590101_v1.0.0.txt'] + [
-            'rbspb_pre_MagEphem_OP77Q_201309{:02d}_v1.0.0.txt'.format(i)
-            for i in range(1, 15)]
-        actual = sorted([v.filename for v in val])
-        self.assertEqual(expected, actual)
-
-    def test_getFilesUTCDay(self):
-        """getFiles with a single UTC day time"""
-        expected = ['ect_rbspb_0186_381_01.ptp.gz',
-                    'ect_rbspb_0186_381_02.ptp.gz']
-        val = self.dbu.getFiles(
-            startTime='2013-03-02', endTime='2013-03-02', product=187)
-        actual = sorted([v.filename for v in val])
-        self.assertEqual(expected, actual)
-        expected = ['ect_rbspb_0186_381_02.ptp.gz']
-        val = self.dbu.getFiles(
-            startTime='2013-03-02', endTime='2013-03-02',
-            product=187, newest_version=True)
-        actual = sorted([v.filename for v in val])
-        self.assertEqual(expected, actual)
-
-    def test_getFilesStartTime(self):
-        """getFiles with a start time"""
-        expected = [
-            # V01 ends earlier in the day than the start time
-            'ect_rbspb_0388_381_02.ptp.gz',
-            'ect_rbspb_0388_381_03.ptp.gz',
-            'ect_rbspb_0389_381_01.ptp.gz',
-            'ect_rbspb_0389_381_02.ptp.gz',
-            'ect_rbspb_0389_381_03.ptp.gz',
-            ]
-        val = self.dbu.getFiles(
-            startTime=datetime.datetime(2013, 9, 21, 12), product=187)
-        actual = sorted([v.filename for v in val])
-        self.assertEqual(expected, actual)
-
-    def test_getFilesByProductTime(self):
-        """getFiles by the UTC date of data"""
-        expected = ['ect_rbspb_0382_381_04.ptp.gz',
-                    'ect_rbspb_0383_381_03.ptp.gz',
-        ]
-        val = self.dbu.getFilesByProductTime(187, ['2013-9-15', '2013-9-15'],
-                                             newest_version=True)
-        actual = sorted([v.filename for v in val])
-        self.assertEqual(expected, actual)
 
     def test_getFilesByProductDate(self):
         """getFilesByProductDate"""
@@ -880,17 +753,6 @@ class DBUtilsGetTests(TestSetup):
         tmp = self.dbu.getProductParentTree()
         self.assertEqual(190, len(tmp))
         self.assertTrue([1, [10, 8, 39, 76]] in tmp)
-
-    def test_getProcessTraceback(self):
-        """Traceback for a process"""
-        result = self.dbu.getTraceback('Process', 4)
-        self.assertEqual(4, result['process'].process_id)
-        self.assertEqual(4, result['code'].code_id)
-        input_product = result['input_product']
-        self.assertEqual(1, len(input_product))
-        input_product, optional = input_product[0]
-        self.assertEqual(83, input_product.product_id)
-        self.assertFalse(optional)
 
 
 class DBUtilsGetTestsNoOpen(TestSetupNoOpen):
@@ -1218,7 +1080,7 @@ class TestWithtestDB(unittest.TestCase):
         cID = self.dbu.addCode(filename="run_test.py",
                                relative_path="scripts",
                                code_start_date="2010-09-01",
-                               code_stop_date="2099-01-01",
+                               code_stop_date="2020-01-01",
                                code_description="Desc",
                                process_id=processID,
                                version="1.2.3",
@@ -1301,7 +1163,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual("run_test.py", c.filename)
         self.assertEqual("scripts", c.relative_path)
         self.assertEqual(datetime.date(2010, 9, 1), c.code_start_date)
-        self.assertEqual(datetime.date(2099, 1, 1), c.code_stop_date)
+        self.assertEqual(datetime.date(2020, 1, 1), c.code_stop_date)
         self.assertEqual("Desc", c.code_description)
         self.assertEqual(1, c.process_id)
         self.assertEqual(1, c.interface_version)
@@ -1513,18 +1375,12 @@ class TestWithtestDB(unittest.TestCase):
         prID = self.dbu.addProcess(process_name="testing_process_{PRODUCT}_{INSTRUMENT}_{SATELLITE}_{MISSION}",
                                    output_product=pID,
                                    output_timebase="FILE")
-        cID = self.addGenericCode(prID)
+        self.addGenericCode(prID)
         self.dbu.addproductprocesslink(input_product_id=1,
                                        process_id=prID,
                                        optional=0
                                        )
-        #Make sure the code was appropriately associated with the process
-        #(test of the test before we rely on it)
-        code = self.dbu.getEntry('Code', cID)
-        self.assertEqual(prID, code.process_id)
-        self.assertEqual(
-            cID,
-            self.dbu.getCodeFromProcess(prID, datetime.date.today()))
+
         self.dbu.updateProcessSubs(prID)
         p = self.dbu.getEntry('Process', prID)
         self.assertEqual('testing_process_testDB_rot13_L1_rot13_testDB-a_testDB', p.process_name)
@@ -1651,178 +1507,6 @@ class TestWithtestDB(unittest.TestCase):
         out = self.dbu.getAllFilenames()
 
         self.assertTrue(all([self.tempD in v for v in out]))
-
-    def testUpdateCodeNewestVersion(self):
-        """Set the newest version flag on a code"""
-        #Test precondition
-        code = self.dbu.getEntry('Code', 1)
-        self.assertTrue(code.newest_version)
-        self.assertTrue(code.active_code)
-        #Test default
-        self.dbu.updateCodeNewestVersion(1)
-        self.assertFalse(code.newest_version)
-        self.assertFalse(code.active_code)
-        #Specify
-        self.dbu.updateCodeNewestVersion(1, True)
-        self.assertTrue(code.newest_version)
-        self.assertTrue(code.active_code)
-        #Test the no-op version
-        self.dbu.updateCodeNewestVersion(1, True)
-        self.assertTrue(code.newest_version)
-        self.assertTrue(code.active_code)
-        #And specify false
-        self.dbu.updateCodeNewestVersion(1, False)
-        self.assertFalse(code.newest_version)
-        self.assertFalse(code.active_code)
-        #Test with the name instead of ID
-        self.dbu.updateCodeNewestVersion('run_rot13_L0toL1.py', True)
-        self.assertTrue(code.newest_version)
-        self.assertTrue(code.active_code)
-
-    def testEditTableReplace(self):
-        """Test editTable with simple string replace"""
-        self.dbu.editTable('code', 1, 'relative_path',
-                           my_str='newscripts', replace_str='scripts')
-        code = self.dbu.getEntry('Code', 1)
-        self.assertEqual('newscripts', code.relative_path)
-
-    def testEditTableReplaceProcess(self):
-        """Test editTable with simple string replace on process table"""
-        self.dbu.editTable('process', 1, 'process_name',
-                           my_str='L5', replace_str='L1')
-        process = self.dbu.getEntry('Process', 1)
-        self.assertEqual('rot_L0toL5', process.process_name)
-
-    def testEditTableReplaceMultipleCodes(self):
-        """Test editTable with multiple matches for the code"""
-        #Make multiple codes with same script name
-        self.addGenericCode()
-        self.addGenericCode()
-        with self.assertRaises(RuntimeError) as cm:
-            self.dbu.editTable('code', 'run_test.py', 'relative_path',
-                               my_str='newscripts', replace_str='scripts')
-        self.assertEqual(
-            'Multiple rows match run_test.py', cm.exception.message)
-
-    def testEditTableReplaceAfter(self):
-        """Test editTable with a replace only after a flag"""
-        code = self.dbu.getEntry('Code', 1)
-        code.arguments = '-i foobar -j foobar -k foobar'
-        self.dbu.editTable('code', 1, 'arguments',
-                           my_str='baz', replace_str='bar',
-                           after_flag='-j')
-        self.assertEqual('-i foobar -j foobaz -k foobar',
-                         code.arguments)
-
-    def testEditTableReplaceAfterMultiple(self):
-        """Test editTable with a replace-after-flag, flag happens many times"""
-        code = self.dbu.getEntry('Code', 1)
-        code.arguments = '-i foobar -j foobar -k foobar -j goobar'
-        self.dbu.editTable('code', 1, 'arguments',
-                           my_str='baz', replace_str='bar',
-                           after_flag='-j')
-        self.assertEqual('-i foobar -j foobaz -k foobar -j goobaz',
-                         code.arguments)
-
-    def testEditTableCombine(self):
-        """Test editTable argument combination"""
-        code = self.dbu.getEntry('Code', 1)
-        code.arguments = '-i foo -i bar -j baz'
-        self.dbu.editTable('code', 1, 'arguments', combine=True,
-                           after_flag='-i')
-        self.assertEqual('-i foo,bar -j baz', code.arguments)
-        code.arguments = '-i foo -i bar -j baz'
-        self.dbu.editTable('code', 1, 'arguments', combine=True,
-                           after_flag='-j')
-        self.assertEqual('-i foo -i bar -j baz', code.arguments)
-
-    def testEditTableInsertBefore(self):
-        """Test editTable inserting before a string"""
-        code = self.dbu.getEntry('Code', 1)
-        code.arguments = '-i foo -j bar -k baz'
-        self.dbu.editTable('code', 1, 'arguments', my_str='test_',
-                           ins_before='foo')
-        self.assertEqual('-i test_foo -j bar -k baz', code.arguments)
-
-    def testEditTableInsertAfter(self):
-        """Test editTable inserting after a string"""
-        code = self.dbu.getEntry('Code', 1)
-        code.arguments = '-i foo -j foobar -k baz'
-        self.dbu.editTable('code', 1, 'arguments', my_str='2',
-                           ins_after='foo')
-        self.assertEqual('-i foo2 -j foo2bar -k baz', code.arguments)
-
-    def testEditTableNoChange(self):
-        """Test editTable with no actual change"""
-        code = self.dbu.getEntry('Code', 1)
-        code.arguments = '-i foo -j foobar -k baz'
-        self.dbu.editTable('code', 1, 'arguments', my_str='2',
-                           replace_str='nothing')
-        self.assertEqual('-i foo -j foobar -k baz', code.arguments)
-
-    def testEditTableNoChange2(self):
-        """Test editTable with identical replacement"""
-        code = self.dbu.getEntry('Code', 1)
-        code.arguments = '-i foo -j foobar -k baz'
-        self.dbu.editTable('code', 1, 'arguments', my_str='foo',
-                           replace_str='foo')
-        self.assertEqual('-i foo -j foobar -k baz', code.arguments)
-
-    def testEditTableNULL(self):
-        """Test editTable with NULL string"""
-        code = self.dbu.getEntry('Code', 1)
-        code.arguments = None
-        self.dbu.editTable('code', 1, 'arguments', my_str='2',
-                           replace_str='nothing')
-        self.assertEqual(None, code.arguments)
-
-    def testEditTableExceptions(self):
-        """Test editTable with bad arguments"""
-        #Each test case is a tuple of kwargs for the call and expected
-        #error message from the exception.
-        test_cases = [
-            ({},
-             'Nothing to be done.'),
-            ({'ins_after': 'foo', 'ins_before': 'bar', 'my_str': 'baz'},
-             'Only use one of ins_after, ins_before,'
-                 ' and replace_str.'),
-            ({'ins_after': 'foo'},
-             'Need my_str.'),
-            ({'combine': True, 'ins_after': 'foo', 'my_str': 'bar',
-              'after_flag': '-f' },
-             'Combine flag cannot be used with ins_after,'
-                 ' ins_before, or replace_str.'),
-            ({'combine': True, 'my_str': 'bar', 'after_flag': '-f'},
-             'Do not need my_str with combine.'),
-            ({'combine': True},
-             'Must specify after_flag with combine.'),
-            ]
-        for kwargs, msg in test_cases:
-            with self.assertRaises(ValueError) as cm:
-                self.dbu.editTable('code', 1, 'arguments', **kwargs)
-            self.assertEqual(msg, cm.exception.message)
-
-        #Tests that don't fit exactly the same pattern
-        with self.assertRaises(ValueError) as cm:
-            self.dbu.editTable('code', 1, 'filename', combine=True,
-                               after_flag='-f')
-        self.assertEqual(
-            'Only use after_flag with arguments column in Code table.',
-            cm.exception.message)
-        with self.assertRaises(ValueError) as cm:
-            self.dbu.editTable('process', 1, 'arguments', combine=True,
-                               after_flag='-f')
-        self.assertEqual(
-            'Only use after_flag with arguments column in Code table.',
-            cm.exception.message)
-
-        with self.assertRaises(AttributeError) as cm:
-            self.dbu.editTable('nonexistent', 1, 'process_name',
-                               ins_after='L1', my_str='_new')
-        self.assertEqual(
-            "'DButils' object has no attribute 'Nonexistent'",
-            cm.exception.message)
-
 
 if __name__ == "__main__":
     unittest.main()

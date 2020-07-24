@@ -19,10 +19,12 @@ if __name__ == '__main__':
                       help="The product the file belongs to")
     parser.add_option("-a", "--args", dest="args",
                       help="kwargs to pass to the inspector(optional)", default=None)
+    parser.add_option("-t", "--inst", dest="instrument", type="string",
+                      help="instrument for the data to be processed", default=None)
 
     (options, args) = parser.parse_args()
 
-    dbu = DButils.DButils(options.mission)
+    dbu = DButils.DButils(options.mission, options.instrument)
 
     inspect = imp.load_source('inspect', options.inspector)
 

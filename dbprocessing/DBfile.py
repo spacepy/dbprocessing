@@ -1,13 +1,12 @@
-from __future__ import absolute_import
 from __future__ import print_function
 
 import os
 import shutil
 import tarfile
 
-from . import DBlogging
-from . import Diskfile
-from . import Utils
+import DBlogging
+import Diskfile
+import Utils
 
 
 class DBfileError(Exception):
@@ -37,8 +36,8 @@ class DBfile(object):
         """
         if makeDiskFile:
             diskfile = Diskfile.Diskfile(diskfile, dbu)
-        if not isinstance(diskfile, Diskfile.Diskfile):
-            raise DBfileError('Wrong input, must input a Diskfile object')
+        #if not isinstance(diskfile, Diskfile.Diskfile):
+        #    raise DBfileError('Wrong input, must input a Diskfile object')
 
         self.dbu = dbu
         self.diskfile = diskfile
@@ -91,7 +90,7 @@ class DBfile(object):
         path = self.getDirectory()
         ## need to do path replacements
         path = Utils.dirSubs(path, self.diskfile.params['filename'], self.diskfile.params['utc_file_date'],
-                             self.diskfile.params['utc_start_time'], '{0}'.format(str(self.diskfile.params['version'])))
+                             self.diskfile.params['utc_start_time'], '{0}'.format(str(self.diskfile.params['version'])), dbu=self.dbu)
 
         # if the file is a link just remove the link and pretend we moved it, this means
         # that this file is tracked only as a dependency

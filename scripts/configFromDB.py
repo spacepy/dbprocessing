@@ -129,7 +129,7 @@ if __name__ == "__main__":
     if os.path.isfile(filename) and not options.force:
         parser.error("file: {0} exists and will not be overwritten (use --force)".format(filename))
 
-    dbu = DButils.DButils(options.mission)
+    dbu = DButils.DButils(options.mission, options.instrument)
 
     # ==============================================================================
     #     This will make a configparser of the needed parts then write to file
@@ -138,8 +138,10 @@ if __name__ == "__main__":
     out = ConfigParser.SafeConfigParser()  # safe is py >= 2.3
 
     # get mission
+    import pdb
+    pdb.set_trace()
     out.add_section('mission')
-    missions = dbu.getMissions()
+    missions = dbu.getEntry('Mission', options.mission)
     if not missions:
         raise (ValueError("No mission in DB, this must be an empty db"))
     if len(missions) > 1:

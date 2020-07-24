@@ -63,12 +63,10 @@ if __name__ == "__main__":
 
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
 
-    dates = [Utils.datetimeToDate(d)
-             for d in Utils.expandDates(startDate, endDate)]
-    print('dates', dates)
+    dates = Utils.expandDates(startDate, endDate)
+    print('dates', list(dates))
 
     inproc = args[0]
-    timebase = pq.dbu.getProcessTimebase(inproc)
 
     # get the input products for a process
     products = pq.dbu.getInputProductID(inproc)
@@ -82,10 +80,7 @@ if __name__ == "__main__":
         for p, opt in products:
             prod_ = pq.dbu.getEntry('Product', p)
             print("    Processing product: {0} : {1}".format((p,opt), prod_.product_name))
-            filegetter = pq.dbu.getFilesByProductTime \
-                         if timebase in ('DAILY',) \
-                         else pq.dbu.getFilesByProductDate
-            files = filegetter(p, [d]*2, newest_version=True)
+            files = pq.dbu.getFilesByProductDate(p, [d]*2, newest_version=True)
             if files:
                 fnames = [v.filename for v in files]
             else:

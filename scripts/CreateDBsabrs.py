@@ -13,8 +13,10 @@ from __future__ import division  # may not be needed but start with it
 import os
 from optparse import OptionParser
 
+import sqlalchemy
 from sqlalchemy import schema, types
 from sqlalchemy.engine import create_engine
+from sqlalchemy.sql import func
 
 from dbprocessing import DButils
 
@@ -24,13 +26,19 @@ class dbprocessing_db(object):
     Main workhorse class for the CreateDB module
     """
 
-    def __init__(self, filename='dbprocessing_default.db', overwrite=False, create=True):
-        self.filename = filename
-        self.overwrite = overwrite
+    def __init__(self, create=True):
+        self.user = 'dnadeau'
+        self.password = ''
+        self.db_name = 'sndd'
         self.dbIsOpen = False
         if create:
-            if os.path.isfile(filename) != True:
-                self.createDB()
+	    self.createDB()
+
+    def init_db(self, user, password, db, host='localhost', port=5432):
+	url = "postgres://{0}:{1}@{2}:{3}/{4}"
+        url = url.format(user, password, host, port, db)
+        self.engine = create_engine(url, echo=False, encoding='utf-8')
+        self.metadata = sqlalchemy.MetaData(bind=self.engine, reflect=True)
 
     def createDB(self):
         """
@@ -44,21 +52,20 @@ class dbprocessing_db(object):
         NOTE: if one stops using sqlite then change file_id, logging_id and file_logging_id
               to BigIntegers (sqlite doesn't know BigInteger)
         """
-        if self.overwrite:
-            raise (NotImplementedError('overwrite is not yet implemented'))
 
-        metadata = schema.MetaData()
+        self.init_db(self.user, self.password, self.db_name)
+        metadata = self.metadata
 
         data_table = schema.Table('mission', metadata,
                                   schema.Column('mission_id', types.Integer, autoincrement=True, primary_key=True,
                                                 nullable=False),
                                   schema.Column('mission_name', types.String(20), nullable=False, unique=True),
-                                  schema.Column('rootdir', types.String(50), nullable=False, ),
-                                  schema.Column('incoming_dir', types.String(50), nullable=False, ),
-                                  schema.Column('codedir', types.String(50), nullable=True, ),
-                                  schema.Column('inspectordir', types.String(50), nullable=True, ),
-                                  schema.Column('errordir', types.String(50), nullable=True, )
-                                  )
+                                  schema.Column('rootdir', types.String(150), nullable=False, ),
+                                  schema.Column('incoming_dir', types.String(150), nullable=False, ),
+                                  schema.Column('codedir', types.String(150), nullable=True, ),
+                                  schema.Column('inspectordir', types.String(150), nullable=True, ),
+                                  schema.Column('errordir', types.String(150), nullable=True, ),
+                                  extend_existing=True)
 
         data_table = schema.Table('satellite', metadata,
                                   schema.Column('satellite_id', types.Integer, autoincrement=True, primary_key=True,
@@ -66,8 +73,8 @@ class dbprocessing_db(object):
                                   schema.Column('satellite_name', types.String(20), nullable=False),  # hmm long enough?
                                   schema.Column('mission_id', types.Integer,
                                                 schema.ForeignKey('mission.mission_id'), nullable=False, ),
-                                  schema.UniqueConstraint('satellite_name', 'mission_id', name='unique_pairs_satellite')
-                                  )
+                                  schema.UniqueConstraint('satellite_name', 'mission_id', name='unique_pairs_satellite'),
+                                  extend_existing=True)
 
         data_table = schema.Table('instrument', metadata,
                                   schema.Column('instrument_id', types.Integer, autoincrement=True, primary_key=True,
@@ -77,8 +84,8 @@ class dbprocessing_db(object):
                                   schema.Column('satellite_id', types.Integer,
                                                 schema.ForeignKey('satellite.satellite_id'), nullable=False, ),
                                   schema.UniqueConstraint('instrument_name', 'satellite_id',
-                                                          name='unique_pairs_instrument')
-                                  )
+                                                          name='unique_pairs_instrument'),
+                                  extend_existing=True)
 
         data_table = schema.Table('product', metadata,
                                   schema.Column('product_id', types.Integer, autoincrement=True, primary_key=True,
@@ -92,16 +99,16 @@ class dbprocessing_db(object):
                                   schema.Column('format', types.Text, nullable=False),  # hmm long enough?
                                   schema.Column('product_description', types.Text, nullable=True),  # hmm long enough?
                                   schema.UniqueConstraint('product_name', 'instrument_id', 'relative_path',
-                                                          name='unique_triplet_product')
-                                  )
+                                                          name='unique_triplet_product'),
+                                  extend_existing=True)
 
         data_table = schema.Table('instrumentproductlink', metadata,
                                   schema.Column('instrument_id', types.Integer,
                                                 schema.ForeignKey('instrument.instrument_id'), nullable=False),
                                   schema.Column('product_id', types.Integer,
                                                 schema.ForeignKey('product.product_id'), nullable=False),
-                                  schema.PrimaryKeyConstraint('instrument_id', 'product_id')
-                                  )
+                                  schema.PrimaryKeyConstraint('instrument_id', 'product_id'),
+                                  extend_existing=True)
 
         data_table = schema.Table('process', metadata,
                                   schema.Column('process_id', types.Integer, autoincrement=True, primary_key=True,
@@ -111,8 +118,8 @@ class dbprocessing_db(object):
                                                 schema.ForeignKey('product.product_id'), nullable=True, index=True),
                                   schema.Column('output_timebase', types.String(10), nullable=True, index=True),
                                   schema.Column('extra_params', types.Text, nullable=True),
-                                  schema.UniqueConstraint('process_name', 'output_product')
-                                  )
+                                  schema.UniqueConstraint('process_name', 'output_product'),
+                                  extend_existing=True)
 
         data_table = schema.Table('productprocesslink', metadata,
                                   schema.Column('process_id', types.Integer,
@@ -120,10 +127,10 @@ class dbprocessing_db(object):
                                   schema.Column('input_product_id', types.Integer,
                                                 schema.ForeignKey('product.product_id'), nullable=False),
                                   schema.Column('optional', types.Boolean, nullable=False),
-                                  schema.Column('yesterday', types.Integer, nullable=False),
-                                  schema.Column('tomorrow', types.Integer, nullable=False),
-                                  schema.PrimaryKeyConstraint('process_id', 'input_product_id')
-                                  )
+#                                  schema.Column('yesterday', types.Integer, nullable=False),
+#                                  schema.Column('tomorrow', types.Integer, nullable=False),
+                                  schema.PrimaryKeyConstraint('process_id', 'input_product_id'),
+                                  extend_existing=True)
 
         data_table = schema.Table('file', metadata,
                                   # this was a bigint, sqlalchemy doesn't seem to like this... think here
@@ -159,11 +166,13 @@ class dbprocessing_db(object):
                                                           'product_id',
                                                           'interface_version',
                                                           'quality_comment',
-                                                          'revision_version', name='Unique file tuple'), )
+                                                          'revision_version', name='Unique file tuple'), 
+                                  extend_existing=True)
         schema.Index('ix_file_big', data_table.columns['filename'],
                      data_table.columns['utc_file_date'],
                      data_table.columns['utc_start_time'],
-                     data_table.columns['utc_stop_time'], unique=True)
+                     data_table.columns['utc_stop_time'], unique=True
+		     )
 
         data_table = schema.Table('filefilelink', metadata,
                                   schema.Column('source_file', types.Integer,
@@ -173,7 +182,7 @@ class dbprocessing_db(object):
                                   schema.PrimaryKeyConstraint('source_file', 'resulting_file'),
                                   schema.CheckConstraint('source_file <> resulting_file'),
                                   # TODO this is supposed to be more general than !=
-                                  )
+		                  extend_existing=True)
 
         data_table = schema.Table('code', metadata,
                                   schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True,
@@ -199,6 +208,7 @@ class dbprocessing_db(object):
                                   schema.CheckConstraint('code_start_date <= code_stop_date'),
                                   schema.CheckConstraint('interface_version >= 1'),
                                   schema.CheckConstraint('output_interface_version >= 1'),
+		                  extend_existing=True
                                   )
 
         data_table = schema.Table('processqueue', metadata,
@@ -206,7 +216,10 @@ class dbprocessing_db(object):
                                                 schema.ForeignKey('file.file_id'),
                                                 primary_key=True, nullable=False, unique=True, index=True),
                                   schema.Column('version_bump', types.SmallInteger, nullable=True),
+                                  schema.Column('instrument_id', types.Integer,
+                                                schema.ForeignKey('instrument.instrument_id'), nullable=False),
                                   schema.CheckConstraint('version_bump is NULL or version_bump < 3'),
+		                  extend_existing=True
                                   )
 
         data_table = schema.Table('filecodelink', metadata,
@@ -214,14 +227,28 @@ class dbprocessing_db(object):
                                                 schema.ForeignKey('file.file_id'), nullable=False),
                                   schema.Column('source_code', types.Integer,
                                                 schema.ForeignKey('code.code_id'), nullable=False),
-                                  schema.PrimaryKeyConstraint('resulting_file', 'source_code')
+                                  schema.PrimaryKeyConstraint('resulting_file', 'source_code'),
+		                  extend_existing=True
                                   )
 
         data_table = schema.Table('release', metadata,
                                   schema.Column('file_id', types.Integer,
                                                 schema.ForeignKey('file.file_id'), nullable=False, ),
                                   schema.Column('release_num', types.String(20), nullable=False),
-                                  schema.PrimaryKeyConstraint('file_id', 'release_num')
+                                  schema.PrimaryKeyConstraint('file_id', 'release_num'),
+		                  extend_existing=True
+                                  )
+
+        data_table = schema.Table('processpidlink', metadata,
+                                  schema.Column('ppl_id', types.Integer, autoincrement=True, primary_key=True,
+                                                nullable=False),
+                                  schema.Column('pid', types.Integer, nullable=True),
+                                  schema.Column('hostname', types.String(100), nullable=True),
+                                  schema.Column('process_id', types.Integer,
+                                                schema.ForeignKey('process.process_id'), nullable=True),
+                                  schema.Column('currentlyprocessing', types.Boolean, nullable=True, default='f'),
+                                  schema.Column('start_time', types.DateTime, nullable=True, default=func.now()),
+                                  schema.Column('end_time', types.DateTime, nullable=True, default=func.now())
                                   )
 
         data_table = schema.Table('logging', metadata,
@@ -239,6 +266,7 @@ class dbprocessing_db(object):
                                   schema.Column('hostname', types.String(100), nullable=False),
                                   # schema.PrimaryKeyConstraint('logging_id'),
                                   schema.CheckConstraint('processing_start_time < processing_end_time'),
+		                  extend_existing=True
                                   )
 
         data_table = schema.Table('logging_file', metadata,
@@ -252,6 +280,7 @@ class dbprocessing_db(object):
                                                 schema.ForeignKey('code.code_id'), nullable=False),
                                   schema.Column('comments', types.Text, nullable=True),
                                   # schema.PrimaryKeyConstraint('logging_file_id'),
+		                  extend_existing=True
                                   )
 
         data_table = schema.Table('inspector', metadata,
@@ -274,15 +303,16 @@ class dbprocessing_db(object):
                                                 schema.ForeignKey('product.product_id'), nullable=False),
                                   schema.CheckConstraint('interface_version >= 1'),
                                   schema.CheckConstraint('output_interface_version >= 1'),
+		                  extend_existing=True
                                   )
 
         # TODO move this out so that the user chooses the db type
-        engine = create_engine('postgres:///' + self.filename, echo=False)
-        metadata.bind = engine
+        # engine = create_engine('postgres:///' + self.filename, echo=False)
+        # metadata.bind = engine
 
         metadata.create_all(checkfirst=True)
-        self.engine = engine
-        self.metadata = metadata
+        # self.engine = engine
+        # self.metadata = metadata
 
     def addMission(self, filename):
         """utility to add a mission"""
@@ -305,15 +335,15 @@ class dbprocessing_db(object):
 
 
 if __name__ == "__main__":
-    usage = "usage: %prog [options] filename"
-    parser = OptionParser(usage=usage)
+    # usage = "usage: %prog [options] filename"
+    # parser = OptionParser(usage=usage)
 
-    (options, args) = parser.parse_args()
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
-    filename = os.path.abspath(args[0])
+    # (options, args) = parser.parse_args()
+    # if len(args) != 1:
+    #     parser.error("incorrect number of arguments")
+    # filename = os.path.abspath(args[0])
 
-    if os.path.isfile(filename):
-        parser.error("file: {0} exists will not overwrite".format(filename))
+    # if os.path.isfile(filename):
+    #     parser.error("file: {0} exists will not overwrite".format(filename))
 
-    db = dbprocessing_db(filename=filename)
+    db = dbprocessing_db()

@@ -1,13 +1,12 @@
 #!/usr/bin/env python2.6
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
 from __future__ import print_function
 
 import glob
 import hashlib
 import os
 
-from . import DBlogging
+import DBlogging
 
 # .. todo look at the logging  of these and fix it, broke the messages printed out, probably because Exception __init__isn't called
 class ReadError(Exception):

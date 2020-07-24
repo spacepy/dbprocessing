@@ -2,14 +2,6 @@
 
 """Combined unit test suite for all dbprocessing classes"""
 
-import os
-import os.path
-
-#The log is opened on import, so need to quarantine the log directory
-#right away
-os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
-                                                  'unittestlogs')
-from test_dbprocessing import *
 from test_DBfile import *
 from test_DBqueue import *
 from test_DButils import *

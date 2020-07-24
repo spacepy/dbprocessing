@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 """
 Inspector requirements:
@@ -22,7 +23,6 @@ Inspector requirements:
             * self.diskfile.params['quality_checked'] : bool (optional)
             * self.diskfile.params['process_keywords'] : str (optional)
 """
-from __future__ import absolute_import
 from __future__ import print_function
 
 from abc import ABCMeta, abstractmethod
@@ -31,10 +31,9 @@ import os
 import re
 import warnings
 
-from . import DBlogging
-from . import Diskfile
-from . import Version
-from . import DBstrings
+import DBlogging
+import Diskfile
+import Version
 
 def EphemeralCallable(basetype=type):
     def _new_caller(cls, *args, **kwargs):
@@ -67,9 +66,6 @@ class inspector(object):
         self.basename = os.path.basename(self.filename)
         self.dirname = os.path.dirname(self.filename)
         self.product = product
-        self.filenameformat = self.dbu.getEntry('Product', self.product).format
-        DBformatter = DBstrings.DBformatter() #must instantiate class
-        self.filenameregex = DBformatter.re(self.filenameformat)
         self.diskfile = Diskfile.Diskfile(self.filename, self.dbu)
         insp = self.inspect(kwargs)
         if insp is None:

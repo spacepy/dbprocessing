@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-from __future__ import absolute_import
 from __future__ import print_function
 
 import datetime
@@ -12,15 +10,18 @@ import time
 import traceback
 from operator import itemgetter
 
-from . import DBfile
-from . import DBlogging
-from . import DBqueue
-from . import DButils
-from . import Utils
-from . import runMe
-from .Utils import strargs_to_args
+import DBfile
+import DBlogging
+import DBqueue
+import DButils
+import Utils
+import runMe
+from Utils import strargs_to_args
 
-from sqlalchemy.exc import IntegrityError
+try:  # new version changed this annoyingly
+    from sqlalchemy.exceptions import IntegrityError
+except ImportError:
+    from sqlalchemy.exc import IntegrityError
 
 
 class ProcessQueue(object):
@@ -36,12 +37,14 @@ class ProcessQueue(object):
     """
 
     def __init__(self,
-                 mission, dryrun=False, echo=False):
+                 mission, instrument, dryrun=False, echo=False):
 
         self.dryrun = dryrun
         self.mission = mission
+        self.instrument = instrument
+        dbname = os.environ['PGDATABASE']
         self.tempdir = None
-        dbu = DButils.DButils(self.mission, echo=echo)
+        dbu = DButils.DButils(dbname, instrument, echo=echo)  #
         self.runme_list = []
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()
@@ -113,8 +116,8 @@ class ProcessQueue(object):
                     self.queue.remove(self.queue[i])
             except IndexError:
                 pass  # this means it was shortened
-        DBlogging.dblogger.debug("Queue contains (%d): %s" % (len(self.queue),
-                                                              self.queue))
+        #DBlogging.dblogger.debug("Queue contains (%d): %s" % (len(self.queue),
+        #                                                      self.queue))
 
     def moveToError(self, fname):
         """
@@ -200,17 +203,27 @@ class ProcessQueue(object):
             # see if the file is in the db, if so then don't call the inspectors
             try:
                 id = self.dbu.getFileID(self.basename)
-                DBlogging.dblogger.info(
-                    'File {0}:{1} was already in DB, not inspecting'.format(id, self.basename))
-                self.moveToError(self.filename)
-                T1 = time.time() - T0
-                print('{1}:{2} Removed from incoming: {0} - already present  {3:.2f}s'.format(self.basename, ii, len(self.queue), T1))
-                T0 = time.time()
-                continue
+                if self.dbu.checkIncomingFileSHA(id): #Added 2019-02-11 XYang, do update if file is in db with different checksum
+                    DBlogging.dblogger.info(
+                        'File {0}:{1} was already in DB, not inspecting'.format(id, self.basename))
+                    self.moveToError(self.filename)
+                    T1 = time.time() - T0
+                    print('{1}:{2} Removed from incoming: {0} - already present  {3:.2f}s'.format(self.basename, ii, len(self.queue), T1))
+                    T0 = time.time()
+                    continue
+                else:
+                    df = self.figureProduct()
+                    dbf = DBfile.DBfile(df, self.dbu)
+                    dbf.move()
+                    self.dbu.updateFileSHA(id)
+                    self.dbu.Processqueue.push(id)
+                    T1 = time.time() - T0
+                    print('{1}:{2} Removed from incoming: {0} - ingested  {3:.2f}s'.format(self.basename, ii, len(self.queue), T1))
+                    T0 = time.time()
             except DButils.DBNoData:
                 DBlogging.dblogger.info('File {0} was not in DB, inspecting'.format(self.basename))
             df = self.figureProduct()
-            if df != []:
+            if df is not None:
                 self.diskfileToDB(df)
                 T1 = time.time() - T0
                 print('{1}:{2} Removed from incoming: {0} - ingested   {3:.2f}s'.format(self.basename, ii, len(self.queue), T1))
@@ -224,7 +237,7 @@ class ProcessQueue(object):
             filename = self.filename
         act_insp = self.dbu.getActiveInspectors()
         claimed = []
-        for code, desc, arg, product in act_insp:
+        for code, arg, product in act_insp:
             try:
                 inspect = imp.load_source('inspect', code)
             except IOError as msg:
@@ -268,7 +281,7 @@ class ProcessQueue(object):
         #####################################################
         ## get all the input products for that process, and if they are optional
         T0 = time.time()
-        input_product_id = self.dbu.getInputProductID(process_id, True)  # this is a list of tuples (id, optional, yesterday, tommorow)
+        input_product_id = self.dbu.getInputProductID(process_id)  # this is a list of tuples (id, optional)
         if debug: print("21:    {0}: self.dbu.getInputProductID: {1}".format(time.time() - T0, input_product_id))
         T0 = time.time()
 
@@ -290,26 +303,19 @@ class ProcessQueue(object):
             files = []
             # get all the possible files based on dates that we might want to put into the process now
 
-            for iprod_id, opt, y, t in input_product_id:
+            for iprod_id, opt in input_product_id:
                 # accept a datetime.datetime or datetime.date
                 dt = Utils.datetimeToDate(utc_file_date)
-                start = dt - datetime.timedelta(days=y)
-                end = dt + datetime.timedelta(days=t)
 
-                filegetter = self.dbu.getFilesByProductTime \
-                             if timebase in ('DAILY',) \
-                             else self.dbu.getFilesByProductDate
-                tmp_files = filegetter(iprod_id, [start, end], newest_version=True)
-                if debug: print("23:    {0}: self.dbu.getFilesByProductDate, {1} {2} {3}".format(time.time() - T0, iprod_id, dt, tmp_files))
+                tmp_files = self.dbu.getFilesByProductDate(iprod_id, [dt] * 2, newest_version=False)
+                #if debug: print("23:    {0}: self.dbu.getFilesByProductDate,format {1} {2} {3}.format(time.time() - T0, iprod_id, dt, tmp_files))
                 T0 = time.time()
-
-
                 if not tmp_files and not opt:
                     return None, input_product_id
                 else:
                     files.extend(tmp_files)
 
-            DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
+            #DBlogging.dblogger.debug("buildChildren files: ".format(str(files)))
 
             ###############
             # BAL 30 March 2017, dropping this clean step as they should all be newest version per above
@@ -338,35 +344,21 @@ class ProcessQueue(object):
             raise (ValueError('Bad timebase for product: {0}'.format(process_id)))
         return files, input_product_id
 
-    def buildChildren(self, file_id, debug=False, skip_run=False, run_procs=None):
+    def buildChildren(self, file_id, debug=False):
         """
         go through and all the runMe's and add to the runme_list variable
-
-        :param int file_id: file ID of the file for which children will be built
-        :param bool skip_run: Skip RUN timebase processes if True
-                              (default False)
-        :param str run_procs: If provided, comma-separated list of process IDs
-                              or process names to run; other processes are
-                              ignored. (Default: all possible processes).
         """
-
-        # if processes to run specified, turn into list of IDs
-        # getProcessID accepts either ID or name and returns ID
-        if run_procs is not None:
-            run_procs = [self.dbu.getProcessID(rp)
-                         for rp in run_procs.split(',')]
-
         T0 = time.time()
         DBlogging.dblogger.debug("Entered buildChildren: file_id={0}".format(file_id))
         if debug: print("Entered buildChildren: file_id={0}".format(file_id))
         # if this file is not a newest_version we do not ant to run
         #print("{1}: Entered buildChildren: file_id={0}".format(file_id, time.time()-T0))
         T0 = time.time()
-        if not self.dbu.fileIsNewest(file_id[0]):
-            DBlogging.dblogger.debug("Was not newest version in buildChildren: file_id={0}".format(file_id))
-            print("    Was not newest version in buildChildren: file_id={0}".format(file_id))
-            return  # do nothing
-            if debug: print("    {1}: was newest moving on in buildChildren: file_id={0}".format(file_id, time.time()-T0))
+        #if not self.dbu.fileIsNewest(file_id[0]):
+        #    DBlogging.dblogger.debug("Was not newest version in buildChildren: file_id={0}".format(file_id))
+        #    print("    Was not newest version in buildChildren: file_id={0}".format(file_id))
+        #    return  # do nothing
+        #    if debug: print("    {1}: was newest moving on in buildChildren: file_id={0}".format(file_id, time.time()-T0))
         T0 = time.time()
 
         children = self.dbu.getChildrenProcesses(file_id[0])  # returns process
@@ -383,7 +375,7 @@ class ProcessQueue(object):
             for utc_file_date in Utils.expandDates(*daterange):
                 if debug: print("    utc_file_date: {0}".format(utc_file_date))
                 files, input_product_id = self._getRequiredProducts(child_process, file_id[0], utc_file_date)
-                if debug: print("13:   {0}: self._getRequiredProducts   {1} {2}".format(time.time()-T0, files, input_product_id))
+                #if debug: print("13:   {0}: self._getRequiredProducts   {1} {2} {3}".format(time.time()-T0, files, input_product_id, timebase)
                 T0 = time.time()
                 if not files:
                     # figure out the missing products
@@ -400,24 +392,24 @@ class ProcessQueue(object):
 
                 try:
                     input_files = [v.file_id for v in files]
+                    if len(input_files) > 1:
+                       #print("        Input files to be removed....")
+                       self.dbu.Processqueue.remove(input_files)
+                       #Dblogging .....
                 except AttributeError:
                     continue
-                DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
-
-                if skip_run \
-                   and self.dbu.getProcessTimebase(child_process) == 'RUN':
-                    DBlogging.dblogger.info(
-                        "Process: {} skipping because RUN timebase"
-                        .format(self.dbu.getEntry('Process', child_process)
-                                .process_name))
+                #DBlogging.dblogger.debug("Input files found, {0}".format(input_files))
+                if self.dbu.dbprocessCurrentlyrunning(child_process):  #exit if the same process ....
+                    DBlogging.dblogger.debug("The same process is running, can't run")
                     continue
-                if run_procs is not None and child_process not in run_procs:
-                    DBlogging.dblogger.info(
-                        "Process: {} skipping because not in run-only list"
-                        .format(self.dbu.getEntry('Process', child_process)
-                                .process_name))
+                if self.dbu.relateddbprocessrunning(child_process):  #exit if the same process ....
+                    DBlogging.dblogger.debug("The related process is running, can't run")
                     continue
-                runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self, file_id[1])
+                timebase = self.dbu.getProcessTimebase(child_process)
+                if child_process in [p.process_id for p in self.runme_list] and timebase == 'DAILY': # Added check on process_id to ....
+                    DBlogging.dblogger.debug("The same process is in the runme list, can't run")
+                    continue
+                runme = runMe.runMe(self.dbu, utc_file_date, child_process, input_files, self)
                 #print("{0}:  runMe.runMe".format(time.time()-T0))
                 #T0 = time.time()
                 # only add to runme list if it can be run
@@ -444,8 +436,8 @@ class ProcessQueue(object):
         raise (NotImplementedError('Not yet implemented'))
 
     def _reprocessBy(self,
-                     startDate=None,
-                     endDate=None,
+                     startDate="1970-01-01",
+                     endDate="2070-01-01",
                      level=None,
                      product=None,
                      code=None,
@@ -469,14 +461,14 @@ class ProcessQueue(object):
 
         return self.dbu.Processqueue.rawadd(f_ids, incVersion)
 
-    def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=None):
+    def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=2):
         try:
             code_id = self.dbu.getCodeID(id_in)
             return self._reprocessBy(code=code_id, startDate=startDate, endDate=endDate,
                                      incVersion=incVersion)
         except DButils.DBNoData:
             DBlogging.dblogger.error('No code_id {0} found in the DB'.format(id_in))
-
+            
     def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=None):
         try:
             prod_id = self.dbu.getProductID(id_in)
@@ -497,3 +489,11 @@ class ProcessQueue(object):
         except DButils.DBNoData:
             DBlogging.dblogger.error('No inst_id {0} found in the DB'.format(id_in))
 
+    def reprocessByAll(self, level=None, startDate=None, endDate=None):
+        """
+        this is a raw call into the db meant to be fast and all every file
+        between the dates into the process queue
+        - there is no version increment allowed
+        """
+        return self._reprocessBy(level=level, startDate=startDate, endDate=endDate,
+                                incVersion=None)

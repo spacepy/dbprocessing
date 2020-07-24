@@ -22,7 +22,7 @@ except NameError:
 if('DBPROCESSING_LOG_DIR' in os.environ):
     log_dir = os.environ['DBPROCESSING_LOG_DIR']
 else:
-    log_dir = os.path.join('~', 'dbprocessing_logs')
+    log_dir = os.path.join('/projects/sdnprod/', 'dbprocessing_logs')
 log_dir = os.path.expanduser(log_dir)
 if not os.path.isdir(log_dir):
     os.makedirs(log_dir)
@@ -37,15 +37,15 @@ dblogger.setLevel(logging.INFO)
 # Add the log message handler to the logger
 # handler = logging.handlers.TimedRotatingFileHandler(
 #              LOG_FILENAME, maxBytes=20000000, backupCount=0) # keep them all
-## TODO this doesn't work so hardcode the name above, so break the rotation here
+# TODO this doesn't work so hardcode the name above, so break the rotation here
 handler = logging.handlers.TimedRotatingFileHandler(
     LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True)  # keep them all
 
-LEVELS = { 'debug': logging.DEBUG,
-           'info': logging.INFO,
-           'warning': logging.WARNING,
-           'error': logging.ERROR,
-           'critical': logging.CRITICAL }
+LEVELS = {'debug': logging.DEBUG,
+          'info': logging.INFO,
+          'warning': logging.WARNING,
+          'error': logging.ERROR,
+          'critical': logging.CRITICAL}
 
 # create formatter
 formatter = \

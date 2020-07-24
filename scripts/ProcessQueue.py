@@ -5,39 +5,35 @@ import datetime
 import os
 import operator
 from optparse import OptionParser
-import pdb
 import traceback
 import subprocess
 
-from dbprocessing import DBlogging, dbprocessing
-from dbprocessing.runMe import ProcessException
+from dbprocessing import DBlogging
+from dbprocessing import dbprocessing
 from dbprocessing import runMe, Utils
-from dbprocessing.Utils import dateForPrinting as DFP
+from runMe import ProcessException
+#from dbprocessing.Utils import dateForPrinting as DFP
+from Utils import dateForPrinting as DFP
+debug=1
 
-
-from dbprocessing import __version__
+#import __version__
 
 
 if __name__ == "__main__":
     usage = \
     """
-    Usage: %prog [-i|-p [-d] [-s] [-o process[,process...]]] -m database
+    Usage: %prog [-i] [-p] [-d] [-m Test] [-t dosim_f]
         -i -> import
         -p -> process
-        -m -> selects mission
+        -m -> selects database
+        -t -> instrument
         -d -> dryrun
-        -s -> skip run timebase
-        -o -> only run listed processes
     """
     parser = OptionParser(usage=usage)
     parser.add_option("-i", "", dest="i", action="store_true",
                       help="ingest mode", default=False)
     parser.add_option("-p", "", dest="p", action="store_true",
                       help="process mode", default=False)
-    parser.add_option("-s", "", dest="s", action="store_true",
-                      help="Skip run timebase processes", default=False)
-    parser.add_option("-o", "--only", dest="o", type="string",
-                      help='Run only listed processes (either id or name)', default = None)
     parser.add_option("-m", "--mission", dest="mission",
                       help="selected mission database", default=None)
     parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
@@ -47,25 +43,27 @@ if __name__ == "__main__":
     parser.add_option("-l", "--log-level", dest="loglevel",
                       help="Set the logging level", default="debug")
     parser.add_option("-n", "--num-proc", dest="numproc", type='int',
-                      help="Number of processes to run in parallel", default=2)
+                      help="Number of processes to run in parallel", default=16)
     parser.add_option("", "--echo", dest="echo", action="store_true",
                       help="Start sqlalchemy with echo in place for debugging", default=False)
     parser.add_option("", "--glb", dest="glob", type="string",
                       help='Glob to use when reading files from incoming: default "*"', default="*")
-
+    parser.add_option("-c", "", dest="c", action="store_true",
+                      help="Allow concurrently processing files", default=True)
+    parser.add_option("-t", "--inst", dest="instrument", type="string",
+                      help="instrument for the data to be processed", default=None)
 
     (options, args) = parser.parse_args()
+
     if len(args) != 0:
         parser.error("incorrect number of arguments")
 
     if options.i and options.p:
         parser.error("options -i and -p are mutually exclusive")
-    if options.i and options.s:
-        parser.error("options -i and -s are mutually exclusive")
-    if options.i and options.o:
-        parser.error("options -i and -o are mutually exclusive")
     if not options.i and not options.p:
         parser.error("either -i or -p must be specified")
+    #...
+    #...
 
     logname = os.path.basename(options.mission).replace('.', '_')
     DBlogging.change_logfile(logname)
@@ -75,24 +73,28 @@ if __name__ == "__main__":
 
     DBlogging.dblogger.setLevel(DBlogging.LEVELS[options.loglevel])
 
-    pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
+    pq = dbprocessing.ProcessQueue(options.mission, options.instrument, dryrun=options.dryrun, echo=options.echo)
+    #...
+    #...
+    #...
+    #...
 
-    # check currently processing
-    curr_proc = pq.dbu.currentlyProcessing()
-    if curr_proc:  # returns False or the PID
-        # check if the PID is running
-        if Utils.processRunning(curr_proc):
-            # we still have an instance processing, don't start another
-            pq.dbu.closeDB()
-            DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
-            raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
-        else:
-            # There is a processing flag set but it died, don't start another
-            pq.dbu.closeDB()
-            DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
-            raise(ProcessException("There is a processing flag set but it died, don't start another"))
-    # start logging as a lock
-    pq.dbu.startLogging()
+    if not options.c:
+        curr_proc = pq.dbu.currentlyProcessing()
+        if curr_proc:  # returns False or the PID
+            # check if the PID is running
+            if Utils.processRunning(curr_proc):
+                # we still have an instance processing, don't start another
+                pq.dbu.closeDB()
+                DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
+                raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
+            else:
+                # There is a processing flag set but it died, don't start another
+                pq.dbu.closeDB()
+                DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
+                raise(ProcessException("There is a processing flag set but it died, don't start another"))
+        # start logging as a lock
+        pq.dbu.startLogging()
 
 
     if options.i: # import selected
@@ -116,25 +118,28 @@ if __name__ == "__main__":
                   'this debugging\ninformation to the developer, along with '
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
-            pq.dbu.stopLogging('Abnormal exit on exception')
+            if not options.c:
+               pq.dbu.stopLogging('Abnormal exit on exception')
         except KeyboardInterrupt:
             print('Shutting down processing chain')
             DBlogging.dblogger.error('Ctrl-C issued, quiting')
-            pq.dbu.stopLogging('Ctrl-C Exit')
+            if not options.c:
+               pq.dbu.stopLogging('Ctrl-C Exit')
 
         else:
-            pq.dbu.stopLogging('Nominal Exit')
+            if not options.c:
+               pq.dbu.stopLogging('Nominal Exit')
         pq.dbu.closeDB()
         print("{0} Import finished: {1} files added".format(DFP(), pq.dbu.Processqueue.len()-start_len))
 
     if options.p: # process selected
         number_proc = 0
-
+        DBlogging.dblogger.info("{0} is the instrument with id {1}".format(options.instrument, pq.dbu.instrument_id))
         try:
-            DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
+            DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0} ".format(pq.dbu.Processqueue.len()))
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
-            while pq.dbu.Processqueue.len() > 0:
+            if pq.dbu.Processqueue.len() > 0:
                 # BAL 30 Mar 2017, no need to clean here as buildChildren() will clean
                 # print('{0} Cleaning Processes queue'.format(DFP()))
                 # # clean the queue
@@ -150,7 +155,7 @@ if __name__ == "__main__":
                 
                 print('{0} Building commands for {1} items in the queue'.format(DFP(), pq.dbu.Processqueue.len()))
          
-                # make the cpommand lines for all the files in tehj processqueue
+                # make the command lines for all the files in the processqueue
                 totalsize = pq.dbu.Processqueue.len()
                 tmp_ind = 0
                 Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
@@ -162,22 +167,24 @@ if __name__ == "__main__":
                     #if hasattr(f, '__iter__') and len(f) == 1:
                     #    f = f[0]
                     #pq.dbu.Processqueue.remove(f) # remove by file_id
+
                     f = pq.dbu.Processqueue.pop()
                     DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(f, pq.dbu.Processqueue.len()))
                     #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
                     #if f is None:
                     #    continue
-                    pq.buildChildren(f, skip_run=options.s,
-                                     run_procs=options.o)
+                    pq.buildChildren(f)
                     tmp_ind += 1
                     Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress: {0}:{1}'.format(tmp_ind, totalsize))
 
                     #pq.runme_list.extend(sorted([v for v in pq.runme_list if v.ableToRun], key=lambda x: x.utc_file_date))
                     
                 # pass the whole runme list off to the runMe module function
-                #  it will go through and decide what can be run in parrallel
+                # it will go through and decide what can be run in parrallel
                 
-                n_good_t, n_bad_t = runMe.runner(pq.runme_list, pq.dbu, options.numproc)
+                #...
+                tmpdir = '/projects/sdnprod/tmp/dbprocessing/{0}/'.format(pq.dbu.instrument)
+                n_good_t, n_bad_t = runMe.runner(pq.runme_list, pq.dbu, options.numproc, rundir=tmpdir)
                 n_good += n_good_t
                 n_bad  += n_bad_t
                 print("{0} {1} of {2} processes were successful".format(DFP(), n_good, n_bad+n_good))
@@ -193,13 +200,16 @@ if __name__ == "__main__":
                   'this debugging\ninformation to the developer, along with '
                   'any information on what was\nhappening at the time.')
             DBlogging.dblogger.critical(tbstring)
-            pq.dbu.stopLogging('Abnormal exit on exception')
+            if not options.c:
+                pq.dbu.stopLogging('Abnormal exit on exception')
         except KeyboardInterrupt:
             print('Shutting down processing chain')
             DBlogging.dblogger.error('Ctrl-C issued, quiting')
-            pq.dbu.stopLogging('Ctrl-C Exit')
+            if not options.c:
+                pq.dbu.stopLogging('Ctrl-C Exit')
         else:
-            pq.dbu.stopLogging('Nominal Exit')
+            if not options.c:
+                pq.dbu.stopLogging('Nominal Exit')
         finally: 
             pq.dbu.closeDB()
         del pq
