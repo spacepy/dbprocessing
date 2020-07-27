@@ -23,7 +23,7 @@ jobs:
        - checkout
        - run: sudo chown -R circleci:circleci /usr/local/bin
        - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
-       - run: sudo apt-get install vi
+       - run: sudo apt-get install vim
        - run: 
            command: |
              sudo apt install -y postgresql-client
