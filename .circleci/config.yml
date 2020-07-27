@@ -18,12 +18,12 @@ jobs:
        - checkout
        - run: sudo chown -R circleci:circleci /usr/local/bin
        - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-       - run:
-         command: |
-           sudo apt install -y postgresql-client
-           createdb -h localhost sndd_test -O user
-           createdb -h localhost sndd_special -O user
-           pip install sqlalchemy
+       - run: 
+           command: |
+             sudo apt install -y postgresql-client
+             createdb -h localhost sndd_test -O user
+             createdb -h localhost sndd_special -O user
+             pip install sqlalchemy
 
 workflows:
   main:
