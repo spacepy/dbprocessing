@@ -27,9 +27,9 @@ class dbprocessing_db(object):
     """
 
     def __init__(self, create=True):
-        self.user = os.environ["root"]
+        self.user = os.environ["PGUSER"]
         self.password = ''
-        self.db_name = os.environ["sndd"]
+        self.db_name = os.environ["PGDATABASE"]
         self.dbIsOpen = False
         if create:
 	    self.createDB()
