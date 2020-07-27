@@ -14,11 +14,11 @@ jobs:
       POSTGRES_USER: root
       POSTGRES_DB: circle_test
       POSTGRES_PASSWORD: ""
-      PGPORT=5432
-      PGUSER=root
-      PGDATABASE=sndd
-      PGPASSWORD=""
-      PGHOST=localhost
+      PGPORT: 5432
+      PGUSER: root
+      PGDATABASE: sndd
+      PGPASSWORD: ""
+      PGHOST: localhost
     steps:
        - checkout
        - run: sudo chown -R circleci:circleci /usr/local/bin
