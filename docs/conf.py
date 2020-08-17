@@ -312,7 +312,10 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/2/', None),
+    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
+}
 
 #Fix for https://github.com/sphinx-doc/sphinx/issues/1585
 #Have to monkey-patch in the entire method for a one-line fix.

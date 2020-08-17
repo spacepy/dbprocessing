@@ -7,7 +7,9 @@ Developer Information
 
    build
    tests
+   code_standards
    documentation
+   github
    pull_requests
    repository
    structure
