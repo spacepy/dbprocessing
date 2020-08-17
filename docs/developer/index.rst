@@ -8,6 +8,7 @@ Developer Information
    build
    tests
    documentation
+   pull_requests
    repository
    structure
    notes	      
