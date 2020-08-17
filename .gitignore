@@ -14,5 +14,6 @@ build/
 test_DB/L1/*
 test_DB/L2/*
 sphinx/build/
+docs/autosummary/
 .DS_Store
 
