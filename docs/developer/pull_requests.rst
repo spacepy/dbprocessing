@@ -77,8 +77,8 @@ update the fork master from the upstream master, then rebase the branch.)
 In the case of a conflict rebase, this can get messy...feel free to ask
 for help. A developer may be able to perform the rebase if `maintainer
 edits are enabled <https://docs.github.com/en/github/
-collaborating-with-issues-and-pull-request/
-sallowing-changes-to-a-pull-request-branch-created-from-a-fork>`_.
+collaborating-with-issues-and-pull-requests/
+allowing-changes-to-a-pull-request-branch-created-from-a-fork>`_.
 After the rebase, the updated branch will have to be `force-pushed
 <https://stackoverflow.com/questions/5509543/
 how-do-i-properly-force-a-git-push>`_ to the fork on github.
