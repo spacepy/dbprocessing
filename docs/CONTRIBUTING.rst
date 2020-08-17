@@ -24,7 +24,8 @@ commit messages. The documentation is available in this repository at
 :doc:`developer/index` and on the web at
 <https://spacepy.github.io/dbprocessing/developer/>. Developers are
 happy to assist in developing code to these standards; please do not
-be offended if changes to your PR are requested.
+be offended if changes to your PR are requested. These standards are
+also updated via pull request.
 
 Becoming a developer
 --------------------
