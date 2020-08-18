@@ -14,6 +14,7 @@ from test_CreateDB import *
 from test_dbprocessing import *
 from test_DBfile import *
 from test_DBqueue import *
+from test_DBRunner import *
 from test_DButils import *
 from test_Diskfile import *
 from test_Version import *
