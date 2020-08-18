@@ -8,11 +8,11 @@ import unittest
 import subprocess
 import sys
 
+import dbp_testing
+dbp_testing.add_scripts_to_path()
+
 from dbprocessing import DBfile
 from dbprocessing import DButils
-# Add scripts dir to the python path for the import
-sys.path.append(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), '..', 'scripts')))
 import CreateDB
 
 filename = 'test_file.txt'

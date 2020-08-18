@@ -9,6 +9,8 @@ import os.path
 #right away
 os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
                                                   'unittestlogs')
+from test_addFromConfig import *
+from test_CreateDB import *
 from test_dbprocessing import *
 from test_DBfile import *
 from test_DBqueue import *
