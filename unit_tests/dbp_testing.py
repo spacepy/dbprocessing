@@ -9,7 +9,7 @@ any dbprocessing modules.
 import datetime
 import os
 import os.path
-import unittest
+import sys
 
 #The log is opened on import, so need to quarantine the log directory
 #right away (before other dbp imports)
@@ -18,7 +18,10 @@ os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
 
 import dbprocessing.Version
 
-__all__ = ['AddtoDBMixin']
+__all__ = ['AddtoDBMixin', 'add_scripts_to_path', 'testsdir']
+
+
+testsdir = os.path.dirname(__file__)
 
 
 class AddtoDBMixin(object):
@@ -124,3 +127,13 @@ class AddtoDBMixin(object):
             exists_on_disk=True,
         )
         return fid
+
+def add_scripts_to_path():
+    """Add the script source directory to Python path
+
+    This allows unit testing of scripts.
+    """
+    scriptpath = os.path.abspath(os.path.join(
+        testsdir, '..', 'scripts'))
+    if not scriptpath in sys.path and os.path.isdir(scriptpath):
+        sys.path.insert(0, scriptpath)

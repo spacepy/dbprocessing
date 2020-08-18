@@ -5,10 +5,9 @@ import sys
 import tempfile
 import unittest
 
-# Add scripts dir to the python path for the import
-thisdir = os.path.dirname(__file__)
-sys.path.append(os.path.abspath(os.path.join(
-    thisdir, '..', 'scripts')))
+import dbp_testing
+dbp_testing.add_scripts_to_path()
+
 from addFromConfig import configCheck, readconfig, _sectionCheck, _keysCheck, _keysRemoveExtra, _keysPresentCheck, _fileTest
 
 class addFromConfig(unittest.TestCase):
@@ -21,7 +20,7 @@ class addFromConfig(unittest.TestCase):
         """Does readconfig match the expected output"""
 
         conf = readconfig(os.path.join(
-            thisdir, 'testing_configs', 'testDB.conf'))
+            dbp_testing.testsdir, 'data', 'configs', 'testDB.conf'))
         # Regression testing, just copy-pasted from the actual output
         ans = {
             'satellite': {'satellite_name': '{MISSION}-a'},
@@ -91,7 +90,7 @@ class addFromConfig(unittest.TestCase):
         """Make sure no Exceptions are thrown for a valid config"""
         try:
             conf = readconfig(os.path.join(
-                thisdir, 'testing_configs', 'testDB.conf'))
+                dbp_testing.testsdir, 'data', 'configs', 'testDB.conf'))
             _sectionCheck(conf)
         except Exception as e:
             self.fail(e)
@@ -99,19 +98,19 @@ class addFromConfig(unittest.TestCase):
     def test_sectionCheck_MissingMission(self):
         """Make sure it notices Mission is missing"""
         conf = readconfig(os.path.join(
-            thisdir, 'testing_configs', 'testDB_noMission.conf'))
+            dbp_testing.testsdir, 'data', 'configs', 'testDB_noMission.conf'))
         self.assertRaises(ValueError, _sectionCheck, conf)
 
     def test_sectionCheck_FakeSection(self):
         """Make sure it notices there's a fake section"""
         conf = readconfig(os.path.join(
-            thisdir, 'testing_configs', 'testDB_fakeSection.conf'))
+            dbp_testing.testsdir, 'data', 'configs', 'testDB_fakeSection.conf'))
         self.assertRaises(ValueError, _sectionCheck, conf)
 
     def test_keysCheck_Valid(self):
         """Make sure no Exceptions are thrown for a valid config"""
         conf = readconfig(os.path.join(
-            thisdir, 'testing_configs', 'testDB.conf'))
+            dbp_testing.testsdir, 'data', 'configs', 'testDB.conf'))
         try:
             for key in conf.keys():
                 _keysCheck(conf, key)
@@ -121,52 +120,56 @@ class addFromConfig(unittest.TestCase):
     def test_keysCheck_MissingRequired(self):
         """Make sure it notices missing required keys"""
         conf = readconfig(os.path.join(
-            thisdir, 'testing_configs', 'testDB_missingKey.conf'))
+            dbp_testing.testsdir, 'data', 'configs', 'testDB_missingKey.conf'))
         self.assertRaises(ValueError, _keysCheck, conf, 'mission')
 
     def test_keysRemoveExtra(self):
         """Make sure it removes extra keys"""
         validResult = readconfig(os.path.join(
-            thisdir, 'testing_configs', 'testDB.conf'))
+            dbp_testing.testsdir, 'data', 'configs', 'testDB.conf'))
 
         conf = _keysRemoveExtra(readconfig(os.path.join(
-            thisdir, 'testing_configs', 'testDB_extraKey.conf')), 'mission')
+            dbp_testing.testsdir, 'data', 'configs', 'testDB_extraKey.conf')), 'mission')
         self.assertEqual(validResult['mission'], conf)
 
     def test_keysPresentCheck_Valid(self):
         try:
             conf = readconfig(os.path.join(
-                thisdir, 'testing_configs', 'testDB.conf'))
+                dbp_testing.testsdir, 'data', 'configs', 'testDB.conf'))
             _keysPresentCheck(conf)
         except Exception as e:
             self.fail(e)
 
     def test_keysPresentCheck_Invalid(self):
         conf = readconfig(os.path.join(
-            thisdir, 'testing_configs', 'testDB_missingProduct.conf'))
+            dbp_testing.testsdir, 'data', 'configs',
+            'testDB_missingProduct.conf'))
         self.assertRaises(ValueError, _keysPresentCheck, conf)
 
     def test_keysPresentCheck_Trigger(self):
         try:
             conf = readconfig(os.path.join(
-                thisdir, 'testing_configs', 'testDB_trigger.conf'))
+                dbp_testing.testsdir, 'data', 'configs', 'testDB_trigger.conf'))
             _keysPresentCheck(conf)
         except Exception as e:
             self.fail(e)
 
     def test_fileTest_Valid(self):
         try:
-            _fileTest(os.path.join(thisdir, 'testing_configs', 'testDB.conf'))
+            _fileTest(os.path.join(dbp_testing.testsdir, 'data', 'configs',
+                                   'testDB.conf'))
         except Exception as e:
             self.fail(e)
 
     def test_fileTest_Invalid(self):
         self.assertRaises(ValueError, _fileTest, os.path.join(
-            thisdir, 'testing_configs', 'testDB_duplicateSection.conf'))
+            dbp_testing.testsdir, 'data', 'configs',
+            'testDB_duplicateSection.conf'))
 
     def test_NoInputs(self):
         """Create a process with no inputs"""
-        conf = readconfig('testing_configs/testDB_processNoInputs.conf')
+        conf = readconfig(os.path.join(dbp_testing.testsdir, 'data', 'configs',
+                                       'testDB_processNoInputs.conf'))
         self.assertEqual(
             {'code_active': 'True',
              'code_arguments': '',
