@@ -61,7 +61,8 @@ Sphinx rst standards
 For static Sphinx documentation (i.e. ``.rst`` files), keep in mind the
 principles of the docstrings. The `Python documentation style guide
 <https://devguide.python.org/documenting/#style-guide>`_ is also a worthy
-reference.
+reference. In particular, note the three-space indentation standard for
+documentation (except Python sample code).
 
 All documentation must be in rST (reStructuredText) format except where
 another format is explicitly required.
