@@ -102,6 +102,30 @@ need to leave previous local values in place. Leave no space between
 the comment ``#`` and the default value, to distinguish between defaults
 and other comments.
 
+Commit messages
+===============
+Commit messages should provide a very brief summary of what was done and
+why; in particular, placing the changes into context.
+
+They must consist of a single line summary, optionally followed by a
+bullet list of details. A blank link must separate the summary and the
+details. Each point in the bullet list must start with a single space,
+an asterisk, and another space; wrapped lines must be indented three
+spaces to align with the start of the line's text.
+
+Lines must not exceed 76 characters (``git log`` adds a
+four-space indent to the commit message on display).
+
+An example::
+
+    Add code of conduct
+
+     * This is marked as rST but in a way that should be compatible with
+       Markdown.
+     * It's not obvious that github will note this as a "real" CoC but that
+       is something that can be dealt with later.
+
+
 Testing
 =======
 All code should be tested in the ``unittest``-based test suite of
