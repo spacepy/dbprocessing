@@ -10,6 +10,7 @@ dbprocessing
    CODE_OF_CONDUCT
    LICENSE
    COPYRIGHT
+   CONTRIBUTORS
 
 API documentation
 -----------------
