@@ -21,5 +21,5 @@ Current developers (*italics denote project administrators*) are:
    | *Steven Morley*
    | *Denis Nadeau*
    | *Jonathan Niehof*
-   | *Andrew Walker*
-   | *Meilin Yan*
+   | Andrew Walker
+   | Meilin Yan
