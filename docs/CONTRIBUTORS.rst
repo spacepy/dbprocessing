@@ -23,3 +23,4 @@ Current developers (*italics denote project administrators*) are:
    | *Jonathan Niehof*
    | Andrew Walker
    | Meilin Yan
+   | Xiaoguang Yang
