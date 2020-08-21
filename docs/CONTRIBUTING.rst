@@ -60,6 +60,12 @@ All developers must maintain this standard of two PRs and two reviews
 within a continuously-rolling twelve month window or have developer
 access revoked.
 
+You can search for pull requests by author and reviewer at
+<https://github.com/spacepy/dbprocessing/pulls>. In the ``Filters`` box,
+enter ``is:pr author:USERNAME`` or ``is:pr reviewed-by:USERNAME``. Further
+search options are described at
+<https://docs.github.com/articles/searching-issues>.
+
 Becoming an administrator
 -------------------------
 Developers with a consistent pattern of high-quality contribution may
