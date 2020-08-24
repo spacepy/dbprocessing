@@ -6,6 +6,7 @@ from __future__ import print_function
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
 
 import datetime
+import re
 import unittest
 
 from dbprocessing import DBstrings
@@ -148,6 +149,30 @@ class DBFormatterTests(unittest.TestCase):
             ]
         for i, o in zip(inputs, outputs):
             self.assertEqual(o, self.fmtr.format(i[0], **i[1]))
+
+    def testAPID(self):
+        """Test regex and format expansion with an APID in the string"""
+        fmt = 'ect_rbspa_{nnnn}_{APID}_{nn}.ptp.gz'
+        expected = 'ect_rbspa_(\d\d\d\d)_([\da-fA-F]+)_(\d\d).ptp.gz'
+        self.assertEqual(expected, self.fmtr.re(fmt))
+        # Does this regex actually match a filename?
+        self.assertTrue(re.match(
+            '^' + expected + '$',
+            'ect_rbspa_0377_34b_02.ptp.gz'))
+        self.assertEqual(
+            'ect_rbspa_{nnnn}_{APID:x}_{nn}.ptp.gz', self.fmtr.expand_format(fmt))
+
+    def testMissionDayRegex(self):
+        """Test regex and format expansion  with mission day in the string"""
+        fmt = 'rbspa_int_ect-mageisLOW-ns-L05_{mday}_v{VERSION}.cdf'
+        expected = 'rbspa_int_ect-mageisLOW-ns-L05_(-?\d+)_v(\d+\.\d+\.\d+).cdf'
+        self.assertEqual(expected, self.fmtr.re(fmt))
+        self.assertTrue(re.match(
+            '^' + expected + '$',
+            'rbspa_int_ect-mageisLOW-ns-L05_0376_v3.0.0.cdf'))
+        self.assertEqual(
+            'rbspa_int_ect-mageisLOW-ns-L05_{mday:d}_v{VERSION}.cdf',
+            self.fmtr.expand_format(fmt))
 
 
 if __name__ == '__main__':
