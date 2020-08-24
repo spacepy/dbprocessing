@@ -94,6 +94,70 @@ class InspectorClass(unittest.TestCase):
         inspect = imp.load_source('inspect', os.path.dirname(__file__) + '/inspector/rot13_L1.py')
         self.assertEqual(None, inspect.Inspector(badfile, self.dbu, 1,))
 
+    def test_inspector_regex(self):
+        """Test regex expansion of inspector"""
+        # Simple inspector class
+        class testi(inspector.inspector):
+            last = None
+            code_name = 'foo.py'
+            def inspect(self, kwargs):
+                # Save everything passed in
+                last = {k: getattr(self, k) for k in
+                        ('dbu', 'filename', 'basename', 'dirname',
+                         'product', 'filenameformat', 'filenameregex',
+                         'diskfile')}
+                last['kwargs'] = kwargs
+                type(self).last = last
+                return None
+        fspec = os.path.join(self.tempD, 'testDB_2016-01-01.cat')
+        open(fspec, 'w').close()
+        testi(fspec, self.dbu, 1)
+        # The metaclass programming makes this awkward, need to extract
+        # members of an intentionally ephemeral class...
+        last = testi.__ephemeral_encapsulated__.last
+        self.assertEqual('testDB_((19|2\\d)\\d\\d(0\\d|1[0-2])[0-3]\\d).cat',
+                         last['filenameregex'])
+        # Force a different pattern
+        p = self.dbu.getEntry('Product', 1)
+        p.format = 'testDB_{APID}.cat'
+        testi(fspec, self.dbu, 1)
+        last = testi.__ephemeral_encapsulated__.last
+        self.assertEqual('testDB_([\\da-fA-F]+).cat',
+                         last['filenameregex'])
+        # Force a pattern we don't expand
+        p = self.dbu.getEntry('Product', 1)
+        p.format = 'testDB_{nonsense}.cat'
+        testi(fspec, self.dbu, 1)
+        last = testi.__ephemeral_encapsulated__.last
+        self.assertEqual('testDB_(.*).cat',
+                         last['filenameregex'])
+        # testi goes out of scope here, so will clean up db objects
+
+
+class InspectorSupportClass(unittest.TestCase):
+    """Test inspector support classes"""
+
+    def testDefaultFields(self):
+        """default dict that returns generic match"""
+        d = inspector.DefaultFields(a=5)
+        self.assertEqual(
+            ('{foo}', '.*'), d['foo'])
+        self.assertEqual(
+            5, d['a'])
+        self.assertTrue('nothing' in d)
+
+    def testDefaultFormatter(self):
+        """formatter that returns generics"""
+        f = inspector.DefaultFormatter()
+        self.assertEqual(('{nothing}', '.*'), f.SPECIAL_FIELDS['nothing'])
+        self.assertEqual(
+            'foo_{bar}_{Y:04d}_{nothing}',
+            f.expand_format('foo_{bar}_{Y}_{nothing}'))
+        self.assertEqual(
+            'foo_bar_2010_(.*)',
+            f.re('foo_{bar}_{Y}_{nothing}', bar='bar', arg='none',
+                     datetime=datetime.datetime(2010, 1, 1)))
+        self.assertEqual('foobar', f.re('foobar'))
 
 
 if __name__ == "__main__":

@@ -49,6 +49,8 @@ class DBformatter(string.Formatter):
         'VERSION': ('{VERSION}', '\d+\.\d+\.\d+'),
         'DATE': ('{DATE}', '(19|2\d)\d\d(0\d|1[0-2])[0-3]\d'),
         'datetime': ('{datetime}', '(19|2\d)\d\d(0\d|1[0-2])[0-3]\d'),
+        'mday': ('{mday:d}', '-?\d+'),
+        'APID': ('{APID:x}', '[\da-fA-F]+'),
         '??': ('{??}', '..'),
         '???': ('{???}', '...'),
         '????': ('{????}', '....'),
