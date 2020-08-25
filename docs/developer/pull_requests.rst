@@ -106,8 +106,8 @@ In order to be merged, a pull request must:
     5. Be merged by someone who is not the author of the PR. Developers
        may not merge their own PR, even with an approving review.
     6. Be merged by someone who has made an approving review.
-    7. Be merged by has *not contributed any code to the PR*. There are
-       two exceptions, provided all other requirements are met:
+    7. Be merged by someone who has *not contributed any code to the PR*.
+       There are two exceptions, provided all other requirements are met:
 
        a. A PR may be merged by a developer whose only contribution is to
 	  rebase the code to account for changes in master.
