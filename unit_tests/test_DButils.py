@@ -120,14 +120,19 @@ class DBUtilsOtherTests(TestSetup):
 
     def test_checkIncoming(self):
         """checkIncoming"""
-        self.assertFalse(self.dbu.checkIncoming())
         e = self.dbu.getEntry('Mission', 1)
-        e.incoming_dir = os.path.abspath(os.path.dirname(__file__))
-        self.dbu.session.add(e)
-        self.dbu.commitDB()
-        inc_files = self.dbu.checkIncoming()
-        self.assertTrue(inc_files)
-        self.assertTrue(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test_DButils.py') in inc_files)
+        td = tempfile.mkdtemp()
+        try:
+            e.incoming_dir = td
+            self.assertFalse(self.dbu.checkIncoming())
+            fnames = [os.path.join(td, f) for f in ['test', 'test2', '3test']]
+            for f in fnames:
+                open(f, 'w').close()
+            inc_files = self.dbu.checkIncoming()
+            self.assertTrue(inc_files)
+            self.assertEqual(sorted(fnames), sorted(inc_files))
+        finally:
+            shutil.rmtree(td)
 
     def test_currentlyProcessing(self):
         """currentlyProcessing"""
