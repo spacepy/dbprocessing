@@ -74,7 +74,7 @@ the discretion of existing administrators.
 
 All administrators must meet the requirements of active developers.
 
-This requirements in no way relate to administration of the SpacePy
+These requirements in no way relate to administration of the SpacePy
 organization and of SpacePy repositories other than dbprocessing.
 
 Policies
