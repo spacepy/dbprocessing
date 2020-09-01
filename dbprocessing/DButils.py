@@ -14,6 +14,7 @@ from collections import namedtuple
 from operator import itemgetter, attrgetter
 
 import sqlalchemy
+import sqlalchemy.sql.expression
 from sqlalchemy import Table
 from sqlalchemy.orm import mapper
 from sqlalchemy.orm import sessionmaker
@@ -1708,13 +1709,17 @@ class DButils(object):
         :return: list of input_product_ids
         :rtype: list
         """
+        columns = [self.Productprocesslink.input_product_id,
+                   self.Productprocesslink.optional]
         if range:
-            sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional,
-                self.Productprocesslink.yesterday, self.Productprocesslink.tomorrow)\
-                .filter_by(process_id=process_id).all()
-        else:
-            sq = self.session.query(self.Productprocesslink.input_product_id, self.Productprocesslink.optional)\
-                .filter_by(process_id=process_id).all()
+            columns.extend(
+                [self.Productprocesslink.yesterday,
+                 self.Productprocesslink.tomorrow]
+                if hasattr(self.Productprocesslink, 'yesterday') else
+                [sqlalchemy.sql.expression.literal(0).label('yesterday'),
+                 sqlalchemy.sql.expression.literal(0).label('tomorrow')]
+            )
+        sq = self.session.query(*columns).filter_by(process_id=process_id).all()
         return sq
 
     def getFiles(self,
