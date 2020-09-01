@@ -531,6 +531,14 @@ class DBUtilsGetTests(TestSetup):
         self.assertFalse(self.dbu.getInputProductID(2343))
         self.assertEqual([], self.dbu.getInputProductID(2343))
 
+    def test_getInputProductIDOldDB(self):
+        """getInputProductID, asking for yesterday/tomorrow on old DB"""
+        res = self.dbu.getInputProductID(2, True)
+        self.assertEqual(
+            [(22, False, 0, 0), (43, False, 0, 0),
+             (84, False, 0, 0), (90, True, 0, 0)],
+            res)
+
     def test_getFilesEndDate(self):
         """getFiles with only end date specified"""
         val = self.dbu.getFiles(endDate='2013-09-14', product=138)
