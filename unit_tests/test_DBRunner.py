@@ -37,39 +37,53 @@ class DBRunnerTests(unittest.TestCase):
             False, options.echo)
         self.assertEqual(1, options.numproc)
 
+
+class DBRunnerCalcRunmeTests(unittest.TestCase):
+    """DBRunner tests of calc_runme"""
+
+    def setUp(self):
+        """Make temp dir, redirect stdout"""
+        self.pq = None # Define the symbol so the del later doesn't fail
+        self.newstdout = self.oldstdout = None # Similar
+        self.td = tempfile.mkdtemp()
+        self.testdb = os.path.join(self.td, 'RBSP_MAGEIS.sqlite')
+        shutil.copy2(os.path.join(dbp_testing.testsdir,
+                                  'RBSP_MAGEIS.sqlite'),
+                     self.testdb)
+        self.pq = dbprocessing.dbprocessing.ProcessQueue(self.testdb)
+        # There's a bunch of print statements to smash...
+        self.oldstdout = sys.stdout
+        self.newstdout = (io.BytesIO if str is bytes else io.StringIO)()
+        sys.stdout = self.newstdout
+
+    def tearDown(self):
+        """Clean up temp dir and stdout"""
+        if self.oldstdout is not None:
+            sys.stdout = self.oldstdout
+        if self.newstdout is not None:
+            self.newstdout.close()
+        del self.pq # Cleaned up by its destructor only
+        shutil.rmtree(self.td)
+
     def test_runme_list(self):
         """Get a list of processes to run"""
-        pq = None # Define the symbol so the del later doesn't fail
-        newstdout = oldstdout = None # Similar
-        td = tempfile.mkdtemp()
-        try:
-            testdb = os.path.join(td, 'RBSP_MAGEIS.sqlite')
-            shutil.copy2(os.path.join(dbp_testing.testsdir,
-                                      'RBSP_MAGEIS.sqlite'),
-                         testdb)
-            pq = dbprocessing.dbprocessing.ProcessQueue(testdb)
-            # There's a bunch of print statements to smash...
-            oldstdout = sys.stdout
-            newstdout = (io.BytesIO if str is bytes else io.StringIO)()
-            sys.stdout = newstdout
-            runme = DBRunner.calc_runme(pq, datetime.datetime(2013, 9, 6),
-                                    datetime.datetime(2013, 9, 9), 38)
-            self.assertEqual(4, len(runme))
-            for r in runme:
-                self.assertEqual(38, r.process_id)
-                self.assertEqual(
-                    '/n/space_data/cda/rbsp/codes/mageis/'
-                    'run_mageis_L2combined_v3.0.0.py', r.codepath)
+        runme = DBRunner.calc_runme(self.pq, datetime.datetime(2013, 9, 6),
+                                datetime.datetime(2013, 9, 9), 38)
+        self.assertEqual(4, len(runme))
+        for r in runme:
+            self.assertEqual(38, r.process_id)
             self.assertEqual(
-                [datetime.date(2013, 9, i) for i in range(6, 10)],
-                sorted([r.utc_file_date for r in runme]))
-        finally:
-            del pq # Cleaned up by its destructor only
-            shutil.rmtree(td)
-            if oldstdout is not None:
-                sys.stdout = oldstdout
-            if newstdout is not None:
-                newstdout.close()
+                '/n/space_data/cda/rbsp/codes/mageis/'
+                'run_mageis_L2combined_v3.0.0.py', r.codepath)
+        self.assertEqual(
+            [datetime.date(2013, 9, i) for i in range(6, 10)],
+            sorted([r.utc_file_date for r in runme]))
+
+    def test_runme_list_no_results(self):
+        """Get a list of processes to run, for day with nothing"""
+        runme = DBRunner.calc_runme(self.pq, datetime.datetime(2010, 9, 6),
+                                    datetime.datetime(2010, 9, 9), 38)
+        self.assertEqual(0, len(runme))
 
 
 if __name__ == "__main__":
