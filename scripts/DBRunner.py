@@ -34,22 +34,26 @@ def parse_args(argv=None):
         Arguments from command line, from flags and non-flag arguments.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--dryrun", action="store_true",
-                        help="dryrun, only print what would be done", default=False)
-    parser.add_argument("-v", "--version",
-                        help="NOTIMPLEMENTED set output version", default='1.0.0')
-    parser.add_argument("-m", "--mission",
-                        help="selected mission database", required=True)
-    parser.add_argument("--echo", action="store_true",
-                        help="Start sqlalchemy with echo in place for debugging", default=False)
-    parser.add_argument("-s", "--startDate",
-                        help="Date to start search (e.g. 2012-10-02 or 20121002)", default=None)
-    parser.add_argument("-e", "--endDate",
-                        help="Date to end search (e.g. 2012-10-25 or 20121025)", default=None)
-    parser.add_argument("--nooptional", dest="optional", action="store_false",
-                        help="Do not include optional inputs", default=True) # logic is backwards
-    parser.add_argument("-n", "--num-proc", dest="numproc", type=int,
-                        help="Number of processes to run in parallel", default=1)
+    parser.add_argument("-d", "--dryrun", action="store_true", default=False,
+                        help="dryrun, only print what would be done")
+    parser.add_argument("-v", "--version",  default='1.0.0',
+                        help="NOTIMPLEMENTED set output version")
+    parser.add_argument("-m", "--mission", required=True,
+                        help="selected mission database")
+    parser.add_argument("--echo", action="store_true", default=False,
+                        help="Start sqlalchemy with echo in place for"
+                        " debugging")
+    parser.add_argument("-s", "--startDate", default=None,
+                        help="Date to start search (e.g. 2012-10-02 or"
+                        " 20121002)")
+    parser.add_argument("-e", "--endDate", default=None,
+                        help="Date to end search (e.g. 2012-10-25 or"
+                        " 20121025)")
+    parser.add_argument(
+        "--nooptional", dest="optional", action="store_false", default=True,
+        help="Do not include optional inputs") # logic is backwards
+    parser.add_argument("-n", "--num-proc", dest="numproc", type=int, default=1,
+                        help="Number of processes to run in parallel")
     parser.add_argument('process_id', action='store', type=int,
                         help="Process ID of process to run")
 
