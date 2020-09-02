@@ -63,9 +63,6 @@ class DBRunnerTests(unittest.TestCase):
             self.assertEqual(
                 [datetime.date(2013, 9, i) for i in range(6, 10)],
                 sorted([r.utc_file_date for r in runme]))
-            # The interesting thing here is that input_files is empty,
-            # but the runme still computes a command line...so look into
-            # that in the future (and add test here).
         finally:
             del pq # Cleaned up by its destructor only
             shutil.rmtree(td)
