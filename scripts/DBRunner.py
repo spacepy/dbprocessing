@@ -117,18 +117,10 @@ def calc_runme(pq, startDate, endDate, inproc):
                          if timebase in ('DAILY',) \
                          else pq.dbu.getFilesByProductDate
             files = filegetter(p, [d]*2, newest_version=True)
-            if files:
-                fnames = [v.filename for v in files]
-            else:
-                fnames = []
+            fnames = [v.filename for v in files]
             print("        Found files: {0}".format(list(fnames)))
 
-            #files = [v.file_id for v in files]
-            if files:
-                input_files.extend([v.file_id for v in files])
-            if not files:
-                continue
-            #files, input_prods = pq._getRequiredProducts(inproc, files[0].filename, d)
+            input_files.extend([v.file_id for v in files])
         if not input_files:
             print("No files to run for process ({0}) {1} on {2}".format(inproc,
                                                                       pq.dbu.getEntry('Process', inproc).process_name,
