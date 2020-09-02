@@ -34,17 +34,17 @@ def parse_args(argv=None):
         Arguments from command line, from flags and non-flag arguments.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--dryrun", dest="dryrun", action="store_true",
+    parser.add_argument("-d", "--dryrun", action="store_true",
                         help="dryrun, only print what would be done", default=False)
-    parser.add_argument("-v", "--version", dest="version", type=str,
+    parser.add_argument("-v", "--version",
                         help="NOTIMPLEMENTED set output version", default='1.0.0')
-    parser.add_argument("-m", "--mission", dest="mission",
+    parser.add_argument("-m", "--mission",
                         help="selected mission database", required=True)
-    parser.add_argument("--echo", dest="echo", action="store_true",
+    parser.add_argument("--echo", action="store_true",
                         help="Start sqlalchemy with echo in place for debugging", default=False)
-    parser.add_argument("-s", "--startDate", dest="startDate", type=str,
+    parser.add_argument("-s", "--startDate",
                         help="Date to start search (e.g. 2012-10-02 or 20121002)", default=None)
-    parser.add_argument("-e", "--endDate", dest="endDate", type=str,
+    parser.add_argument("-e", "--endDate",
                         help="Date to end search (e.g. 2012-10-25 or 20121025)", default=None)
     parser.add_argument("--nooptional", dest="optional", action="store_false",
                         help="Do not include optional inputs", default=True) # logic is backwards
