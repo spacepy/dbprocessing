@@ -38,7 +38,7 @@ class DBRunnerTests(unittest.TestCase):
         self.assertEqual(1, options.numproc)
 
 
-class DBRunnerCalcRunmeTests(unittest.TestCase):
+class DBRunnerCalcRunmeTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """DBRunner tests of calc_runme"""
 
     def setUp(self):
@@ -51,6 +51,7 @@ class DBRunnerCalcRunmeTests(unittest.TestCase):
                                   'RBSP_MAGEIS.sqlite'),
                      self.testdb)
         self.pq = dbprocessing.dbprocessing.ProcessQueue(self.testdb)
+        self.dbu = self.pq.dbu # Mixin methods looking for direct dbu access.
         # There's a bunch of print statements to smash...
         self.oldstdout = sys.stdout
         self.newstdout = (io.BytesIO if str is bytes else io.StringIO)()
@@ -84,6 +85,23 @@ class DBRunnerCalcRunmeTests(unittest.TestCase):
         runme = DBRunner.calc_runme(self.pq, datetime.datetime(2010, 9, 6),
                                     datetime.datetime(2010, 9, 9), 38)
         self.assertEqual(0, len(runme))
+
+    def test_runme_list_no_input(self):
+        """List of processes to run for no-input processes"""
+        # Create a product to serve as the output of the process
+        prodid = self.addProduct(
+            product_name='triggered_output',
+            instrument_id=1,
+            format='trigger_{Y}{m}{d}_v{VERSION}.out',
+            level=2)
+        procid, codeid = self.addProcess('no_input', output_product_id=prodid)
+        runme = DBRunner.calc_runme(self.pq, datetime.datetime(2010, 1, 1),
+                                    datetime.datetime(2010, 1, 5), procid)
+        self.assertEqual(5, len(runme))
+        # Quick checks; test_runMe has extensive tests with no input products.
+        rm = runme[0]
+        self.assertEqual('/n/space_data/cda/rbsp/scripts/junk.py', rm.codepath)
+        self.assertEqual('trigger_20100101_v1.0.0.out', rm.filename)
 
 
 if __name__ == "__main__":

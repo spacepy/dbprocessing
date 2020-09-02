@@ -101,6 +101,11 @@ DBRunner.py:
 
 Used to demo run codes for certain dates out of the database. This primarily used in testing can also be used to reprocess files as needed
 
+As is typical, processes for which there are no input files for a date will
+not be run. However, if a process has no input *products*, dates specified
+will always run (unlike in ProcessQueue, which has no way of triggering
+such processing.)
+
 .. option:: filename The filename to save the config
 .. option:: -d, --dryrun Only print what would be done
 .. option:: -m <dbname>, --mission <dbname> Selected mission database

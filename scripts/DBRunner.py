@@ -121,11 +121,14 @@ def calc_runme(pq, startDate, endDate, inproc):
 
             input_files.extend([v.file_id for v in files])
         if not input_files:
-            print("No files to run for process ({0}) {1} on {2}".format(inproc,
-                                                                      pq.dbu.getEntry('Process', inproc).process_name,
-                                                                      d.isoformat()))
-        else:
-            runme.append(runMe.runMe(pq.dbu, d, inproc, input_files, pq, force=True))
+            print("{3} ({0}) {1} on {2}".format(
+                inproc, pq.dbu.getEntry('Process', inproc).process_name,
+                d.isoformat(),
+                "No files to run for" if products
+                else "No input product, always run"))
+            if products: # Skip the run.
+                continue
+        runme.append(runMe.runMe(pq.dbu, d, inproc, input_files, pq, force=True))
     return runme
 
 
