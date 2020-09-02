@@ -21,10 +21,10 @@ class DBRunnerTests(unittest.TestCase):
 
     def test_parse_dbrunner_args(self):
         """Parse the command line arguments"""
-        args, options = DBRunner.parse_args([
+        options = DBRunner.parse_args([
             '-m', 'foo.sqlite', '-s', '20180101', '5'])
         self.assertEqual(
-            ['5'], args)
+            5, options.process_id)
         self.assertEqual(
             'foo.sqlite', options.mission)
         self.assertEqual(

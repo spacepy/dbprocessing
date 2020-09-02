@@ -3,7 +3,7 @@
 import datetime
 import os
 import operator
-from optparse import OptionParser
+import argparse
 import traceback
 import subprocess
 
@@ -30,36 +30,30 @@ def parse_args(argv=None):
 
     Returns
     =======
-    args : list
-        positional arguments from command line
-    options : optparse.Values
-        Arguments to command line flags
+    options : argparse.Values
+        Arguments from command line, from flags and non-flag arguments.
     """
-    usage = \
-    """
-    Usage: %prog -m db process_id
-    """
-    parser = OptionParser(usage=usage)
-    parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
-                      help="dryrun, only print what would be done", default=False)
-    parser.add_option("-v", "--version", dest="version", type='str', 
-                      help="NOTIMPLEMENTED set output version", default='1.0.0')
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission database", default=None)
-    parser.add_option("", "--echo", dest="echo", action="store_true",
-                      help="Start sqlalchemy with echo in place for debugging", default=False)
-    parser.add_option("-s", "--startDate", dest="startDate", type="string",
-                      help="Date to start search (e.g. 2012-10-02 or 20121002)", default=None)
-    parser.add_option("-e", "--endDate", dest="endDate", type="string",
-                      help="Date to end search (e.g. 2012-10-25 or 20121025)", default=None)
-    parser.add_option("", "--nooptional", dest="optional", action="store_false",
-                      help="Do not include optional inputs", default=True) # logic is backwards
-    parser.add_option("-n", "--num-proc", dest="numproc", type='int',
-                      help="Number of processes to run in parallel", default=1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--dryrun", dest="dryrun", action="store_true",
+                        help="dryrun, only print what would be done", default=False)
+    parser.add_argument("-v", "--version", dest="version", type=str,
+                        help="NOTIMPLEMENTED set output version", default='1.0.0')
+    parser.add_argument("-m", "--mission", dest="mission",
+                        help="selected mission database", required=True)
+    parser.add_argument("--echo", dest="echo", action="store_true",
+                        help="Start sqlalchemy with echo in place for debugging", default=False)
+    parser.add_argument("-s", "--startDate", dest="startDate", type=str,
+                        help="Date to start search (e.g. 2012-10-02 or 20121002)", default=None)
+    parser.add_argument("-e", "--endDate", dest="endDate", type=str,
+                        help="Date to end search (e.g. 2012-10-25 or 20121025)", default=None)
+    parser.add_argument("--nooptional", dest="optional", action="store_false",
+                        help="Do not include optional inputs", default=True) # logic is backwards
+    parser.add_argument("-n", "--num-proc", dest="numproc", type=int,
+                        help="Number of processes to run in parallel", default=1)
+    parser.add_argument('process_id', action='store', type=int,
+                        help="Process ID of process to run")
 
-    (options, args) = parser.parse_args(argv)
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args(argv)
 
     if options.startDate is not None:
         options.startDate = dup.parse(options.startDate)
@@ -72,7 +66,7 @@ def parse_args(argv=None):
 
     if options.endDate < options.startDate:
         parser.error("endDate must be >= to startDate")
-    return args, options
+    return options
 
 
 def calc_runme(pq, startDate, endDate, inproc):
@@ -133,8 +127,8 @@ def calc_runme(pq, startDate, endDate, inproc):
 
 
 if __name__ == "__main__":
-    args, options = parse_args()
-    inproc = args[0]
+    options = parse_args()
+    inproc = options.process_id
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
     runme = calc_runme(pq, options.startDate, options.endDate, inproc)
     runMe.runner(runme, pq.dbu, MAX_PROC=options.numproc, rundir='.')
