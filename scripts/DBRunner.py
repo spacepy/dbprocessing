@@ -127,7 +127,6 @@ def calc_runme(pq, startDate, endDate, inproc):
             if files:
                 input_files.extend([v.file_id for v in files])
             if not files:
-                print("No process to run for {0}".format(d.isoformat()))
                 continue
             #files, input_prods = pq._getRequiredProducts(inproc, files[0].filename, d)
         if not input_files:
