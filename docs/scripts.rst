@@ -97,7 +97,7 @@ Show files in database but not on disk. Additionally, this can remove files from
 
 DBRunner.py:
 ------------
-.. program:: DBRunner
+.. program:: DBRunner.py
 
 Used to demo run codes for certain dates out of the database. This primarily used in testing can also be used to reprocess files as needed
 
@@ -106,14 +106,48 @@ not be run. However, if a process has no input *products*, dates specified
 will always run (unlike in ProcessQueue, which has no way of triggering
 such processing.)
 
-.. option:: filename The filename to save the config
-.. option:: -d, --dryrun Only print what would be done
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-.. option:: --echo Start sqlalchemy with echo in place for debugging
-.. option:: -s <date>, --startDate <date> Date to start search (e.g. 2012-10-02 or 20121002)
-.. option:: -e <date>, --endDate <date> Date to end search (e.g. 2012-10-25 or 20121025)
-.. option:: --nooptional Do not include optional inputs
-.. option:: -n, --num-proc Number of processes to run in parallel
+.. option:: process_id
+
+   Process ID of process to run.
+
+.. option:: -d, --dryrun
+
+   Only print what would be done (not currently working).
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: --echo
+
+   Start sqlalchemy with echo in place for debugging
+
+.. option:: -s <date>, --startDate <date>
+
+   Date to start search (e.g. 2012-10-02 or 20121002)
+
+.. option:: -e <date>, --endDate <date>
+
+   Date to end search (e.g. 2012-10-25 or 20121025)
+
+.. option:: --nooptional
+
+   Do not include optional inputs
+
+.. option:: -n, --num-proc
+
+   Number of processes to run in parallel
+
+.. option:: -u, --update
+
+   Only run files that have not yet been created or with updated codes.
+   Mutually exclusive with --force, -v. (Default: run all.)
+
+.. option:: --force {0,1,2}
+
+   Run all files in given date range and always increment version
+   (0: interface; 1: quality; 2: revision). Mutually exclusive with -u, -v.
+   (Default: run all but do not increment version.)
 
 deleteAllDBFiles.py:
 --------------------
