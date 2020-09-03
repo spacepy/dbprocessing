@@ -36,8 +36,6 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--dryrun", action="store_true", default=False,
                         help="dryrun, only print what would be done")
-    parser.add_argument("-v", "--version",  default='1.0.0',
-                        help="NOTIMPLEMENTED set output version")
     parser.add_argument("-m", "--mission", required=True,
                         help="selected mission database")
     parser.add_argument("--echo", action="store_true", default=False,
@@ -49,6 +47,19 @@ def parse_args(argv=None):
     parser.add_argument("-e", "--endDate", default=None,
                         help="Date to end search (e.g. 2012-10-25 or"
                         " 20121025)")
+    howtorun = parser.add_mutually_exclusive_group()
+    howtorun.add_argument("--force", type=int, default=None, choices=[0, 1, 2],
+                          help="Always process and bump version; specify"
+                          " which version to bump (0: interface; 1: quality;"
+                          " 2: revision). Mutually exclusive with -u, -v."
+                          " (Default: version 1.0.0.)")
+    howtorun.add_argument("-u", "--update", action="store_true", default=False,
+                          help="Only run files that have not yet been created"
+                          " or have updated codes. Mutually exclusive with"
+                          " --force, -v. (Default: run all.)")
+    howtorun.add_argument("-v", "--version",  default='1.0.0',
+                          help="NOTIMPLEMENTED set output version."
+                          " Mutually exclusive with --force, -u.")
     parser.add_argument(
         "--nooptional", dest="optional", action="store_false", default=True,
         help="Do not include optional inputs") # logic is backwards
@@ -73,7 +84,8 @@ def parse_args(argv=None):
     return options
 
 
-def calc_runme(pq, startDate, endDate, inproc):
+def calc_runme(pq, startDate, endDate, inproc,
+               version_bump=None, update=False):
     """Find all processes that can be run given the inputs
 
     Parameters
@@ -86,12 +98,20 @@ def calc_runme(pq, startDate, endDate, inproc):
         Last date to process (inclusive)
     inproc : int
         Process ID to run
+    version_bump : int
+        Which component of version to bump (0-2, 0 for interface).
+        Cannot combine with `update`. Default: do not bump version.
+    update : bool
+        Only run for updated files, and increment version appropriately.
+        Cannot combine with `version_bump`.
 
     Returns
     =======
     runme : list
         All commands that can be run.
     """
+    if update and version_bump is not None:
+        raise ValueError('Cannot specify both update and version_bump.')
     dates = [Utils.datetimeToDate(d)
              for d in Utils.expandDates(startDate, endDate)]
     print('dates', dates)
@@ -126,7 +146,11 @@ def calc_runme(pq, startDate, endDate, inproc):
                 else "No input product, always run"))
             if products: # Skip the run.
                 continue
-        runme.append(runMe.runMe(pq.dbu, d, inproc, input_files, pq, force=True))
+        runme.append(runMe.runMe(
+            pq.dbu, d, inproc, input_files, pq, version_bump=version_bump,
+            # "force" flag means "force even if version conflict"; no
+            # version conflicts if bumping version or only running out-of-date
+            force=(version_bump is None and not update)))
     return runme
 
 
@@ -134,6 +158,7 @@ if __name__ == "__main__":
     options = parse_args()
     inproc = options.process_id
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
-    runme = calc_runme(pq, options.startDate, options.endDate, inproc)
+    runme = calc_runme(pq, options.startDate, options.endDate, inproc,
+                       version_bump=options.force, update=options.update)
     runMe.runner(runme, pq.dbu, MAX_PROC=options.numproc, rundir='.')
                 

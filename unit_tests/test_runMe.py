@@ -284,7 +284,12 @@ class RunMeCmdArgTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         rm = dbprocessing.runMe.runMe(
             self.dbu, datetime.date(2013, 9, 21), procid,
             [], None, version_bump=None)
-        # Make sure this is runnable
+        # Should not be runnable, because no change (would conflict)
+        self.assertFalse(rm.ableToRun)
+        # But if force, that marks runnable even with conflict
+        rm = dbprocessing.runMe.runMe(
+            self.dbu, datetime.date(2013, 9, 21), procid,
+            [], None, version_bump=None, force=True)
         self.assertTrue(rm.ableToRun)
         # And now the command line itself
         rm.make_command_line()
