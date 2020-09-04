@@ -95,16 +95,17 @@ Show files in database but not on disk. Additionally, this can remove files from
 .. option:: --startID The File id to start on
 .. option:: -v, --verbose Print out each file as it is checked
 
-DBRunner.py:
-------------
+DBRunner.py
+-----------
 .. program:: DBRunner.py
 
 Used to demo run codes for certain dates out of the database. This primarily used in testing can also be used to reprocess files as needed
 
 As is typical, processes for which there are no input files for a date will
 not be run. However, if a process has no input *products*, dates specified
-will always run (unlike in ProcessQueue, which has no way of triggering
-such processing.)
+will be run, depending on the values of :option:`--force` and
+:option:`--update`. This is unlike `ProcessQueue.py`_, which has no way of
+triggering such processing.
 
 .. option:: process_id
 
@@ -275,8 +276,8 @@ Prints the process queue.
 .. option:: -o, --output The name of the file to output to(if blank, print to stdout)
 .. option:: --html Output in HTML
 
-ProcessQueue.py:
-----------------
+ProcessQueue.py
+---------------
 .. program:: ProcessQueue
 
 The main thing
