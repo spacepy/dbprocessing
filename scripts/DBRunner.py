@@ -161,11 +161,10 @@ def calc_runme(pq, startDate, endDate, inproc,
 
 if __name__ == "__main__":
     options = parse_args()
-    if options.ingest:
-        raise NotImplementedError('Ingest not functional yet.')
     inproc = options.process_id
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
     runme = calc_runme(pq, options.startDate, options.endDate, inproc,
                        version_bump=options.force, update=options.update)
-    runMe.runner(runme, pq.dbu, MAX_PROC=options.numproc, rundir='.')
+    runMe.runner(runme, pq.dbu, MAX_PROC=options.numproc,
+                 rundir=None if options.ingest else '.')
                 
