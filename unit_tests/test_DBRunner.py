@@ -36,6 +36,7 @@ class DBRunnerTests(unittest.TestCase):
         self.assertFalse(options.echo)
         self.assertEqual(1, options.numproc)
         self.assertFalse(options.update)
+        self.assertFalse(options.ingest)
         self.assertTrue(options.force is None)
 
     def test_parse_dbrunner_args_other(self):
@@ -46,16 +47,27 @@ class DBRunnerTests(unittest.TestCase):
         options = DBRunner.parse_args([
             '-m', 'foo.sqlite', '-s', '20180101', '5', '-u'])
         self.assertTrue(options.update)
+        options = DBRunner.parse_args([
+            '-m', 'foo.sqlite', '-s', '20180101', '5', '-u', '-i'])
+        self.assertTrue(options.update)
+        self.assertTrue(options.ingest)
+        options = DBRunner.parse_args([
+            '-m', 'foo.sqlite', '-s', '20180101', '5', '--force', '1', '-i'])
+        self.assertFalse(options.update)
+        self.assertEqual(1, options.force)
+        self.assertTrue(options.ingest)
 
     def test_parse_dbrunner_args_bad(self):
         """Parse the command line arguments with errors"""
         arglist = [
             ['--force', '6'],
             ['--force', '0', '-u'],
+            ['-i'],
             ]
         msgs = [
             'argument --force: invalid choice: 6 (choose from 0, 1, 2)',
             'argument -u/--update: not allowed with argument --force',
+            'argument -i/--ingest: requires --force or --update',
             ]
         oldstderr = sys.stderr
         for args, msg in zip(arglist, msgs):
