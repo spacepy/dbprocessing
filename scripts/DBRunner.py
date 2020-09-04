@@ -148,14 +148,18 @@ def calc_runme(pq, startDate, endDate, inproc,
                 inproc, pq.dbu.getEntry('Process', inproc).process_name,
                 d.isoformat(),
                 "No files to run for" if products
-                else "No input product, always run"))
+                else "No input product, always check"))
             if products: # Skip the run.
                 continue
-        runme.append(runMe.runMe(
+        r = runMe.runMe(
             pq.dbu, d, inproc, input_files, pq, version_bump=version_bump,
             # "force" flag means "force even if version conflict"; no
             # version conflicts if bumping version or only running out-of-date
-            force=(version_bump is None and not update)))
+            force=(version_bump is None and not update))
+        if r.ableToRun or version_bump is not None or not update:
+            runme.append(r)
+        else:
+            print("Up to date, not running.")
     return runme
 
 
