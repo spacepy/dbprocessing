@@ -20,3 +20,9 @@ ProcessQueue.py -p -m ./no_inputs.sqlite # Nothing to do
 
 Make sure don't run again; they're up to date:
 DBRunner.py -m ./no_inputs.sqlite -s 20100101 -e 20100102 1 -u
+
+Bump the code version:
+python ./inc_code_version.py
+
+Make sure get new versions of files:
+DBRunner.py -m ./no_inputs.sqlite -s 20100101 -e 20100102 1 -u -i
