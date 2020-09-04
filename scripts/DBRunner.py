@@ -60,6 +60,9 @@ def parse_args(argv=None):
     howtorun.add_argument("-v", "--version",  default='1.0.0',
                           help="NOTIMPLEMENTED set output version."
                           " Mutually exclusive with --force, -u.")
+    parser.add_argument("-i", "--ingest", action="store_true", default=False,
+                        help="Ingest the created files. Requires -u or --force."
+                        " (Default: create file in current directory.)")
     parser.add_argument(
         "--nooptional", dest="optional", action="store_false", default=True,
         help="Do not include optional inputs") # logic is backwards
@@ -69,6 +72,8 @@ def parse_args(argv=None):
                         help="Process ID of process to run")
 
     options = parser.parse_args(argv)
+    if options.ingest and options.force is None and not options.update:
+        parser.error("argument -i/--ingest: requires --force or --update")
 
     if options.startDate is not None:
         options.startDate = dup.parse(options.startDate)
@@ -156,6 +161,8 @@ def calc_runme(pq, startDate, endDate, inproc,
 
 if __name__ == "__main__":
     options = parse_args()
+    if options.ingest:
+        raise NotImplementedError('Ingest not functional yet.')
     inproc = options.process_id
     pq = dbprocessing.ProcessQueue(options.mission, dryrun=options.dryrun, echo=options.echo)
     runme = calc_runme(pq, options.startDate, options.endDate, inproc,

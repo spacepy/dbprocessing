@@ -138,6 +138,12 @@ such processing.)
 
    Number of processes to run in parallel
 
+.. option:: -i, --ingest
+
+   Ingest created files into the database. This will also add them to the
+   process queue, to be built into further products by ProcessQueue -p.
+   (Default: create in current directory and do not add to database.)
+
 .. option:: -u, --update
 
    Only run files that have not yet been created or with updated codes.
