@@ -12,6 +12,9 @@ chmod u+x root/dbp_codes/scripts/inputless_v1.0.0/inputless_v1.0.0.py
 Run to just make files in the local directory:
 DBRunner.py -m ./no_inputs.sqlite -s 20100101 -e 20100102 1
 
+Try same thing but process name:
+DBRunner.py -m ./no_inputs.sqlite -s 20100101 -e 20100102 inputless
+
 Run so as to ingest them:
 DBRunner.py -m ./no_inputs.sqlite -s 20100101 -e 20100102 1 -i -u
 ls root/data/ # Should be files there
