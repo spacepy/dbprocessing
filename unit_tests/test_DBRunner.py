@@ -87,7 +87,7 @@ class DBRunnerTests(unittest.TestCase):
                 sys.stderr.close()
                 sys.stderr = oldstderr
             self.assertEqual(
-                '{}: error: {}'.format(os.path.basename(__file__), msg), err)
+                '{}: error: {}'.format(os.path.basename(sys.argv[0]), msg), err)
 
 
 class DBRunnerCalcRunmeTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
