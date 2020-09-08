@@ -109,7 +109,7 @@ triggering such processing.
 
 .. option:: process_id
 
-   Process ID of process to run.
+   Process ID or process name of process to run.
 
 .. option:: -d, --dryrun
 

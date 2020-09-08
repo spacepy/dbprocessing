@@ -68,8 +68,8 @@ def parse_args(argv=None):
         help="Do not include optional inputs") # logic is backwards
     parser.add_argument("-n", "--num-proc", dest="numproc", type=int, default=1,
                         help="Number of processes to run in parallel")
-    parser.add_argument('process_id', action='store', type=int,
-                        help="Process ID of process to run")
+    parser.add_argument('process_id', action='store',
+                        help="Process ID or name of process to run")
 
     options = parser.parse_args(argv)
     if options.ingest and options.force is None and not options.update:
@@ -101,8 +101,8 @@ def calc_runme(pq, startDate, endDate, inproc,
         First date to process (inclusive)
     endDate : datetime.datetime
         Last date to process (inclusive)
-    inproc : int
-        Process ID to run
+    inproc : int or str
+        Process ID or name to run
     version_bump : int
         Which component of version to bump (0-2, 0 for interface).
         Cannot combine with `update`. Default: do not bump version.
