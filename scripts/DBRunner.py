@@ -121,10 +121,12 @@ def calc_runme(pq, startDate, endDate, inproc,
              for d in Utils.expandDates(startDate, endDate)]
     print('dates', dates)
 
-    timebase = pq.dbu.getProcessTimebase(inproc)
+    # Get the full Process entry for the process ID
+    inproc = pq.dbu.getEntry('Process', inproc)
+    timebase = pq.dbu.getProcessTimebase(inproc.process_id)
 
     # get the input products for a process
-    products = pq.dbu.getInputProductID(inproc)
+    products = pq.dbu.getInputProductID(inproc.process_id)
     print('products', products)
 
     runme = []
@@ -145,14 +147,15 @@ def calc_runme(pq, startDate, endDate, inproc,
             input_files.extend([v.file_id for v in files])
         if not input_files:
             print("{3} ({0}) {1} on {2}".format(
-                inproc, pq.dbu.getEntry('Process', inproc).process_name,
+                inproc.process_id, inproc.process_name,
                 d.isoformat(),
                 "No files to run for" if products
                 else "No input product, always check"))
             if products: # Skip the run.
                 continue
         r = runMe.runMe(
-            pq.dbu, d, inproc, input_files, pq, version_bump=version_bump,
+            pq.dbu, d, inproc.process_id, input_files, pq,
+            version_bump=version_bump,
             # "force" flag means "force even if version conflict"; no
             # version conflicts if bumping version or only running out-of-date
             force=(version_bump is None and not update))
