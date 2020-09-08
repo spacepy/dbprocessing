@@ -187,14 +187,15 @@ class DBRunnerCalcRunmeTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
             runme = DBRunner.calc_runme(self.pq, datetime.datetime(2010, 1, 1),
                                         datetime.datetime(2010, 1, 1), procid,
                                         version_bump=vb, update=u)
+            # -u can't make output
+            if v is None:
+                self.assertEqual(0, len(runme))
+                continue
             self.assertEqual(1, len(runme))
             rm = runme[0]
-            if v is None:
-                self.assertFalse(rm.ableToRun)
-            else:
-                self.assertTrue(rm.ableToRun)
-                self.assertEqual('trigger_20100101_v{}.out'.format(v),
-                                 rm.filename)
+            self.assertTrue(rm.ableToRun)
+            self.assertEqual('trigger_20100101_v{}.out'.format(v),
+                             rm.filename)
         # Update the code
         oldcode = self.dbu.getEntry('Code', codeid)
         newcode = self.dbu.Code()
