@@ -157,7 +157,6 @@ class DBRunnerCalcRunmeTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
 
     def test_runme_list_options(self):
         """List of processes to run, no input, various forcing"""
-        print('foo')
         prodid = self.addProduct(
             product_name='triggered_output',
             instrument_id=1,
