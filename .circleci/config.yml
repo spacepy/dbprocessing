@@ -21,17 +21,15 @@ jobs:
       PGHOST: localhost
     steps:
        - checkout
-       - run: sudo chown -R circleci:circleci /usr/local/bin
-       - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
        - run: sudo apt-get install vim
        - run: 
            command: |
              sudo apt install -y postgresql-client
              createdb -h localhost sndd -O root
-             pip install sqlalchemy
-             pip install python-dateutil
-             pip install psycopg2
-             python setup.py install
+             pip install --user sqlalchemy
+             pip install --user python-dateutil
+             pip install --user psycopg2
+             python setup.py install --user
              python scripts/CreateDBsabrs.py
 
 workflows:
