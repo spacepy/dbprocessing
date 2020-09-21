@@ -8,7 +8,6 @@ import traceback
 import subprocess
 
 import dateutil.parser as dup
-import spacepy.toolbox as tb
 
 from dbprocessing import dbprocessing
 from dbprocessing.runMe import ProcessException
