@@ -21,7 +21,6 @@ jobs:
       PGHOST: localhost
     steps:
        - checkout
-       - run: sudo apt-get install vim
        - run: 
            command: |
              sudo apt install -y postgresql-client
