@@ -5,6 +5,30 @@ jobs:
   build:
     docker:
       - image: circleci/python:2.7.18
+    steps:
+       - checkout
+       - run:
+           command: |
+             pip install --user sqlalchemy
+             pip install --user python-dateutil
+             python setup.py install --user
+       - persist_to_workspace:
+           root: ~/.local
+           paths:
+             - lib # Save installed Python libraries (including dbp itself)
+  unittest:
+    docker:
+      - image: circleci/python:2.7.18
+    steps:
+       - checkout
+       - attach_workspace:
+           at: ~/.local
+       - run:
+           command: |
+             python unit_tests/test_all.py
+  createpostgres:
+    docker:
+      - image: circleci/python:2.7.18
         environment:
           DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
       - image: circleci/postgres:9.6.2-alpine
@@ -19,17 +43,22 @@ jobs:
       PGHOST: localhost
     steps:
        - checkout
-       - run: 
+       - attach_workspace:
+           at: ~/.local
+       - run:
            command: |
              sudo apt install -y postgresql-client
              createdb -h localhost sndd -O root
-             pip install --user sqlalchemy
-             pip install --user python-dateutil
              pip install --user psycopg2
-             python setup.py install --user
              python scripts/CreateDBsabrs.py
 
 workflows:
   main:
     jobs:
      - build
+     - unittest:
+         requires:
+           - build
+     - createpostgres:
+         requires:
+           - build
