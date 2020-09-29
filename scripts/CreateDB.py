@@ -165,6 +165,13 @@ class dbprocessing_db(object):
                      data_table.columns['utc_start_time'],
                      data_table.columns['utc_stop_time'], unique=True)
 
+        data_table = schema.Table('unixtime', metadata,
+                                  schema.Column('file_id', types.Integer,
+                                                schema.ForeignKey('file.file_id'), primary_key=True),
+                                  schema.Column('unix_start', types.Integer, index=True),
+                                  schema.Column('unix_stop', types.Integer, index=True),
+        )
+
         data_table = schema.Table('filefilelink', metadata,
                                   schema.Column('source_file', types.Integer,
                                                 schema.ForeignKey('file.file_id'), nullable=False, index=True),
