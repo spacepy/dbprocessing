@@ -1738,6 +1738,17 @@ class DButils(object):
         # if a datetime.datetime comes in this does not work, make them datetime.date
         startDate = Utils.datetimeToDate(startDate)
         endDate = Utils.datetimeToDate(endDate)
+        unixtime = hasattr(self, 'Unixtime')
+        if startTime is not None:
+            startTime = Utils.toDatetime(startTime)
+            if unixtime:
+                startTime = (startTime - datetime.datetime(1970, 1, 1))\
+                            .total_seconds()
+        if endTime is not None:
+            endTime = Utils.toDatetime(endTime, end=True)
+            if unixtime:
+                endTime = (endTime - datetime.datetime(1970, 1, 1))\
+                          .total_seconds()
         
         files = self.session.query(self.File)
 
@@ -1768,10 +1779,14 @@ class DButils(object):
         elif endDate is not None: # End date only
             files = files.filter(self.File.utc_file_date <= endDate)
 
+        if unixtime and (startTime is not None or endTime is not None):
+            files = files.join(self.Unixtime)
         if startTime is not None:
-            files = files.filter(self.File.utc_stop_time >= Utils.toDatetime(startTime))
+            files = files.filter((self.Unixtime.unix_stop if unixtime
+                                  else self.File.utc_stop_time) >= startTime)
         if endTime is not None:
-            files = files.filter(self.File.utc_start_time <= Utils.toDatetime(endTime, end=True))
+            files = files.filter((self.Unixtime.unix_start if unixtime
+                                  else self.File.utc_start_time) <= endTime)
 
         if newest_version:
             files = files.order_by(self.File.interface_version, self.File.quality_version, self.File.revision_version)
