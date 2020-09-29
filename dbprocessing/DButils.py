@@ -6,6 +6,7 @@ import datetime
 import pdb
 import glob
 import itertools
+import math
 import os.path
 import pwd
 import socket  # to get the local hostname
@@ -2613,4 +2614,40 @@ class DButils(object):
         else: #no after_flag provided, or the column is empty in db
             setattr(entry, column, original.replace(old_str, new_str))
             
+        self.commitDB()
+
+    def addUnixTimeTable(self):
+        """Add a table containing a file's Unix start/stop time.
+
+        Used for migrating databases; doing file searches based on the
+        Unix time is faster than the UTC timestamp. This will also
+        populate the time columns from a file's UTC start/stop time.
+
+        Raises
+        ------
+        RuntimeError
+            If the Unix time table already exists
+        """
+        if hasattr(self, 'Unixtime'):
+            raise RuntimeError('Unixtime table already seems to exist.')
+        unixtime = sqlalchemy.Table(
+            'unixtime', self.metadata,
+            sqlalchemy.Column(
+                'file_id', sqlalchemy.Integer,
+                sqlalchemy.ForeignKey('file.file_id'), primary_key=True),
+            sqlalchemy.Column('unix_start', sqlalchemy.Integer, index=True),
+            sqlalchemy.Column('unix_stop', sqlalchemy.Integer, index=True)
+        )
+        self.metadata.create_all(tables=[unixtime])
+        # Make object for the new table definition (skips existing tables)
+        self._createTableObjects()
+        unx0 = datetime.datetime(1970, 1, 1)
+        for f in self.getFiles(): # Populate the times
+            r = self.Unixtime()
+            r.file_id = f.file_id
+            r.unix_start = int((f.utc_start_time - unx0)\
+                               .total_seconds()) # Round down
+            r.unix_stop = int(math.ceil((f.utc_stop_time - unx0)\
+                                        .total_seconds())) # Round up
+            self.session.add(r)
         self.commitDB()
