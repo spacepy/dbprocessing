@@ -176,9 +176,10 @@ class dbprocessing_db(object):
 
         data_table = schema.Table('unixtime', metadata,
                                   schema.Column('file_id', types.Integer,
-                                                schema.ForeignKey('file.file_id'), primary_key=True),
+                                                schema.ForeignKey('file.file_id'), primary_key=True, index=True),
                                   schema.Column('unix_start', types.Integer, index=True),
                                   schema.Column('unix_stop', types.Integer, index=True),
+                                  schema.CheckConstraint('unix_start <= unix_stop'),
         )
 
         data_table = schema.Table('filefilelink', metadata,
