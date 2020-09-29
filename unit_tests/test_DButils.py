@@ -1886,6 +1886,26 @@ class TestWithtestDB(unittest.TestCase):
             "'DButils' object has no attribute 'Nonexistent'",
             cm.exception.message)
 
+    def testAddUnixTimeTable(self):
+        """Add the table with Unix time"""
+        self.dbu.addUnixTimeTable()
+        r = self.dbu.getEntry('Unixtime', 1)
+        f = self.dbu.getEntry('File', 1)
+        # Verify the preconditions, UTC times are what expect
+        self.assertEqual(
+            datetime.datetime(2016, 1, 2),
+            f.utc_start_time)
+        self.assertEqual(
+            datetime.datetime(2016, 1, 3),
+            f.utc_stop_time)
+        # Verify the Unix time conversions
+        self.assertEqual(1451692800, r.unix_start)
+        self.assertEqual(1451779200, r.unix_stop)
+        with self.assertRaises(RuntimeError) as cm:
+            self.dbu.addUnixTimeTable()
+        self.assertEqual('Unixtime table already seems to exist.',
+                         str(cm.exception))
+
 
 if __name__ == "__main__":
     unittest.main()
