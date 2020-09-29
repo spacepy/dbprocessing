@@ -602,6 +602,12 @@ class DBUtilsGetTests(TestSetup):
         actual = sorted([v.filename for v in val])
         self.assertEqual(expected, actual)
 
+    def test_getFilesUTCDayUnixTime(self):
+        """getFiles with a single UTC day time, lookup by Unix time"""
+        self.dbu.addUnixTimeTable()
+        # Run all the same checks
+        self.test_getFilesUTCDay()
+
     def test_getFilesStartTime(self):
         """getFiles with a start time"""
         expected = [
@@ -617,6 +623,11 @@ class DBUtilsGetTests(TestSetup):
         actual = sorted([v.filename for v in val])
         self.assertEqual(expected, actual)
 
+    def test_getFilesStartTimeUnixTime(self):
+        """getFiles with a start time, lookup by Unix time"""
+        self.dbu.addUnixTimeTable()
+        self.test_getFilesStartTime()
+
     def test_getFilesByProductTime(self):
         """getFiles by the UTC date of data"""
         expected = ['ect_rbspb_0382_381_04.ptp.gz',
@@ -626,6 +637,11 @@ class DBUtilsGetTests(TestSetup):
                                              newest_version=True)
         actual = sorted([v.filename for v in val])
         self.assertEqual(expected, actual)
+
+    def test_getFilesByProductTimeUnixTime(self):
+        """getFiles by the UTC date of data, lookup by Unix time"""
+        self.dbu.addUnixTimeTable()
+        self.test_getFilesByProductTime()
 
     def test_getFilesByProductDate(self):
         """getFilesByProductDate"""
