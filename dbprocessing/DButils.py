@@ -2662,9 +2662,11 @@ class DButils(object):
             'unixtime', self.metadata,
             sqlalchemy.Column(
                 'file_id', sqlalchemy.Integer,
-                sqlalchemy.ForeignKey('file.file_id'), primary_key=True),
+                sqlalchemy.ForeignKey('file.file_id'),
+                primary_key=True, index=True),
             sqlalchemy.Column('unix_start', sqlalchemy.Integer, index=True),
-            sqlalchemy.Column('unix_stop', sqlalchemy.Integer, index=True)
+            sqlalchemy.Column('unix_stop', sqlalchemy.Integer, index=True),
+            sqlalchemy.CheckConstraint('unix_start <= unix_stop'),
         )
         self.metadata.create_all(tables=[unixtime])
         # Make object for the new table definition (skips existing tables)
