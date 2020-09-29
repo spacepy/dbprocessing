@@ -1483,6 +1483,19 @@ class DButils(object):
             d1.newest_version = False
 
         self.session.add(d1)
+        if hasattr(self, 'Unixtime'):
+            # Populate file_id, but still allow rollback of file insert
+            self.session.flush()
+            unx0 = datetime.datetime(1970, 1, 1)
+            r = self.Unixtime()
+            r.file_id = d1.file_id
+            r.unix_start = None if utc_start_time is None \
+                           else int((utc_start_time - unx0)\
+                                    .total_seconds()) # Round down
+            r.unix_stop = None if utc_stop_time is None\
+                          else int(math.ceil((utc_stop_time - unx0)\
+                                             .total_seconds())) # Round up
+            self.session.add(r)
         self.commitDB()
         return d1.file_id
 

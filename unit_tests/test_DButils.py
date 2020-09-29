@@ -1427,6 +1427,14 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(1, i.product_id)
         self.assertEqual('0', i.shasum)
 
+    def test_addFileUnixTime(self):
+        """Tests if addFile populates Unix time"""
+        self.dbu.addUnixTimeTable()
+        fID = self.addGenericFile(1)
+        r = self.dbu.getEntry('Unixtime', fID)
+        self.assertEqual(1262304000, r.unix_start)
+        self.assertEqual(1262390400, r.unix_stop)
+
     def test_addInstrument(self):
         """Tests if addInstrument is succesful"""
         iID = self.dbu.addInstrument(instrument_name="testing_{MISSION}_{SPACECRAFT}_Instrument",
