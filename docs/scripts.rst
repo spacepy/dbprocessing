@@ -233,6 +233,26 @@ In a given directory, make symlinks to all the newest versions of files into ano
 
 .. warning:: There's no documentation on the config file
 
+MigrateDB.py
+------------
+.. program:: MigrateDB.py
+
+Migrate a database to the latest structure.
+
+Right now this only adds a Unix time table that stores the UTC start/end
+time as seconds since Unix epoch, but planned to extend to support all
+other database changes to date.
+
+Will display all possible changes and prompt for confirmation.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: -y, --yes
+
+   Process possible changes without asking for confirmation.
+
 missingFilesByProduct.py:
 -------------------------
 Attempt to reprocess files that are missing, 90% solution, not used much, but did work
