@@ -4,6 +4,7 @@ dbprocessing
    :maxdepth: 1
 
    README
+   release_notes
    developer/index
    scripts
    ConfigurationFiles

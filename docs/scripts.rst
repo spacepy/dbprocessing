@@ -95,6 +95,8 @@ Show files in database but not on disk. Additionally, this can remove files from
 .. option:: --startID The File id to start on
 .. option:: -v, --verbose Print out each file as it is checked
 
+.. _scripts_DBRunner:
+
 DBRunner.py
 -----------
 .. program:: DBRunner.py
