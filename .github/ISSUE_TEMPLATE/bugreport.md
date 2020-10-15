@@ -9,6 +9,9 @@ taking the time to report a dbprocessing issue. Please
 describe the issue in detail, and fill in the applicable fields
 below.
 
+Please also include a title that is descriptive, but not too long (under
+about 80 characters), as it will be included in release notes.
+
 You can delete the sections that don't apply to your
 issue. For example, if a feature is inadequately
 described, simply delete all sections below and 

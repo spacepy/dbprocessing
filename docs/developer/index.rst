@@ -13,6 +13,7 @@ Developer Information
    pull_requests
    repository
    structure
+   release
    notes	      
    todo
    ../CONTRIBUTING

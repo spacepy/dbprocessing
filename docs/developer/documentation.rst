@@ -127,3 +127,7 @@ More information on possible locations for these files is (somewhat obscurely)
 in the `github documentation for setting default versions <https://
 docs.github.com/en/github/building-a-strong-community/
 creating-a-default-community-health-file>`_.
+
+Release Notes
+=============
+See :doc:`release`.

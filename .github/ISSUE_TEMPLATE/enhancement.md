@@ -10,6 +10,9 @@ taking the time to suggest an enhancement. Please describe
 your desired enhancement in detail, including at least
 one possible use case.
 
+Please also include a title that is descriptive, but not too long (under
+about 80 characters), as it will be included in release notes.
+
 You can use the sections below if they're helpful in
 describing the enhancement, or delete any that aren't.
 
