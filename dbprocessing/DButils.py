@@ -1456,6 +1456,8 @@ class DButils(object):
         :return: file_id of the newly inserted file
         :rtype: long
         """
+        utc_start_time = Utils.toDatetime(utc_start_time)
+        utc_stop_time = Utils.toDatetime(utc_stop_time)
         d1 = self.File()
         d1.filename = filename
         d1.utc_file_date = utc_file_date

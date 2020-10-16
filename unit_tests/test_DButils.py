@@ -1427,6 +1427,36 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(1, i.product_id)
         self.assertEqual('0', i.shasum)
 
+    def test_addFileNonDatetimeStart(self):
+        """Add a file with a non-datetime utc_start_time"""
+        v = Version.Version(1, 0, 0)
+        kwargs = {
+            'filename': "testing_file_1.0.0.file",
+            'data_level': 0,
+            'version': v,
+            'file_create_date': datetime.date(2010, 1, 1),
+            'exists_on_disk': 1,
+            'utc_file_date': datetime.date(2010, 1, 1),
+            'utc_start_time': datetime.date(2010, 1, 1),
+            'utc_stop_time': datetime.datetime(2010, 1, 2, 0, 0, 0),
+            'product_id': 1,
+            'shasum': '0'
+        }
+        # Make with a start date instead of datetime
+        fID = self.dbu.addFile(**kwargs)
+        f = self.dbu.getEntry('File', fID)
+        self.assertEqual(datetime.datetime(2010, 1, 1),
+                         f.utc_start_time)
+        # Do the same thing with the Unix time table
+        self.dbu.addUnixTimeTable()
+        kwargs.update({
+            'filename': "testing_file_1.1.0.file",
+            'version': Version.Version(1, 1, 0)
+        })
+        fID = self.dbu.addFile(**kwargs)
+        r = self.dbu.getEntry('Unixtime', fID)
+        self.assertEqual(1262304000, r.unix_start)
+
     def test_addFileUnixTime(self):
         """Tests if addFile populates Unix time"""
         self.dbu.addUnixTimeTable()
