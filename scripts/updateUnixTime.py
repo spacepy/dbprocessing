@@ -44,6 +44,8 @@ def main(mission):
     unx0 = datetime.datetime(1970, 1, 1)
     for f in dbu.getFiles(): # Populate the times
         r = dbu.getEntry('Unixtime', f.file_id)
+        # If changed, also change addFile, addUnixTimeTable, getFiles
+        # (all in DButils)
         r.unix_start = int((f.utc_start_time - unx0)\
                            .total_seconds())
         r.unix_stop = int((f.utc_stop_time - unx0)\
