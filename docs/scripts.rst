@@ -233,6 +233,8 @@ In a given directory, make symlinks to all the newest versions of files into ano
 
 .. warning:: There's no documentation on the config file
 
+.. _MigrateDB:
+
 MigrateDB.py
 ------------
 .. program:: MigrateDB.py
@@ -391,6 +393,20 @@ Goes into the database and update the shasum entry for a file that is changed af
 
 .. option:: infile File to update the shasum of
 .. option:: -m <dbname>, --mission <dbname> Selected mission database
+
+updateUnixTime.py
+-----------------
+.. program:: updateUnixTime.py
+
+Rewrites all Unix timestamps in a file, recalculating them from the UTC
+start/stop time. This is not needed if adding a Unix timestamp table
+to an existing database (see :ref:`MigrateDB`); it is only required
+if the algorithm for populating the Unix timestamps changes and a database
+has been created with the older algorithm.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
 
 weeklyReport.py:
 ----------------
