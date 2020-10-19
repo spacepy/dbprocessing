@@ -1492,6 +1492,8 @@ class DButils(object):
             r.file_id = d1.file_id
             # Round times down so they don't slide into next second
             # (and potentially next day)
+            # If changed, also change getFiles, addUnixTimeTable,
+            # updateUnixTime.py
             r.unix_start = None if utc_start_time is None \
                            else int((utc_start_time - unx0)\
                                     .total_seconds())
@@ -1760,6 +1762,7 @@ class DButils(object):
         # and non-truncated start time of file is 1.6) but better than
         # missing a file that does overlap (e.g requested start time is 1.2
         # and non-truncated file start is 1.6, truncates to 1.0)
+        # If changed, also change addFile, addUnixTimeTable, updateUnixTime.py
         if startTime is not None:
             startTime = Utils.toDatetime(startTime)
             if unixtime:
@@ -2683,6 +2686,7 @@ class DButils(object):
         for f in self.getFiles(): # Populate the times
             r = self.Unixtime()
             r.file_id = f.file_id
+            # If changed, also change addFile, getFiles, updateUnixTime.py
             r.unix_start = int((f.utc_start_time - unx0)\
                                .total_seconds())
             r.unix_stop = int((f.utc_stop_time - unx0)\
