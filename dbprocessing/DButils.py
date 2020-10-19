@@ -6,7 +6,6 @@ import datetime
 import pdb
 import glob
 import itertools
-import math
 import os.path
 import pwd
 import socket  # to get the local hostname
@@ -1491,12 +1490,14 @@ class DButils(object):
             unx0 = datetime.datetime(1970, 1, 1)
             r = self.Unixtime()
             r.file_id = d1.file_id
+            # Round times down so they don't slide into next second
+            # (and potentially next day)
             r.unix_start = None if utc_start_time is None \
                            else int((utc_start_time - unx0)\
-                                    .total_seconds()) # Round down
+                                    .total_seconds())
             r.unix_stop = None if utc_stop_time is None\
-                          else int(math.ceil((utc_stop_time - unx0)\
-                                             .total_seconds())) # Round up
+                          else int((utc_stop_time - unx0)\
+                                   .total_seconds())
             self.session.add(r)
         self.commitDB()
         return d1.file_id
@@ -1754,16 +1755,21 @@ class DButils(object):
         startDate = Utils.datetimeToDate(startDate)
         endDate = Utils.datetimeToDate(endDate)
         unixtime = hasattr(self, 'Unixtime')
+        # Truncate start/end seconds to match the truncation in the db.
+        # Might result in false matches (e.g requested stop time is 1.2
+        # and non-truncated start time of file is 1.6) but better than
+        # missing a file that does overlap (e.g requested start time is 1.2
+        # and non-truncated file start is 1.6, truncates to 1.0)
         if startTime is not None:
             startTime = Utils.toDatetime(startTime)
             if unixtime:
-                startTime = (startTime - datetime.datetime(1970, 1, 1))\
-                            .total_seconds()
+                startTime = int((startTime - datetime.datetime(1970, 1, 1))\
+                                .total_seconds())
         if endTime is not None:
             endTime = Utils.toDatetime(endTime, end=True)
             if unixtime:
-                endTime = (endTime - datetime.datetime(1970, 1, 1))\
-                          .total_seconds()
+                endTime = int((endTime - datetime.datetime(1970, 1, 1))\
+                              .total_seconds())
         
         files = self.session.query(self.File)
 
@@ -2678,8 +2684,8 @@ class DButils(object):
             r = self.Unixtime()
             r.file_id = f.file_id
             r.unix_start = int((f.utc_start_time - unx0)\
-                               .total_seconds()) # Round down
-            r.unix_stop = int(math.ceil((f.utc_stop_time - unx0)\
-                                        .total_seconds())) # Round up
+                               .total_seconds())
+            r.unix_stop = int((f.utc_stop_time - unx0)\
+                              .total_seconds())
             self.session.add(r)
         self.commitDB()

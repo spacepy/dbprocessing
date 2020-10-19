@@ -628,6 +628,27 @@ class DBUtilsGetTests(TestSetup):
         self.dbu.addUnixTimeTable()
         self.test_getFilesStartTime()
 
+    def test_getFilesStartTimeFractional(self):
+        """getFiles looked up by Unix time with a fractional second"""
+        self.dbu.addUnixTimeTable()
+        kwargs = {
+            'filename': "rbspa_int_ect-mageisM35-hr-L1_20100101_v1.0.0.cdf",
+            'data_level': 1.0,
+            'version': Version.Version(1, 0, 0),
+            'file_create_date': datetime.date(2010, 1, 1),
+            'exists_on_disk': 1,
+            'utc_file_date': datetime.date(2010, 1, 1),
+            'utc_start_time': datetime.datetime(2010, 1, 1),
+            # Weird stop time to trigger rounding errors
+            'utc_stop_time': datetime.datetime(2010, 1, 1, 23, 0, 0, 600000),
+            'product_id': 4,
+            'shasum': '0'
+        }
+        fID = self.dbu.addFile(**kwargs)
+        start_time = datetime.datetime(2010, 1, 1, 23, 0, 0, 200000)
+        val = self.dbu.getFiles(startTime=start_time, product=4)
+        self.assertEqual([fID], [v.file_id for v in val])
+
     def test_getFilesByProductTime(self):
         """getFiles by the UTC date of data"""
         expected = ['ect_rbspb_0382_381_04.ptp.gz',
@@ -1464,6 +1485,28 @@ class TestWithtestDB(unittest.TestCase):
         r = self.dbu.getEntry('Unixtime', fID)
         self.assertEqual(1262304000, r.unix_start)
         self.assertEqual(1262390400, r.unix_stop)
+
+    def test_addFileNearDay(self):
+        """Make sure conversion to unix time doesn't change day"""
+        self.dbu.addUnixTimeTable()
+        kwargs = {
+            'filename': "testing_file_1.0.0.file",
+            'data_level': 0,
+            'version': Version.Version(1, 0, 0),
+            'file_create_date': datetime.date(2010, 1, 1),
+            'exists_on_disk': 1,
+            'utc_file_date': datetime.date(2010, 1, 1),
+            'utc_start_time': datetime.datetime(2010, 1, 1),
+            'utc_stop_time': datetime.datetime(2010, 1, 1, 23, 59, 59, 600000),
+            'product_id': 1,
+            'shasum': '0'
+        }
+        fID = self.dbu.addFile(**kwargs)
+        r = self.dbu.getEntry('Unixtime', fID)
+        # Convert back from Unix time and make sure same date
+        self.assertEqual(datetime.date(2010, 1, 1),
+                         (datetime.datetime(1970, 1, 1)
+                          + datetime.timedelta(seconds=r.unix_stop)).date())
 
     def test_addInstrument(self):
         """Tests if addInstrument is succesful"""
