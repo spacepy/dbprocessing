@@ -47,6 +47,7 @@ jobs:
            at: ~/.local
        - run:
            command: |
+             sudo apt update
              sudo apt install -y postgresql-client
              createdb -h localhost sndd -O root
              pip install --user psycopg2
