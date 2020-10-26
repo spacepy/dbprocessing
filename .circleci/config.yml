@@ -65,7 +65,7 @@ jobs:
              pip install --user sphinx numpy
              pip install --user numpydoc
              make -C sphinx html | tee doc_output.txt
-             # Fail (return nonzero) if there are warnings in outpus.
+             # Fail (return nonzero) if there are warnings in output.
              ! grep -e "^build succeeded.*warning.*$" < doc_output.txt
 
 workflows:
