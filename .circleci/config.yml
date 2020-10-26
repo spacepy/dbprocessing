@@ -52,6 +52,20 @@ jobs:
              createdb -h localhost sndd -O root
              pip install --user psycopg2
              python scripts/CreateDBsabrs.py
+  docs:
+    docker:
+      - image: circleci/python:2.7.18
+    steps:
+       - checkout
+       - attach_workspace:
+           at: ~/.local
+       - run:
+           command: |
+             pip install --user sphinx
+             pip install --user numpydoc
+             make -C sphinx html | tee doc_output.txt
+             # Fail (return nonzero) if there are warnings in outpus.
+             ! grep -e "^build succeeded.*warning.*$" < doc_output.txt
 
 workflows:
   main:
@@ -61,5 +75,8 @@ workflows:
          requires:
            - build
      - createpostgres:
+         requires:
+           - build
+     - docs:
          requires:
            - build
