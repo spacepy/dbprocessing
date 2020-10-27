@@ -145,7 +145,7 @@ about-merge-methods-on-github>`_. This maintains a linear history and
 also makes it clear both who authored the commit and who approved it
 for the repository.
 
-One all conditions are met, a developer can `perform the merge
+Once all conditions are met, a developer can `perform the merge
 <https://docs.github.com/en/github/
 collaborating-with-issues-and-pull-requests/merging-a-pull-request>`_.
 
