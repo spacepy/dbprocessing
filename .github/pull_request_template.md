@@ -24,7 +24,7 @@ pull request description.
 - [ ] Major new functionality has appropriate Sphinx documentation
 - [ ] Added an entry to release notes if fixing a major bug or providing a major new feature
 - [ ] New features and bug fixes should have unit tests
-- [ ] Relevant issues are linked in the description (e.g. `See issue #` or `Closes #`)
+- [ ] Relevant issues are linked in the description (use `Closes #` if this PR closes the issue, or some other reference, such as `See #` if it is related in some other way)
 
 <!--
 Thank you so much for your PR!  The dbprocessing community appreciates your
