@@ -6,7 +6,8 @@ Documented here is the procedure for working with pull requests (PRs)
 in the ``dbprocessing`` project. It does not include details on working
 with git and github in general; relevant docs are linked.
 
-If you can't figure it out, please do your best and ask for help in the PR.
+If you can't figure it out, please do your best and ask for help in the PR
+(use the ``question`` tag).
 
 .. contents::
    :local:
@@ -48,7 +49,18 @@ The preferred flow of code is summarized:
        the pull request has been merged.
 
 When creating the PR, following the provided template as closely as
-possible will facilitate its review. This template includes a checklist;
+possible will facilitate its review.
+
+Use ``closes #x`` in the description of the PR if merging the PR will
+close that issue. (``Closes`` is preferred to ``fixes`` because e.g
+closing an enhancement issue is not exactly a fix.) Referencing
+other related issues or PRs is also encouraged, e.g. ``see #x``.
+Avoid the `issue-closing magic words <https://docs.github.com/en/
+free-pro-team@latest/github/managing-your-work-on-github/
+linking-a-pull-request-to-an-issue>`_ unless closing the issue,
+in which case ``closes`` is preferred.
+
+The template includes a checklist;
 consider every item on the list and check it if completed. If an item
 is not relevant, check it, add "(N/A)" to the start of the line, and
 include an explanation below the checklist. E.g.::

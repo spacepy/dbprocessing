@@ -113,6 +113,9 @@ details. Each point in the bullet list must start with a single space,
 an asterisk, and another space; wrapped lines must be indented three
 spaces to align with the start of the line's text.
 
+If a commit closes an issue, include ``(Closes #x)`` at the end of the
+first-line summary. See also :doc:`pull_requests`.
+
 Lines must not exceed 76 characters (``git log`` adds a
 four-space indent to the commit message on display).
 
