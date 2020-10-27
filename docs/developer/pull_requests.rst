@@ -33,9 +33,6 @@ request <https://docs.github.com/en/github/
 collaborating-with-issues-and-pull-requests/creating-a-pull-request>`_
 against ``spacepy/dbprocessing master``.
 
-When creating the PR, following the provided template as closely as
-possible will facilitate its review.
-
 The preferred flow of code is summarized:
 
     1. Code is created on a `branch <https://docs.github.com/en/github/
@@ -50,6 +47,28 @@ The preferred flow of code is summarized:
        collaborating-with-issues-and-pull-requests/syncing-a-fork>`_ after
        the pull request has been merged.
 
+When creating the PR, following the provided template as closely as
+possible will facilitate its review. This template includes a checklist;
+consider every item on the list and check it if completed. If an item
+is not relevant, check it, add "(N/A)" to the start of the line, and
+include an explanation below the checklist. E.g.::
+
+   - [X] ...
+   - [X] (N/A) Major new functionality has appropriate Sphinx documentation
+   - [X] ...
+
+   This is a pure bugfix, no new functionality or documentation.
+
+If working in a draft PR, adding more checklists to the description is
+fine. A PR will be reviewed when:
+
+   1. All checklists are checked (this shows in the pull request list
+      as e.g. "8 of 8").
+   2. The PR is marked ready for review, i.e. not draft.
+   3. All CI checks pass.
+
+Feel free to request help before this point (tag the PR with ``question``
+to make it stand out).
 
 Reviews and updating
 ====================
@@ -61,6 +80,8 @@ reviews and comments are welcome from all.
 Our experience has been that using the github interface to suggest
 line-by-line diffs doesn't work very well; line-by-line comments are fine
 (and helpful!)
+
+You can request a specific reviewer, but are not required to.
 
 The review will mostly evaluate whether the PR checklist has been met,
 all tests pass, and the contribution meets requirements in the :doc:`index`.

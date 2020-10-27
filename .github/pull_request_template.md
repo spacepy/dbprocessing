@@ -2,8 +2,13 @@
 New code is easier to review, integrate and maintain if it's
 consistent with the style of the rest of the dbprocessing code.
 Please try to follow as much of this checklist as you can for
-your PR. If you can't hit everything, or don't know how to,
-then submit the PR and the rest can be discussed during review.
+your PR. If a given item is not relevant to your PR, please check
+it off, add "(N/A)" to the start of the line, and include a
+description below the checklist.
+
+If you don't know how to complete something in the checklist, go
+ahead and submit the PR as a draft and ask for help.
+
 Some additional suggestions are given below.
 
 Please also see our Code of Conduct so that the dbprocessing community
