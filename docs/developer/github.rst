@@ -75,3 +75,12 @@ For ssh access to the CircleCI build environment, click "Project
 Settings" in the dbprocessing project on CircleCI, then "SSH Keys" and
 add a key there. (This needs to be the private key, so use one just
 for this purpose.)
+
+We use `Docker authentication <https://circleci.com/docs/2.0/
+private-images/>`_ to avoid `rate-limiting <https://www.docker.com/blog/
+scaling-docker-to-serve-millions-more-developers-network-egress/>`_ on
+the pull of the image from DockerHub. This requires a `DockerHub <https://
+hub.docker.com/>`_ account (which has been created); the username and password
+are set up as environment variables in CircleCI (Project Settings, Environment
+Variables in CircleCI). The variables are referenced in the CircleCI
+``config.yaml``. These credentials should not be reused.
