@@ -34,6 +34,10 @@ request <https://docs.github.com/en/github/
 collaborating-with-issues-and-pull-requests/creating-a-pull-request>`_
 against ``spacepy/dbprocessing master``.
 
+If you use CircleCI, `unfollow your fork before submitting a PR
+<https://support.circleci.com/hc/en-us/articles/
+360008097173-Why-aren-t-pull-requests-triggering-jobs-on-my-organization->`_.
+
 The preferred flow of code is summarized:
 
     1. Code is created on a `branch <https://docs.github.com/en/github/
