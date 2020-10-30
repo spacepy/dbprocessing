@@ -49,12 +49,15 @@ repository).
 
 We require status checks to pass before merging to master; in the GitHub
 branch settings, this takes the form of a branch protection rule that requires
-the circleci jobs to succeed on the PR. `This document
+the CircleCI ``main`` workflow to succeed on the PR. `This document
 <https://support.circleci.com/hc/en-us/articles/
 360004346254-Workflow-status-checks-never-completes-because-
-of-ci-circleci-Waiting-for-status-to-be-reported>`_ is somewhat ambiguous,
-but what it appears to mean is that the top-level circleci check should not
-be selected (individual jobs should.). All jobs are selected.
+of-ci-circleci-Waiting-for-status-to-be-reported>`_ appears to state
+the top-level circleci check should not be selected, but it may predate
+pipelines. The ``main`` workflow appears to work; if it fails, the checks
+can be expanded to identify the failed job (rather than requiring all
+individual jobs to succeed, which increases the chance that a status
+may not be communicated back to GitHub.)
 
 The GitHub checks are set up as described `in the CircleCI docs
 <https://circleci.com/docs/2.0/enable-checks/>`_. This involves
