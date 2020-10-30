@@ -79,6 +79,14 @@ Settings" in the dbprocessing project on CircleCI, then "SSH Keys" and
 add a key there. (This needs to be the private key, so use one just
 for this purpose.)
 
+Users with a CircleCI account should *not* follow their fork on
+CircleCI, as `this will cause the checks to fail
+<https://support.circleci.com/hc/en-us/articles/
+360008097173-Why-aren-t-pull-requests-triggering-jobs-on-my-organization->`_.
+(In general, triggering a CircleCI build on a branch before submitting the
+PR `may cause problems <https://ideas.circleci.com/cloud-feature-requests/
+p/trigger-new-build-when-a-pull-request-is-opened>`_.)
+
 We use `Docker authentication <https://circleci.com/docs/2.0/
 private-images/>`_ to avoid `rate-limiting <https://www.docker.com/blog/
 scaling-docker-to-serve-millions-more-developers-network-egress/>`_ on
