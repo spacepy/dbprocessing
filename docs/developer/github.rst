@@ -64,9 +64,9 @@ Status Updates" in the CircleCI advanced project settings.
 
 The "webhooks" repository setting on GitHub controls the triggering of
 CircleCI; this is set to "Let me select individual events" and we have
-just "Pull requests", "Pushes" and "Releases" selected. (This was the
-default setup; normally only PRs matter, as we don't do pushes without
-PR, and we don't do CircleCI processing of releases.) This is also
+just "Pull requests" selected. Otherwise CircleCI will build when a
+PR is opened (the "Pull requests" selection) *and* when it's merged
+(since this manifests as a push to the repository.) This is also
 where a hook can be re-delivered to CircleCI (triggering processing
 again) if the build never happened on CircleCI (the build can also be
 restarted on CircleCI if it has already run.)
