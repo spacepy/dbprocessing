@@ -210,6 +210,29 @@ link_missing_ql_mag_l2_mag.py:
 ------------------------------
 QL "required,", L2 "optional". We don't support "either or but prefer this one", so this links them together and the wrapper handles the actual priority
 
+.. _scripts_linkUningested:
+
+linkUningested.py
+-----------------
+.. program:: linkUningested.py
+
+Find all files that are in a directory associated with a product and match
+the product's file format, but are not in the database. Make a symbolic
+link to the incoming directory for each file (so they will be ingested
+on next run).
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database.
+
+.. option:: -p <product>, --product <product>
+
+   Product name or product ID to check. Optional (default will check all
+   products), but highly recommended, since in particular ingestion of files
+   that are normally created rather than ingested as first-order inputs might
+   lead to odd results. Multiple products can be specified by specifying
+   more than once.
+
 magephem_dataToIncoming.py:
 ---------------------------
 What it says on tin. Delete?
