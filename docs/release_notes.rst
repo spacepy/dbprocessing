@@ -21,6 +21,11 @@ Support for processes that take no input was added, as part of many
 enhancements to :ref:`scripts_DBRunner`  (`26 <https://github.com/spacepy/
 dbprocessing/pull/26>`_).
 
+New script :ref:`scripts_linkUningested` to find files which match product
+format but are not in database, and symlink them to the incoming directory
+so they can be ingested (`54 <https://github.com/spacepy/dbprocessing/
+pull/54>`_).
+
 Deprecations and removals
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
