@@ -315,6 +315,7 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/2/', None),
     'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
+    'sqlalchemy': ('https://docs.sqlalchemy.org/en/stable/', None),
 }
 
 #Fix for https://github.com/sphinx-doc/sphinx/issues/1585

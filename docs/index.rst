@@ -30,5 +30,6 @@ API documentation
     module
     reports
     runMe
+    tables
     Utils
     Version
