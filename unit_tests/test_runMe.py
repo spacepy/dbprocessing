@@ -16,6 +16,7 @@ import dbp_testing
 
 import dbprocessing.DButils
 import dbprocessing.runMe
+import dbprocessing.Version
 
 
 class RunMeCmdArgTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
@@ -355,6 +356,79 @@ class RunMeCmdArgTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         ], rm.cmdline)
 
 
+class RunMeVersioningTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
+    """Tests calculation of data versions"""
+
+    def setUp(self):
+        """Make a copy of db and open it so have something to work with"""
+        super(RunMeVersioningTests, self).setUp()
+        self.td = tempfile.mkdtemp()
+        shutil.copy2(
+            os.path.join(os.path.dirname(__file__), 'emptyDB.sqlite'),
+            self.td)
+        self.addSkeletonMission()
+        self.dbu = dbprocessing.DButils.DButils(os.path.join(
+            self.td, 'emptyDB.sqlite'))
+
+    def tearDown(self):
+        """Remove the copy of db"""
+        self.dbu.closeDB()
+        del self.dbu
+        shutil.rmtree(self.td)
+        super(RunMeVersioningTests, self).tearDown()
+
+    def testCodeInterfaceBump(self):
+        """Code interface increment should change quality version of output"""
+        # Start with simple L1toL2 code makes L1 from single L2
+        l1_pid = self.addProduct('level1', level=1)
+        l2_pid = self.addProduct('level2', level=2)
+        procid, codeid = self.addProcess('l1tol2', output_product_id=2)
+        self.addProductProcessLink(l1_pid, procid)
+        # Existing L1, L2 files, linked to each other and code
+        l1_fid = self.addFile('level1_20100101_v1.0.0', l1_pid)
+        l2_fid = self.addFile('level2_20100101_v1.0.0', l2_pid)
+        self.dbu.addFilecodelink(l2_fid, codeid)
+        self.dbu.addFilefilelink(l2_fid, l1_fid)
+        # Increment the code version to 2.0.0 but output interface stays 1
+        oldcode = self.dbu.getEntry('Code', codeid)
+        newcode = self.dbu.Code()
+        for k in dir(newcode):
+            if not k.startswith('_'):
+                setattr(newcode, k, getattr(oldcode, k))
+        newcode.interface_version = 2 # rest stay .0.0
+        newcode.code_id = None
+        self.dbu.session.add(newcode)
+        self.dbu.commitDB()
+        # Old code no longer active
+        self.dbu.updateCodeNewestVersion(codeid)
+        # Now see if the updated code will make updated file
+        rm = dbprocessing.runMe.runMe(self.dbu, datetime.date(2010, 1, 1),
+                                      procid, [l1_fid], None)
+        self.assertTrue(rm.ableToRun)
+        self.assertEqual(dbprocessing.Version.Version(1, 1, 0),
+                         rm.output_version)
+
+    def testInputInterfaceBump(self):
+        """Input product interface increment should bump quality of output"""
+        # Start with simple L1toL2 code makes L1 from single L2
+        l1_pid = self.addProduct('level1', level=1)
+        l2_pid = self.addProduct('level2', level=2)
+        procid, codeid = self.addProcess('l1tol2', output_product_id=2)
+        self.addProductProcessLink(l1_pid, procid)
+        # Existing L1, L2 files, linked to each other and code
+        l1_fid = self.addFile('level1_20100101_v1.0.0', l1_pid)
+        l2_fid = self.addFile('level2_20100101_v1.0.0', l2_pid)
+        self.dbu.addFilecodelink(l2_fid, codeid)
+        self.dbu.addFilefilelink(l2_fid, l1_fid)
+        # Add the "new" L1 file
+        l1_fid_new = self.addFile('level1_20100101_v2.0.0', l1_pid)
+        # Now see if the updated input will make updated output
+        rm = dbprocessing.runMe.runMe(self.dbu, datetime.date(2010, 1, 1),
+                                      procid, [l1_fid_new], None)
+        self.assertTrue(rm.ableToRun)
+        self.assertEqual(dbprocessing.Version.Version(1, 1, 0),
+                         rm.output_version)
+
+
 if __name__ == '__main__':
     unittest.main()
-
