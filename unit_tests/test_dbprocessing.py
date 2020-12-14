@@ -29,23 +29,8 @@ class ProcessQueueTestsBase(unittest.TestCase, dbp_testing.AddtoDBMixin):
         shutil.copy2(
             os.path.join(os.path.dirname(__file__), 'emptyDB.sqlite'),
             self.td)
-        dbu = dbprocessing.DButils.DButils(os.path.join(
-            self.td, 'emptyDB.sqlite'))
         # Set up the baseline mission environment, BEFORE making processqueue
-        mission_id = dbu.addMission(
-            'Test mission',
-            os.path.join(self.td, 'data'),
-            os.path.join(self.td, 'incoming'),
-            os.path.join(self.td, 'codes'),
-            os.path.join(self.td, 'inspectors'),
-            os.path.join(self.td, 'errors'))
-        satellite_id = dbu.addSatellite('Satellite', mission_id)
-        # Make two instruments (so can test interactions between them)
-        self.instrument_ids = [
-            dbu.addInstrument(instrument_name='Instrument {}'.format(i),
-                              satellite_id=satellite_id)
-            for i in range(1, 3)]
-        del dbu
+        self.addSkeletonMission()
         self.pq = dbprocessing.dbprocessing.ProcessQueue(
             os.path.join(self.td, 'emptyDB.sqlite'))
         self.dbu = self.pq.dbu
