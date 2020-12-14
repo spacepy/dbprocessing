@@ -40,6 +40,14 @@ older databases without ``yesterday`` and ``tomorrow`` columns in the
 ``Productprocesslink`` table (`20 <https://github.com/spacepy/dbprocessing/
 issues/20>`_).
 
+Fixed :class:`~dbprocessing.runMe.runMe` to always maintain the
+``output_interface`` version specified by the code. Updates to a code's
+interface version will increment the quality version of its output (not
+the interface); updates to a file's interface version will increment the
+quality version of child files (rather than assuming children were up-to-date
+and failing to reprocess them). (`63 <https://github.com/spacepy/dbprocessing/
+pull/63>`_)
+
 Other changes
 ^^^^^^^^^^^^^
 
