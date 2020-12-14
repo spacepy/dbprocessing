@@ -16,6 +16,7 @@ import sys
 os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
                                                   'unittestlogs')
 
+import dbprocessing.DButils
 import dbprocessing.Version
 
 __all__ = ['AddtoDBMixin', 'add_scripts_to_path', 'testsdir']
@@ -127,6 +128,35 @@ class AddtoDBMixin(object):
             exists_on_disk=True,
         )
         return fid
+
+    def addSkeletonMission(self):
+        """Starting with empty database, add a skeleton mission
+
+        Should be called before opening a DButils instance so that
+        the mission, etc. tables can be created.
+
+        Makes one mission, one satellite, and two instruments
+
+        Assumes self.td has the test/temp directory path (str),
+        will populate self.instrument_ids for a list of instruments.
+        """
+        dbu = dbprocessing.DButils.DButils(os.path.join(
+            self.td, 'emptyDB.sqlite'))
+        mission_id = dbu.addMission(
+            'Test mission',
+            os.path.join(self.td, 'data'),
+            os.path.join(self.td, 'incoming'),
+            os.path.join(self.td, 'codes'),
+            os.path.join(self.td, 'inspectors'),
+            os.path.join(self.td, 'errors'))
+        satellite_id = dbu.addSatellite('Satellite', mission_id)
+        # Make two instruments (so can test interactions between them)
+        self.instrument_ids = [
+            dbu.addInstrument(instrument_name='Instrument {}'.format(i),
+                              satellite_id=satellite_id)
+            for i in range(1, 3)]
+        del dbu
+
 
 def add_scripts_to_path():
     """Add the script source directory to Python path
