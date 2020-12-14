@@ -495,7 +495,9 @@ class runMe(object):
                                          format(self.code_id, db_code_id))
                 raise(DButils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".\
                                       format(self.code_id, db_code_id)))
-            self._incVersion(ver_diff)
+            # Increment output quality if code interface increments, to
+            # maintain output_interface_version; else increment what code did.
+            self._incVersion([0, 1, 0] if ver_diff[0] else ver_diff)
             return True
         else:
             return False
@@ -564,7 +566,13 @@ class runMe(object):
                 DBlogging.dblogger.debug("Found a difference between files {0} and {1} -- {2}".format(
                     parent.file_id, parent_max.file_id, df))
 
-                if df[1]:
+                if df[0]:
+                    # Interface change on input is quality change on output,
+                    # to maintain a code's consistent output_interface_version
+                    quality_diff = True
+                    DBlogging.dblogger.debug("parent: {0} had an interface difference, will reprocess child".\
+                                             format(parent.file_id))
+                elif df[1]:
                     quality_diff = True
                     DBlogging.dblogger.debug("parent: {0} had a quality difference, will reprocess child".\
                                              format(parent.file_id))
