@@ -24,7 +24,7 @@ Go into the database and get the verbose provenance for a file
 then add that to the global attrs for the file.
 Either putout to the same file or a different file
 
-.. warning:: This code has not been fully tested or used.
+.. warning:: This code has not been fully tested or used; never worked.
 
 clearProcessingFlag.py
 ----------------------
@@ -50,12 +50,15 @@ Build a config file from an existing database.
 
 .. warning:: This is untested and not fully useful yet.
 
+.. _scripts_coveragePlot:
+
 coveragePlot.py
 ---------------
 .. program:: coveragePlot
 
-Creates a coverage plot based on config file input. This script is useful for
-determining which files may be missing from a processing chain.
+Creates a coverage plot based on config file input. This script is
+useful for determining which files may be missing from a processing
+chain. See note on :ref:`scripts_htmlCoverage`.
 
 .. option:: configfile The config file to read.
 
@@ -86,8 +89,8 @@ dataToIncoming.py
 -----------------
 Concept, never actually used. supposed to be one script + config file, but we wound up using separate scripts for everything
 
-dbOnlyFiles.py:
----------------
+dbOnlyFiles.py
+--------------
 .. program:: dbOnlyFiles.py
 
 Show files in database but not on disk. Additionally, this can remove files from the db that are only in the db.
@@ -164,22 +167,22 @@ triggering such processing.
    (0: interface; 1: quality; 2: revision). Mutually exclusive with -u, -v.
    (Default: run all but do not increment version.)
 
-deleteAllDBFiles.py:
---------------------
+deleteAllDBFiles.py
+-------------------
 .. program:: deleteAllDBFiles
 
 Deletes all file entries in the database.
 
 .. option:: -m <dbname>, --mission <dbname> Selected mission database
 
-deleteAllDBProducts.py:
------------------------
+deleteAllDBProducts.py
+----------------------
 .. program:: deleteAllDBProducts
 
 Doesn't work, maybe should?
 
-deleteFromDBifNotOnDisk.py:
----------------------------
+deleteFromDBifNotOnDisk.py
+--------------------------
 .. program:: deleteFromDBifNotOnDisk
 
 Finds all files that are in the DB but not found on the DB
@@ -188,32 +191,34 @@ Finds all files that are in the DB but not found on the DB
 .. option:: --fix Remove the files from the DB (make a backup first)
 .. option:: --echo Echo sql queries for debugging
 
-flushProcessQueue.py:
----------------------
+flushProcessQueue.py
+--------------------
 .. program:: flushProcessQueue
 
 Clears the ProcessQueue of a database.
 
 .. option:: Database The name of the database to wipe the ProcesQueue of.
 
-histogramCodes.py:
-------------------
+histogramCodes.py
+-----------------
 may or may not still work, read logs to find out what codes take a long time to run
 
-hopeCoverageHTML.py:
---------------------
+hopeCoverageHTML.py
+-------------------
 delete
 
-hope_query.py:
---------------
+hope_query.py
+-------------
 delete
 
-htmlCoverage.py:
-----------------
-either this or coveragePlot works, not both.
+.. _scripts_htmlCoverage:
 
-link_missing_ql_mag_l2_mag.py:
-------------------------------
+htmlCoverage.py
+---------------
+either this or :ref:`scripts_coveragePlot` works, not both.
+
+link_missing_ql_mag_l2_mag.py
+-----------------------------
 QL "required,", L2 "optional". We don't support "either or but prefer this one", so this links them together and the wrapper handles the actual priority
 
 .. _scripts_linkUningested:
@@ -239,20 +244,20 @@ on next run).
    lead to odd results. Multiple products can be specified by specifying
    more than once.
 
-magephem_dataToIncoming.py:
----------------------------
+magephem_dataToIncoming.py
+--------------------------
 What it says on tin. Delete?
 
-magephem_def_dataToIncoming.py:
--------------------------------
+magephem_def_dataToIncoming.py
+------------------------------
 What it says on tin. Delete?
 
-magephem-pre-CoverageHTML.py:
------------------------------
+magephem-pre-CoverageHTML.py
+----------------------------
 Probably works. Delete?
 
-makeLatestSymlinks.py:
-----------------------
+makeLatestSymlinks.py
+---------------------
 .. program:: makeLatestSymlinks
 
 In a given directory, make symlinks to all the newest versions of files into another directory
@@ -286,20 +291,20 @@ Will display all possible changes and prompt for confirmation.
 
    Process possible changes without asking for confirmation.
 
-missingFilesByProduct.py:
--------------------------
+missingFilesByProduct.py
+------------------------
 Attempt to reprocess files that are missing, 90% solution, not used much, but did work
 
-missingFiles.py:
-----------------
+missingFiles.py
+---------------
 .. program:: missingFiles
 
 Prints out what's missing, based on noncontiguous date ranges
 
 .. warning:: Maybe works, maybe not
 
-possibleProblemDates.py:
-------------------------
+possibleProblemDates.py
+-----------------------
 .. program:: possibleProblemDates
 
 A database scrub/validation routine.
@@ -308,10 +313,10 @@ A database scrub/validation routine.
 .. option:: --fix Fix the issues (make a backup first)
 .. option:: --echo Echo sql queries for debugging
 
-.. warning:: Worth looking into and cleaning up a bit
+.. warning:: Worth looking into and cleaning up a bit; may have sharp edges.
 
-printInfo.py:
--------------
+printInfo.py
+------------
 .. program:: printInfo
 
 Prints a table of info about files or products or processes.
@@ -319,8 +324,8 @@ Prints a table of info about files or products or processes.
 .. option:: Database The name of the database to print table of
 .. option:: Field Either Product or Mission (more to come)
 
-printProcessQueue.py:
----------------------
+printProcessQueue.py
+--------------------
 .. program:: printProcessQueue
 
 Prints the process queue.
@@ -335,17 +340,20 @@ ProcessQueue.py
 
 The main thing
 
-purgeFileFromDB.py:
--------------------
+purgeFileFromDB.py
+------------------
 .. program:: purgeFileFromDB
 
-Deletes individual files from the database.
+Deletes individual files from the database. Pending note on this
+"different than delete how? This might be the one to use. purge
+deletes it and everything that depends on it. delete might not, which
+might leave loose ends." Not clear which "delete" this refers to.
 
 .. option:: -m <dbname>, --mission <dbname> Selected mission database
 .. option:: -r, --recursive Recursive removal
 
-reprocessByAll.py:
-------------------
+reprocessByAll.py
+-----------------
 .. program:: reprocessByAll
 
 Goes through the database and adds all the files that are a certain level to the processqueue so that the next ProcessQueue -p will run them
@@ -357,8 +365,8 @@ Goes through the database and adds all the files that are a certain level to the
 
 .. warning:: Should work, probably doesn't
 
-reprocessByCode.py:
--------------------
+reprocessByCode.py
+------------------
 .. program:: reprocessByCode
 
 Goes through the database and adds all the files that went into the code to the processqueue so that the next ProcessQueue -p will run them
@@ -371,11 +379,17 @@ Goes through the database and adds all the files that went into the code to the 
 
 .. warning:: Should work, probably doesn't
 
-reprocessByDate.py:
--------------------
+reprocessByDate.py
+------------------
 .. program:: reprocessByDate
 
-Goes through the database and adds all the files that are in a date range to the processqueue so that the next ProcessQueue -p will run them
+Goes through the database and adds all the files that are in a date
+range to the processqueue so that the next ProcessQueue -p will run
+them.
+
+This code works and is likely the one that should be used most of the
+time for reprocessing files. (Used as the default for do everything on
+a date range, maybe reprocessByAll should go away.
 
 .. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
 .. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
@@ -383,8 +397,8 @@ Goes through the database and adds all the files that are in a date range to the
 .. option:: --echo Echo sql queries for debugging
 .. option:: --force Force the reprocessing. Speicify which version number to increment (1,2,3)
 
-reprocessByInstrument.py:
--------------------------
+reprocessByInstrument.py
+------------------------
 .. program:: reprocessByInstrument
 
 Goes through the database and adds all the files that are a certain instrument and level to the processqueue so that the next ProcessQueue -p will run them
@@ -396,11 +410,15 @@ Goes through the database and adds all the files that are a certain instrument a
 .. option:: --echo Echo sql queries for debugging
 .. option:: --force Force the reprocessing. Specify which version number to increment (1,2,3)
 
-reprocessByProduct.py:
-----------------------
-.. program:: reprocessByProduct.
+reprocessByProduct.py
+---------------------
+.. program:: reprocessByProduct
 
-Goes through the database and adds all the files that are a certain product and put then to the processqueue so that the next ProcessQueue -p will run them
+Goes through the database and adds all the files that are a certain product and put then to the processqueue so that the next ProcessQueue -p will run them.
+
+This reprocessing script works and is used all the time; it's been
+tested much more heavily than the others and is used all the time for
+individual processing.
 
 .. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
 .. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
@@ -408,16 +426,16 @@ Goes through the database and adds all the files that are a certain product and 
 .. option:: --echo Echo sql queries for debugging
 .. option:: --force Force the reprocessing. Specify which version number to increment (1,2,3)
 
-updateCode.py:
---------------
+updateCode.py
+-------------
 New version of code, rerun based on that, better done through config files (although can't be done that way) and then run reprocessByCode
 
-updateProducts.py:
-------------------
+updateProducts.py
+-----------------
 probably broken
 
-updateSHAsum.py:
-----------------
+updateSHAsum.py
+---------------
 .. program:: updateSHAsum
 
 Goes into the database and update the shasum entry for a file that is changed after ingestion.
@@ -439,18 +457,18 @@ has been created with the older algorithm.
 
    Selected mission database
 
-weeklyReport.py:
-----------------
-unused, probably broken, delete
-
-writeDBhtml.py:
+weeklyReport.py
 ---------------
 unused, probably broken, delete
 
-writeProcessConf.py:
---------------------
+writeDBhtml.py
+--------------
+unused, probably broken, delete
+
+writeProcessConf.py
+-------------------
 probably not used
 
-writeProductsConf.py:
----------------------
+writeProductsConf.py
+--------------------
 probably not used
