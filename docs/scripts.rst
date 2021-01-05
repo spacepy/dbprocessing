@@ -1,5 +1,17 @@
+********************
 dbprocessing Scripts
-====================
+********************
+
+.. contents::
+   :depth: 1
+   :local:
+
+Maintained scripts
+==================
+These scripts are of general use in dbprocessing and either are fully
+tested and verified to work, or are moving to that status. They are
+maintained as part of dbprocessing. They are in the ``scripts``
+directory.
 
 addFromConfig.py
 ----------------
@@ -15,16 +27,6 @@ format and capability.
 .. option:: -m <dbname>, --mission <dbname> The database to apply the config file to
 .. option:: -v, --verify  Verify the config file then stop
 
-
-addVerboseProvenance.py
------------------------
-.. program:: addVerboseProvenance
-
-Go into the database and get the verbose provenance for a file
-then add that to the global attrs for the file.
-Either putout to the same file or a different file
-
-.. warning:: This code has not been fully tested or used; never worked.
 
 clearProcessingFlag.py
 ----------------------
@@ -84,10 +86,6 @@ This is the first step in the setup of a new processing chain.
 .. option:: dbname
 
    The name of the database to create
-
-dataToIncoming.py
------------------
-Concept, never actually used. supposed to be one script + config file, but we wound up using separate scripts for everything
 
 dbOnlyFiles.py
 --------------
@@ -175,12 +173,6 @@ Deletes all file entries in the database.
 
 .. option:: -m <dbname>, --mission <dbname> Selected mission database
 
-deleteAllDBProducts.py
-----------------------
-.. program:: deleteAllDBProducts
-
-Doesn't work, maybe should?
-
 deleteFromDBifNotOnDisk.py
 --------------------------
 .. program:: deleteFromDBifNotOnDisk
@@ -203,23 +195,11 @@ histogramCodes.py
 -----------------
 may or may not still work, read logs to find out what codes take a long time to run
 
-hopeCoverageHTML.py
--------------------
-delete
-
-hope_query.py
--------------
-delete
-
 .. _scripts_htmlCoverage:
 
 htmlCoverage.py
 ---------------
 either this or :ref:`scripts_coveragePlot` works, not both.
-
-link_missing_ql_mag_l2_mag.py
------------------------------
-QL "required,", L2 "optional". We don't support "either or but prefer this one", so this links them together and the wrapper handles the actual priority
 
 .. _scripts_linkUningested:
 
@@ -243,18 +223,6 @@ on next run).
    that are normally created rather than ingested as first-order inputs might
    lead to odd results. Multiple products can be specified by specifying
    more than once.
-
-magephem_dataToIncoming.py
---------------------------
-What it says on tin. Delete?
-
-magephem_def_dataToIncoming.py
-------------------------------
-What it says on tin. Delete?
-
-magephem-pre-CoverageHTML.py
-----------------------------
-Probably works. Delete?
 
 makeLatestSymlinks.py
 ---------------------
@@ -426,14 +394,6 @@ individual processing.
 .. option:: --echo Echo sql queries for debugging
 .. option:: --force Force the reprocessing. Specify which version number to increment (1,2,3)
 
-updateCode.py
--------------
-New version of code, rerun based on that, better done through config files (although can't be done that way) and then run reprocessByCode
-
-updateProducts.py
------------------
-probably broken
-
 updateSHAsum.py
 ---------------
 .. program:: updateSHAsum
@@ -456,6 +416,59 @@ has been created with the older algorithm.
 .. option:: -m <dbname>, --mission <dbname>
 
    Selected mission database
+
+
+Examples
+========
+These scripts are meant as reference for specific tasks that might be
+required for a particular mission. They may not be fully tested or may
+be mission-specific. They are not generally maintained; some are
+candidates for eventually transferring to maintained scripts. They are
+in the directory ``examples/scripts``.
+
+addVerboseProvenance.py
+-----------------------
+.. program:: addVerboseProvenance
+
+Go into the database and get the verbose provenance for a file
+then add that to the global attrs for the CDF file.
+Either put out to the same file or a different file
+
+.. warning:: This code has not been fully tested or used; never worked.
+
+dataToIncoming.py
+-----------------
+Concept, never actually used. supposed to be one script + config file
+to handle all incoming data for RBSP-ECT, but we wound up using
+separate scripts for everything
+
+hopeCoverageHTML.py
+-------------------
+delete
+
+hope_query.py
+-------------
+delete
+
+link_missing_ql_mag_l2_mag.py
+-----------------------------
+RBSP-ECT had some inputs available initially in a quicklook format and
+then later in a definitive level 2 format. The database treated QL as
+"required,", L2 "optional". We don't support "either or but prefer
+this one", so this links them together and the wrapper handles the
+actual priority
+
+magephem-pre-CoverageHTML.py
+----------------------------
+Probably works. Delete?
+
+updateCode.py
+-------------
+New version of code, rerun based on that, better done through config files (although can't be done that way) and then run reprocessByCode
+
+updateProducts.py
+-----------------
+probably broken
 
 weeklyReport.py
 ---------------
