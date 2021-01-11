@@ -307,7 +307,8 @@ class DBUtilsGetTests(TestSetup):
 
     def test_openDB1(self):
         """__init__ has an exception to test"""
-        self.assertRaises(ValueError, DButils.DButils, 'i do not exist')
+        self.assertRaises(ValueError, DButils.DButils, 'i do not exist',
+                          engine='sqlite')
 
     def test_openDB2(self):
         """__init__ bad engine"""

@@ -118,12 +118,12 @@ class DButils(object):
                        postgresql.
         :type engine: str
         """
-        if engine is None:
-            engine = 'sqlite' if os.path.isfile(os.path.expanduser(mission))\
-                     else 'postgresql'
         self.dbIsOpen = False
         if mission is None:
             raise (DBError("Must input database name to create DButils instance"))
+        if engine is None:
+            engine = 'sqlite' if os.path.isfile(os.path.expanduser(mission))\
+                     else 'postgresql'
         self.mission = mission
         # Expose the format/regex routines of DBformatter
         fmtr = DBstrings.DBformatter()
@@ -197,7 +197,7 @@ class DButils(object):
         elif engine == 'postgresql':
             db_url = postgresql_url(self.mission)
         else:
-            raise ValueError('Unknown engine {}'.format(engine))
+            raise DBError('Unknown engine {}'.format(engine))
         try:
             engineIns = sqlalchemy.create_engine(db_url, echo=echo)
             DBlogging.dblogger.info("Database Connection opened: {0}  {1}".format(str(engineIns), self.mission))
