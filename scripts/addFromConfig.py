@@ -341,18 +341,21 @@ if __name__ == "__main__":
         # recheck the temp file
         conf = readconfig(tmpf.name)
         configCheck(conf)
-        # do all our work on a temp version of the DB, if it all works, move tmp on top of existing
-        #   if it fails just delete the tmp and do nothing
-        orig_db = options.mission
-        tmp_db = tempfile.NamedTemporaryFile(delete=False, suffix='_temp_db')
-        tmp_db.file.writelines(cfg)
-        tmp_db.close()
-        shutil.copy(orig_db, tmp_db.name)
-        options.mission = tmp_db.name
-        try:
+        if os.path.isfile(options.mission): # sqlite
+            # do all our work on a temp version of the DB, if it all works, move tmp on top of existing
+            #   if it fails just delete the tmp and do nothing
+            orig_db = options.mission
+            tmp_db = tempfile.NamedTemporaryFile(delete=False, suffix='_temp_db')
+            tmp_db.file.writelines(cfg)
+            tmp_db.close()
+            shutil.copy(orig_db, tmp_db.name)
+            options.mission = tmp_db.name
+            try:
+                addStuff(conf, options)
+                shutil.copy(tmp_db.name, orig_db)
+            finally:
+                os.remove(tmp_db.name)
+        else: # postgresql
             addStuff(conf, options)
-            shutil.copy(tmp_db.name, orig_db)
-        finally:
-            os.remove(tmp_db.name)
     finally:
         os.remove(tmpf.name)
