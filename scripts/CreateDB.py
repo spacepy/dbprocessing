@@ -25,9 +25,11 @@ class dbprocessing_db(object):
     Main workhorse class for the CreateDB module
     """
 
-    def __init__(self, filename='dbprocessing_default.db', overwrite=False, create=True):
+    def __init__(self, filename='dbprocessing_default.db', overwrite=False,
+                 create=True, dialect='sqlite'):
         self.filename = filename
         self.overwrite = overwrite
+        self.dialect = dialect
         self.dbIsOpen = False
         if create:
             if os.path.isfile(filename) != True:
@@ -41,14 +43,21 @@ class dbprocessing_db(object):
         if self.overwrite:
             raise (NotImplementedError('overwrite is not yet implemented'))
 
+        # TODO move this out so that the user chooses the db type
+        if self.dialect == 'sqlite':
+            url = 'sqlite:///' + self.filename
+        elif self.dialect == 'postgresql':
+            url = dbprocessing.DButils.postgresql_url(self.filename)
+        else:
+            raise ValueError('Unknown dialect {}'.format(self.dialect))
+
         metadata = schema.MetaData()
 
         for name in dbprocessing.tables.names:
             data_table = schema.Table(
                 name, metadata, *dbprocessing.tables.definition(name))
 
-        # TODO move this out so that the user chooses the db type
-        engine = create_engine('sqlite:///' + self.filename, echo=False)
+        engine = create_engine(url, echo=False)
         metadata.bind = engine
 
         metadata.create_all(checkfirst=True)
@@ -59,13 +68,18 @@ class dbprocessing_db(object):
 if __name__ == "__main__":
     usage = "usage: %prog [options] filename"
     parser = OptionParser(usage=usage)
+    parser.add_option("-d", "--dialect", dest="dialect", default='sqlite',
+                      help="sqlalchemy dialect (sqlite or postgresql)")
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
         parser.error("incorrect number of arguments")
-    filename = os.path.abspath(args[0])
 
-    if os.path.isfile(filename):
-        parser.error("file: {0} exists will not overwrite".format(filename))
+    filename = args[0]
+    if options.dialect == 'sqlite':
+        filename = os.path.abspath(filename)
 
-    db = dbprocessing_db(filename=filename)
+        if os.path.isfile(filename):
+            parser.error("file: {0} exists will not overwrite".format(filename))
+
+    db = dbprocessing_db(filename=filename, dialect=options.dialect)

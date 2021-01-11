@@ -74,7 +74,13 @@ Create an empty sqlite database for use in dbprocessing.
 
 This is the first step in the setup of a new processing chain.
 
-.. option:: dbname The name of the database to create
+.. option:: -d <dialect>, --dialect <dialect>
+
+   sqlalchemy dialect to use, ``sqlite`` (default) or ``postgresql``
+
+.. option:: dbname
+
+   The name of the database to create
 
 dataToIncoming.py
 -----------------

@@ -26,4 +26,4 @@ DButils
 .. autosummary::
     :toctree: autosummary
 
-
+    postgresql_url
