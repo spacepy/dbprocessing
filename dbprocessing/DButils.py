@@ -6,12 +6,18 @@ import datetime
 import pdb
 import glob
 import itertools
+import os
 import os.path
 import pwd
 import socket  # to get the local hostname
 import sys
 from collections import namedtuple
 from operator import itemgetter, attrgetter
+try:
+    import urllib.parse #python 3
+except ImportError:
+    import urllib
+    urllib.parse = urllib
 
 import sqlalchemy
 import sqlalchemy.sql.expression
@@ -61,13 +67,44 @@ class DBNoData(Exception):
     pass
 
 
+def postgresql_url(databasename):
+    """Build postgresl database URL
+
+    Environment variable ``PGUSER`` is required. Will also use ``PGHOST``,
+    ``PGPORT`` (requires ``PGHOST``), ``PGPASSWORD`` to define database
+    server to connect to. Anything unspecified is postgresql default.
+
+    Parameters
+    ----------
+    databasename : str
+        Name of the database
+
+    Returns
+    -------
+    str
+        Full postgresql URL, suitable for use in
+        :func:`~sqlalchemy.engine.create_engine`
+    """
+    # If no host, defaults to Unix domain on localhost.
+    hostport = os.environ.get('PGHOST', '')
+    if 'PGPORT' in os.environ:
+        hostport = '{}:{}'.format(hostport, os.environ['PGPORT'])
+    userpass = os.environ['PGUSER']
+    if 'PGPASSWORD' in os.environ:
+        userpass = '{}:{}'.format(userpass, urllib.parse.quote_plus(
+                      os.environ['PGPASSWORD']))
+    db_url = 'postgresql://{userpass}@{hostport}/{database}'.format(
+        userpass=userpass, hostport=hostport, database=databasename)
+    return db_url
+
+
 class DButils(object):
     """
     Utility routines for the DBProcessing class, all of these may be user called but are meant to
     be internal routines for DBProcessing
     """
 
-    def __init__(self, mission='Test', db_var=None, echo=False, engine='sqlite'):
+    def __init__(self, mission='Test', db_var=None, echo=False, engine=None):
         """
         Initialize the DButils class
 
@@ -76,9 +113,14 @@ class DButils(object):
         :param db_var: Does nothing.
         :param echo: if True, the Engine will log all statements as well as a repr() of their parameter lists to the logger
         :type echo: bool
-        :param engine: DB engine to connect to
+        :param engine: DB engine to connect to (e.g sqlite, postgresql).
+                       Defaults to sqlite if mission is an existing file, else
+                       postgresql.
         :type engine: str
         """
+        if engine is None:
+            engine = 'sqlite' if os.path.isfile(os.path.expanduser(mission))\
+                     else 'postgresql'
         self.dbIsOpen = False
         if mission is None:
             raise (DBError("Must input database name to create DButils instance"))
@@ -146,13 +188,18 @@ class DButils(object):
         """
         if self.dbIsOpen == True:
             return
-        try:
+        if engine == 'sqlite':
             if not os.path.isfile(os.path.expanduser(self.mission)):
                 raise (ValueError("DB file specified doesn't exist"))
-            engineIns = sqlalchemy.create_engine('{0}:///{1}'.format(engine, os.path.expanduser(self.mission)),
-                                                 echo=echo)
+            db_url = '{0}:///{1}'.format(engine, os.path.expanduser(
+                self.mission))
             self.mission = os.path.abspath(os.path.expanduser(self.mission))
-
+        elif engine == 'postgresql':
+            db_url = postgresql_url(self.mission)
+        else:
+            raise ValueError('Unknown engine {}'.format(engine))
+        try:
+            engineIns = sqlalchemy.create_engine(db_url, echo=echo)
             DBlogging.dblogger.info("Database Connection opened: {0}  {1}".format(str(engineIns), self.mission))
 
         except (DBError, ArgumentError):
