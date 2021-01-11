@@ -55,25 +55,6 @@ class dbprocessing_db(object):
         self.engine = engine
         self.metadata = metadata
 
-    def addMission(self, filename):
-        """utility to add a mission"""
-        self.dbu = DButils.DButils(filename)
-        self.mission = self.dbu.addMission('rbsp', os.path.join('/', 'n', 'space_data', 'cda', 'rbsp'))
-
-    def addSatellite(self):
-        """add satellite utility"""
-        self.satellite = self.dbu.addSatellite('rbspa')  # 1
-        self.satellite = self.dbu.addSatellite('rbspb')  # 2
-
-    def addInstrument(self):
-        """addInstrument utility"""
-        self.instrument = self.dbu.addInstrument('hope', 1)
-        self.instrument = self.dbu.addInstrument('hope', 2)
-        self.instrument = self.dbu.addInstrument('rept', 1)
-        self.instrument = self.dbu.addInstrument('rept', 2)
-        self.instrument = self.dbu.addInstrument('mageis', 1)
-        self.instrument = self.dbu.addInstrument('mageis', 2)
-
 
 if __name__ == "__main__":
     usage = "usage: %prog [options] filename"
