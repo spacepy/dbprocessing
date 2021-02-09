@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
+import argparse
 import itertools
 import glob
 import os
-from optparse import OptionParser
 import re
 import sys
 import traceback
@@ -15,13 +15,11 @@ import matplotlib.pyplot as plt
    
 
 if __name__ == '__main__':
-    usage = "usage: %prog logfile [[logfile]...]"
-    parser = OptionParser(usage=usage)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('logfile', action='store', type=str, nargs='+',
+                        help='Name of dbprocessing log to parse.')
 
-    (options, args) = parser.parse_args()
-
-    if len(args) < 1:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
 
     """
@@ -29,9 +27,7 @@ if __name__ == '__main__':
     make histograms by code
     """
 
-    files = args
-    if not files:
-        parser.error("No files matching {0} found".format(args[0]))
+    files = options.logfile
 
     lines = []
     # read in each file and add to lines the lines that fit the format:

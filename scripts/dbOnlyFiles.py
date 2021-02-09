@@ -6,10 +6,10 @@ files that are such should have thier exists_on_disk flag set to false
 """
 from __future__ import division
 
+import argparse
 import bisect
 import datetime
 import os
-from optparse import OptionParser
 
 from dateutil import parser as dup
 from dateutil.relativedelta import relativedelta
@@ -19,31 +19,28 @@ import dbprocessing.dbprocessing as dbprocessing
 from dbprocessing.Utils import progressbar
 
 if __name__ == "__main__":
-    usage = "%prog -m mission"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-s", "--startDate", dest="startDate", type="string",
-                      help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
-    parser.add_option("-e", "--endDate", dest="endDate", type="string",
-                      help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
-    parser.add_option("-f", "--fix", dest="fix", action='store_true',
-                      help="Fix the database exists_on_disk field ", default=False)
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission database", default=None)
-    parser.add_option("", "--echo", dest="echo", action='store_true',
-                      help="echo sql queries for debugging", default=False)
-    parser.add_option("-n", "--newest", dest="newest", action='store_true',
-                      help="Only check the newest files", default=False)
-    parser.add_option("", "--startID", dest="startID", type="int",
-                      help="The File id to start on", default=1)
-    parser.add_option("-v", "--verbose", dest="verbose", action='store_true',
-                      help="Print out each file as it is checked", default=False)
-    parser.add_option("-p", "--path", dest="path", action="store_true",
-                      help="Print full file path of missing files", default=False)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--startDate", type=str,
+                        help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
+    parser.add_argument("-e", "--endDate", type=str,
+                        help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
+    parser.add_argument("-f", "--fix", action='store_true',
+                        help="Fix the database exists_on_disk field ", default=False)
+    parser.add_argument("-m", "--mission",
+                        help="selected mission database", required=True)
+    parser.add_argument("--echo", action='store_true',
+                        help="echo sql queries for debugging", default=False)
+    parser.add_argument("-n", "--newest", action='store_true',
+                        help="Only check the newest files", default=False)
+    parser.add_argument("--startID", type=int,
+                        help="The File id to start on", default=1)
+    parser.add_argument("-v", "--verbose", action='store_true',
+                        help="Print out each file as it is checked", default=False)
+    parser.add_argument("-p", "--path", action="store_true",
+                        help="Print full file path of missing files", default=False)
 
     
-    (options, args) = parser.parse_args()
-    if len(args) != 0:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
     if options.startDate is not None:
         startDate = dup.parse(options.startDate)

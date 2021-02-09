@@ -8,12 +8,12 @@ Created on Fri Mar 14 10:30:27 2014
 """
 from __future__ import division
 
+import argparse
 import ConfigParser
 import datetime
 import fnmatch
 import os
 import subprocess
-from optparse import OptionParser
 
 import matplotlib
 
@@ -163,14 +163,14 @@ def _combine_coverage(inval):
 
 
 if __name__ == "__main__":
-    usage = "usage: %prog [options] configfile"
-    parser = OptionParser(usage=usage)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('configfile', action='store', type=str,
+                        help='Plot configuration file to read')
 
-    (options, args) = parser.parse_args()
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
-    conffile = os.path.expanduser(os.path.expandvars(os.path.abspath(args[0])))
+    conffile = os.path.expanduser(os.path.expandvars(os.path.abspath(
+        options.configfile)))
     if not os.path.isfile(conffile):
         parser.error("could not read config file: {0}".format(conffile))
 

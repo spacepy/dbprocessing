@@ -10,8 +10,8 @@ Module to create the database structure for dbprocessing
 """
 from __future__ import division  # may not be needed but start with it
 
+import argparse
 import os
-from optparse import OptionParser
 
 from sqlalchemy import schema, types
 from sqlalchemy.engine import create_engine
@@ -66,16 +66,15 @@ class dbprocessing_db(object):
 
 
 if __name__ == "__main__":
-    usage = "usage: %prog [options] filename"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-d", "--dialect", dest="dialect", default='sqlite',
-                      help="sqlalchemy dialect (sqlite or postgresql)")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--dialect", dest="dialect", default='sqlite',
+                        help="sqlalchemy dialect (sqlite or postgresql)")
+    parser.add_argument('dbname', action='store', type=str,
+                        help='Name of database (or sqlite file) to create.')
 
-    (options, args) = parser.parse_args()
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
-    filename = args[0]
+    filename = options.dbname
     if options.dialect == 'sqlite':
         filename = os.path.abspath(filename)
 

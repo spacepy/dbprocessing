@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
+import argparse
 import datetime
 import os
 import operator
-from optparse import OptionParser
-import pdb
 import traceback
 import subprocess
 
@@ -29,43 +28,37 @@ if __name__ == "__main__":
         -s -> skip run timebase
         -o -> only run listed processes
     """
-    parser = OptionParser(usage=usage)
-    parser.add_option("-i", "", dest="i", action="store_true",
-                      help="ingest mode", default=False)
-    parser.add_option("-p", "", dest="p", action="store_true",
-                      help="process mode", default=False)
-    parser.add_option("-s", "", dest="s", action="store_true",
-                      help="Skip run timebase processes", default=False)
-    parser.add_option("-o", "--only", dest="o", type="string",
-                      help='Run only listed processes (either id or name)', default = None)
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission database", default=None)
-    parser.add_option("-d", "--dryrun", dest="dryrun", action="store_true",
-                      help="only do a dryrun processing or ingesting", default=False)
-    parser.add_option("-r", "--report", dest="report", action="store_true",
-                      help="Make the html report", default=False)
-    parser.add_option("-l", "--log-level", dest="loglevel",
-                      help="Set the logging level", default="debug")
-    parser.add_option("-n", "--num-proc", dest="numproc", type='int',
-                      help="Number of processes to run in parallel", default=2)
-    parser.add_option("", "--echo", dest="echo", action="store_true",
-                      help="Start sqlalchemy with echo in place for debugging", default=False)
-    parser.add_option("", "--glb", dest="glob", type="string",
-                      help='Glob to use when reading files from incoming: default "*"', default="*")
+    parser = argparse.ArgumentParser()
+    action_group = parser.add_mutually_exclusive_group(required=True)
+    action_group.add_argument("-i", action="store_true",
+                              help="ingest mode", default=False)
+    action_group.add_argument("-p", action="store_true",
+                              help="process mode", default=False)
+    parser.add_argument("-s", dest="s", action="store_true",
+                        help="Skip run timebase processes", default=False)
+    parser.add_argument("-o", "--only", dest="o", type=str,
+                        help='Run only listed processes (either id or name)', default = None)
+    parser.add_argument("-m", "--mission", required=True,
+                        help="selected mission database", default=None)
+    parser.add_argument("-d", "--dryrun", action="store_true",
+                        help="only do a dryrun processing or ingesting", default=False)
+    parser.add_argument("-r", "--report", action="store_true",
+                        help="Make the html report", default=False)
+    parser.add_argument("-l", "--log-level", dest="loglevel",
+                        help="Set the logging level", default="debug")
+    parser.add_argument("-n", "--num-proc", dest="numproc", type=int,
+                        help="Number of processes to run in parallel", default=2)
+    parser.add_argument("--echo", action="store_true",
+                        help="Start sqlalchemy with echo in place for debugging", default=False)
+    parser.add_argument("--glb", dest="glob", type=str,
+                        help='Glob to use when reading files from incoming: default "*"', default="*")
 
+    options = parser.parse_args()
 
-    (options, args) = parser.parse_args()
-    if len(args) != 0:
-        parser.error("incorrect number of arguments")
-
-    if options.i and options.p:
-        parser.error("options -i and -p are mutually exclusive")
-    if options.i and options.s:
-        parser.error("options -i and -s are mutually exclusive")
-    if options.i and options.o:
-        parser.error("options -i and -o are mutually exclusive")
-    if not options.i and not options.p:
-        parser.error("either -i or -p must be specified")
+    if options.s and not options.p:
+        parser.error('-s requires -p')
+    if options.o and not options.p:
+        parser.error('-o requires -p')
 
     logname = os.path.basename(options.mission).replace('.', '_')
     DBlogging.change_logfile(logname)

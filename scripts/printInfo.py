@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
+import argparse
 import datetime
 import itertools
 import glob
 import os
-from optparse import OptionParser
 import re
 import sys
 import traceback
@@ -26,23 +26,25 @@ def getProductString(p, basepath):
 
 
 if __name__ == '__main__':
-    usage = "usage: %prog database field \n Field can be: Product, Mission (more to come)"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-p", "--product", dest="product", 
-                    help='Product id (or name) to use, only used for "File"', default=None)
-    parser.add_option("-s", "--startDate", dest="startDate", type="string",
-                      help='Date to start printing, only used for "File"  (e.g. 2012-10-02)', default=None)
-    parser.add_option("-e", "--endDate", dest="endDate", type="string",
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--product",
+                        help='Product id (or name) to use, only used for "File"', default=None)
+    parser.add_argument("-s", "--startDate", dest="startDate", type=str,
+                        help='Date to start printing, only used for "File"  (e.g. 2012-10-02)', default=None)
+    parser.add_argument("-e", "--endDate", dest="endDate", type=str,
                       help='Date to end printing, only used for "File" (e.g. 2012-10-25)', default=None)
+    parser.add_argument(
+        'database', action='store', type=str,
+        help='Name of database (or sqlite file), i.e. mission, to open.')
+    parser.add_argument(
+        'field', action='store', type=str,
+        help='Field to print (Product, Mission; more to come)')
 
 
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()
 
-    if len(args) != 2:
-        parser.error("incorrect number of arguments")
-
-    mission = args[0]
-    field = args[1].capitalize()
+    mission = options.database
+    field = options.field.capitalize()
 
     dbu = DButils.DButils(mission)
 

@@ -11,7 +11,6 @@ Module to create the database structure for dbprocessing
 from __future__ import division  # may not be needed but start with it
 
 import os
-from optparse import OptionParser
 
 import sqlalchemy
 from sqlalchemy import schema, types

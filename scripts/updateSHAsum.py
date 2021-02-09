@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
+import argparse
 import os
-from optparse import OptionParser
 
 from dbprocessing import DButils
 
@@ -19,16 +19,14 @@ def updateSHA(dbu, filename):
     
 if __name__ == '__main__':
     usage = "usage: %prog infile"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission database", default=None)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--mission", required=True,
+                        help="selected mission database", default=None)
+    parser.add_argument('infile', action='store',
+                        help='File to update.')
+    options = parser.parse_args()
 
-    (options, args) = parser.parse_args()
-
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
-
-    infile = os.path.expanduser(os.path.expandvars(args[0]))
+    infile = os.path.expanduser(os.path.expandvars(options.infile))
     if not os.path.isfile(infile):
         parser.error("Input file {0} did not exist".format(infile))
 

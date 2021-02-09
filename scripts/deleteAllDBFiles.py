@@ -2,22 +2,15 @@
 
 from __future__ import print_function
 
-from optparse import OptionParser
+import argparse
 
 from dbprocessing import DButils
 
 if __name__ == "__main__":
-    usage = \
-        """
-        Usage: %prog -m
-            -m -> selects mission
-        """
-    parser = OptionParser(usage=usage)
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission database", default=None)
-    (options, args) = parser.parse_args()
-    if len(args) != 0:
-        parser.error("incorrect number of arguments")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--mission", dest="mission",
+                        help="selected mission database", required=True)
+    options = parser.parse_args()
 
     a = DButils.DButils(options.mission)
     f = a.getAllFilenames()

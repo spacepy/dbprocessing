@@ -23,7 +23,7 @@ import os
 import shutil
 import sys
 import tempfile
-from optparse import OptionParser
+import argparse
 from ast import literal_eval as make_tuple
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -298,18 +298,17 @@ def addStuff(cfg, options):
 
 
 if __name__ == "__main__":
-    usage = "usage: %prog [options] -m mission_db filename"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-m", "--mission", dest="mission", type="string",
-                      help="mission to connect to", default='')
-    parser.add_option("-v", "--verify", dest="verify", action='store_true',
-                      help="Don't do anything other than verify the config file", default=False)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--mission", type=str,
+                        help="mission to connect to", default='')
+    parser.add_argument("-v", "--verify", action='store_true',
+                        help="Don't do anything other than verify the config file", default=False)
+    parser.add_argument('config_file', action='store', type=str,
+                        help='Configuration file to read from')
 
-    (options, args) = parser.parse_args()
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
-    filename = os.path.expanduser(args[0])
+    filename = os.path.expanduser(options.config_file)
 
     if not os.path.isfile(filename):
         parser.error("file: {0} does not exist or is not readable".format(filename))

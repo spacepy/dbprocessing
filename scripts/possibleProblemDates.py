@@ -2,8 +2,8 @@
 
 from __future__ import division
 
+import argparse
 import datetime
-from optparse import OptionParser
 
 from sqlalchemy import func
 
@@ -124,23 +124,14 @@ def noNewestVersion(dbu, fix=False):
 
 
 if __name__ == "__main__":
-    usage = "%prog"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission", default=None)
-    parser.add_option("", "--fix", dest="fix", action='store_true',
-                      help="Fix the issues (make a backup first)", default=False)    
-    parser.add_option("", "--echo", dest="echo", action='store_true',
-                      help="enable sqlalchemy echo mode for debugging", default=False)    
-    (options, args) = parser.parse_args()
-
-
-    if len(args) != 0:
-        parser.error("incorrect number of arguments")
-
-    if options.mission is None:
-        parser.error("-m must be specified")
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--mission", required=True,
+                        help="selected mission", default=None)
+    parser.add_argument("--fix", action='store_true',
+                        help="Fix the issues (make a backup first)", default=False)
+    parser.add_argument("--echo", action='store_true',
+                        help="enable sqlalchemy echo mode for debugging", default=False)
+    options = parser.parse_args()
                 
     dbu = DButils.DButils(options.mission, echo=options.echo)
 

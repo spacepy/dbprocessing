@@ -3,7 +3,7 @@
 
 import ConfigParser
 import os
-from optparse import OptionParser
+import argparse
 
 from dbprocessing import DButils
 from dbprocessing import Utils
@@ -102,29 +102,32 @@ header_comments = """
 """
 
 if __name__ == "__main__":
-    usage = "usage: %prog [options] -m mission_db filename"
-    parser = OptionParser(usage=usage)
+    parser = argparse.ArgumentParser()
     parser.set_defaults(mission=None)
     parser.set_defaults(force=False)
     parser.set_defaults(satellite=None)
     parser.set_defaults(nocomments=False)
 
-    parser.add_option("-m", "--mission", dest="mission", type="string",
-                      help="mission to connect to")
-    parser.add_option("-f", "--force", dest="force", action="store_true",
-                      help="Force the processing, overwrite the outfile")
-    parser.add_option("-s", "--satellite", dest="satellite", type="string",
-                      help="satellite to write to conf file (one per file)")
-    parser.add_option("-i", "--instrument", dest="instrument", type="string",
-                      help="instrument to write to conf file (one per file)")
-    parser.add_option("-c", "--nocomments", dest="nocomments", action='store_true',
-                      help="Do not add comments to the top of the config file")
+    parser.add_argument("-m", "--mission", dest="mission", type=str,
+                        default=None,
+                        help="mission to connect to")
+    parser.add_argument("-f", "--force", dest="force", action="store_true",
+                        default=False,
+                        help="Force the processing, overwrite the outfile")
+    parser.add_argument("-s", "--satellite", dest="satellite", type=str,
+                        default=None,
+                        help="satellite to write to conf file (one per file)")
+    parser.add_argument("-i", "--instrument", dest="instrument", type=str,
+                        help="instrument to write to conf file (one per file)")
+    parser.add_argument("-c", "--nocomments", dest="nocomments", action='store_true',
+                        default=False,
+                        help="Do not add comments to the top of the config file")
+    parser.add_argument('config_file', action='store', type=str,
+                        help='Configuration file to write')
 
-    (options, args) = parser.parse_args()
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
-    filename = os.path.expandvars(os.path.expanduser(args[0]))
+    filename = os.path.expandvars(os.path.expanduser(options.config_file))
 
     if os.path.isfile(filename) and not options.force:
         parser.error("file: {0} exists and will not be overwritten (use --force)".format(filename))

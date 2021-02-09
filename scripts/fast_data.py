@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
+import argparse
 import datetime
 import itertools
 import os
-from optparse import OptionParser
 import warnings
 
 import networkx
@@ -113,38 +113,35 @@ def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False
 
 
 if __name__ == '__main__':
-    usage = "usage: %prog -m database -d YYYY-MM-DD [--reap-files] [--reap-records] [--verbose]"
-    parser = OptionParser(usage=usage)
-    parser.add_option(
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
         "-m",
         "--mission",
-        dest="mission",
+        required=True,
         help="selected mission database",)
-    parser.add_option(
-        "-d",
+    parser.add_argument(
         "--cutoff",
-        dest="cutoff",
+        required=True,
         help="What date to use as the fast data cut off",)
-    parser.add_option(
+    parser.add_argument(
         "--reap-files",
         dest="files",
         action='store_true',
         help="Removes all Level0 files, and all of their children, that are not the newest version and are newer than the cut off date. It will still keep the records of the files in the dbprocessing database, but sets exists_on_disk to false.",
         default=False)
-    parser.add_option(
+    parser.add_argument(
         "--reap-records",
         dest="records",
         action='store_true',
         help="Removes any file records that are marked as not exists_on_disk, and will sanity check that none of its children are still on disk. It also removes the corresponding file_file_links and file_code_links.",
         default=False)
-    parser.add_option(
+    parser.add_argument(
         "--verbose",
-        dest="verbose",
         action='store_true',
         help="Prints names of files that will be deleted",
         default=False)
 
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()
 
     if options.mission is None:
         parser.error("Mission needs to be specified")
@@ -153,7 +150,7 @@ if __name__ == '__main__':
         cut_date = datetime.datetime.strptime(
             options.cutoff, "%Y-%m-%d").date()
     except TypeError as err:
-        parser.error("Must pass a cutoff date")
+        parser.error("Must pass a cutoff date in form YYYY-MM-DD")
     except ValueError as err:
         parser.error(err.message)
 
