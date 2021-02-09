@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from optparse import OptionParser
+import argparse
 
 from dbprocessing import DButils
 
@@ -31,16 +31,15 @@ class scrubber(object):
         
 
 if __name__ == '__main__':
-    usage = "usage: %prog -m database"
-    parser = OptionParser(usage=usage)
-    parser.add_option(
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
         "-m",
         "--mission",
-        dest="mission",
+        required=True,
         help="selected mission database",
         default=None)
 
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()
 
     scrubber = scrubber(options.mission)
     scrubber.parents_are_newest()

@@ -7,7 +7,7 @@ processqueue so that the next ProcessQueue -p will run them
 """
 from __future__ import print_function
 
-from optparse import OptionParser
+import argparse
 
 from dateutil import parser as dup
 
@@ -15,34 +15,25 @@ import dbprocessing.DBlogging as DBlogging
 import dbprocessing.dbprocessing as dbprocessing
 
 if __name__ == "__main__":
-    usage = "%prog -s yyyymmdd -e yyyymmdd -m database"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-s", "--startDate", dest="startDate", type="string",
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--startDate", dest="startDate", type=str, required=True,
                       help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
-    parser.add_option("-e", "--endDate", dest="endDate", type="string",
-                      help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
-    parser.add_option("", "--force", dest="force", type="int",
-                      help="Force the reprocessing, specify which version number {0},{1},{2}", default=None)
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission database", default=None)
-    parser.add_option("", "--echo", dest="echo", action='store_true',
-                      help="echo sql queries for debugging", default=False)
-    parser.add_option("", "--level", dest="level", type='float',
-                      help="The data level to reprocess", default=None)
+    parser.add_argument("-e", "--endDate", dest="endDate", type=str, required=True,
+                        help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
+    parser.add_argument("--force", dest="force", type=int,
+                        help="Force the reprocessing, specify which version number {0},{1},{2}", default=None)
+    parser.add_argument("-m", "--mission", required=True,
+                        help="selected mission database", default=None)
+    parser.add_argument("--echo", dest="echo", action='store_true',
+                        help="echo sql queries for debugging", default=False)
+    parser.add_argument("--level", dest="level", type=float,
+                        help="The data level to reprocess", default=None)
 
-    (options, args) = parser.parse_args()
-    if len(args) != 0:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
-    if options.startDate is not None:
-        startDate = dup.parse(options.startDate)
-    else:
-        parser.error("-s must be specified")
+    startDate = dup.parse(options.startDate)
 
-    if options.endDate is not None:
-        endDate = dup.parse(options.endDate)
-    else:
-        parser.error("-e must be specified")
+    endDate = dup.parse(options.endDate)
 
     if options.force not in [None, 0, 1, 2]:
         parser.error("invalid force option [0,1,2]")

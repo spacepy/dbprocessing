@@ -6,12 +6,12 @@ in a given directory make symlinks to all the newest versions of files into anot
 
 from __future__ import print_function
 
+import argparse
 import ConfigParser
 import datetime
 import glob
 from pprint import pprint
 import os
-from optparse import OptionParser
 import sys
 import re
 import traceback
@@ -193,24 +193,20 @@ def readconfig(config_filepath):
 
 
 if __name__ == '__main__':
-    usage = "usage: %prog config"
-    parser = OptionParser(usage=usage)
-    parser.add_option("", "--verbose",
-                  dest="verbose", action='store_true',
-                  help="Print out verbose information", default=False)
-    parser.add_option("-l", "--list",
-                  dest="list", action='store_true',
-                  help="Instead of syncing list the sections of the conf file", default=False)
-    parser.add_option("-f", "--filter",
-                  dest="filter", 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--verbose",
+                        action='store_true',
+                        help="Print out verbose information", default=False)
+    parser.add_argument("-l", "--list",
+                        action='store_true',
+                        help="Instead of syncing list the sections of the conf file", default=False)
+    parser.add_argument("-f", "--filter",
                   help="Comma seperated list of strings that must be in the sync conf name (e.g. -f hope,rbspa)", default=None)
+    parser.add_argument('config', type=str, help='Configuration file')
 
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()
 
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
-
-    conffile = os.path.abspath(os.path.expanduser((os.path.expandvars(args[0]))))
+    conffile = os.path.abspath(os.path.expanduser((os.path.expandvars(options.config))))
     if not os.path.isfile(conffile):
         parser.error("Config file not readable ({0})".format(conffile))
         

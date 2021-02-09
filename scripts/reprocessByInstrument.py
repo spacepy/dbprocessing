@@ -8,8 +8,7 @@ processqueue so that the next ProcessQueue -p will run them
 
 
 
-
-from optparse import OptionParser
+import argparse
 
 from dateutil import parser as dup
 
@@ -18,21 +17,21 @@ import dbprocessing.dbprocessing as dbprocessing
 
 
 if __name__ == "__main__":
-    parser = OptionParser()
-    parser.add_option("-s", "--startDate", dest="startDate", type="string",
-                      help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
-    parser.add_option("-e", "--endDate", dest="endDate", type="string",
-                      help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
-    parser.add_option("", "--force", dest="force", type="int",
-                      help="Force the reprocessing, specify which version number {0},{1},{2}", default=None)
-    parser.add_option("-l", "--level", dest="level", type="float",
-                      help="The level to reprocess for the given instrument", default=None)
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission database", default=None)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--startDate", type=str,
+                        help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
+    parser.add_argument("-e", "--endDate", type=str,
+                        help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
+    parser.add_argument("--force", type=int,
+                        help="Force the reprocessing, specify which version number {0},{1},{2}", default=None)
+    parser.add_argument("-l", "--level", type=float,
+                        help="The level to reprocess for the given instrument", default=None)
+    parser.add_argument("-m", "--mission", required=True,
+                        help="selected mission database", default=None)
+    parser.add_argument('instrument', action='store',
+                        help='Name or ID of instrument.')
 
-    (options, args) = parser.parse_args()
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
     if options.startDate is not None:
         startDate = dup.parse(options.startDate)
@@ -48,11 +47,11 @@ if __name__ == "__main__":
     if options.force not in [None, 0, 1, 2]:
         parser.error("invalid force option [0,1,2]")
 
-    num = db.reprocessByInstrument(args[0], level=options.level,
+    num = db.reprocessByInstrument(options.instrument, level=options.level,
                                    startDate=startDate, endDate=endDate,
                                    incVersion=options.force)
 
-    print('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
-    DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, args[0]))
+    print('Added {0} files to be reprocessed for product {1}'.format(num, options.instrument))
+    DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, options.instrument))
 
 

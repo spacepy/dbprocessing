@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
+import argparse
 import datetime
 import glob
 import os
 import sys
 import re
-from optparse import OptionParser
 import tempfile
 import shutil
 import time
@@ -197,16 +197,14 @@ def makeHTML(dbu, info, satellite, delta_days=3):
 
 
 if __name__ == "__main__":
-    usage = "usage: %prog [options] -m mission_db outhtmlbase\n    outhtmlbase is th base name _mission.html is appended"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-m", "--mission", dest="mission", type="string",
-                      help="mission to connect to", default='~ectsoc/RBSP_processing.sqlite')
-    parser.add_option("-d", "--deltadays", dest="deltadays", type="int",
-                      help="days past last file to make table", default=3)
-
-    (options, args) = parser.parse_args()
-    if len(args) != 1:
-        parser.error("incorrect number of arguments")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--mission", type=str,
+                        help="mission to connect to", default='~ectsoc/RBSP_processing.sqlite')
+    parser.add_argument("-d", "--deltadays", type=int,
+                        help="days past last file to make table", default=3)
+    parser.add_argument('outbase', type=str,
+                        help='Output filename base; _mission.html is appended.')
+    options = parser.parse_args()
 
     Time1 = time.time()
     info, dbu = getInfo(options.mission)
@@ -214,7 +212,7 @@ if __name__ == "__main__":
 
     for sat in info:
         filename = makeHTML(dbu, info, sat, delta_days=options.deltadays)
-        outname = args[0] + '_{0}.html'.format(sat)
+        outname = options.outbase + '_{0}.html'.format(sat)
         shutil.move(filename, outname)
         os.chmod(outname, 0664)
         Time1 = EventTimer ('Created: {0}'.format(outname), Time1) 

@@ -4,7 +4,7 @@
 Run both the old and new methods of finding newestVersion and report differences
 """
 
-from optparse import OptionParser
+import argparse
 from operator import itemgetter
 from datetime import date
 
@@ -108,18 +108,16 @@ def oldGetFilesByProduct(dbu, prod_id, newest_version=False):
     return sq.all()
 
 if __name__ == "__main__":
-    parser = OptionParser()
-    parser.add_option("-m", "--mission", dest="mission",
-                      help="selected mission database")
-    parser.add_option("--settest", dest="settest", default=True, action="store_true",
-                      help="Run the tests that compare the results of the \
-                      old and new implementations of newest_version")
-    parser.add_option("--errortest", dest="errortest", default=True, action="store_true",
-                      help="Check if any file has a newer file_create_date but lower version number")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--mission", dest="mission", required=True,
+                        help="selected mission database")
+    parser.add_argument("--settest", dest="settest", default=True, action="store_true",
+                        help="Run the tests that compare the results of the \
+                        old and new implementations of newest_version")
+    parser.add_argument("--errortest", dest="errortest", default=True, action="store_true",
+                        help="Check if any file has a newer file_create_date but lower version number")
 
-    (options, args) = parser.parse_args()
-    if len(args) != 0:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
     dbu = DButils.DButils(options.mission)
 

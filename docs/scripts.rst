@@ -289,8 +289,8 @@ printInfo.py
 
 Prints a table of info about files or products or processes.
 
-.. option:: Database The name of the database to print table of
-.. option:: Field Either Product or Mission (more to come)
+.. option:: database The name of the database to print table of
+.. option:: field Either Product or Mission (more to come)
 
 printProcessQueue.py
 --------------------
@@ -298,7 +298,7 @@ printProcessQueue.py
 
 Prints the process queue.
 
-.. option:: Database The name of the database to print the queue of
+.. option:: database The name of the database to print the queue of
 .. option:: -o, --output The name of the file to output to(if blank, print to stdout)
 .. option:: --html Output in HTML
 

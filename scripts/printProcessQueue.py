@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
+import argparse
 import datetime
-from optparse import OptionParser
 
 from dbprocessing import DButils
 
@@ -63,18 +63,18 @@ def output_text(items):
     return output
 
 if __name__ == '__main__':
-    parser = OptionParser()
-    parser.add_option("", "--html", dest="html", action="store_true",
-                      help="Output in html", default=False)
-    parser.add_option("-o", "--output", dest="output",
-                      help="Write output to a file")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--html", action="store_true",
+                        help="Output in html", default=False)
+    parser.add_argument("-o", "--output",
+                        help="Write output to a file")
+    parser.add_argument(
+        'database', action='store', type=str,
+        help='Name of database (or sqlite file), i.e. mission, to open.')
 
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()
 
-    if( len(args) != 1 ):
-        parser.error("Must pass a mission DB")
-
-    dbu = DButils.DButils(args[0])
+    dbu = DButils.DButils(options.database)
     items = dbu.Processqueue.getAll()
     traceback = []
     for v in items:

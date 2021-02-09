@@ -8,9 +8,8 @@ processqueue so that the next ProcessQueue -p will run them
 from __future__ import print_function
 
 
-
+import argparse
 import datetime
-from optparse import OptionParser
 
 from dateutil import parser as dup
 from dateutil.relativedelta import relativedelta
@@ -21,21 +20,21 @@ import dbprocessing.dbprocessing as dbprocessing
 
 if __name__ == "__main__":
     usage = "%prog [-s yyyymmdd] [-e yyyymmdd] -m product_id [[product_id] ...]"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-s", "--startDate", dest="startDate", type="string",
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--startDate", type=str,
                       help="Date to start reprocessing (e.g. 2012-10-02)", default=None)
-    parser.add_option("-e", "--endDate", dest="endDate", type="string",
+    parser.add_argument("-e", "--endDate", type=str,
                       help="Date to end reprocessing (e.g. 2012-10-25)", default=None)
-    parser.add_option("", "--force", dest="force", type="int",
+    parser.add_argument("--force", type=int,
                       help="Force the reprocessing, specify which version number {0},{1},{2}", default=None)
-    parser.add_option("-m", "--mission", dest="mission",
+    parser.add_argument("-m", "--mission", required=True,
                       help="selected mission database", default=None)
-    parser.add_option("", "--echo", dest="echo", action='store_true',
+    parser.add_argument("--echo", dest="echo", action='store_true',
                       help="echo sql queries for debugging", default=False)
+    parser.add_argument('product', action='store', nargs='+',
+                        help='Name or ID of product.')
     
-    (options, args) = parser.parse_args()
-    if len(args) < 1:
-        parser.error("incorrect number of arguments")
+    options = parser.parse_args()
 
     if options.startDate is not None:
         startDate = dup.parse(options.startDate)
@@ -62,7 +61,7 @@ if __name__ == "__main__":
 
     print(startDate, endDate)
 
-    for prod in args:
+    for prod in options.product:
         num = db.reprocessByProduct(prod, startDate=startDate, endDate=endDate, incVersion=options.force)
         if num is None:
             num = 0
