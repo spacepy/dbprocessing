@@ -18,7 +18,10 @@
 # <- create the inst_prod link
 
 import collections
-import ConfigParser
+try:
+    import configparser
+except ImportError: # Py2
+    import ConfigParser as configparser
 import os
 import shutil
 import sys
@@ -60,7 +63,10 @@ expected_keyword['process'] = ['process_name', 'output_product',
 
 def readconfig(config_filepath):
     # Create a ConfigParser object, to read the config file
-    cfg = ConfigParser.SafeConfigParser()
+    # "Safe" deprecated in 3.2, but still present, so version is only way
+    #  to avoid stepping on the deprecation. "Safe" preferred before 3.2
+    cfg = (configparser.SafeConfigParser if sys.version_info[:2] < (3, 2)
+           else configparser.ConfigParser)()
     cfg.read(config_filepath)
     sections = cfg.sections()
     # Read each parameter in turn
@@ -81,8 +87,8 @@ def _sectionCheck(conf):
     Check the sections to be sure they are correct and readable
     """
     # check the section names that are there.
-    keys = conf.keys()
-    for key in conf.keys():
+    keys = list(conf)
+    for key in list(conf):
         # startswith allows you to supply a tuple of strings to test for
         if key.startswith(tuple(expected + ["DEFAULT"])):
             keys.remove(key)
@@ -128,7 +134,7 @@ def _keysRemoveExtra(conf, section):
         section_ex = 'product'
     else:
         section_ex = section
-    keys = conf[section].keys()
+    keys = list(conf[section])
     for k in keys:
         if k.startswith('required_input') or k.startswith('optional_input'):
             continue
