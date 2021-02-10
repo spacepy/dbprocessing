@@ -12,7 +12,7 @@ if len(sys.argv) != 2:
 
 if __name__ == "__main__":
     a = DButils.DButils(sys.argv[1])
-    n_items = a.Processqueue.len()
-    a.Processqueue.flush()
+    n_items = a.ProcessqueueLen()
+    a.ProcessqueueFlush()
     print('Flushed {0} items from queue'.format(n_items))
 

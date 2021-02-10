@@ -131,11 +131,6 @@ class DButils(object):
         self.re = fmtr.re
         self.openDB(db_var=db_var, engine=engine, echo=echo)
         self._createTableObjects()
-        try:
-            self._patchProcessQueue()
-        except AttributeError:
-            raise (AttributeError('{0} is not a valid database'.format(mission)))
-
         self.MissionDirectory = self.getMissionDirectory()
         self.CodeDirectory = self.getCodeDirectory()
         self.InspectorDirectory = self.getInspectorDirectory()
@@ -153,22 +148,6 @@ class DButils(object):
         :return: DBProcessing class instance for mission <mission name>
         """
         return 'DBProcessing class instance for mission ' + self.mission + ', version: ' + __version__
-
-    def _patchProcessQueue(self):
-        self.Processqueue.flush = self._processqueueFlush
-        self.Processqueue.remove = self._processqueueRemoveItem
-        self.Processqueue.getAll = self._processqueueGetAll
-        self.Processqueue.push = self._processqueuePush
-        self.Processqueue.len = self._processqueueLen
-        self.Processqueue.pop = self._processqueuePop
-        self.Processqueue.get = self._processqueueGet
-        self.Processqueue.clean = self._processqueueClean
-        self.Processqueue.rawadd = self._processqueueRawadd
-
-        # TODO to do thus cleaner and allow for [] to work on the classes
-        # ...info here...
-        # metaclass that is dbutils aware
-        # get __getitem__ to be a class mo
 
     ####################################
     ###### DB and Tables ###############
@@ -421,18 +400,18 @@ class DButils(object):
         else:
             return True
 
-    def _processqueueFlush(self):
+    def ProcessqueueFlush(self):
         """
         remove everything from the process queue
         This is as optimized as it can be
         """
-        length = self.Processqueue.len()
+        length = self.ProcessqueueLen()
         self.session.query(self.Processqueue).delete()
         self.commitDB()
         DBlogging.dblogger.info("Processqueue was cleared")
         return length
 
-    def _processqueueRemoveItem(self, item, commit = True):
+    def ProcessqueueRemove(self, item, commit = True):
         """
         remove a file from the queue by name or number
         """
@@ -447,7 +426,7 @@ class DButils(object):
         if sq and commit:
             self.commitDB()
 
-    def _processqueueGetAll(self, version_bump=False):
+    def ProcessqueueGetAll(self, version_bump=False):
         """
         Return the entire contents of the process queue
         """
@@ -461,7 +440,7 @@ class DButils(object):
         DBlogging.dblogger.debug("Entire Processqueue was read: {0} elements returned".format(len(ans)))
         return ans
 
-    def _processqueuePush(self, fileid, version_bump=None, MAX_ADD=150):
+    def ProcessqueuePush(self, fileid, version_bump=None, MAX_ADD=150):
         """
         Push a file onto the process queue (onto the right)
 
@@ -482,7 +461,7 @@ class DButils(object):
             if len(fileid) > MAX_ADD:
                 outval = []
                 for v in Utils.chunker(fileid, MAX_ADD):
-                    outval.extend(self._processqueuePush(v, version_bump=version_bump))
+                    outval.extend(self.ProcessqueuePush(v, version_bump=version_bump))
                 return outval
 
         # first filter() takes care of putting in values that are not in the DB.  It is silent
@@ -495,7 +474,7 @@ class DButils(object):
 
         fileid = list(map(itemgetter(0), fileid))  # nested tuples to list
 
-        pq = set(self.Processqueue.getAll())
+        pq = set(self.ProcessqueueGetAll())
         fileid = set(fileid).difference(pq)
 
         outval = []
@@ -513,7 +492,7 @@ class DButils(object):
         #        pqid = self.session.query(self.Processqueue.file_id).all()
         return outval
 
-    def _processqueueRawadd(self, fileid, version_bump=None, commit=True):
+    def ProcessqueueRawadd(self, fileid, version_bump=None, commit=True):
         """
         raw add file ids to the process queue
         *** this might break things if an id is added that does not exist
@@ -530,7 +509,7 @@ class DButils(object):
         num : int
             the number of entries added to the processqueue
         """
-        current_q = set(self._processqueueGetAll())
+        current_q = set(self.ProcessqueueGetAll())
 
         if not hasattr(fileid, '__iter__'):
             fileid = [fileid]
@@ -552,14 +531,14 @@ class DButils(object):
                 self.commitDB()  # commit once for all the adds
         return len(files_to_add)
 
-    def _processqueueLen(self):
+    def ProcessqueueLen(self):
         """
         Return the number of files in the process queue
         """
 
         return self.session.query(self.Processqueue).count()
 
-    def _processqueuePop(self, index=0):
+    def ProcessqueuePop(self, index=0):
         """
         pop a file off the process queue (from the left)
 
@@ -573,12 +552,12 @@ class DButils(object):
         file_id : int
             the file_id of the file popped from the queue
         """
-        val = self._processqueueGet(index=index, instance=True)
+        val = self.ProcessqueueGet(index=index, instance=True)
         self.session.delete(val)
         self.commitDB()
         return (val.file_id, val.version_bump)
 
-    def _processqueueGet(self, index=0, instance=False):
+    def ProcessqueueGet(self, index=0, instance=False):
         """
         Get the file at the head of the queue (from the left)
 
@@ -588,7 +567,7 @@ class DButils(object):
             the file_id of the file popped from the queue
         """
         if index < 0:  # enable the python from the end indexing
-            index = self.Processqueue.len() + index
+            index = self.ProcessqueueLen() + index
 
         sq = self.session.query(self.Processqueue).offset(index).first()
         if instance:
@@ -597,7 +576,7 @@ class DButils(object):
             ans = (sq.file_id, sq.version_bump)
         return ans
 
-    def _processqueueClean(self, dryrun=False):
+    def ProcessqueueClean(self, dryrun=False):
         """
         go through the process queue and clear out lower versions of the same files
         this is determined by product and utc_file_date
@@ -607,8 +586,8 @@ class DButils(object):
         # BAL 30 March 2017 Trying a different method here that might be cleaner
 
         # # TODO this might break with weekly input files
-        # DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
-        # pqdata = self.Processqueue.getAll(version_bump=True)
+        # DBlogging.dblogger.debug("Entering ProcessqueueClean(), there are {0} entries".format(self.ProcessqueueLen()))
+        # pqdata = self.ProcessqueueGetAll(version_bump=True)
         #
         # file_ids = list(map(itemgetter(0), pqdata))
         # version_bumps = list(map(itemgetter(1), pqdata))
@@ -634,25 +613,25 @@ class DButils(object):
         #
         # ## now we have a list of just the newest file_id's
         # if not dryrun:
-        #     self.Processqueue.flush()
-        #     #        self.Processqueue.push(ans)
+        #     self.ProcessqueueFlush()
+        #     #        self.ProcessqueuePush(ans)
         #     if not any(version_bumps2):
-        #         self.Processqueue.push(file_entries2)
+        #         self.ProcessqueuePush(file_entries2)
         #     else:
-        #         itertools.starmap(self.Processqueue.push, mixed_entries)
+        #         itertools.starmap(self.ProcessqueuePush, mixed_entries)
         #     #                for v in mixed_entries:
-        #     #                    itertools.startmap(self.Processqueue.push, v)
+        #     #                    itertools.startmap(self.ProcessqueuePush, v)
         # else:
         #     print(
-        #         '<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.Processqueue.len()))
+        #         '<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.ProcessqueueLen()))
         #
         # DBlogging.dblogger.debug(
-        #     "Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
+        #     "Done in ProcessqueueClean(), there are {0} entries left".format(self.ProcessqueueLen()))
 
         # # BAL 30 March 2017 new version
         # # get all the files from the process queue
-        DBlogging.dblogger.debug("Entering _processqueueClean(), there are {0} entries".format(self.Processqueue.len()))
-        pqdata = self.Processqueue.getAll(version_bump=True)
+        DBlogging.dblogger.debug("Entering ProcessqueueClean(), there are {0} entries".format(self.ProcessqueueLen()))
+        pqdata = self.ProcessqueueGetAll(version_bump=True)
         # all we need to do is look at each file and see if it is latest version or not, if it is not drop it
         entries = []
         version_bump = False
@@ -665,17 +644,17 @@ class DButils(object):
                 if self.fileIsNewest(pq[0]):
                     entries.append(pq)  # if the file is newest_version than we keep it
         if not dryrun:
-            self.Processqueue.flush()
+            self.ProcessqueueFlush()
             if not version_bump:
-                self.Processqueue.rawadd(zip(*entries)[0])
+                self.ProcessqueueRawadd(zip(*entries)[0])
             else:
                 for f in pqdata:
-                    self.Processqueue.add(f)
+                    self.Processqueueadd(f)
         else:
             print(
-                '<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.Processqueue.len()))
+                '<dryrun> Queue cleaned leaving {0} of {1} entries'.format(len(file_entries2), self.ProcessqueueLen()))
         DBlogging.dblogger.debug(
-            "Done in _processqueueClean(), there are {0} entries left".format(self.Processqueue.len()))
+            "Done in ProcessqueueClean(), there are {0} entries left".format(self.ProcessqueueLen()))
 
 
     def fileIsNewest(self, filename, debug=False):
@@ -732,7 +711,7 @@ class DButils(object):
 
             # we need to look in each table that could have a reference to this file and delete that
             try:  ## processqueue
-                self.Processqueue.remove(f)
+                self.ProcessqueueRemove(f)
             except DBNoData:
                 pass
 

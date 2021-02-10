@@ -177,7 +177,7 @@ class ProcessQueue(object):
                 self.session.rollback()
                 raise (DButils.DBError(IE))
             # add to processqueue for later processing
-            self.dbu.Processqueue.push(f_id)
+            self.dbu.ProcessqueuePush(f_id)
             return f_id
         else:
             return None
@@ -467,7 +467,7 @@ class ProcessQueue(object):
                                                           instrument=instrument,
                                                           newest_version=True)]
 
-        return self.dbu.Processqueue.rawadd(f_ids, incVersion)
+        return self.dbu.ProcessqueueRawadd(f_ids, incVersion)
 
     def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=None):
         try:

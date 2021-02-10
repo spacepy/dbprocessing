@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     if options.i: # import selected
         try:
-            start_len = pq.dbu.Processqueue.len()
+            start_len = pq.dbu.ProcessqueueLen()
             print("{0} Currently {1} entries in process queue".format(DFP(), start_len))
             pq.checkIncoming(glb=options.glob) 
             if not options.dryrun:
@@ -118,21 +118,21 @@ if __name__ == "__main__":
         else:
             pq.dbu.stopLogging('Nominal Exit')
         pq.dbu.closeDB()
-        print("{0} Import finished: {1} files added".format(DFP(), pq.dbu.Processqueue.len()-start_len))
+        print("{0} Import finished: {1} files added".format(DFP(), pq.dbu.ProcessqueueLen()-start_len))
 
     if options.p: # process selected
         number_proc = 0
 
         try:
-            DBlogging.dblogger.debug("pq.dbu.Processqueue.len(): {0}".format(pq.dbu.Processqueue.len()))
+            DBlogging.dblogger.debug("pq.dbu.ProcessqueueLen(): {0}".format(pq.dbu.ProcessqueueLen()))
             # this loop does everything, both make the runMe objects and then
             #   do all the actuall running
-            while pq.dbu.Processqueue.len() > 0:
+            while pq.dbu.ProcessqueueLen() > 0:
                 # BAL 30 Mar 2017, no need to clean here as buildChildren() will clean
                 # print('{0} Cleaning Processes queue'.format(DFP()))
                 # # clean the queue
-                # pq.dbu.Processqueue.clean(options.dryrun)  # get rid of duplicates and sort
-                # if not pq.dbu.Processqueue.len():
+                # pq.dbu.ProcessqueueClean(options.dryrun)  # get rid of duplicates and sort
+                # if not pq.dbu.ProcessqueueLen():
                 #     print("{0} Process queue is empty".format(DFP()))
                 #     break
 
@@ -141,23 +141,23 @@ if __name__ == "__main__":
                 n_good  = 0
                 n_bad   = 0
                 
-                print('{0} Building commands for {1} items in the queue'.format(DFP(), pq.dbu.Processqueue.len()))
+                print('{0} Building commands for {1} items in the queue'.format(DFP(), pq.dbu.ProcessqueueLen()))
          
                 # make the cpommand lines for all the files in tehj processqueue
-                totalsize = pq.dbu.Processqueue.len()
+                totalsize = pq.dbu.ProcessqueueLen()
                 tmp_ind = 0
                 Utils.progressbar(tmp_ind, 1, totalsize, text='Command Build Progress:')
-                while pq.dbu.Processqueue.len() > 0:
+                while pq.dbu.ProcessqueueLen() > 0:
                     # do smarter pop that sorts at the db level
                     #f = (pq.dbu.session.query(pq.dbu.Processqueue.file_id)
                     #     .join((pq.dbu.File, pq.dbu.Processqueue.file_id==pq.dbu.File.file_id))
                     #     .order_by(pq.dbu.File.data_level, pq.dbu.File.utc_file_date).first())
                     #if hasattr(f, '__iter__') and len(f) == 1:
                     #    f = f[0]
-                    #pq.dbu.Processqueue.remove(f) # remove by file_id
-                    f = pq.dbu.Processqueue.pop()
-                    DBlogging.dblogger.debug("popped {0} from pq.dbu.Processqueue.get(), {1} left".format(f, pq.dbu.Processqueue.len()))
-                    #                    f = pq.dbu.Processqueue.pop() # this is empty queue safe, gives None
+                    #pq.dbu.ProcessqueueRemove(f) # remove by file_id
+                    f = pq.dbu.ProcessqueuePop()
+                    DBlogging.dblogger.debug("popped {0} from pq.dbu.ProcessqueueGet(), {1} left".format(f, pq.dbu.ProcessqueueLen()))
+                    #                    f = pq.dbu.ProcessqueuePop() # this is empty queue safe, gives None
                     #if f is None:
                     #    continue
                     pq.buildChildren(f, skip_run=options.s,
