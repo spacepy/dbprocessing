@@ -7,6 +7,7 @@ from distutils.dir_util import copy_tree, remove_tree
 import os
 import tempfile
 
+import dbp_testing
 from dbprocessing import DBfile
 from dbprocessing import DButils
 from dbprocessing import Diskfile
@@ -18,10 +19,10 @@ class DBfileTests(unittest.TestCase):
     def setUp(self):
         super(DBfileTests, self).setUp()
         self.tempD = tempfile.mkdtemp()
-        copy_tree(os.path.dirname(__file__) + '/../functional_test/', self.tempD)
-        copy_tree(os.path.dirname(__file__) + '/tars/', self.tempD)
+        copy_tree(os.path.join(dbp_testing.testsdir, '..', 'functional_test'), self.tempD)
+        copy_tree(os.path.join(dbp_testing.testsdir, 'tars'), self.tempD)
 
-        self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
+        self.dbu = DButils.DButils(os.path.join(self.tempD, 'testDB.sqlite'))
         #Update the mission path to the tmp dir
         self.dbu.getEntry('Mission', 1).rootdir = self.tempD
         self.dbu.commitDB()
