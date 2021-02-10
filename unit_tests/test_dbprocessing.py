@@ -475,7 +475,7 @@ class ProcessQueueTests(ProcessQueueTestsBase):
         l0pid = self.addProduct('level 0')
         fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
         self.assertEqual(1, self.pq._reprocessBy())
-        self.assertEqual((fid, None), self.dbu.Processqueue.pop())
+        self.assertEqual((fid, None), self.dbu.ProcessqueuePop())
 
 
 class GetRequiredProductsTests(ProcessQueueTestsBase):

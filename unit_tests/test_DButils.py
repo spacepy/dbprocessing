@@ -1123,137 +1123,137 @@ class ProcessqueueTests(TestSetup):
     """Test all the processqueue functionality"""
 
     def add_files(self):
-        self.dbu.Processqueue.push([17, 18, 19, 20, 21])
+        self.dbu.ProcessqueuePush([17, 18, 19, 20, 21])
 
     def test_pq_getall(self):
-        """test self.Processqueue.getAll"""
-        self.assertEqual(0, self.dbu.Processqueue.len())
+        """test self.ProcessqueueGetAll"""
+        self.assertEqual(0, self.dbu.ProcessqueueLen())
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.assertEqual([17, 18, 19, 20, 21], self.dbu.Processqueue.getAll())
-        self.assertEqual(zip([17, 18, 19, 20, 21], [None] * 5), self.dbu.Processqueue.getAll(version_bump=True))
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.assertEqual([17, 18, 19, 20, 21], self.dbu.ProcessqueueGetAll())
+        self.assertEqual(zip([17, 18, 19, 20, 21], [None] * 5), self.dbu.ProcessqueueGetAll(version_bump=True))
 
     def test_pq_getall2(self):
-        """test self.Processqueue.getAll"""
-        self.assertEqual(0, self.dbu.Processqueue.len())
-        self.assertFalse(self.dbu.Processqueue.getAll())
-        self.assertFalse(self.dbu.Processqueue.getAll(version_bump=True))
+        """test self.ProcessqueueGetAll"""
+        self.assertEqual(0, self.dbu.ProcessqueueLen())
+        self.assertFalse(self.dbu.ProcessqueueGetAll())
+        self.assertFalse(self.dbu.ProcessqueueGetAll(version_bump=True))
 
     def test_pq_flush(self):
-        """test self.Processqueue.flush"""
+        """test self.ProcessqueueFlush"""
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.dbu.Processqueue.flush()
-        self.assertEqual(0, self.dbu.Processqueue.len())
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.dbu.ProcessqueueFlush()
+        self.assertEqual(0, self.dbu.ProcessqueueLen())
 
     def test_pq_remove(self):
-        """test self.Processqueue.remove"""
+        """test self.ProcessqueueRemove"""
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.dbu.Processqueue.remove(20)
-        self.assertEqual(4, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.dbu.ProcessqueueRemove(20)
+        self.assertEqual(4, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         for v in [17, 18, 19, 21]:
             self.assertTrue(v in pq)
-        self.dbu.Processqueue.remove([17, 18])
-        self.assertEqual(2, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        self.dbu.ProcessqueueRemove([17, 18])
+        self.assertEqual(2, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         for v in [19, 21]:
             self.assertTrue(v in pq)
-        self.dbu.Processqueue.remove('ect_rbspb_0377_381_03.ptp.gz')
-        self.assertEqual(1, self.dbu.Processqueue.len())
-        self.assertEqual([21], self.dbu.Processqueue.getAll())
+        self.dbu.ProcessqueueRemove('ect_rbspb_0377_381_03.ptp.gz')
+        self.assertEqual(1, self.dbu.ProcessqueueLen())
+        self.assertEqual([21], self.dbu.ProcessqueueGetAll())
 
     def test_pq_push(self):
-        """test self.Processqueue.push"""
-        self.assertEqual(0, self.dbu.Processqueue.len())
-        self.dbu.Processqueue.push(20)
-        self.assertEqual(1, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        """test self.ProcessqueuePush"""
+        self.assertEqual(0, self.dbu.ProcessqueueLen())
+        self.dbu.ProcessqueuePush(20)
+        self.assertEqual(1, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         self.assertTrue(20 in pq)
         # push a value that is not there
-        self.assertFalse(self.dbu.Processqueue.push(214442))
-        self.assertFalse(self.dbu.Processqueue.push(20))
-        self.assertEqual([17, 18, 19, 21], self.dbu.Processqueue.push([17, 18, 19, 20, 21]))
+        self.assertFalse(self.dbu.ProcessqueuePush(214442))
+        self.assertFalse(self.dbu.ProcessqueuePush(20))
+        self.assertEqual([17, 18, 19, 21], self.dbu.ProcessqueuePush([17, 18, 19, 20, 21]))
 
     def test_pq_push_MAX_ADD(self):
-        """test self.Processqueue.push"""
-        self.assertEqual(0, self.dbu.Processqueue.len())
-        self.dbu._processqueuePush([17, 18, 19, 20, 21], MAX_ADD=2)
-        self.assertEqual(5, self.dbu.Processqueue.len())
+        """test self.ProcessqueuePush"""
+        self.assertEqual(0, self.dbu.ProcessqueueLen())
+        self.dbu.ProcessqueuePush([17, 18, 19, 20, 21], MAX_ADD=2)
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
 
     def test_pq_len(self):
-        """test self.Processqueue.len"""
-        self.assertEqual(0, self.dbu.Processqueue.len())
+        """test self.ProcessqueueLen"""
+        self.assertEqual(0, self.dbu.ProcessqueueLen())
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
 
     def test_pq_pop(self):
-        """test self.Processqueue.pop"""
+        """test self.ProcessqueuePop"""
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.dbu.Processqueue.pop(0)
-        self.assertEqual(4, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.dbu.ProcessqueuePop(0)
+        self.assertEqual(4, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         for v in [18, 19, 20, 21]:
             self.assertTrue(v in pq)
-        self.dbu.Processqueue.pop(2)
-        self.assertEqual(3, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        self.dbu.ProcessqueuePop(2)
+        self.assertEqual(3, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         for v in [18, 19, 21]:
             self.assertTrue(v in pq)
 
     def test_pq_pop_reverse(self):
-        """test self.Processqueue.pop with negative indices"""
+        """test self.ProcessqueuePop with negative indices"""
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.dbu.Processqueue.pop(-1)
-        self.assertEqual(4, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.dbu.ProcessqueuePop(-1)
+        self.assertEqual(4, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         for v in [17, 18, 19, 20]:
             self.assertTrue(v in pq)
-        self.dbu.Processqueue.pop(-2)
-        self.assertEqual(3, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        self.dbu.ProcessqueuePop(-2)
+        self.assertEqual(3, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         for v in [17, 18, 20]:
             self.assertTrue(v in pq)
 
     def test_pq_get(self):
-        """test self.Processqueue.get"""
+        """test self.ProcessqueueGet"""
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.assertEqual((17, None), self.dbu.Processqueue.get(0))
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.assertEqual((19, None), self.dbu.Processqueue.get(2))
-        self.assertEqual(5, self.dbu.Processqueue.len())
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.assertEqual((17, None), self.dbu.ProcessqueueGet(0))
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.assertEqual((19, None), self.dbu.ProcessqueueGet(2))
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
 
     def test_pq_get_reverse(self):
-        """test self.Processqueue.get with negative indices"""
+        """test self.ProcessqueueGet with negative indices"""
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.assertEqual((21, None), self.dbu.Processqueue.get(-1))
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.assertEqual((20, None), self.dbu.Processqueue.get(-2))
-        self.assertEqual(5, self.dbu.Processqueue.len())
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.assertEqual((21, None), self.dbu.ProcessqueueGet(-1))
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.assertEqual((20, None), self.dbu.ProcessqueueGet(-2))
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
 
     def test_pq_clean(self):
-        """test self.Processqueue.clean"""
+        """test self.ProcessqueueClean"""
         self.add_files()
-        self.assertEqual(5, self.dbu.Processqueue.len())
-        self.dbu.Processqueue.clean()
-        self.assertEqual(1, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        self.assertEqual(5, self.dbu.ProcessqueueLen())
+        self.dbu.ProcessqueueClean()
+        self.assertEqual(1, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         self.assertTrue(17 in pq)
 
     def test_pq_rawadd(self):
-        """test self.Processqueue.rawadd"""
-        self.assertEqual(0, self.dbu.Processqueue.len())
-        self.dbu.Processqueue.rawadd(20)
-        self.assertEqual(1, self.dbu.Processqueue.len())
-        pq = self.dbu.Processqueue.getAll()
+        """test self.ProcessqueueRawadd"""
+        self.assertEqual(0, self.dbu.ProcessqueueLen())
+        self.dbu.ProcessqueueRawadd(20)
+        self.assertEqual(1, self.dbu.ProcessqueueLen())
+        pq = self.dbu.ProcessqueueGetAll()
         self.assertTrue(20 in pq)
-        self.dbu.Processqueue.rawadd(20000)
-        pq = self.dbu.Processqueue.pop(1)
+        self.dbu.ProcessqueueRawadd(20000)
+        pq = self.dbu.ProcessqueuePop(1)
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, pq)
 
 
