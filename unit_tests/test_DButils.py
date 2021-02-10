@@ -92,28 +92,28 @@ class DBUtilsOtherTests(TestSetup):
         ans = set([v.filename for v in self.dbu.getFilesByProduct(13, newest_version=True)])
         self.assertEqual(len(ans), 22)
         newest_files = set([
-                         u'ect_rbspa_0220_377_02.ptp.gz',
-                         u'ect_rbspa_0221_377_04.ptp.gz',
-                         u'ect_rbspa_0370_377_06.ptp.gz',
-                         u'ect_rbspa_0371_377_03.ptp.gz',
-                         u'ect_rbspa_0372_377_03.ptp.gz',
-                         u'ect_rbspa_0373_377_04.ptp.gz',
-                         u'ect_rbspa_0374_377_02.ptp.gz',
-                         u'ect_rbspa_0375_377_03.ptp.gz',
-                         u'ect_rbspa_0376_377_07.ptp.gz',
-                         u'ect_rbspa_0377_377_01.ptp.gz',
-                         u'ect_rbspa_0378_377_03.ptp.gz',
-                         u'ect_rbspa_0379_377_04.ptp.gz',
-                         u'ect_rbspa_0380_377_02.ptp.gz',
-                         u'ect_rbspa_0381_377_02.ptp.gz',
-                         u'ect_rbspa_0382_377_07.ptp.gz',
-                         u'ect_rbspa_0383_377_04.ptp.gz',
-                         u'ect_rbspa_0384_377_02.ptp.gz',
-                         u'ect_rbspa_0385_377_03.ptp.gz',
-                         u'ect_rbspa_0386_377_03.ptp.gz',
-                         u'ect_rbspa_0387_377_02.ptp.gz',
-                         u'ect_rbspa_0388_377_03.ptp.gz',
-                         u'ect_rbspa_0389_377_05.ptp.gz'])
+                         'ect_rbspa_0220_377_02.ptp.gz',
+                         'ect_rbspa_0221_377_04.ptp.gz',
+                         'ect_rbspa_0370_377_06.ptp.gz',
+                         'ect_rbspa_0371_377_03.ptp.gz',
+                         'ect_rbspa_0372_377_03.ptp.gz',
+                         'ect_rbspa_0373_377_04.ptp.gz',
+                         'ect_rbspa_0374_377_02.ptp.gz',
+                         'ect_rbspa_0375_377_03.ptp.gz',
+                         'ect_rbspa_0376_377_07.ptp.gz',
+                         'ect_rbspa_0377_377_01.ptp.gz',
+                         'ect_rbspa_0378_377_03.ptp.gz',
+                         'ect_rbspa_0379_377_04.ptp.gz',
+                         'ect_rbspa_0380_377_02.ptp.gz',
+                         'ect_rbspa_0381_377_02.ptp.gz',
+                         'ect_rbspa_0382_377_07.ptp.gz',
+                         'ect_rbspa_0383_377_04.ptp.gz',
+                         'ect_rbspa_0384_377_02.ptp.gz',
+                         'ect_rbspa_0385_377_03.ptp.gz',
+                         'ect_rbspa_0386_377_03.ptp.gz',
+                         'ect_rbspa_0387_377_02.ptp.gz',
+                         'ect_rbspa_0388_377_03.ptp.gz',
+                         'ect_rbspa_0389_377_05.ptp.gz'])
         self.assertEqual(ans, newest_files)
 
     def test_checkIncoming(self):
@@ -346,7 +346,11 @@ class DBUtilsGetTests(TestSetup):
         ans = self.dbu.getAllSatellites()
         # check that this is what we expect
         self.assertEqual(2, len(ans))
-        self.assertEqual([('satellite', 'satellite'), ('mission', 'mission')], zip(*ans))
+        # Checking keys
+        self.assertEqual(
+            sorted([('satellite', 'satellite'), ('mission', 'mission')]),
+            sorted(list(zip(*ans))))
+        # And for the same contents
         self.assertEqual(ans[0]['mission'], ans[1]['mission'])
         self.assertEqual(ans[0]['satellite'].satellite_name[:-1],
                          ans[1]['satellite'].satellite_name[:-1])
@@ -356,9 +360,13 @@ class DBUtilsGetTests(TestSetup):
         ans = self.dbu.getAllInstruments()
         # check that this is what we expect
         self.assertEqual(2, len(ans))
-        self.assertEqual([('instrument', 'instrument'),
-                          ('satellite', 'satellite'),
-                          ('mission', 'mission')], zip(*ans))
+        # Expected keys...
+        self.assertEqual(
+            sorted([('instrument', 'instrument'),
+                    ('satellite', 'satellite'),
+                    ('mission', 'mission')]),
+            sorted(zip(*ans)))
+        # ...and matching values
         self.assertEqual(ans[0]['mission'], ans[1]['mission'])
         self.assertEqual(ans[0]['satellite'].satellite_name[:-1],
                          ans[1]['satellite'].satellite_name[:-1])
@@ -369,7 +377,7 @@ class DBUtilsGetTests(TestSetup):
         """getAllFileIds"""
         files = self.dbu.getAllFileIds()
         self.assertEqual(6681, len(files))
-        self.assertEqual(range(1, 6682), sorted(files))
+        self.assertEqual(list(range(1, 6682)), sorted(files))
 
     def test_getAllFileIds2(self):
         """getAllFileIds"""
@@ -381,7 +389,7 @@ class DBUtilsGetTests(TestSetup):
         """getAllFileIds"""
         files = self.dbu.getAllFileIds(limit=10)
         self.assertEqual(10, len(files))
-        self.assertEqual(range(1, 11), sorted(files))
+        self.assertEqual(list(range(1, 11)), sorted(files))
 
     def test_getAllFileIds2_limit(self):
         """getAllFileIds"""
@@ -420,14 +428,14 @@ class DBUtilsGetTests(TestSetup):
 
     def test_getFileFullPath(self):
         """getFileFullPath"""
-        self.assertEqual(u'/n/space_data/cda/rbsp/MagEphem/predicted/b/rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt',
+        self.assertEqual('/n/space_data/cda/rbsp/MagEphem/predicted/b/rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt',
                          self.dbu.getFileFullPath(1))
-        self.assertEqual(u'/n/space_data/cda/rbsp/MagEphem/predicted/b/rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt',
+        self.assertEqual('/n/space_data/cda/rbsp/MagEphem/predicted/b/rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt',
                          self.dbu.getFileFullPath('rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt'))
 
-        self.assertEqual(u'/n/space_data/cda/rbsp/rbspb/mageis_vc/level0/ect_rbspb_0377_364_02.ptp.gz',
+        self.assertEqual('/n/space_data/cda/rbsp/rbspb/mageis_vc/level0/ect_rbspb_0377_364_02.ptp.gz',
                          self.dbu.getFileFullPath(100))
-        self.assertEqual(u'/n/space_data/cda/rbsp/rbspb/mageis_vc/level0/ect_rbspb_0377_364_02.ptp.gz',
+        self.assertEqual('/n/space_data/cda/rbsp/rbspb/mageis_vc/level0/ect_rbspb_0377_364_02.ptp.gz',
                          self.dbu.getFileFullPath('ect_rbspb_0377_364_02.ptp.gz'))
 
     def test_getProcessFromInputProduct(self):
@@ -455,8 +463,8 @@ class DBUtilsGetTests(TestSetup):
         """getSatelliteMission"""
         val = self.dbu.getSatelliteMission(1)
         self.assertEqual(1, val.mission_id)
-        self.assertEqual(u'mageis_incoming', val.incoming_dir)
-        self.assertEqual(u'/n/space_data/cda/rbsp', val.rootdir)
+        self.assertEqual('mageis_incoming', val.incoming_dir)
+        self.assertEqual('/n/space_data/cda/rbsp', val.rootdir)
         self.assertRaises(NoResultFound, self.dbu.getSatelliteMission, 100)
         self.assertRaises(NoResultFound, self.dbu.getSatelliteMission, 'badval')
 
@@ -472,7 +480,7 @@ class DBUtilsGetTests(TestSetup):
 
     def test_getMissions(self):
         """getMissions"""
-        self.assertEqual([u'rbsp'], self.dbu.getMissions())
+        self.assertEqual(['rbsp'], self.dbu.getMissions())
 
     def test_getFileID(self):
         """getFileID"""
@@ -699,8 +707,8 @@ class DBUtilsGetTests(TestSetup):
         val = self.dbu.getFilesByDate([datetime.date(2013, 9, 10)] * 2, newest_version=True)
         self.assertEqual(129, len(val))
         filenames = sorted([v.filename for v in val])
-        ans = [u'ect_rbspa_0377_344_02.ptp.gz', 
-               u'ect_rbspa_0377_345_01.ptp.gz']
+        ans = ['ect_rbspa_0377_344_02.ptp.gz', 
+               'ect_rbspa_0377_345_01.ptp.gz']
         self.assertEqual(ans, filenames[:len(ans)])
 
     def test_getFilesByProduct(self):
@@ -742,12 +750,12 @@ class DBUtilsGetTests(TestSetup):
         val = self.dbu.getActiveInspectors()
         self.assertEqual(190, len(val))
         v2 = set([v[0] for v in val])
-        ans = set([u'/n/space_data/cda/rbsp/codes/inspectors/ect_L05_V1.0.0.py',
-                   u'/n/space_data/cda/rbsp/codes/inspectors/ect_L0_V1.0.0.py',
-                   u'/n/space_data/cda/rbsp/codes/inspectors/ect_L1_V1.0.0.py',
-                   u'/n/space_data/cda/rbsp/codes/inspectors/ect_L2_V1.0.0.py',
-                   u'/n/space_data/cda/rbsp/codes/inspectors/emfisis_V1.0.0.py',
-                   u'/n/space_data/cda/rbsp/codes/inspectors/rbsp_pre_MagEphem_insp.py'])
+        ans = set(['/n/space_data/cda/rbsp/codes/inspectors/ect_L05_V1.0.0.py',
+                   '/n/space_data/cda/rbsp/codes/inspectors/ect_L0_V1.0.0.py',
+                   '/n/space_data/cda/rbsp/codes/inspectors/ect_L1_V1.0.0.py',
+                   '/n/space_data/cda/rbsp/codes/inspectors/ect_L2_V1.0.0.py',
+                   '/n/space_data/cda/rbsp/codes/inspectors/emfisis_V1.0.0.py',
+                   '/n/space_data/cda/rbsp/codes/inspectors/rbsp_pre_MagEphem_insp.py'])
         self.assertEqual(ans, v2)
         v3 = set([v[-1] for v in val])
         self.assertEqual(set(range(1, 191)), v3)
@@ -1131,7 +1139,8 @@ class ProcessqueueTests(TestSetup):
         self.add_files()
         self.assertEqual(5, self.dbu.ProcessqueueLen())
         self.assertEqual([17, 18, 19, 20, 21], self.dbu.ProcessqueueGetAll())
-        self.assertEqual(zip([17, 18, 19, 20, 21], [None] * 5), self.dbu.ProcessqueueGetAll(version_bump=True))
+        self.assertEqual(list(zip([17, 18, 19, 20, 21], [None] * 5)),
+                         self.dbu.ProcessqueueGetAll(version_bump=True))
 
     def test_pq_getall2(self):
         """test self.ProcessqueueGetAll"""
@@ -1863,7 +1872,7 @@ class TestWithtestDB(unittest.TestCase):
             self.dbu.editTable('code', 'run_test.py', 'relative_path',
                                my_str='newscripts', replace_str='scripts')
         self.assertEqual(
-            'Multiple rows match run_test.py', cm.exception.message)
+            'Multiple rows match run_test.py', str(cm.exception))
 
     def testEditTableReplaceAfter(self):
         """Test editTable with a replace only after a flag"""
@@ -1961,7 +1970,7 @@ class TestWithtestDB(unittest.TestCase):
         for kwargs, msg in test_cases:
             with self.assertRaises(ValueError) as cm:
                 self.dbu.editTable('code', 1, 'arguments', **kwargs)
-            self.assertEqual(msg, cm.exception.message)
+            self.assertEqual(msg, str(cm.exception))
 
         #Tests that don't fit exactly the same pattern
         with self.assertRaises(ValueError) as cm:
@@ -1969,20 +1978,20 @@ class TestWithtestDB(unittest.TestCase):
                                after_flag='-f')
         self.assertEqual(
             'Only use after_flag with arguments column in Code table.',
-            cm.exception.message)
+            str(cm.exception))
         with self.assertRaises(ValueError) as cm:
             self.dbu.editTable('process', 1, 'arguments', combine=True,
                                after_flag='-f')
         self.assertEqual(
             'Only use after_flag with arguments column in Code table.',
-            cm.exception.message)
+            str(cm.exception))
 
         with self.assertRaises(AttributeError) as cm:
             self.dbu.editTable('nonexistent', 1, 'process_name',
                                ins_after='L1', my_str='_new')
         self.assertEqual(
             "'DButils' object has no attribute 'Nonexistent'",
-            cm.exception.message)
+            str(cm.exception))
 
     def testAddUnixTimeTable(self):
         """Add the table with Unix time"""
