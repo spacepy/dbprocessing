@@ -178,7 +178,7 @@ def daterange_to_dates(daterange):
     """
 
     return [daterange[0] + datetime.timedelta(days=val) for val in
-            xrange((daterange[1] - daterange[0]).days + 1)]
+            range((daterange[1] - daterange[0]).days + 1)]
 
 
 def parseDate(inval):
@@ -223,7 +223,7 @@ def flatten(l):
     :rtype: list
     """
     for el in l:
-        if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
+        if isinstance(el, collections.Iterable) and not isinstance(el, str_classes):
             for sub in flatten(el):
                 yield sub
         else:
@@ -366,7 +366,7 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
     if '{S}' in path:
         path = path.replace('{S}', utc_start_time.strftime('%S'))
     if '{VERSION}' in path:
-        if isinstance(version, (unicode, str)):
+        if isinstance(version, str_classes):
             version = Version.Version.fromString(version)
         path = path.replace('{VERSION}', '{0}'.format(str(version)))
     if '{DATE}' in path:

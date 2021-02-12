@@ -34,6 +34,7 @@ class UtilsTests(unittest.TestCase):
 
     def tearDown(self):
         super(UtilsTests, self).tearDown()
+        self.dbu.closeDB()
         remove_tree(self.tempD)
 
     def test_dirSubs(self):
@@ -77,15 +78,23 @@ class UtilsTests(unittest.TestCase):
 
     def test_chunker(self):
         """chunker()"""
-        self.assertEqual(list(Utils.chunker(range(10), 3)), [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]])
-        self.assertEqual(list(Utils.chunker(range(10), 4)), [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9]])
-        self.assertEqual(list(Utils.chunker(range(10), 4)), [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9]])
-        self.assertEqual(list(Utils.chunker(range(10), 10)), [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
-        self.assertEqual(list(Utils.chunker(range(10), 20)), [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
+        # Turn iterator-of-iterators into list-of-lists
+        def unfold_iter(i):
+            return [list(j) for j in i]
+        self.assertEqual(unfold_iter(Utils.chunker(range(10), 3)),
+                         [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]])
+        self.assertEqual(unfold_iter(Utils.chunker(range(10), 4)),
+                         [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9]])
+        self.assertEqual(unfold_iter(Utils.chunker(range(10), 4)),
+                         [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9]])
+        self.assertEqual(unfold_iter(Utils.chunker(range(10), 10)),
+                         [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
+        self.assertEqual(unfold_iter(Utils.chunker(range(10), 20)),
+                         [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
 
     def test_unique(self):
         """unique"""
-        self.assertEqual(Utils.unique(range(5)), range(5))
+        self.assertEqual(Utils.unique(range(5)), list(range(5)))
         self.assertEqual(Utils.unique([1, 1, 2, 2, 3]), [1, 2, 3])
         self.assertEqual(Utils.unique([1, 1, 3, 2, 2, 3]), [1, 3, 2])
 
