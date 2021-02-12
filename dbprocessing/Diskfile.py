@@ -126,11 +126,11 @@ class Diskfile(object):
         self.READ_ACCESS = os.access(self.infile, os.R_OK)
         if not self.READ_ACCESS:
             DBlogging.dblogger.debug("{0} read access denied!".format(self.infile))
-            raise(ReadError("file is not readable, does it exist? {0}".format(self.infile)))
+            raise ReadError("file is not readable, does it exist? {0}".format(self.infile))
         self.WRITE_ACCESS = os.access(self.infile, os.W_OK) | os.path.islink(self.infile)
         if not self.WRITE_ACCESS:
             DBlogging.dblogger.debug("{0} write access denied!".format(self.infile))
-            raise(WriteError("file is not writeable, won't be able to move it to proper location: {0}".format(self.infile)))
+            raise WriteError("file is not writeable, won't be able to move it to proper location: {0}".format(self.infile))
 #        DBlogging.dblogger.debug("{0} Access Checked out OK".format(self.infile))
 
 
@@ -149,7 +149,7 @@ def calcDigest(infile):
         with open(infile, 'rb') as f:
             m.update(f.read())
     except IOError:
-        raise(DigestError("File not found: {0}".format(infile)))
+        raise DigestError("File not found: {0}".format(infile))
         
     DBlogging.dblogger.debug("digest calculated: {0}, file: {1} ".format(m.hexdigest(), infile))
 

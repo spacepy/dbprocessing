@@ -40,12 +40,12 @@ class DiskfileStaticTests(unittest.TestCase):
         """ calcDigest  should behave correctly"""
         self.assertRaises(Diskfile.DigestError, Diskfile.calcDigest, 'idontexist.file')
         with open('IamAfileThatExists.file', 'wb') as f:
-            f.write('I am some text in a file')
+            f.write(b'I am some text in a file')
         real_ans = 'aa42c02f50c92203be933747670bdd512848385e'
         ans = Diskfile.calcDigest('IamAfileThatExists.file')
         self.assertEqual(real_ans, ans)
         with open('IamAfileThatExists.file', 'wb+') as f:
-            f.write('I m more text')
+            f.write(b'I m more text')
         ans = Diskfile.calcDigest('IamAfileThatExists.file')
         self.assertNotEqual (real_ans, ans)
         f.close()
@@ -62,7 +62,7 @@ class DiskfileTests(TestSetup):
         """given a file input that is not writeable WriteError"""
         try:
             with open('IamAfileThatExists.file', 'wb') as f:
-                f.write('I am some text in a file')
+                f.write(b'I am some text in a file')
             os.chmod('IamAfileThatExists.file', stat.S_IRUSR)
             self.assertRaises(Diskfile.WriteError, Diskfile.Diskfile, 'IamAfileThatExists.file', self.dbu)
 
@@ -73,7 +73,7 @@ class DiskfileTests(TestSetup):
     def test_init(self):
         """init does some checking"""
         with open('IamAfileThatExists.file', 'wb') as f:
-            f.write('I am some text in a file')
+            f.write(b'I am some text in a file')
         try:
             a = Diskfile.Diskfile('IamAfileThatExists.file', self.dbu)
         finally:
@@ -84,7 +84,7 @@ class DiskfileTests(TestSetup):
         # File must exist...
         reprfile = 'reprtest.txt'
         with open(reprfile, 'wb') as f:
-            f.write('I am some text in a file')
+            f.write(b'I am some text in a file')
 
         df = Diskfile.Diskfile(reprfile, self.dbu)
 
