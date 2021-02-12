@@ -750,7 +750,7 @@ class DButils(object):
         """
         ans = []
         sats = self.session.query(self.Satellite).all()
-        ans = list(map(lambda x: self.getTraceback('Satellite', x.satellite_id), sats))
+        ans = [self.getTraceback('Satellite', x.satellite_id) for x in sats]
         return ans
 
     def getAllInstruments(self):
@@ -762,7 +762,7 @@ class DButils(object):
         """
         ans = []
         insts = self.session.query(self.Instrument).all()
-        ans = list(map(lambda x: self.getTraceback('Instrument', x.instrument_id), insts))
+        ans = [self.getTraceback('Instrument', x.instrument_id) for x in insts]
         return ans
 
     def getAllCodes(self, active=True):
@@ -774,7 +774,7 @@ class DButils(object):
             codes = self.session.query(self.Code).filter(and_(self.Code.newest_version, self.Code.active_code)).all()
         else:
             codes = self.session.query(self.Code).all()
-        ans = list(map(lambda x: self.getTraceback('Code', x.code_id), codes))
+        ans = [self.getTraceback('Code', x.code_id) for x in codes]
         return ans
 
     def getAllFilenames(self,
