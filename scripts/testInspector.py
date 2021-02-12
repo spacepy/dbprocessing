@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     if options.args:
         kwargs = strargs_to_args(options.args)
-        df = inspect.Inspector(options.file, dbu, options.product, **kwargs)
+        df = inspect.Inspector(options.file, dbu, options.product, **kwargs)()
     else:
-        df = inspect.Inspector(options.file, dbu, options.product, )
+        df = inspect.Inspector(options.file, dbu, options.product, )()
     print(df)

@@ -236,7 +236,7 @@ class ProcessQueue(object):
             if arg is not None:
                 kwargs = strargs_to_args(arg)
                 try:
-                    df = inspect.Inspector(filename, self.dbu, product, **kwargs)
+                    df = inspect.Inspector(filename, self.dbu, product, **kwargs)()
                 except:
                     exc_type, exc_value, exc_traceback = sys.exc_info()
                     DBlogging.dblogger.error(
@@ -246,7 +246,7 @@ class ProcessQueue(object):
                     continue  # try the next inspector
             else:
                 try:
-                    df = inspect.Inspector(filename, self.dbu, product, )
+                    df = inspect.Inspector(filename, self.dbu, product, )()
                 except:
                     DBlogging.dblogger.error("File {0} inspector threw an exception".format(filename))
                     continue  # try the next inspector
