@@ -129,7 +129,7 @@ def _start_a_run(runme):
                                      .format(f, runme.cmdline))
         else:
             print("Could not have gotten here")
-            raise(RuntimeError("Should not have gotten here"))
+            raise RuntimeError("Should not have gotten here")
 
 
 def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
@@ -226,7 +226,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
             except IOError:
                 DBlogging.dblogger.error("Could not create the prob file, so skipped {0}"
                                             .format(os.path.basename(' '.join(runme.cmdline))))
-                #raise(IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline)))))
+                #raise IOError("Could not create the prob file, so died {0}".format(os.path.basename(' '.join(runme.cmdline))))
                 try:
                     rm_tempdir(runme.tempdir) # delete the tempdir
                 except OSError:
@@ -271,7 +271,7 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
                 print("{0} Process {1} FINISHED".format(DFP(), ' '.join(rm.cmdline)))
                 n_good += 1
             else:
-                raise(ValueError("Should not have gotten here"))
+                raise ValueError("Should not have gotten here")
 
             # execution gets here if the process finished
             del processes[p]
@@ -435,7 +435,7 @@ class runMe(object):
         attrs = ['ableToRun', 'code_id', 'extra_params', 'input_files', 'out_prod', 'pq',
                  'args', 'codepath', 'filename', 'output_version', 'process_id', 'utc_file_date']
         if not isinstance(other, runMe):
-            raise(TypeError("Cannot compare runMe with {0}".format(type(other))))
+            raise TypeError("Cannot compare runMe with {0}".format(type(other)))
         for a in attrs:
             if getattr(self, a) != getattr(other, a):
                 return False
@@ -493,8 +493,8 @@ class runMe(object):
             if ver_diff == [0,0,0]:
                 DBlogging.dblogger.error("two different codes with the same version ode_id: {0}   db_code_id: {1}".\
                                          format(self.code_id, db_code_id))
-                raise(DButils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".\
-                                      format(self.code_id, db_code_id)))
+                raise DButils.DBError("two different codes with the same version ode_id: {0}   db_code_id: {1}".\
+                                      format(self.code_id, db_code_id))
             # Increment output quality if code interface increments, to
             # maintain output_interface_version; else increment what code did.
             self._incVersion([0, 1, 0] if ver_diff[0] else ver_diff)
@@ -535,7 +535,7 @@ class runMe(object):
             return None
 
         DBlogging.dblogger.debug("db_file: {0} has parents: {1}".format(f_id_db,
-               map(attrgetter('file_id'), parents)))
+               list(map(attrgetter('file_id'), parents))))
 
         # if there are more input files now then we need to reprocess
         if len(self.input_files) != len(parents):
