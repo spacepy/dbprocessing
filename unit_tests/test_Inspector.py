@@ -70,6 +70,7 @@ class InspectorClass(unittest.TestCase):
 
     def tearDown(self):
         super(InspectorClass, self).tearDown()
+        self.dbu.closeDB()
         remove_tree(self.tempD)
 
     def test_inspector(self):
@@ -85,7 +86,6 @@ class InspectorClass(unittest.TestCase):
             dbp_testing.testsdir, 'inspector', 'testDB_001_first.raw')
         self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)()))
         #self.assertEqual(None, self.inspect.Inspector(goodfile, self.dbu, 1,).extract_YYYYMMDD())
-        
         # This inspector sets the data_level - not allowed
         inspect = imp.load_source('inspect', os.path.join(
             dbp_testing.testsdir, 'inspector', 'rot13_L1_dlevel.py'))
