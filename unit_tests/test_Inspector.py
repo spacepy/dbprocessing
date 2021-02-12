@@ -78,19 +78,19 @@ class InspectorClass(unittest.TestCase):
         # File doesn't match the inspector pattern...
         self.assertEqual(None, self.inspect.Inspector(os.path.join(
             dbp_testing.testsdir, 'inspector', 'testDB_01_first.raw'),
-                                                      self.dbu, 1,))
+                                                      self.dbu, 1,)())
 
         # File matches pattern...
         goodfile = os.path.join(
             dbp_testing.testsdir, 'inspector', 'testDB_001_first.raw')
-        self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)))
+        self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)()))
         #self.assertEqual(None, self.inspect.Inspector(goodfile, self.dbu, 1,).extract_YYYYMMDD())
         
         # This inspector sets the data_level - not allowed
         inspect = imp.load_source('inspect', os.path.join(
             dbp_testing.testsdir, 'inspector', 'rot13_L1_dlevel.py'))
         with warnings.catch_warnings(record=True) as w:
-            self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)))
+            self.assertEqual(repr(Diskfile.Diskfile(goodfile, self.dbu)), repr(self.inspect.Inspector(goodfile, self.dbu, 1,)()))
         self.assertEqual(len(w), 1)
         self.assertTrue(isinstance(w[0].message, UserWarning))
         self.assertEqual('Inspector rot13_L1_dlevel.py:  set level to 2.0, '
@@ -102,7 +102,7 @@ class InspectorClass(unittest.TestCase):
             dbp_testing.testsdir, 'inspector', 'testDB_01_first.raw')
         inspect = imp.load_source('inspect', os.path.join(
             dbp_testing.testsdir, 'inspector', 'rot13_L1.py'))
-        self.assertEqual(None, inspect.Inspector(badfile, self.dbu, 1,))
+        self.assertEqual(None, inspect.Inspector(badfile, self.dbu, 1,)())
 
     def test_inspector_regex(self):
         """Test regex expansion of inspector"""
@@ -122,23 +122,21 @@ class InspectorClass(unittest.TestCase):
         fspec = os.path.join(self.tempD, 'testDB_2016-01-01.cat')
         open(fspec, 'w').close()
         testi(fspec, self.dbu, 1)
-        # The metaclass programming makes this awkward, need to extract
-        # members of an intentionally ephemeral class...
-        last = testi.__ephemeral_encapsulated__.last
+        last = testi.last
         self.assertEqual('testDB_((19|2\\d)\\d\\d(0\\d|1[0-2])[0-3]\\d).cat',
                          last['filenameregex'])
         # Force a different pattern
         p = self.dbu.getEntry('Product', 1)
         p.format = 'testDB_{APID}.cat'
         testi(fspec, self.dbu, 1)
-        last = testi.__ephemeral_encapsulated__.last
+        last = testi.last
         self.assertEqual('testDB_([\\da-fA-F]+).cat',
                          last['filenameregex'])
         # Force a pattern we don't expand
         p = self.dbu.getEntry('Product', 1)
         p.format = 'testDB_{nonsense}.cat'
         testi(fspec, self.dbu, 1)
-        last = testi.__ephemeral_encapsulated__.last
+        last = testi.last
         self.assertEqual('testDB_(.*).cat',
                          last['filenameregex'])
         # testi goes out of scope here, so will clean up db objects

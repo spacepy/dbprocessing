@@ -36,22 +36,6 @@ from . import Diskfile
 from . import Version
 from . import DBstrings
 
-def EphemeralCallable(basetype=type):
-    def _new_caller(cls, *args, **kwargs):
-        return cls.__ephemeral_encapsulated__(*args, **kwargs)()
-    class _EphemeralMetaclass(basetype):
-        def __new__(cls, name, bases, dct):
-            encbases = tuple([b.__ephemeral_encapsulated__
-                              if hasattr(b, '__ephemeral_encapsulated__')
-                              else b for b in bases])
-            encaps = super(_EphemeralMetaclass, cls).__new__(
-                cls, '_' + name + '_ephemeral_encapsulated', encbases, dct)
-            return super(_EphemeralMetaclass, cls).__new__(
-                cls, name, bases,
-                {'__new__': _new_caller,
-                 '__ephemeral_encapsulated__': encaps})
-    return _EphemeralMetaclass
-
 
 class DefaultFields(dict):
     """Dict-like with defaults for the special fields used by DBformatter
@@ -86,7 +70,6 @@ class inspector(object):
     ABC for inspectors to be sure the user has implemented what is required
     and to provide for utility routes common to many inspectors
     """
-    __metaclass__ = EphemeralCallable(ABCMeta)
 
     def __init__(self, filename, dbu, product, **kwargs):
         """"""
