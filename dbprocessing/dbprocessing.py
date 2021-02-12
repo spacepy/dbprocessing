@@ -175,7 +175,7 @@ class ProcessQueue(object):
                 self.dbu.session.commit()
             except IntegrityError as IE:
                 self.session.rollback()
-                raise (DButils.DBError(IE))
+                raise DButils.DBError(IE)
             # add to processqueue for later processing
             self.dbu.ProcessqueuePush(f_id)
             return f_id
@@ -260,7 +260,7 @@ class ProcessQueue(object):
             return None
         if len(claimed) > 1:
             DBlogging.dblogger.error("File {0} matched more than one product, there is a DB error".format(filename))
-            raise (DButils.DBError("File {0} matched more than one product, there is a DB error".format(filename)))
+            raise DButils.DBError("File {0} matched more than one product, there is a DB error".format(filename))
 
         return claimed[0]  # return the diskfile
 
@@ -334,8 +334,8 @@ class ProcessQueue(object):
                 # and give it the right name
                 files = files_out
         else:
-            raise (NotImplementedError('Not implemented yet: {0} based processing'.format(timebase)))
-            raise (ValueError('Bad timebase for product: {0}'.format(process_id)))
+            raise NotImplementedError('Not implemented yet: {0} based processing'.format(timebase))
+            raise ValueError('Bad timebase for product: {0}'.format(process_id))
         return files, input_product_id
 
     def buildChildren(self, file_id, debug=False, skip_run=False, run_procs=None):
@@ -441,7 +441,7 @@ class ProcessQueue(object):
         ##
         # not sure how to deal with having to specify a filename and handle that in the DB
         # things made here will also have to have inspectors
-        raise (NotImplementedError('Not yet implemented'))
+        raise NotImplementedError('Not yet implemented')
 
     def _reprocessBy(self,
                      startDate=None,
