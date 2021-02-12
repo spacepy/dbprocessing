@@ -83,7 +83,7 @@ class Version(object):
         Check a version to make sure it is valid, works on current object
         """
         if self.interface == 0:
-            raise (VersionError("interface_version starts at 1"))
+            raise VersionError("interface_version starts at 1")
 
     def __repr__(self):
         return 'Version: ' + self.__str__()
