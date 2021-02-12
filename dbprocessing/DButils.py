@@ -125,7 +125,7 @@ class DButils(object):
         """
         self.dbIsOpen = False
         if mission is None:
-            raise (DBError("Must input database name to create DButils instance"))
+            raise DBError("Must input database name to create DButils instance")
         if engine is None:
             engine = 'sqlite' if os.path.isfile(os.path.expanduser(mission))\
                      else 'postgresql'
@@ -174,7 +174,7 @@ class DButils(object):
             return
         if engine == 'sqlite':
             if not os.path.isfile(os.path.expanduser(self.mission)):
-                raise (ValueError("DB file specified doesn't exist"))
+                raise ValueError("DB file specified doesn't exist")
             db_url = '{0}:///{1}'.format(engine, os.path.expanduser(
                 self.mission))
             self.mission = os.path.abspath(os.path.expanduser(self.mission))
@@ -188,7 +188,7 @@ class DButils(object):
 
         except (DBError, ArgumentError):
             (t, v, tb) = sys.exc_info()
-            raise (DBError('Error creating engine: ' + str(v)))
+            raise DBError('Error creating engine: ' + str(v))
         try:
             metadata = sqlalchemy.MetaData(bind=engineIns)
             # a session is what you use to actually talk to the DB, set one up with the current engine
@@ -201,7 +201,7 @@ class DButils(object):
             if verbose: print("DB is open: %s" % (engineInsR))
             return
         except Exception as msg:
-            raise (DBError('Error opening database: %s' % (msg)))
+            raise DBError('Error opening database: %s' % (msg))
 
     def _createTableObjects(self, verbose=False):
         """
@@ -260,7 +260,7 @@ class DButils(object):
             return False
         else:
             DBlogging.dblogger.error("More than one currently_processing flag set, fix the DB")
-            raise (DBError("More than one currently_processing flag set, fix the DB"))
+            raise DBError("More than one currently_processing flag set, fix the DB")
 
     def resetProcessingFlag(self, comment):
         """
@@ -273,7 +273,7 @@ class DButils(object):
         """
         sq2 = self.session.query(self.Logging).filter_by(currently_processing=True).count()
         if sq2 and comment is None:
-            raise (ValueError("Must enter a comment to override DB lock"))
+            raise ValueError("Must enter a comment to override DB lock")
         sq = self.session.query(self.Logging).filter_by(currently_processing=True)
         for val in sq:
             val.currently_processing = False
@@ -291,7 +291,7 @@ class DButils(object):
         # this is the logging of the processing, no real use for it yet but maybe we will in the future
         # helps to know is the process ran and if it succeeded
         if self.currentlyProcessing():
-            raise (DBError('A Currently Processing flag is still set, cannot process now'))
+            raise DBError('A Currently Processing flag is still set, cannot process now')
         # save this class instance so that we can finish the logging later
         self.__p1 = self.addLogging(True,
                                     datetime.datetime.utcnow(),
@@ -363,7 +363,7 @@ class DButils(object):
             self.__p1
         except:
             DBlogging.dblogger.warning("Logging was not started, can't stop")
-            raise (DBProcessingError("Logging was not started"))
+            raise DBProcessingError("Logging was not started")
         # clean up the logging, we are done processing and we can release the lock (currently_processing) and
         # put in the complete time
 
@@ -679,7 +679,7 @@ class DButils(object):
         if debug: print('file_id', file_id, file.filename)
         latest = self.getFilesByProductDate(product_id, [date]*2, newest_version=True)
         if len(latest) > 1:
-            raise(DBError("More than one latest for a product date"))
+            raise DBError("More than one latest for a product date")
         latest_id = latest[0].file_id
         if debug: print('latest_id', latest_id)
         return file_id == latest_id
@@ -841,7 +841,7 @@ class DButils(object):
         try:
             m1 = self.Mission()
         except AttributeError:
-            raise (DBError("Class Mission not found was it created?"))
+            raise DBError("Class Mission not found was it created?")
 
         m1.mission_name = mission_name
         m1.rootdir = rootdir.replace('{MISSION}', mission_name)
@@ -894,7 +894,7 @@ class DButils(object):
         :type extra_params: str
         """
         if output_timebase not in ['RUN', 'ORBIT', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'FILE']:
-            raise (ValueError("output_timebase invalid choice"))
+            raise ValueError("output_timebase invalid choice")
 
         p1 = self.Process()
         p1.output_product = output_product
@@ -1046,7 +1046,7 @@ class DButils(object):
         n1 = self.session.query(self.Filefilelink).filter_by(source_file=f).delete()
         n2 = self.session.query(self.Filefilelink).filter_by(resulting_file=f).delete()
         if n1 + n2 == 0:
-            raise (DBNoData("No entry for ID={0} found".format(f)))
+            raise DBNoData("No entry for ID={0} found".format(f))
         elif commit:
             self.commitDB()
 
@@ -1057,7 +1057,7 @@ class DButils(object):
         f = self.getFileID(f)  # change a name to a number
         n2 = self.session.query(self.Filecodelink).filter_by(resulting_file=f).delete()
         if n2 == 0:
-            raise (DBNoData("No entry for ID={0} found".format(f)))
+            raise DBNoData("No entry for ID={0} found".format(f))
         elif commit:
             self.commitDB()
 
@@ -1411,7 +1411,7 @@ class DButils(object):
             self.session.commit()
         except IntegrityError as IE:
             self.session.rollback()
-            raise (DBError(IE))
+            raise DBError(IE)
 
     def closeDB(self):
         """
@@ -1429,7 +1429,7 @@ class DButils(object):
             DBlogging.dblogger.info("Database connection closed")
         except DBError:
             DBlogging.dblogger.error("Database connection could not be closed")
-            raise (DBError('could not close DB'))
+            raise DBError('could not close DB')
 
     def addFile(self,
                 filename=None,
@@ -1623,7 +1623,7 @@ class DButils(object):
             proc_id = int(proc_name)
             proc_name = self.session.query(self.Process).get(proc_id)
             if proc_name is None:
-                raise (NoResultFound('No row was found for id={0}'.format(proc_id)))
+                raise NoResultFound('No row was found for id={0}'.format(proc_id))
         except ValueError:  # it is not a number
             proc_id = self.session.query(self.Process.process_id).filter_by(process_name=proc_name).one()[0]
         return proc_id
@@ -1644,21 +1644,21 @@ class DButils(object):
             i_id = int(name)
             sq = self.session.query(self.Instrument).get(i_id)
             if sq is None:
-                raise (DBNoData("No instrument_id {0} found in the DB".format(i_id)))
+                raise DBNoData("No instrument_id {0} found in the DB".format(i_id))
             return sq.instrument_id
         except ValueError:
             sq = self.session.query(self.Instrument).filter_by(instrument_name=name).all()
             if len(sq) == 0:
-                raise (DBNoData("No instrument_name {0} found in the DB".format(name)))
+                raise DBNoData("No instrument_name {0} found in the DB".format(name))
             if len(sq) > 1:
                 if satellite_id is None:
-                    raise (ValueError('Non unique instrument name and no satellite specified'))
+                    raise ValueError('Non unique instrument name and no satellite specified')
                 sat_id = self.getSatelliteID(satellite_id)
                 for v in sq:
                     if v.satellite_id == sat_id:
                         return v.instrument_id
                 # I do not believe this can be reached, BAL 2-12-2016
-                raise (ValueError("No matching instrument, satellite found. {0}:{1}".format(name, satellite_id)))
+                raise ValueError("No matching instrument, satellite found. {0}:{1}".format(name, satellite_id))
             return sq[0].instrument_id
 
     def getMissions(self):
@@ -1691,7 +1691,7 @@ class DButils(object):
             f_id = int(filename)
             sq = self.session.query(self.File).get(f_id)
             if sq is None:
-                raise (DBNoData("No file_id {0} found in the DB".format(filename)))
+                raise DBNoData("No file_id {0} found in the DB".format(filename))
             return sq.file_id
         except TypeError:  # came in as list or tuple
             return list(map(self.getFileID, filename))
@@ -1700,7 +1700,7 @@ class DButils(object):
             if sq is not None:
                 return sq.file_id
             else:  # no file_id found
-                raise (DBNoData("No filename %s found in the DB" % (filename)))
+                raise DBNoData("No filename %s found in the DB" % (filename))
 
     def getCodeID(self, codename):
         """
@@ -1716,13 +1716,13 @@ class DButils(object):
             c_id = int(codename)
             code = self.session.query(self.Code).get(c_id)
             if code is None:
-                raise (DBNoData("No code id {0} found in the DB".format(c_id)))
+                raise DBNoData("No code id {0} found in the DB".format(c_id))
         except TypeError:  # came in as list or tuple
             return list(map(self.getCodeID, codename))
         except ValueError:
             sq = self.session.query(self.Code.code_id).filter_by(filename=codename).all()
             if len(sq) == 0:
-                raise (DBNoData("No code name {0} found in the DB".format(codename)))
+                raise DBNoData("No code name {0} found in the DB".format(codename))
             c_id = list(map(itemgetter(0), sq))
         return c_id
 
@@ -1964,7 +1964,7 @@ class DButils(object):
             if sq is not None:
                 return sq.product_id
             else:
-                raise (DBNoData("No product_id {0} found in the DB".format(product_name)))
+                raise DBNoData("No product_id {0} found in the DB".format(product_name))
         except TypeError:  # came in as list or tuple
             return list(map(self.getProductID, product_name))
         except ValueError:
@@ -1973,7 +1973,7 @@ class DButils(object):
                 # if two products have the same name always return the lower id one
                 return (sorted([x.product_id for x in sq])[0])
             except IndexError:  # no file_id found
-                raise (DBNoData("No product_name %s found in the DB" % (product_name)))
+                raise DBNoData("No product_name %s found in the DB" % (product_name))
 
     def getSatelliteID(self,
                        sat_name):
@@ -1988,7 +1988,7 @@ class DButils(object):
             sat_id = int(sat_name)
             sq = self.session.query(self.Satellite).get(sat_id)
             if sq is None:
-                raise (NoResultFound("No satellite id={0} found".format(sat_id)))
+                raise NoResultFound("No satellite id={0} found".format(sat_id))
             return sq.satellite_id
         except TypeError:  # came in as list or tuple
             return list(map(self.getSatelliteID, sat_name))
@@ -2046,7 +2046,7 @@ class DButils(object):
         if sq.count() == 0:
             return None
         elif sq.count() > 1:
-            raise (DBError('More than one code active for a Given day'))
+            raise DBError('More than one code active for a Given day')
         return sq[0].code_id
 
     def getMissionDirectory(self):
@@ -2062,7 +2062,7 @@ class DButils(object):
         except sqlalchemy.orm.exc.NoResultFound:
             return None
         except sqlalchemy.orm.exc.MultipleResultsFound:
-            raise (ValueError('No mission id specified and more than one mission present'))
+            raise ValueError('No mission id specified and more than one mission present')
 
     def getCodeDirectory(self):
         """
@@ -2159,11 +2159,11 @@ class DButils(object):
             m_id = int(mission_name)
             ms = self.session.query(self.Mission).get(m_id)
             if ms is None:
-                raise (DBNoData('Invalid mission id {0}'.format(m_id)))
+                raise DBNoData('Invalid mission id {0}'.format(m_id))
         except (ValueError, TypeError):
             sq = self.session.query(self.Mission.mission_id).filter_by(mission_name=mission_name).all()
             if len(sq) == 0:
-                raise (DBNoData('Invalid mission name {0}'.format(mission_name)))
+                raise DBNoData('Invalid mission name {0}'.format(mission_name))
             m_id = sq[0].mission_id
         return m_id
 
@@ -2255,10 +2255,10 @@ class DButils(object):
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
 
             if not sq:  # did not find a matchm this is a dberror
-                raise (DBError("file {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+                raise DBError("file {0} did not have a traceback, this is a problem, fix it".format(in_id))
 
             if len(sq) > 1:
-                raise (DBError("Found multiple tracebacks for file {0}".format(in_id)))
+                raise DBError("Found multiple tracebacks for file {0}".format(in_id))
             for ii, v in enumerate(vars):
                 retval[v] = sq[0][ii]
 
@@ -2273,7 +2273,7 @@ class DButils(object):
                   .join((self.Process, self.Code.process_id == self.Process.process_id)).all())
 
             if not sq:  # did not find a match this is a dberror
-                raise (DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+                raise DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id))
             
             if sq[0][1].output_timebase != 'RUN':
                 vars = ['code', 'process', 'product', 'instrument',
@@ -2292,10 +2292,10 @@ class DButils(object):
                       .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
 
             if not sq:  # did not find a match this is a dberror
-                raise (DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+                raise DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id))
 
             if len(sq) > 1:
-                raise (DBError("Found multiple tracebacks for code {0}".format(in_id)))
+                raise DBError("Found multiple tracebacks for code {0}".format(in_id))
             for ii, v in enumerate(vars):
                 retval[v] = sq[0][ii]
 
@@ -2322,10 +2322,10 @@ class DButils(object):
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
 
             if not sq:  # did not find a match this is a dberror
-                raise (DBError("product {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+                raise DBError("product {0} did not have a traceback, this is a problem, fix it".format(in_id))
 
             if len(sq) > 1:
-                raise (DBError("Found multiple tracebacks for product {0}".format(in_id)))
+                raise DBError("Found multiple tracebacks for product {0}".format(in_id))
             for ii, v in enumerate(vars):
                 retval[v] = sq[0][ii]
 
@@ -2349,10 +2349,10 @@ class DButils(object):
                   .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
 
             if not sq:  # did not find a match this is a dberror
-                raise (DBError("process {0} did not have a traceback, this is a problem, fix it".format(in_id)))
+                raise DBError("process {0} did not have a traceback, this is a problem, fix it".format(in_id))
 
             if len(sq) > 1:
-                raise (DBError("Found multiple tracebacks for process {0}".format(in_id)))
+                raise DBError("Found multiple tracebacks for process {0}".format(in_id))
             for ii, v in enumerate(vars):
                 retval[v] = sq[0][ii]
 
@@ -2388,7 +2388,7 @@ class DButils(object):
             retval['mission'] = self.getEntry('Mission', in_id)
 
         else:
-            raise (NotImplementedError('The traceback or {0} is not implemented'.format(table)))
+            raise NotImplementedError('The traceback or {0} is not implemented'.format(table))
 
         return retval
 
