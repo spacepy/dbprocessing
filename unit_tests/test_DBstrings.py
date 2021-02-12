@@ -95,14 +95,14 @@ class DBFormatterTests(unittest.TestCase):
     def testHopeRegressExpandDatetime(self):
         """Check on the datetime expansion for a simple HOPE regression"""
         fmtstring = 'rbspa_ect-hope-hk-L05_0095_v{VERSION}.cdf'
-        fmtkeywords = {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
-                       'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-hk-L05',
+        fmtkeywords = {'INSTRUMENT': 'hope', 'SATELLITE': 'rbspa',
+                       'VERSION': '2.0.0', 'PRODUCT': 'rbsp_ect-hope-hk-L05',
                        'datetime': datetime.date(2012, 12, 2)}
         self.fmtr.expand_datetime(fmtkeywords)
         self.assertEqual({'DATE': '20121202',
-                          'INSTRUMENT': u'hope',
-                          'PRODUCT': u'rbsp_ect-hope-hk-L05',
-                          'SATELLITE': u'rbspa',
+                          'INSTRUMENT': 'hope',
+                          'PRODUCT': 'rbsp_ect-hope-hk-L05',
+                          'SATELLITE': 'rbspa',
                           'VERSION': '2.0.0',
                           'Y': 2012,
                           'b': 'Dec',
@@ -124,20 +124,20 @@ class DBFormatterTests(unittest.TestCase):
         #each tuple of (format string, kwargs dict)
         inputs = [
             ('rbspa_ect-hope-hk-L05_0095_v{VERSION}.cdf',
-             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
-              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-hk-L05',
+             {'INSTRUMENT': 'hope', 'SATELLITE': 'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': 'rbsp_ect-hope-hk-L05',
               'datetime': datetime.date(2012, 12, 2)}),
             ('rbspa_ect-hope-sci-L05_0091_v{VERSION}.cdf',
-             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
-              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-sci-L05',
+             {'INSTRUMENT': 'hope', 'SATELLITE': 'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': 'rbsp_ect-hope-sci-L05',
               'datetime': datetime.date(2012, 11, 28)}),
             ('rbspa_ect-hope-hk-L1_{DATE}_v{VERSION}.cdf',
-             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
-              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-hk-L1',
+             {'INSTRUMENT': 'hope', 'SATELLITE': 'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': 'rbsp_ect-hope-hk-L1',
               'datetime': datetime.date(2012, 10, 3)}),
             ('rbspa_ect-hope-sci-L1_{DATE}_v{VERSION}.cdf',
-             {'INSTRUMENT': u'hope', 'SATELLITE': u'rbspa',
-              'VERSION': '2.0.0', 'PRODUCT': u'rbsp_ect-hope-sci-L1',
+             {'INSTRUMENT': 'hope', 'SATELLITE': 'rbspa',
+              'VERSION': '2.0.0', 'PRODUCT': 'rbsp_ect-hope-sci-L1',
               'datetime': datetime.date(2012, 10, 3)}),
             ]
         #output string
