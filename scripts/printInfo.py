@@ -178,7 +178,7 @@ if __name__ == '__main__':
         
     else:
         dbu.closeDB()
-        raise(NotImplementedError('Attr: "{0}" not yet implemented'.format(field) ))
+        raise NotImplementedError('Attr: "{0}" not yet implemented'.format(field) )
 
 
     dbu.closeDB()

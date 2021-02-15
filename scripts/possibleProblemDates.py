@@ -145,12 +145,12 @@ if __name__ == "__main__":
                 # we still have an instance processing, don't start another
                 dbu.closeDB()
                 DBlogging.dblogger.error( "There is a process running, can't start another: PID: %d" % (curr_proc))
-                raise(ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc)))
+                raise ProcessException("There is a process running, can't start another: PID: %d" % (curr_proc))
             else:
                 # There is a processing flag set but it died, don't start another
                 dbu.closeDB()
                 DBlogging.dblogger.error( "There is a processing flag set but it died, don't start another" )
-                raise(ProcessException("There is a processing flag set but it died, don't start another"))
+                raise ProcessException("There is a processing flag set but it died, don't start another")
         
     print("Running noNewestVersion()")
     noNewestVersion(dbu, options.fix)

@@ -41,7 +41,7 @@ class dbprocessing_db(object):
 
         """
         if self.overwrite:
-            raise (NotImplementedError('overwrite is not yet implemented'))
+            raise NotImplementedError('overwrite is not yet implemented')
 
         # TODO move this out so that the user chooses the db type
         if self.dialect == 'sqlite':
