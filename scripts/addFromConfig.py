@@ -340,7 +340,8 @@ if __name__ == "__main__":
         cfg[ii] = cfg[ii].replace('{INSTRUMENT}', INSTRUMENT)
 
     try:
-        tmpf = tempfile.NamedTemporaryFile(delete=False, suffix='_conf_file')
+        tmpf = tempfile.NamedTemporaryFile(mode='wt', delete=False,
+                                           suffix='_conf_file')
         tmpf.file.writelines(cfg)
         tmpf.close()
         # recheck the temp file
@@ -350,8 +351,8 @@ if __name__ == "__main__":
             # do all our work on a temp version of the DB, if it all works, move tmp on top of existing
             #   if it fails just delete the tmp and do nothing
             orig_db = options.mission
-            tmp_db = tempfile.NamedTemporaryFile(delete=False, suffix='_temp_db')
-            tmp_db.file.writelines(cfg)
+            tmp_db = tempfile.NamedTemporaryFile(delete=False,
+                                                 suffix='_temp_db')
             tmp_db.close()
             shutil.copy(orig_db, tmp_db.name)
             options.mission = tmp_db.name
