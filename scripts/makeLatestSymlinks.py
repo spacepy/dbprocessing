@@ -23,6 +23,7 @@ import warnings
 from dateutil import parser as dup
 
 from dbprocessing import inspector
+import dbprocessing.Utils
 
 
 ################################################################
@@ -157,17 +158,8 @@ def delete_unneeded(files, files_out, options):
 def readconfig(config_filepath):
     expected_items = ['sourcedir', 'destdir', 'deltadays', 'startdate',
                       'enddate', 'filter', 'linkdirs', 'outmode', 'nodate']
-    # Create a ConfigParser object, to read the config file
-    # "Safe" deprecated in 3.2, but still present, so version is only way
-    #  to avoid stepping on the deprecation. "Safe" preferred before 3.2
-    cfg = (configparser.SafeConfigParser if sys.version_info[:2] < (3, 2)
-           else configparser.ConfigParser)()
-    cfg.read(config_filepath)
-    sections = cfg.sections()
     # Read each parameter in turn
-    ans = {}
-    for section in sections:
-        ans[section] = dict(cfg.items(section))
+    ans = dbprocessing.Utils.readconfig(config_filepath)
     # make sure that for each section the reqiured items are present
     for k in ans:
         for ei in expected_items:
