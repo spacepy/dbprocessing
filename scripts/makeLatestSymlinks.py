@@ -7,7 +7,10 @@ in a given directory make symlinks to all the newest versions of files into anot
 from __future__ import print_function
 
 import argparse
-import ConfigParser
+try:
+    import configparser
+except ImportError: # Py2
+    import ConfigParser as configparser
 import datetime
 import glob
 from pprint import pprint
@@ -155,7 +158,10 @@ def readconfig(config_filepath):
     expected_items = ['sourcedir', 'destdir', 'deltadays', 'startdate',
                       'enddate', 'filter', 'linkdirs', 'outmode', 'nodate']
     # Create a ConfigParser object, to read the config file
-    cfg=ConfigParser.SafeConfigParser()
+    # "Safe" deprecated in 3.2, but still present, so version is only way
+    #  to avoid stepping on the deprecation. "Safe" preferred before 3.2
+    cfg = (configparser.SafeConfigParser if sys.version_info[:2] < (3, 2)
+           else configparser.ConfigParser)()
     cfg.read(config_filepath)
     sections = cfg.sections()
     # Read each parameter in turn
@@ -166,25 +172,25 @@ def readconfig(config_filepath):
     for k in ans:
         for ei in expected_items:
             if ei not in ans[k]:
-                raise(ValueError('Section [{0}] does not have required key "{1}"'.format(k, ei)))
+                raise ValueError('Section [{0}] does not have required key "{1}"'.format(k, ei))
     # check that we can parse the dates
     for k in ans:
         try:
             tmp = dup.parse(ans[k]['startdate'])
         except:
-            raise(ValueError('Date "{0}" in [{1}][{2}] is not valid'.format(ans[k]['startdate'], k, 'startdate',)))
+            raise ValueError('Date "{0}" in [{1}][{2}] is not valid'.format(ans[k]['startdate'], k, 'startdate',))
         try:
             tmp = dup.parse(ans[k]['enddate'])
         except:
-            raise(ValueError('Date "{0}" in [{1}][{2}] is not valid'.format(ans[k]['enddate'], k, 'enddate')))
+            raise ValueError('Date "{0}" in [{1}][{2}] is not valid'.format(ans[k]['enddate'], k, 'enddate'))
         try:
             tmp = int(ans[k]['deltadays'])
         except:
-            raise(ValueError('Invalid "{0}" in [{1}][{2}]'.format(ans[k]['deltadays'], k, 'deltadays')))
+            raise ValueError('Invalid "{0}" in [{1}][{2}]'.format(ans[k]['deltadays'], k, 'deltadays'))
         try:
             tmp = int(ans[k]['outmode'])
         except:
-            raise(ValueError('Invalid "{0}" in [{1}][{2}]'.format(ans[k]['outmode'], k, 'outmode')))
+            raise ValueError('Invalid "{0}" in [{1}][{2}]'.format(ans[k]['outmode'], k, 'outmode'))
     for k in ans:
         ans[k]['sourcedir'] = os.path.abspath(os.path.expanduser(os.path.expandvars(ans[k]['sourcedir'])))
         ans[k]['destdir']   = os.path.abspath(os.path.expanduser(os.path.expandvars(ans[k]['destdir'])))

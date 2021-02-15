@@ -214,7 +214,7 @@ if __name__ == "__main__":
         filename = makeHTML(dbu, info, sat, delta_days=options.deltadays)
         outname = options.outbase + '_{0}.html'.format(sat)
         shutil.move(filename, outname)
-        os.chmod(outname, 0664)
+        os.chmod(outname, 0o664)
         Time1 = EventTimer ('Created: {0}'.format(outname), Time1) 
 
 

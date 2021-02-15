@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 
 
-import ConfigParser
+try:
+    import configparser
+except ImportError: # Py2
+    import ConfigParser as configparser
 import os
+import sys
 import argparse
 
 from dbprocessing import DButils
@@ -138,15 +142,18 @@ if __name__ == "__main__":
     #     This will make a configparser of the needed parts then write to file
     # ==============================================================================
 
-    out = ConfigParser.SafeConfigParser()  # safe is py >= 2.3
+    # "Safe" deprecated in 3.2, but still present, so version is only way
+    #  to avoid stepping on the deprecation. "Safe" preferred before 3.2
+    out = (configparser.SafeConfigParser if sys.version_info[:2] < (3, 2)
+           else configparser.ConfigParser)()
 
     # get mission
     out.add_section('mission')
     missions = dbu.getMissions()
     if not missions:
-        raise (ValueError("No mission in DB, this must be an empty db"))
+        raise ValueError("No mission in DB, this must be an empty db")
     if len(missions) > 1:
-        raise (NotImplementedError("Can't yet handle multi mission db"))
+        raise NotImplementedError("Can't yet handle multi mission db")
     mission = missions[0]
     mission = dbu.getEntry('Mission', mission)
     for d in dir(mission):
@@ -158,11 +165,11 @@ if __name__ == "__main__":
     sats = dbu.getAllSatellites()
     for v in sats:
         if v['mission'].mission_id != mission.mission_id:
-            raise (NotImplementedError("Can't yet handle multi mission db"))
+            raise NotImplementedError("Can't yet handle multi mission db")
     nsats = len(Utils.unique([v['satellite'].satellite_id for v in sats]))
     if nsats > 1 and options.satellite is None:
-        raise (ValueError("More than one sat in db and no --satellite set\n    {0}".format(
-            [v['satellite'].satellite_name for v in sats])))
+        raise ValueError("More than one sat in db and no --satellite set\n    {0}".format(
+            [v['satellite'].satellite_name for v in sats]))
     elif nsats == 1 and options.satellite is None:
         options.satellite = sats['satellite'].satellite_name
     for s in sats:
@@ -177,14 +184,14 @@ if __name__ == "__main__":
     insts = dbu.getAllInstruments()
     for v in insts:
         if v['mission'].mission_id != mission.mission_id:
-            raise (NotImplementedError("Can't yet handle multi mission db"))
+            raise NotImplementedError("Can't yet handle multi mission db")
         #        if v['satellite'].satellite_name != options.satellite:
         #            raise(ValueError("More than one sat in db and no --satellite set\n    {0}".format([v['satellite'].satellite_name for v in sats])))
     ninsts = len(Utils.unique(
         [v['instrument'].instrument_id for v in insts if v['satellite'].satellite_name == options.satellite]))
     if ninsts > 1 and options.instrument is None:
-        raise (ValueError("More than one instrument in db and no --instrument set\n    {0}".format(
-            [v['instrument'].instrument_name for v in insts])))
+        raise ValueError("More than one instrument in db and no --instrument set\n    {0}".format(
+            [v['instrument'].instrument_name for v in insts]))
     elif ninsts == 1 and options.instrument is None:
         # find the inst related to the right sat
         for i in insts:

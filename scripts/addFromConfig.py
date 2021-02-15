@@ -95,12 +95,12 @@ def _sectionCheck(conf):
 
     # do we have any left over keys?
     if keys:
-        raise(ValueError('Section error, {0} was not understood'.format(keys[0])))
+        raise ValueError('Section error, {0} was not understood'.format(keys[0]))
 
     # check that all the required sections are there
     for req in expected[:-2]:
         if not req in conf:
-            raise (ValueError('Required section: "{0}" was not found'.format(req)))
+            raise ValueError('Required section: "{0}" was not found'.format(req))
 
 
 def _keysCheck(conf, section):
@@ -120,7 +120,7 @@ def _keysCheck(conf, section):
            or k in optional:
             continue
         if k not in conf[section]:
-            raise (ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section)))
+            raise ValueError('Required key: "{0}" was not found in [{1}] section'.format(k, section))
 
 
 def _keysRemoveExtra(conf, section):
@@ -154,10 +154,10 @@ def _keysPresentCheck(conf):
             for k2 in conf[k]:
                 if 'input' in k2:
                     if conf[k][k2][0] not in conf:
-                        raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
+                        raise ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k))
                 elif 'output_product' in k2:
                     if conf[k][k2] not in conf and conf[k]['output_timebase'] != "RUN":
-                        raise (ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k)))
+                        raise ValueError('Key {0} referenced in {1} was not found'.format(conf[k][k2], k))
 
 
 def configCheck(conf):
@@ -184,7 +184,7 @@ def _fileTest(filename):
 
     seen_twice = set([x for x in data if data.count(x) > 1]) # It's O(n^2), but it's small enough it doesn't matter
     if seen_twice:
-        raise (ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice)))
+        raise ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice))
 
 
 def addStuff(cfg, options):
@@ -213,7 +213,7 @@ def addStuff(cfg, options):
         inst_id = dbu.getInstrumentID(cfg['instrument']['instrument_name'], satellite_id)
         instrument = dbu.session.query(dbu.Instrument).get(inst_id)
         if instrument.satellite_id != satellite_id:
-            raise (ValueError())  # this means it is the same name on a different sat, need to add
+            raise ValueError()  # this means it is the same name on a different sat, need to add
         instrument_id = instrument.instrument_id
         print(
             'Found Instrument: {0} {1}'.format(instrument_id,

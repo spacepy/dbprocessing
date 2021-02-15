@@ -104,7 +104,7 @@ if __name__ == "__main__":
         files = dbu.session.query(dbu.File.file_id).filter_by(product_id=options.parent).filter(dbu.File.utc_file_date.in_(missing_dates)).all()
         if not len(files):
             sys.exit(0)
-        files = map(itemgetter(0), files)
+        files = list(map(itemgetter(0), files))
         added = dbu.ProcessqueuePush(files)
         print("   -- Added {0} files to be reprocessed for product {1}".format(len(added), options.parent))
         DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(len(added), options.parent))

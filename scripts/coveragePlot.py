@@ -60,7 +60,7 @@ def _fileTest(filename):
     data = [v.strip() for v in data if v[0] == '[']
     seen_twice = rep_list(data)
     if seen_twice:
-        raise (ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice)))
+        raise ValueError('Specified section(s): "{0}" is repeated!'.format(seen_twice))
 
 
 def _processSubs(conf):
@@ -80,7 +80,7 @@ def _processSubs(conf):
                         elif 'DAYS' in sub:
                             sub_v = "**days=7**"
                         else:
-                            raise (NotImplementedError("Unsupported substitution {0} found".format(sub)))
+                            raise NotImplementedError("Unsupported substitution {0} found".format(sub))
                         conf[key][v] = conf[key][v].replace('{' + sub + '}', sub_v)
                     else:
                         break
@@ -111,7 +111,7 @@ def _processDates(conf):
                 if del_date == 'days':
                     ans[key] = date + datetime.timedelta(days=int(del_num))
                 else:
-                    raise (NotImplementedError("Unsupported substitution {0} found".format(del_date)))
+                    raise NotImplementedError("Unsupported substitution {0} found".format(del_date))
 
         try:
             conf['settings'][key] = ans[key].date()
@@ -253,9 +253,9 @@ if __name__ == "__main__":
 
             ax.set_yticks(np.arange(out[0][ind_d][0].shape[0]))
             ax.set_yticklabels(yticklabels)
-            ax.set_ylim(tb.bin_center_to_edges(range(out[0][ind_d][0].shape[0]))[0],
-                        tb.bin_center_to_edges(range(out[0][ind_d][0].shape[0]))[-1])
-            for i in tb.bin_center_to_edges(range(out[0][ind_d][0].shape[0])):
+            bin_edges = tb.bin_center_to_edges(list(range(out[0][ind_d][0].shape[0])))
+            ax.set_ylim(bin_edges[0], bin_edges[-1])
+            for i in bin_edges:
                 ax.axhline(i, color='k')
 
             steps = np.arange(out[0][ind_d][0].shape[1])
