@@ -4,10 +4,12 @@ Class to hold random utilities of use throughout this code
 """
 from __future__ import print_function
 
+
+from ast import literal_eval as make_tuple
 try:
-    import ConfigParser
-except ImportError:
-    import configparser as ConfigParser
+    import configparser
+except ImportError: # Py2
+    import ConfigParser as configparser
 import collections
 import datetime
 import os
@@ -426,11 +428,20 @@ def readconfig(config_filepath):
     :return: Dictionary of key value pairs from config files
     :rtype: dict
     """
-    cfg = ConfigParser.SafeConfigParser()
+    # "Safe" deprecated in 3.2, but still present, so version is only way
+    #  to avoid stepping on the deprecation. "Safe" preferred before 3.2
+    cfg = (configparser.SafeConfigParser if sys.version_info[:2] < (3, 2)
+           else configparser.ConfigParser)()
     cfg.read(config_filepath)
     sections = cfg.sections()
     # Read each parameter in turn
     ans = { }
     for section in sections:
         ans[section] = dict(cfg.items(section))
+        for item in ans[section]:
+            if 'input' in item:
+                if '(' in ans[section][item]:
+                    ans[section][item] = make_tuple(ans[section][item])
+                else:
+                    ans[section][item] = (ans[section][item], 0, 0)
     return ans

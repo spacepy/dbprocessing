@@ -18,20 +18,16 @@
 # <- create the inst_prod link
 
 import collections
-try:
-    import configparser
-except ImportError: # Py2
-    import ConfigParser as configparser
 import os
 import shutil
 import sys
 import tempfile
 import argparse
-from ast import literal_eval as make_tuple
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from dbprocessing import DButils
+import dbprocessing.Utils
 
 expected = ['mission', 'satellite', 'instrument', 'product', 'process']
 # All keywords that are permitted in a section (optional or required)
@@ -59,27 +55,6 @@ expected_keyword['process'] = ['process_name', 'output_product',
                                'code_output_interface', 'code_active',
                                'code_date_written', 'code_newest_version',
                                'code_arguments', 'code_cpu', 'code_ram']
-
-
-def readconfig(config_filepath):
-    # Create a ConfigParser object, to read the config file
-    # "Safe" deprecated in 3.2, but still present, so version is only way
-    #  to avoid stepping on the deprecation. "Safe" preferred before 3.2
-    cfg = (configparser.SafeConfigParser if sys.version_info[:2] < (3, 2)
-           else configparser.ConfigParser)()
-    cfg.read(config_filepath)
-    sections = cfg.sections()
-    # Read each parameter in turn
-    ans = { }
-    for section in sections:
-        ans[section] = dict(cfg.items(section))
-        for item in ans[section]:
-            if 'input' in item:
-                if '(' in ans[section][item]:
-                    ans[section][item] = make_tuple(ans[section][item])
-                else:
-                    ans[section][item] = (ans[section][item], 0, 0)
-    return ans
 
 
 def _sectionCheck(conf):
@@ -321,7 +296,7 @@ if __name__ == "__main__":
 
     _fileTest(filename)
 
-    conf = readconfig(filename)
+    conf = dbprocessing.Utils.readconfig(filename)
     configCheck(conf)
     if options.verify:  # we are done here if --verify is set
         sys.exit(0)
@@ -345,7 +320,7 @@ if __name__ == "__main__":
         tmpf.file.writelines(cfg)
         tmpf.close()
         # recheck the temp file
-        conf = readconfig(tmpf.name)
+        conf = dbprocessing.Utils.readconfig(tmpf.name)
         configCheck(conf)
         if os.path.isfile(options.mission): # sqlite
             # do all our work on a temp version of the DB, if it all works, move tmp on top of existing
