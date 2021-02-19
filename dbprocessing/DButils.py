@@ -1425,6 +1425,7 @@ class DButils(object):
             return
         try:
             self.session.close()
+            self.engine.dispose()
             self.dbIsOpen = False
             DBlogging.dblogger.info("Database connection closed")
         except DBError:
