@@ -37,6 +37,19 @@ Clear a processing flag (lock) on a database that has crashed.
 .. option:: database The name of the database to unlock
 .. option:: message Log message to insert into the database
 
+compareDB.py
+------------
+.. program:: compareDB.py
+
+Compares two databases for having the same products, processes, codes,
+and files; matching is done by name not ID, as ID may differ. The input
+files for each file, and the codes used to make each file, are also
+compared by filename. Output is printed to the screen.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Mission database. Specify twice, for the two missions to compare.
+
 configFromDB.py
 ---------------
 .. program:: configFromDB
