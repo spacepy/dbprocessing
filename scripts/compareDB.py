@@ -78,8 +78,16 @@ def check_tables(table, dbu1, dbu2):
         nameattr = '{}{}'.format(table, name_suffix)
         if entries1 and hasattr(entries1[0], nameattr):
             break
-    entries1 = { getattr(p, nameattr): p for p in entries1 }
-    entries2 = { getattr(p, nameattr): p for p in entries2 }
+    # Code description is often not unique, so make something
+    # that might be
+    if table == 'code':
+        entries1 = { '{} {} {}'.format(
+            p.code_description, p.filename, p.arguments): p for p in entries1 }
+        entries2 = { '{} {} {}'.format(
+            p.code_description, p.filename, p.arguments): p for p in entries2 }
+    else:
+        entries1 = { getattr(p, nameattr): p for p in entries1 }
+        entries2 = { getattr(p, nameattr): p for p in entries2 }
     # Check what's in only one database
     names1 = set(entries1.keys())
     names2 = set(entries2.keys())
