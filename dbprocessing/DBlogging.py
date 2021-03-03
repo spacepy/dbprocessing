@@ -38,8 +38,12 @@ dblogger.setLevel(logging.INFO)
 # handler = logging.handlers.TimedRotatingFileHandler(
 #              LOG_FILENAME, maxBytes=20000000, backupCount=0) # keep them all
 ## TODO this doesn't work so hardcode the name above, so break the rotation here
+# Without explicit encoding on the handler, logging during interpreter shutdown
+# (e.g. DButils.closeDB(), from __del__) will fail.
+# https://stackoverflow.com/questions/42372981/filehandler-encoding-producing-exception
 handler = logging.handlers.TimedRotatingFileHandler(
-    LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True)  # keep them all
+    LOG_FILENAME, when='midnight', interval=1, backupCount=0, # keep them all
+    utc=True, encoding='ascii')
 
 LEVELS = { 'debug': logging.DEBUG,
            'info': logging.INFO,
@@ -70,9 +74,11 @@ def change_logfile(logname=None):
         basename, utctoday)))
     dblogger.info("Logging file switched from {0} to {1}".format(old_filename, LOG_FILENAME))
     new_handler = logging.handlers.TimedRotatingFileHandler(
-        LOG_FILENAME, when='midnight', interval=1, backupCount=0, utc=True)  # keep them all
+        LOG_FILENAME, when='midnight', interval=1, backupCount=0, # keep them all
+        utc=True, encoding='ascii')
     new_handler.setFormatter(formatter)
     dblogger.removeHandler(handler)
+    handler.close()
     dblogger.addHandler(new_handler)
     handler = new_handler
     dblogger.info("Switching logging file from {0} to {1}".format(old_filename, LOG_FILENAME))
