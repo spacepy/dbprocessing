@@ -12,4 +12,5 @@ if len(sys.argv) != 3:
 if __name__ == "__main__":
     a = DButils.DButils(sys.argv[1])
     a.resetProcessingFlag(sys.argv[2])
+    a.closeDB()
     print('Database lock removed')
