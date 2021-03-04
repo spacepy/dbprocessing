@@ -198,7 +198,7 @@ class DButils(object):
             self.metadata = metadata
             self.session = session
             self.dbIsOpen = True
-            if verbose: print("DB is open: %s" % (engineInsR))
+            if verbose: print("DB is open: %s" % (engineIns))
             return
         except Exception as msg:
             raise DBError('Error opening database: %s' % (msg))

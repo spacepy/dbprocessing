@@ -26,21 +26,30 @@ class ProcessQueueTestsBase(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Make a db and open it so have something to work with"""
         super(ProcessQueueTestsBase, self).setUp()
         self.td = tempfile.mkdtemp()
-        shutil.copy2(
-            os.path.join(os.path.dirname(__file__), 'emptyDB.sqlite'),
-            self.td)
+        if 'PGDATABASE' in os.environ:
+            dbname = os.environ['PGDATABASE']
+        else:
+            shutil.copy2(
+                os.path.join(os.path.dirname(__file__), 'emptyDB.sqlite'),
+                self.td)
+            dbname = os.path.join(self.td, 'emptyDB.sqlite')
+
         # Set up the baseline mission environment, BEFORE making processqueue
         self.addSkeletonMission()
-        self.pq = dbprocessing.dbprocessing.ProcessQueue(
-            os.path.join(self.td, 'emptyDB.sqlite'))
+        self.pq = dbprocessing.dbprocessing.ProcessQueue(dbname)
         self.dbu = self.pq.dbu
 
     def tearDown(self):
         """Remove the db and working tree"""
-        self.dbu.closeDB() # Before the database is removed...
-        del self.dbu
         # Unfortunately all the cleanup is in the destructor
         del self.pq
+        if 'PGDATABASE' in os.environ:
+            # Postgres database, remove all data from tables
+            for table in reversed(self.dbu.metadata.sorted_tables):
+                self.dbu.session.execute(table.delete())
+            self.dbu.session.commit() 
+        self.dbu.closeDB() # Before the database is removed...
+        del self.dbu
         shutil.rmtree(self.td)
         super(ProcessQueueTestsBase, self).tearDown()
 
