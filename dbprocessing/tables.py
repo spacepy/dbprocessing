@@ -54,11 +54,11 @@ def definition(name):
             schema.Column('mission_id', types.Integer, autoincrement=True, primary_key=True,
                           nullable=False),
             schema.Column('mission_name', types.String(20), nullable=False, unique=True),
-            schema.Column('rootdir', types.String(50), nullable=False, ),
-            schema.Column('incoming_dir', types.String(50), nullable=False, ),
-            schema.Column('codedir', types.String(50), nullable=True, ),
-            schema.Column('inspectordir', types.String(50), nullable=True, ),
-            schema.Column('errordir', types.String(50), nullable=True, )
+            schema.Column('rootdir', types.String(250), nullable=False, ),
+            schema.Column('incoming_dir', types.String(250), nullable=False, ),
+            schema.Column('codedir', types.String(250), nullable=True, ),
+            schema.Column('inspectordir', types.String(250), nullable=True, ),
+            schema.Column('errordir', types.String(250), nullable=True, )
         )
     elif name == 'satellite':
         return (
@@ -88,7 +88,7 @@ def definition(name):
             # hmm long enough?
             schema.Column('instrument_id', types.Integer,
                           schema.ForeignKey('instrument.instrument_id'), nullable=False, ),
-            schema.Column('relative_path', types.String(100), nullable=False),  # hmm long enough?
+            schema.Column('relative_path', types.String(250), nullable=False),  # hmm long enough?
             schema.Column('level', types.Float, nullable=False),
             schema.Column('format', types.Text, nullable=False),  # hmm long enough?
             schema.Column('product_description', types.Text, nullable=True),  # hmm long enough?
@@ -187,7 +187,7 @@ def definition(name):
             schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True,
                           nullable=False, index=True),
             schema.Column('filename', types.String(250), nullable=False, unique=False),
-            schema.Column('relative_path', types.String(100), nullable=False),
+            schema.Column('relative_path', types.String(250), nullable=False),
             schema.Column('code_start_date', types.Date, nullable=False),
             schema.Column('code_stop_date', types.Date, nullable=False),
             schema.Column('code_description', types.Text, nullable=False),
