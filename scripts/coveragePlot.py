@@ -9,11 +9,15 @@ Created on Fri Mar 14 10:30:27 2014
 from __future__ import division
 
 import argparse
-import ConfigParser
+try:
+    import configparser
+except ImportError: # Py2
+    import ConfigParser as configparser
 import datetime
 import fnmatch
 import os
 import subprocess
+import sys
 
 import matplotlib
 
@@ -35,7 +39,8 @@ cmap = LinearSegmentedColormap.from_list('cmap', ['r', 'g', 'y', 'grey'], N=4)
 
 def readconfig(config_filepath):
     # Create a ConfigParser object, to read the config file
-    cfg = ConfigParser.SafeConfigParser()
+    cfg = (configparser.SafeConfigParser if sys.version_info[:2] < (3, 2)
+           else configparser.ConfigParser)()
     cfg.read(config_filepath)
     sections = cfg.sections()
     # Read each parameter in turn
@@ -72,7 +77,7 @@ def _processSubs(conf):
     for key in conf:
         for v in conf[key]:
             while True:
-                if isinstance(conf[key][v], (str, unicode)):
+                if isinstance(conf[key][v], DButils.str_classes):
                     if '{' in conf[key][v] and '}' in conf[key][v]:
                         sub = conf[key][v].split('{')[1].split('}')[0]
                         if sub == 'TODAY':
@@ -142,7 +147,7 @@ def _get_yticklabels(conf, plotnum):
     """
     labels = [(v, conf['plot{0}'.format(plotnum)][v]) for v in conf['plot{0}'.format(plotnum)] if
               v.startswith('yticklabel')]
-    return zip(*sorted(labels, key=lambda x: x[0]))[1]
+    return list(zip(*sorted(labels, key=lambda x: x[0])))[1]
 
 
 def _combine_coverage(inval):
@@ -156,7 +161,7 @@ def _combine_coverage(inval):
         for ind_t, t in enumerate(inval[np_]):  # this is the date range
             out[np_].append([])
             for nprod in inval[np_][ind_t]:  # this is the product
-                out[np_][ind_t].append(np.require(zip(*ans[np_][ind_t])[1]))
+                out[np_][ind_t].append(np.require(list(zip(*ans[np_][ind_t]))[1]))
                 # [0][0] is bcease all prods have same dates and we want the first
                 out[np_][ind_t].append(ans[np_][ind_t][0][0])
     return out
