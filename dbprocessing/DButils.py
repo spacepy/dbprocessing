@@ -1959,22 +1959,29 @@ class DButils(object):
 
         :return: product_id -the product  ID for the input product name
         """
+        is_sequence, is_name = False, False # Assume input is a product ID
         try:
             product_name = int(product_name)
-            sq = self.session.query(self.Product).get(product_name)
-            if sq is not None:
-                return sq.product_id
-            else:
-                raise DBNoData("No product_id {0} found in the DB".format(product_name))
         except TypeError:  # came in as list or tuple
-            return list(map(self.getProductID, product_name))
+            is_sequence = True
         except ValueError:
+            is_name = True
+        if is_sequence: # Call for every input
+            return list(map(self.getProductID, product_name))
+        if is_name: # Product name, just get ID
             sq = self.session.query(self.Product).filter_by(product_name=product_name)
-            try:
-                # if two products have the same name always return the lower id one
-                return (sorted([x.product_id for x in sq])[0])
-            except IndexError:  # no file_id found
+            # if two products have the same name always return the lower id one
+            res = sorted([x.product_id for x in sq])
+            if res:
+                return res[0]
+            # no file_id found
                 raise DBNoData("No product_name %s found in the DB" % (product_name))
+        # Numerical product ID, make sure it exists
+        sq = self.session.query(self.Product).get(product_name)
+        if sq is not None:
+            return sq.product_id
+        else:
+            raise DBNoData("No product_id {0} found in the DB".format(product_name))
 
     def getSatelliteID(self,
                        sat_name):
