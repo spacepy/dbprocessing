@@ -282,6 +282,7 @@ if __name__ == "__main__":
             conf['settings']['filename_format'] + '_{0:03d}.{1}'
             .format(ind_d, conf['settings']['outformat']))))))
         plt.savefig(outfiles[-1])
+        plt.close()
         print("Wrote: {0}".format(outfiles[-1]))
 
     comb_name = (os.path.join(conf['settings']['outdirectory'],
