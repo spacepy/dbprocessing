@@ -307,6 +307,7 @@ if __name__ == "__main__":
 
 ## [settings]
 ## mission = ~/RBSP_MAGEIS.sqlite
+## outdirectory = .
 ## outformat = pdf
 ## filename_format = MagEIS_L3_Coverage_{TODAY}
 ## startdate = 20120901
