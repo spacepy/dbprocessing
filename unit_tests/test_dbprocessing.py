@@ -104,7 +104,7 @@ class BuildChildrenTests(ProcessQueueTestsBase):
             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
             'level_1_20120101_v1.0.0']]
         self.checkCommandLines(fid, expected)
-        
+
     def testSingleDailyUpdate(self):
         """Single daily file making another, new version appears"""
         l0pid = self.addProduct('level 0')
