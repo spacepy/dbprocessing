@@ -31,10 +31,10 @@ class dbprocessing_db(object):
         self.db_name = os.environ["PGDATABASE"]
         self.dbIsOpen = False
         if create:
-	    self.createDB()
+            self.createDB()
 
     def init_db(self, user, password, db, host='localhost', port=5432):
-	url = "postgresql://{0}:{1}@{2}:{3}/{4}"
+        url = "postgresql://{0}:{1}@{2}:{3}/{4}"
         url = url.format(user, password, host, port, db)
         self.engine = create_engine(url, echo=False, encoding='utf-8')
         self.metadata = sqlalchemy.MetaData(bind=self.engine)
@@ -172,7 +172,7 @@ class dbprocessing_db(object):
                      data_table.columns['utc_file_date'],
                      data_table.columns['utc_start_time'],
                      data_table.columns['utc_stop_time'], unique=True
-		     )
+        )
 
         data_table = schema.Table('unixtime', metadata,
                                   schema.Column('file_id', types.Integer,
@@ -190,7 +190,7 @@ class dbprocessing_db(object):
                                   schema.PrimaryKeyConstraint('source_file', 'resulting_file'),
                                   schema.CheckConstraint('source_file <> resulting_file'),
                                   # TODO this is supposed to be more general than !=
-		                  extend_existing=True)
+                                  extend_existing=True)
 
         data_table = schema.Table('code', metadata,
                                   schema.Column('code_id', types.Integer, autoincrement=True, primary_key=True,
@@ -216,7 +216,7 @@ class dbprocessing_db(object):
                                   schema.CheckConstraint('code_start_date <= code_stop_date'),
                                   schema.CheckConstraint('interface_version >= 1'),
                                   schema.CheckConstraint('output_interface_version >= 1'),
-		                  extend_existing=True
+                                  extend_existing=True
                                   )
 
         data_table = schema.Table('processqueue', metadata,
@@ -227,7 +227,7 @@ class dbprocessing_db(object):
                                   schema.Column('instrument_id', types.Integer,
                                                 schema.ForeignKey('instrument.instrument_id'), nullable=False),
                                   schema.CheckConstraint('version_bump is NULL or version_bump < 3'),
-		                  extend_existing=True
+                                  extend_existing=True
                                   )
 
         data_table = schema.Table('filecodelink', metadata,
@@ -236,7 +236,7 @@ class dbprocessing_db(object):
                                   schema.Column('source_code', types.Integer,
                                                 schema.ForeignKey('code.code_id'), nullable=False),
                                   schema.PrimaryKeyConstraint('resulting_file', 'source_code'),
-		                  extend_existing=True
+                                  extend_existing=True
                                   )
 
         data_table = schema.Table('release', metadata,
@@ -244,7 +244,7 @@ class dbprocessing_db(object):
                                                 schema.ForeignKey('file.file_id'), nullable=False, ),
                                   schema.Column('release_num', types.String(20), nullable=False),
                                   schema.PrimaryKeyConstraint('file_id', 'release_num'),
-		                  extend_existing=True
+                                  extend_existing=True
                                   )
 
         data_table = schema.Table('processpidlink', metadata,
@@ -274,7 +274,7 @@ class dbprocessing_db(object):
                                   schema.Column('hostname', types.String(100), nullable=False),
                                   # schema.PrimaryKeyConstraint('logging_id'),
                                   schema.CheckConstraint('processing_start_time < processing_end_time'),
-		                  extend_existing=True
+                                  extend_existing=True
                                   )
 
         data_table = schema.Table('logging_file', metadata,
@@ -288,7 +288,7 @@ class dbprocessing_db(object):
                                                 schema.ForeignKey('code.code_id'), nullable=False),
                                   schema.Column('comments', types.Text, nullable=True),
                                   # schema.PrimaryKeyConstraint('logging_file_id'),
-		                  extend_existing=True
+                                  extend_existing=True
                                   )
 
         data_table = schema.Table('inspector', metadata,
@@ -311,7 +311,7 @@ class dbprocessing_db(object):
                                                 schema.ForeignKey('product.product_id'), nullable=False),
                                   schema.CheckConstraint('interface_version >= 1'),
                                   schema.CheckConstraint('output_interface_version >= 1'),
-		                  extend_existing=True
+                                  extend_existing=True
                                   )
 
         # TODO move this out so that the user chooses the db type
