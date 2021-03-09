@@ -124,7 +124,10 @@ def makeHTML(dbu, info, satellite, delta_days=3):
     <br>
     </body></html>
     """
-    output = tempfile.NamedTemporaryFile(delete=False, suffix='_htmlCoverage')
+    kwargs = {'delete': False, 'suffix': '_htmlCoverage', 'mode': 'w+t'}
+    if str is not bytes: # Encoding of temporary file only in python 3
+        kwargs['encoding'] = 'ascii'
+    output = tempfile.NamedTemporaryFile(**kwargs)
     output.writelines(header)
 
     output.write('<h1>{0}</h1>\n'.format(dbu.mission))
