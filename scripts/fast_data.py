@@ -152,7 +152,7 @@ if __name__ == '__main__':
     except TypeError as err:
         parser.error("Must pass a cutoff date in form YYYY-MM-DD")
     except ValueError as err:
-        parser.error(err.message)
+        parser.error(str(err))
 
     if not (options.files or options.records):
         warnings.warn("Will not take any action without --reap-files or"
