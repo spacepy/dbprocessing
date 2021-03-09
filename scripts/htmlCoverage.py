@@ -216,7 +216,7 @@ if __name__ == "__main__":
         shutil.move(filename, outname)
         os.chmod(outname, 0o664)
         Time1 = EventTimer ('Created: {0}'.format(outname), Time1) 
-
+    dbu.closeDB()
 
 
 
