@@ -176,7 +176,7 @@ def addStuff(cfg, options):
 
     # is the satellite in the DB?  If not add it
     try:
-        satellite_id = dbu.getEntry('Satellite', cfg['satellite']['satellite_name']).satellite_id
+        satellite_id = dbu.getSatelliteID(cfg['satellite']['satellite_name'])
         print('Found Satellite: {0} {1}'.format(satellite_id, dbu.getEntry('Satellite', satellite_id).satellite_name))
     except (DButils.DBNoData, NoResultFound):
         # add it
