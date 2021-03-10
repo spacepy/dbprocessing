@@ -251,6 +251,11 @@ if __name__ == "__main__":
         out.add_section(pname)
         for d in dir(p['process']):
             if d[0] == '_': continue
+            if d == 'output_product':
+                product_id = str(getattr(p['process'], d))
+                product_name  = dbu.getEntry('Product', product_id).product_name
+                out.set(pname, d, 'product_' + product_name)
+                continue
             out.set(pname, d, str(getattr(p['process'], d)))
         # loop over the input_product key and add them to the conf
         ip_req_counter = 1
