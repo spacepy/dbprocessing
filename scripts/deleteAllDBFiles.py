@@ -13,7 +13,8 @@ if __name__ == "__main__":
     options = parser.parse_args()
 
     a = DButils.DButils(options.mission)
-    f = a.getAllFilenames()
+    f = a.getAllFilenames(fullPath=False)
     for ff in f:
-        a._purgeFileFromDB(ff[0])
+        a._purgeFileFromDB(ff)
     print('deleted {0} files'.format(len(f)))
+    a.closeDB()
