@@ -695,7 +695,9 @@ class DButils(object):
 
         >>>  pnl._purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
         """
-        if not hasattr(filename, '__iter__'):  # if not an iterable make it a iterable
+        # if not an iterable make it a iterable
+        if isinstance(filename, str_classes) \
+           or not isinstance(filename, collections.Iterable):
             filename = [filename]
 
         for ii, f in enumerate(filename):

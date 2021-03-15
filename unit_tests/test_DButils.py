@@ -193,6 +193,15 @@ class DBUtilsOtherTests(TestSetup):
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, file_id)
         self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6680)
 
+    def test_purgeFileFromDBByName(self):
+        """purgeFileFromDB, given a filename"""
+        self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6681)
+        self.dbu._purgeFileFromDB('ect_rbspb_0377_356_01.ptp.gz')
+        self.assertRaises(DButils.DBNoData, self.dbu.getFileID, 123)
+        self.assertRaises(DButils.DBNoData, self.dbu.getFileID,
+                          'ect_rbspb_0377_356_01.ptp.gz')
+        self.assertEqual(self.dbu.session.query(self.dbu.File).count(), 6680)
+
     def test_nameSubProduct(self):
         """_nameSubProduct"""
         self.assertTrue(self.dbu._nameSubProduct(None, 1) is None)
