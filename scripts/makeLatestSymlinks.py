@@ -7,10 +7,7 @@ in a given directory make symlinks to all the newest versions of files into anot
 from __future__ import print_function
 
 import argparse
-try:
-    import configparser
-except ImportError: # Py2
-    import ConfigParser as configparser
+import collections
 import datetime
 import glob
 from pprint import pprint
@@ -24,6 +21,7 @@ from dateutil import parser as dup
 
 from dbprocessing import inspector
 import dbprocessing.Utils
+import dbprocessing.DButils
 
 
 ################################################################
@@ -66,8 +64,9 @@ def cull_to_newest(files, options=None):
     ans = []
     # make a set of all the file bases
     tmp = [getBaseVersion(f) for f in files]
-    bases = zip(*tmp)[0]
-    versions = zip(*tmp)[1]
+    tmp = list(zip(*tmp))
+    bases = tmp[0]
+    versions = tmp[1]
     uniq_bases = list(set(bases))
     while uniq_bases:
         val = uniq_bases.pop(0)
@@ -115,9 +114,11 @@ def make_symlinks(files, files_out, outdir, linkdirs, mode, options):
     """
     for all the files make symlinks into outdir
     """
-    if not hasattr(files, '__iter__'):
+    if isinstance(files, dbprocessing.DButils.str_classes) \
+           or not isinstance(files, collections.Iterable):
         files = [files]
-    if not hasattr(files_out, '__iter__'):
+    if isinstance(files_out, dbprocessing.DButils.str_classes) \
+           or not isinstance(files_out, collections.Iterable):
         files_out = [files_out]
     # if files_out then cull the files to get rid of the ones
     for f in files:
