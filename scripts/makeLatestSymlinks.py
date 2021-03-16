@@ -264,3 +264,23 @@ if __name__ == '__main__':
             #if options.verbose: print files_out
             make_symlinks(files, files_out, config[sec]['destdir'], config[sec]['linkdirs'], config[sec]['outmode'], options)
 
+# Example configuration file, copy and remove leading "##" to use
+##[isois]
+### Directory containing the data files
+##sourcedir = ~/dbp_py3/data/ISOIS/level1/
+### Directory to make the symlinks in
+##destdir = ~/tmp/
+### First date to link
+##startdate = 2010-01-01
+### Last date to link
+##enddate = 2021-01-01
+### Number of days before present not to link (e.g. to keep internal-only)
+##deltadays = 60
+### glob for files to match
+##filter = psp_isois_l1-sc-hk_*.cdf
+### Link directories as well as files
+##linkdirs = True
+### Mode to use when making output directory
+##outmode = 775
+### Do not limit based on date (i.e., ignore date options; they're still required)
+##nodate = False
