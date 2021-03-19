@@ -49,6 +49,7 @@ if __name__ == "__main__":
 
     # get the product tree:
     tree = dbu.getProductParentTree()
+    del dbu
     for t1 in tree:
         for t2 in t1[1]:
             cmd = [
