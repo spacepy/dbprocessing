@@ -11,6 +11,7 @@ import datetime
 import fnmatch
 import os
 import subprocess
+import sys
 
 from dateutil import parser as dup
 
@@ -50,7 +51,10 @@ if __name__ == "__main__":
     tree = dbu.getProductParentTree()
     for t1 in tree:
         for t2 in t1[1]:
-            cmd = [ os.path.expanduser('~/dbUtils/missingFilesByProduct.py'),
+            cmd = [
+                sys.executable,
+                os.path.join(os.path.dirname(__file__),
+                             'missingFilesByProduct.py'),
                 '-m', options.mission,
                 '-s', startDate.date().isoformat(),
                 '-e', endDate.date().isoformat(),
