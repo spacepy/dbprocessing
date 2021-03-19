@@ -1831,6 +1831,16 @@ class TestWithtestDB(unittest.TestCase):
 
         self.assertTrue(all([self.tempD in v for v in out]))
 
+    def test_getChildTreeNoOutput(self):
+        """getChildTree for processes w/o output"""
+        tmp = self.dbu.getChildTree(3)
+        ans = set([])
+        self.assertFalse(set(tmp).difference(ans))
+        # Explicitly make it null (it's empty string in the db)
+        self.dbu.getEntry('Process', 2).output_product = None
+        tmp = self.dbu.getChildTree(3)
+        self.assertFalse(set(tmp).difference(ans))
+
     def testUpdateCodeNewestVersion(self):
         """Set the newest version flag on a code"""
         #Test precondition

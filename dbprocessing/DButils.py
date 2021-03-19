@@ -2506,7 +2506,10 @@ class DButils(object):
         Given an input product return a list of its output product ids
         """
         out_proc = self.getProcessFromInputProduct(inprod)
-        return [self.getEntry('Process', op).output_product for op in out_proc]
+        out_prod = [self.getEntry('Process', op).output_product
+                    for op in out_proc]
+        # Skip if no output product ('', null, but allow prodid of 0)
+        return [op for op in out_prod if op or op == 0]
 
     def getProductParentTree(self):
         """
