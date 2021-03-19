@@ -43,7 +43,6 @@ if __name__ == "__main__":
 
     
     options = parser.parse_args()
-    print(options)
 
     if options.startDate is not None:
         startDate = dup.parse(options.startDate)
@@ -91,6 +90,7 @@ if __name__ == "__main__":
             missing_dates.append(d)
     if not missing_dates:
         print("No missing files")
+        del dbu
         sys.exit(0)
        
     print("Missing files for product {0} for these dates:".format(product_id))
@@ -102,10 +102,8 @@ if __name__ == "__main__":
             parser.error("Cannot process without a parent product id specified")
         # do a custom query here to get all the file ids in one sweep
         files = dbu.session.query(dbu.File.file_id).filter_by(product_id=options.parent).filter(dbu.File.utc_file_date.in_(missing_dates)).all()
-        if not len(files):
-            sys.exit(0)
         files = list(map(itemgetter(0), files))
         added = dbu.ProcessqueuePush(files)
         print("   -- Added {0} files to be reprocessed for product {1}".format(len(added), options.parent))
         DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(len(added), options.parent))
-
+    del dbu
