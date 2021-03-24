@@ -4,9 +4,13 @@ import argparse
 import datetime
 import itertools
 import os
+import os.path
+import shutil
 import warnings
 
 import networkx
+import spacepy.datamanager
+
 from dbprocessing import DButils, Version
 
 
@@ -82,7 +86,8 @@ def filter_graph(graph, cutoff):
     graph.remove_nodes_from(removenodes)
 
 
-def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False):
+def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False,
+         archive=None):
     """Reap files and/or records from fileids in a set
 
     Arguments:
@@ -92,19 +97,37 @@ def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False
         dofiles: remove files from disc
         dorecords: remove records from db (only if the files do not exist)
         verbose: print matching files (ones to delete)
+        archive: directory to copy files to instead of deleting, requires dofiles.
     """
     if dofiles and dorecords:
         #This is in theory possible but for now probably safer not to
         raise ValueError('Cannot reap files and records in one call')
+    if archive is not None and not dofiles:
+        raise ValueError(
+            'Cannot specify archive directory without reaping files')
+    missiondir = spacepy.datamanager.RePath.path_split(
+        dbu.getMissionDirectory())
+    # Path index of "leading" directory information
+    leading_idx = len(missiondir)
+    if missiondir[-1] == '':
+        leading_idx -= 1
     nodes = [graph.node[x] for x in participants]
     nodes.sort(key=lambda file: (
         file['product_id'], file['utc_file_date'], file['version']))
-
     for node in reversed(nodes[:-1]):
         if verbose:
             print(node['filename'])
         if dofiles:
-            os.remove(dbu.getFileFullPath(node['file_id']))
+            fullpath = dbu.getFileFullPath(node['file_id'])
+            if archive is None:
+                os.remove(fullpath)
+            else:
+                targetdir = os.path.join(
+                    archive, spacepy.datamanager.RePath.path_slice(
+                        fullpath, leading_idx, -1))
+                if not os.path.isdir(targetdir):
+                    os.makedirs(targetdir)
+                shutil.move(fullpath, targetdir)
             # This is slow, and we(I.E. not me) can fix it later if its too slow. - Myles 6/5/2018
             dbu.getEntry('File', node['file_id']).exists_on_disk = False
         if dorecords:
@@ -119,6 +142,9 @@ if __name__ == '__main__':
         "--mission",
         required=True,
         help="selected mission database",)
+    parser.add_argument(
+        "-a", "--archive", default=None,
+        help="Directory to archive files instead of deleting",)
     parser.add_argument(
         "--cutoff",
         required=True,
@@ -166,7 +192,7 @@ if __name__ == '__main__':
 
     if fd:
         reap(dbu, G, fd, dofiles=options.files, dorecords=options.records,
-             verbose=options.verbose)
+             verbose=options.verbose, archive=options.archive)
 
     dbu.commitDB()
     dbu.closeDB()
