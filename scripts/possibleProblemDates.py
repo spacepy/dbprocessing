@@ -160,4 +160,4 @@ if __name__ == "__main__":
     missingInstrumentproductlink(dbu, options.fix)
     print("Running suspiciousDateRanges()")
     suspiciousDateRanges(dbu, options.fix)
-    
+    del dbu
