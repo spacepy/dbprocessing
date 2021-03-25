@@ -92,6 +92,10 @@ class Version(object):
         return str(self.interface) + '.' + str(self.quality) + '.' + \
                str(self.revision)
 
+    def __format__(self, *args, **kwargs):
+        """Explicitly format as string"""
+        return format(str(self), *args, **kwargs)
+
     def incInterface(self):
         """Increment the interface version and reset the other two"""
         self.interface += 1
