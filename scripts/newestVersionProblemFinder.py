@@ -153,3 +153,4 @@ if __name__ == "__main__":
             for f2 in files2:
                 if f.file_create_date < f2.file_create_date:
                     print('{0} is the "Newest Version", however was created after {1}'.format(f.filename, f2.filename))
+    del dbu
