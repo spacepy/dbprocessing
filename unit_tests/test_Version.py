@@ -24,8 +24,8 @@ class VersionTests(unittest.TestCase):
         ver.incInterface()
         self.assertEqual(Version.Version(2, 0, 0), ver)
 
-    def test_Version_repr(self):
-        """__repr__ should have a known output"""
+    def test_Version_str(self):
+        """__str__ should have a known output"""
         invals = ( Version.Version(1, 0, 1), Version.Version(5, 0, 1),
                   Version.Version(1, 3, 1) )
         answers = ( '1.0.1', '5.0.1', '1.3.1' )
@@ -108,6 +108,14 @@ class VersionTests(unittest.TestCase):
     def test_repr(self):
         """__repr__ has known output"""
         self.assertEqual(Version.Version(1,0,1).__repr__(), 'Version: 1.0.1')
+
+    def test_format(self):
+        """Version can be interpolated into a format string"""
+        self.assertEqual(
+            'v. 1.2.3', 'v. {}'.format(Version.Version(1, 2, 3)))
+        kwargs = {'ans': Version.Version(1, 2, 3)}
+        self.assertEqual(
+            'v. 1.2.3  ', 'v. {ans:7}'.format(**kwargs))
 
     def test_fromString(self):
         """fromString"""
