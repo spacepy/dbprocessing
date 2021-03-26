@@ -53,7 +53,7 @@ if __name__ == "__main__":
     if options.force not in [None, 0, 1, 2]:
         parser.error("invalid force option [0,1,2]")
 
-    if startDate > endDate:
+    if startDate is not None and endDate is not None and startDate > endDate:
         parser.error("startDate > endDate, nothing will be added")
 
         
