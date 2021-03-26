@@ -54,7 +54,6 @@ if __name__ == "__main__":
         parser.error("invalid force option [0,1,2]")
     num = db.reprocessByCode(options.code, startDate=startDate, endDate=endDate, incVersion=options.force)
 
+    del db
     print('Added {0} files to be reprocessed for code {1}'.format(num, options.code))
     DBlogging.dblogger.info('Added {0} files to be reprocessed for code {1}'.format(num, options.code))
-
-

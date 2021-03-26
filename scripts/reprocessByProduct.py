@@ -67,5 +67,5 @@ if __name__ == "__main__":
             num = 0
         print('Added {0} files to be reprocessed for product {1}'.format(num, prod))
         DBlogging.dblogger.info('Added {0} files to be reprocessed for product {1}'.format(num, prod))
-
+    del db
 
