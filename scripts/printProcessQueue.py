@@ -91,3 +91,4 @@ if __name__ == '__main__':
         output = open(options.output, 'w')
         output.write(out)
         output.close()
+    del dbu
