@@ -8,11 +8,14 @@ class scrubber(object):
     def __init__(self, mission):
         self.dbu = DButils.DButils(mission)
 
+    def __del__(self):
+        del self.dbu
+
     def parents_are_newest(self):
         n = self.dbu.getAllFileIds(newest_version=True)
 
         xp = self.dbu.session.query(self.dbu.Filefilelink.source_file).filter(self.dbu.Filefilelink.resulting_file.in_(n)).all()
-        np = set(zip(*xp)[0])
+        np = set(list(zip(*xp))[0])
 
         if np.issubset(n):
             print("All parents of newest are newest")
@@ -44,3 +47,4 @@ if __name__ == '__main__':
     scrubber = scrubber(options.mission)
     scrubber.parents_are_newest()
     scrubber.version_number_check()
+    del scrubber
