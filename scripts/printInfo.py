@@ -167,7 +167,7 @@ if __name__ == '__main__':
                 print("{0:6} {1:4} {2:80} {3:40} {4:6}".format(
                     f.file_id, options.product,
                     os.path.join(filepath, f.filename), f.filename,
-                    f.newest_version))
+                    getattr(f, 'newest_version', 'N/A')))
             
         else:
             print("No files found for product {0} in date range".format(options.product))
