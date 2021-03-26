@@ -164,13 +164,10 @@ if __name__ == '__main__':
             filepath = os.path.dirname(dbu.getFileFullPath(files[0].file_id))
             print("{0:6} {1:4} {2:80} {3:40} {4:6}".format('f_id', 'p_id', 'full path', 'filename', 'newest'))
             for f in files:
-                print("{0:6} {1:4} {2:80} {3:40} {4:6}".format(f.file_id,
-                                                                options.product,
-                                                                os.path.join(filepath, f.filename),
-                                                                f.filename,
-                                                                f.newest_version))
-                
-
+                print("{0:6} {1:4} {2:80} {3:40} {4:6}".format(
+                    f.file_id, options.product,
+                    os.path.join(filepath, f.filename), f.filename,
+                    f.newest_version))
             
         else:
             print("No files found for product {0} in date range".format(options.product))
