@@ -51,6 +51,7 @@ if __name__ == "__main__":
                                    startDate=startDate, endDate=endDate,
                                    incVersion=options.force)
 
+    del db
     print('Added {0} files to be reprocessed for instrument {1}'.format(num, options.instrument))
     DBlogging.dblogger.info('Added {0} files to be reprocessed for instrument {1}'.format(num, options.instrument))
 
