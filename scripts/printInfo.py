@@ -129,6 +129,7 @@ if __name__ == '__main__':
 
     elif field == 'File':
         if options.product is None:
+            dbu.closeDB()
             parser.error("To print File info a product_id is required via -p,--product")
 
         options.product = dbu.getProductID(options.product) # make sure the p_id is here or change name to p_id
