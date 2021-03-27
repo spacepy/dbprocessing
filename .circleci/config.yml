@@ -96,3 +96,26 @@ workflows:
      - docs:
          requires:
            - build
+
+# Schedule disables other triggers; nightly identical to main except
+# triggers and branch restriction
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 7 * * *"
+          filters:
+            branches:
+              only:
+                - master
+                - main
+    jobs:
+     - build
+     - unittest:
+         requires:
+           - build
+     - createpostgres:
+         requires:
+           - build
+     - docs:
+         requires:
+           - build
