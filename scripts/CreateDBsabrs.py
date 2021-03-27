@@ -34,7 +34,7 @@ class dbprocessing_db(object):
 	    self.createDB()
 
     def init_db(self, user, password, db, host='localhost', port=5432):
-	url = "postgres://{0}:{1}@{2}:{3}/{4}"
+	url = "postgresql://{0}:{1}@{2}:{3}/{4}"
         url = url.format(user, password, host, port, db)
         self.engine = create_engine(url, echo=False, encoding='utf-8')
         self.metadata = sqlalchemy.MetaData(bind=self.engine, reflect=True)
