@@ -26,6 +26,9 @@ format but are not in database, and symlink them to the incoming directory
 so they can be ingested (`54 <https://github.com/spacepy/dbprocessing/
 pull/54>`_).
 
+Python 3 support was added.  (`77 <https://github.com/spacepy/dbprocessing/
+pull/77>`_).
+
 Deprecations and removals
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
