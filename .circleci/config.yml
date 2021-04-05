@@ -4,7 +4,11 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/python:2.7.18
+      - image: circleci/python:2.7
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+      - image: circleci/python:3.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -15,13 +19,19 @@ jobs:
              pip install --user sqlalchemy
              pip install --user python-dateutil
              python setup.py install --user
+             sudo apt update
+             sudo apt install python3-pip
+             pip3 install --user sqlalchemy
+             pip3 install --user python-dateutil
+             rm -rf build/
+             python3 setup.py install --user
        - persist_to_workspace:
            root: ~/.local
            paths:
              - lib # Save installed Python libraries (including dbp itself)
   unittest:
     docker:
-      - image: circleci/python:2.7.18
+      - image: circleci/python:2.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -32,9 +42,22 @@ jobs:
        - run:
            command: |
              python unit_tests/test_all.py -v
+  unittest3:
+    docker:
+      - image: circleci/python:3.7
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    steps:
+       - checkout
+       - attach_workspace:
+           at: ~/.local
+       - run:
+           command: |
+             python3 unit_tests/test_all.py -v
   createpostgres:
     docker:
-      - image: circleci/python:2.7.18
+      - image: circleci/python:2.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -64,9 +87,41 @@ jobs:
              createdb -h localhost sndd -O root
              pip install --user psycopg2
              python scripts/CreateDBsabrs.py
+  createpostgres3:
+    docker:
+      - image: circleci/python:3.7
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
+      - image: circleci/postgres:9.6.5-alpine-ram
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_DB: circle_test
+      POSTGRES_PASSWORD: ""
+      PGPORT: 5432
+      PGUSER: root
+      PGDATABASE: sndd
+      PGPASSWORD: ""
+      PGHOST: localhost
+    steps:
+       - checkout
+       - attach_workspace:
+           at: ~/.local
+       - run:
+           command: |
+             sudo apt update
+             sudo apt install -y postgresql-client python3-pip
+             createdb -h localhost sndd -O root
+             pip3 install --user psycopg2
+             python3 scripts/CreateDBsabrs.py
   docs:
     docker:
-      - image: circleci/python:2.7.18
+      - image: circleci/python:2.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -93,6 +148,12 @@ workflows:
      - createpostgres:
          requires:
            - build
+     - unittest3:
+         requires:
+           - build
+     - createpostgres3:
+         requires:
+           - build
      - docs:
          requires:
            - build
@@ -114,6 +175,12 @@ workflows:
          requires:
            - build
      - createpostgres:
+         requires:
+           - build
+     - unittest3:
+         requires:
+           - build
+     - createpostgres3:
          requires:
            - build
      - docs:
