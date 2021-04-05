@@ -501,9 +501,11 @@ class DButils(object):
     def ProcessqueueRawadd(self, fileid, version_bump=None, commit=True):
         """
         raw add file ids to the process queue
-        *** this might break things if an id is added that does not exist
-        ***   meant to be fast and used after getting the ids
-        *** IS safe against adding ids that are already in the queue
+
+        .. warning::
+           This might break things if an id is added that does not exist;
+           it's meant to be fast and used after getting the ids.
+           IS safe against adding ids that are already in the queue.
 
         Parameters
         ==========
