@@ -25,4 +25,3 @@ inspector
     extract_YYYYMMDD
     extract_Version
     valid_YYYYMMDD
-    EphemeralCallable
