@@ -210,7 +210,8 @@ class DButils(object):
         DBlogging.dblogger.debug("Entered _createTableObjects()")
 
         ## ask for the table names form the database (does not grab views)
-        table_names = self.engine.table_names()
+        inspector = sqlalchemy.inspect(self.engine)
+        table_names = inspector.get_table_names()
 
         ## create a dictionary of all the table names that will be used as class names.
         ## this uses the db table name as the table name and a cap 1st letter as the class
