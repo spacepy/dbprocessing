@@ -73,7 +73,7 @@ jobs:
       POSTGRES_PASSWORD: ""
       PGPORT: 5432
       PGUSER: root
-      PGDATABASE: sndd
+      PGDATABASE: unhtesting
       PGPASSWORD: ""
       PGHOST: localhost
     steps:
@@ -106,7 +106,7 @@ jobs:
       POSTGRES_PASSWORD: ""
       PGPORT: 5432
       PGUSER: root
-      PGDATABASE: sndd
+      PGDATABASE: unhtesting
       PGPASSWORD: ""
       PGHOST: localhost
     steps:
