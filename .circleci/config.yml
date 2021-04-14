@@ -84,7 +84,7 @@ jobs:
            command: |
              sudo apt update
              sudo apt install -y postgresql-client
-             createdb -h localhost sndd -O root
+             createdb -h localhost unhtesting -O root
              pip install --user psycopg2
              python scripts/CreateDB.py --dialect postgresql unhtesting
              python unit_tests/test_all.py
@@ -117,7 +117,7 @@ jobs:
            command: |
              sudo apt update
              sudo apt install -y postgresql-client python3-pip
-             createdb -h localhost sndd -O root
+             createdb -h localhost unhtesting -O root
              pip3 install --user psycopg2
              python3 scripts/CreateDBsabrs.py
   docs:
