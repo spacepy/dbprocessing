@@ -248,7 +248,7 @@ def addStuff(cfg, options):
             tmp = dict((k, cfg[p][k]) for k in cfg[p] if not k.startswith('code') and 'input' not in k)
             # need to replace the output product with the right ID
             # if it is a key then have to get the name from cfg, or it is a name itself
-            if tmp['output_product'] is not '':
+            if tmp['output_product'] != '':
                 tmp['output_product'] = cfg[tmp['output_product']]['product_id']
             p_id = dbu.addProcess(**tmp)
             print('Added Process: {0} {1}'.format(p_id, dbu.getEntry('Process', p_id).process_name))
