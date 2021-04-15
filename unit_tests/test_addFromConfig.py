@@ -124,6 +124,34 @@ class addFromConfig(unittest.TestCase):
             conf['process_no_input'])
         configCheck(conf)
 
+    def test_NoOutputs(self):
+        """Create a process with no outputs"""
+        conf = dbprocessing.Utils.readconfig(os.path.join(
+            dbp_testing.testsdir, 'data', 'configs',
+            'testDB_processNoOutputs.conf'))
+        self.assertEqual(
+            {'code_active': 'True',
+             'code_arguments': '',
+             'code_cpu': '1',
+             'code_date_written': '2016-05-31',
+             'code_description': 'Creates no output',
+             'code_filename': 'no_output.py',
+             'code_newest_version': 'True',
+             'code_output_interface': '1',
+             'code_ram': '1',
+             'code_relative_path': 'scripts',
+             'code_start_date': '2010-09-01',
+             'code_stop_date': '2020-01-01',
+             'code_version': '1.0.0',
+             'extra_params': '',
+             'output_product': '',
+             'output_timebase': 'RUN',
+             'process_name': 'no_output',
+             'required_input1': ('product_input_only', 0, 0),
+            },
+            conf['process_no_output'])
+        configCheck(conf)
+
 
 if __name__ == "__main__":
     unittest.main()
