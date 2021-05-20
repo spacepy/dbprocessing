@@ -2465,17 +2465,35 @@ class DButils(object):
         return prods
 
     def getEntry(self, table, args):
+        """Return entry instance from any table in DB
+
+        :param str table: Name of the table
+        :param args: Argument to identify entry. This is first tried as a
+                     primary key (integer or sequence of integers); if that
+                     fails, then assumed to be a name and used for a lookup
+                     via get[table]ID.
+        :returns: Matching column from the table. If there is no primary
+                  key match and the table does not support name lookup,
+                  returns ``None``.
+        :raises DBNoData: if argument is not found as primary key
+                          and name lookup fails (but not if name lookup
+                          is not available).
         """
-        Master method to return a entry instance from any table in the db
-        """
-        # just try and get the entry
-        retval = self.session.query(getattr(self, table)).get(args)
-        if retval is None:  # either this was not a valid pk or not a pk that is in the db
+        retval = None
+        if isinstance(args, (int, collections.Iterable)) \
+           and not isinstance(args, str_classes):  # PK: int, non-str sequence
+            retval = self.session.query(getattr(self, table)).get(args)
+        if retval is None:  # Not valid PK type, or PK not found
             # see if it was a name
             if ('get' + table + 'ID') in dir(self):
                 cmd = 'get' + table + 'ID'
                 pk = getattr(self, cmd)(args)
                 retval = self.session.query(getattr(self, table)).get(pk)
+# This code will make it consistently raise DBNoData if nothing is found,
+# but codebase needs to be scrubbed for callers that expect None instead.
+#            else:
+#                raise DBNoData('No entry found for table {}, key {}.'
+#                               .format(table, args))
         return retval
 
     def getFileParents(self, file_id, id_only=False):

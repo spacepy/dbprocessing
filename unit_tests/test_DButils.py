@@ -284,6 +284,29 @@ class DBUtilsOtherTests(TestSetup):
         self.dbu.renameFile('ect_rbspb_0388_34c_01.ptp.gz', 'ect_rbspb_0388_34c_01.ptp.gz_newname')
         self.assertEqual(2051, self.dbu.getFileID('ect_rbspb_0388_34c_01.ptp.gz_newname'))
 
+    def test_getEntry(self):
+        """getEntry works for non-PK input (e.g. names)"""
+        res = self.dbu.getEntry(
+            'File', 'rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt')
+        self.assertEqual(1, res.file_id)
+
+    def test_getEntryNoresult(self):
+        """getEntry always raises DBNoData on no match"""
+        with self.assertRaises(DButils.DBNoData) as cm:
+            res = self.dbu.getEntry(
+                'File', 'rbspb_pre_MagEphem_OP77Q_20130909_v1.0.1.txt')
+        self.assertEqual(
+            'No filename rbspb_pre_MagEphem_OP77Q_20130909_v1.0.1.txt'
+            ' found in the DB', str(cm.exception))
+        self.assertIs(None, self.dbu.getEntry('Inspector', 0))
+# Desired behaviour in the future
+#        with self.assertRaises(DButils.DBNoData) as cm:
+#            res = self.dbu.getEntry(
+#                'Inspector', 0)
+#        self.assertEqual(
+#            'No entry found for table Inspector, key 0.',
+#            str(cm.exception))
+
 
 class DBUtilsAddTests(TestSetup):
     """Tests for database adds through DButils"""
