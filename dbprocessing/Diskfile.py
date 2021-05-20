@@ -147,10 +147,13 @@ def calcDigest(infile):
     m = hashlib.sha1()
     try:
         with open(infile, 'rb') as f:
-            m.update(f.read())
+            for d in iter(lambda: f.read(1048576), b''):
+                m.update(d)
     except IOError:
         raise DigestError("File not found: {0}".format(infile))
-        
-    DBlogging.dblogger.debug("digest calculated: {0}, file: {1} ".format(m.hexdigest(), infile))
 
-    return m.hexdigest()
+    res = m.hexdigest()
+    DBlogging.dblogger.debug("digest calculated: {0}, file: {1} ".format(
+        res, infile))
+
+    return res
