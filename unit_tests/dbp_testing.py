@@ -11,6 +11,8 @@ import os
 import os.path
 import sys
 
+import sqlalchemy
+
 #The log is opened on import, so need to quarantine the log directory
 #right away (before other dbp imports)
 os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
@@ -145,6 +147,9 @@ class AddtoDBMixin(object):
                 self.td, 'emptyDB.sqlite'))
         else:  # No sqlite database, must be using postgres
             dbu = dbprocessing.DButils.DButils(os.environ['PGDATABASE'])
+        if dbu.session.query(sqlalchemy.func.count(
+                dbu.Mission.mission_id)).scalar():
+            raise RuntimeError('Unit test database is not empty!')
         mission_id = dbu.addMission(
             'Test mission',
             os.path.join(self.td, 'data'),
