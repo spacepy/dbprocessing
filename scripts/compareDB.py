@@ -3,7 +3,11 @@
 """Compare two databases for similarities in products, files, etc."""
 
 import argparse
-import collections
+
+try:
+    from collections.abc import Mapping
+except ImportError: # Py2
+    from collections import Mapping
 
 import dbprocessing.DButils
 
@@ -70,7 +74,7 @@ def check_tables(table, dbu1, dbu2):
         entries2 = getattr(dbu2, gettername)()
     # E.g. getAllCodes returns dicts, of which only one part is the code record
     # So recover just that part
-    if entries1 and isinstance(entries1[0], collections.Mapping):
+    if entries1 and isinstance(entries1[0], Mapping):
         entries1 = [e[table] for e in entries1]
         entries2 = [e[table] for e in entries2]
     # Codes also have a description not a name, and files have no _

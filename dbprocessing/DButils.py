@@ -20,6 +20,11 @@ except ImportError:
     urllib.parse = urllib
 
 try:
+    from collections.abc import Iterable
+except ImportError: # Py2
+    from collections import Iterable
+
+try:
     str_classes = (str, unicode)
 except NameError:
     str_classes = (str,)
@@ -423,7 +428,7 @@ class DButils(object):
         """
         # if the input is a file name need to handle that
         if isinstance(item, str_classes) \
-           or not isinstance(item, collections.Iterable):
+           or not isinstance(item, Iterable):
             item = [item]
         for ii, v in enumerate(item):
             item[ii] = self.getFileID(v)
@@ -700,7 +705,7 @@ class DButils(object):
         """
         # if not an iterable make it a iterable
         if isinstance(filename, str_classes) \
-           or not isinstance(filename, collections.Iterable):
+           or not isinstance(filename, Iterable):
             filename = [filename]
 
         for ii, f in enumerate(filename):
@@ -2481,7 +2486,7 @@ class DButils(object):
                           is not available).
         """
         retval = None
-        if isinstance(args, (int, collections.Iterable)) \
+        if isinstance(args, (int, Iterable)) \
            and not isinstance(args, str_classes):  # PK: int, non-str sequence
             retval = self.session.query(getattr(self, table)).get(args)
         if retval is None:  # Not valid PK type, or PK not found

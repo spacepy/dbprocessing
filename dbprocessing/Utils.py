@@ -10,7 +10,12 @@ try:
     import configparser
 except ImportError: # Py2
     import ConfigParser as configparser
-import collections
+
+try:
+    from collections.abc import Iterable
+except ImportError: # Py2
+    from collections import Iterable
+
 import datetime
 import os
 import re
@@ -225,7 +230,7 @@ def flatten(l):
     :rtype: list
     """
     for el in l:
-        if isinstance(el, collections.Iterable) and not isinstance(el, str_classes):
+        if isinstance(el, Iterable) and not isinstance(el, str_classes):
             for sub in flatten(el):
                 yield sub
         else:
