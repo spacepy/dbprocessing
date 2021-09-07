@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import argparse
 import datetime
+import sys
 
 from dbprocessing import DButils
 
@@ -64,8 +65,18 @@ def output_text(items):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--html", action="store_true",
-                        help="Output in html", default=False)
+    parser.add_argument("--html", action='store_true',
+                        help="Output in html",
+                        default=False)
+    parser.add_argument("-e", "--exist",  action='store_true',
+                        help="return 1 if processqueue is empty 0 otherwise",
+                        default=False)
+    parser.add_argument("-q", "--quiet",  action='store_true',
+                        help="Do not display output", 
+                        default=False)
+    parser.add_argument("-c", "--count", action='store_true',
+                        help="Count how many files in the process queue", 
+                        default=False)
     parser.add_argument("-o", "--output",
                         help="Write output to a file")
     parser.add_argument(
@@ -76,16 +87,36 @@ if __name__ == '__main__':
 
     dbu = DButils.DButils(options.database)
     items = dbu.ProcessqueueGetAll()
+     
+    # Check if the processque is empty 
+    # Usually used for bash scripts
+    #   return 0 if data exists (true)
+    #   return 1 if processque is empty (false)
+    if options.exist:
+        if items: 
+            print("Process Queue is not empty\n" if not options.quiet else "", end='')
+            del dbu
+            sys.exit(0)
+        else:
+            del dbu
+            sys.exit(1)
+
+    # return the number of items in processqueue 
+    if options.count:
+         print("Number of items in processqueue %d\n" % len(items) if not options.quiet else "", end='')
+         del dbu
+         sys.exit(len(items))
+
     traceback = []
     for v in items:
         traceback.append(dbu.getTraceback('File', v))
 
-    if( options.html ):
+    if options.html:
         out = output_html(traceback)
     else:
         out = output_text(traceback)
 
-    if( options.output is None):
+    if options.output is None:
         print(out)
     else:
         output = open(options.output, 'w')
