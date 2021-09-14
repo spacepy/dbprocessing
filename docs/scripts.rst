@@ -315,6 +315,8 @@ Prints the process queue.
 .. option:: -o, --output The name of the file to output to(if blank, print to stdout)
 .. option:: --html Output in HTML
 
+.. _scripts_ProcessQueue_py:
+
 ProcessQueue.py
 ---------------
 .. program:: ProcessQueue
