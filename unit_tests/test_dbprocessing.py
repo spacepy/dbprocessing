@@ -560,6 +560,31 @@ class GetRequiredProductsTests(ProcessQueueTestsBase):
         self.assertEqual(1, len(files))
         self.assertEqual(fid1, files[0].file_id)
 
+    def testOverlapDaysNotOnDisc(self):
+        """Single file, version not on disc crosses days"""
+        l0pid = self.addProduct('level 0')
+        l1pid = self.addProduct('level 1', level=1)
+        l01process, l01code = self.addProcess('level 0-1', l1pid)
+        self.addProductProcessLink(l0pid, l01process)
+        fid0 = self.addFile('level_0_20120101_v1.0.0', l0pid,
+                            utc_start=datetime.datetime(2012, 1, 1, 1),
+                            utc_stop=datetime.datetime(2012, 1, 2, 0, 59),
+                            exists=False)
+        fid0 = self.addFile('level_0_20120101_v1.1.0', l0pid,
+                            utc_start=datetime.datetime(2012, 1, 1, 1),
+                            utc_stop=datetime.datetime(2012, 1, 1, 23, 59))
+        fid1 = self.addFile('level_0_20120102_v1.0.0', l0pid,
+                            utc_start=datetime.datetime(2012, 1, 2, 1),
+                            utc_stop=datetime.datetime(2012, 1, 2, 23, 59))
+        files, input_products = self.pq._getRequiredProducts(
+            l01process, fid1, datetime.datetime(2012, 1, 2))
+        self.assertEqual(1, len(input_products))
+        self.assertEqual(l0pid,
+                         input_products[0][0])
+        self.assertEqual(1, len(files))
+        self.assertEqual([fid1],
+                         sorted([f.file_id for f in files]))
+
 
 if __name__ == '__main__':
     unittest.main()

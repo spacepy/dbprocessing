@@ -51,6 +51,12 @@ quality version of child files (rather than assuming children were up-to-date
 and failing to reprocess them). (`63 <https://github.com/spacepy/dbprocessing/
 pull/63>`_)
 
+Fixed :meth:`~dbprocessing.dbprocessing.ProcessQueue.buildChildren`
+(specifically, helper method ``_getRequiredProducts``) to only look
+for files which are recorded in the database as existing on disk. Most
+notably, this means :ref:`ProcessQueue.py <scripts_ProcessQueue_py>`
+will not attempt to use nonexistent files as inputs to processing.
+
 Other changes
 ^^^^^^^^^^^^^
 

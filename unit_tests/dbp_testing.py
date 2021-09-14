@@ -102,7 +102,7 @@ class AddtoDBMixin(object):
                                        yesterday, tomorrow)
 
     def addFile(self, filename, product_id, utc_date=None, version=None,
-                utc_start=None, utc_stop=None):
+                utc_start=None, utc_stop=None, exists=True):
         """Add a file to the database"""
         if utc_date is None:
             utc_date = datetime.datetime.strptime(
@@ -127,7 +127,7 @@ class AddtoDBMixin(object):
             utc_start_time=utc_start,
             utc_stop_time=utc_stop,
             file_create_date=datetime.datetime.now(),
-            exists_on_disk=True,
+            exists_on_disk=exists,
         )
         return fid
 
