@@ -117,7 +117,7 @@ def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False
     for node in reversed(nodes[:-1]):
         if verbose:
             print(node['filename'])
-        if dofiles:
+        if node['exists_on_disk'] and dofiles:
             fullpath = dbu.getFileFullPath(node['file_id'])
             if archive is None:
                 os.remove(fullpath)
