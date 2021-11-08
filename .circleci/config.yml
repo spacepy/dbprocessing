@@ -133,6 +133,7 @@ jobs:
        - run:
            command: |
              rm -f ./setup.cfg # So sphinx-build doesn't go in ~/dbUtils
+             pip install --user "docutils<0.16"
              pip install --user sphinx numpy
              pip install --user numpydoc
              make -C sphinx html | tee doc_output.txt
