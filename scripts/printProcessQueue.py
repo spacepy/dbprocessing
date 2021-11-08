@@ -89,21 +89,13 @@ if __name__ == '__main__':
     items = dbu.ProcessqueueGetAll()
 
     if not options.quiet:
-        traceback = []
-        for v in items:
-            traceback.append(dbu.getTraceback('File', v))
-
-        if options.html:
-            out = output_html(traceback)
-        else:
-            out = output_text(traceback)
-
+        traceback = [dbu.getTraceback('File', v) for v in items]
+        out = (output_html if options.html else output_text)(traceback)
         if options.output is None:
             print(out)
         else:
-            output = open(options.output, 'w')
-            output.write(out)
-            output.close()
+            with open(options.output, 'w') as output:
+                output.write(out)
     del dbu
     if options.exist:
         sys.exit(not(items))
