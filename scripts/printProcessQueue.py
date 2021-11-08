@@ -87,39 +87,25 @@ if __name__ == '__main__':
 
     dbu = DButils.DButils(options.database)
     items = dbu.ProcessqueueGetAll()
-     
-    # Check if the processque is empty 
-    # Usually used for bash scripts
-    #   return 0 if data exists (true)
-    #   return 1 if processque is empty (false)
-    if options.exist:
-        if items: 
-            print("Process Queue is not empty\n" if not options.quiet else "", end='')
-            del dbu
-            sys.exit(0)
+
+    if not options.quiet:
+        traceback = []
+        for v in items:
+            traceback.append(dbu.getTraceback('File', v))
+
+        if options.html:
+            out = output_html(traceback)
         else:
-            del dbu
-            sys.exit(1)
+            out = output_text(traceback)
 
-    # return the number of items in processqueue 
-    if options.count:
-         print("Number of items in processqueue %d\n" % len(items) if not options.quiet else "", end='')
-         del dbu
-         sys.exit(len(items))
-
-    traceback = []
-    for v in items:
-        traceback.append(dbu.getTraceback('File', v))
-
-    if options.html:
-        out = output_html(traceback)
-    else:
-        out = output_text(traceback)
-
-    if options.output is None:
-        print(out)
-    else:
-        output = open(options.output, 'w')
-        output.write(out)
-        output.close()
+        if options.output is None:
+            print(out)
+        else:
+            output = open(options.output, 'w')
+            output.write(out)
+            output.close()
     del dbu
+    if options.exist:
+        sys.exit(not(items))
+    if options.count:
+        sys.exit(min(len(items), 255))
