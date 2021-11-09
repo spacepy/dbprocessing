@@ -305,15 +305,45 @@ Prints a table of info about files or products or processes.
 .. option:: database The name of the database to print table of
 .. option:: field Either Product or Mission (more to come)
 
+.. _scripts_printProcessQueue:
+
 printProcessQueue.py
 --------------------
 .. program:: printProcessQueue
 
 Prints the process queue.
 
-.. option:: database The name of the database to print the queue of
-.. option:: -o, --output The name of the file to output to(if blank, print to stdout)
-.. option:: --html Output in HTML
+.. option:: database
+
+   The name of the database to print the queue of
+
+.. option:: -c, --count
+
+   Set the return code to the number of files in the queue. If there
+   are more than 255 files, set to 255. With this option, it is impossible
+   to differentiate between an error and a single-element process queue based
+   on return code. Mutually exclusive with :option:`-e`, :option:`--exist`.
+
+.. option:: -e, --exist
+
+   Set the return code based on whether there are any files in the process
+   queue: 0 (shell True) if there are, 1 (shell False) if there are no files.
+   With this option, it is impossible to differentiate between an error and
+   an empty process queue based on return code. Mutually exclusive with
+   :option:`-c`, :option:`--count`.
+
+.. option:: --html
+
+   Provide output in HTML (default text).
+
+.. option:: -o filename, --output filename
+
+   The name of the file to output to (if not specified, output to stdout).
+
+.. option:: -q, --quiet
+
+   Quiet mode: produce no output. Mutually exclusive with :option:`--html`,
+   :option:`-o`, :option:`--output`.
 
 .. _scripts_ProcessQueue_py:
 
