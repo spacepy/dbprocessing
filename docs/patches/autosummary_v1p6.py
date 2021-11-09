@@ -6,25 +6,34 @@ data members. These patches address those limitations.
 
 # Monkey-patch to put data items in automodule
 # This STARTS verbatim from 1.6.7, then new code is commented with ##
+# 1.5 is functionally same as 1.6 (with type hints and structured
+# a little different, but compatible.)
+# 1.3, 1.4 identical to each other, require some conditionals
+# 1.7 differs more from 1.6 but handled by conditionals.
 import os.path
 from jinja2 import FileSystemLoader, TemplateNotFound
 from jinja2.sandbox import SandboxedEnvironment
 
-from sphinx import package_dir
+from sphinx import package_dir, version_info
 from sphinx.ext.autosummary import import_by_name, get_documenter
 from sphinx.jinja2glue import BuiltinTemplateLoader
 from sphinx.pycode import ModuleAnalyzer
 from sphinx.util.osutil import ensuredir
 from sphinx.util.inspect import safe_getattr
-from sphinx.util.rst import escape as rst_escape
+if version_info[0:2] >= (1, 5):  ## NEW: unconditional in 1.6
+    from sphinx.util.rst import escape as rst_escape
 
+## NEW: _underline broken out (in same line for 1.6)
 from sphinx.ext.autosummary.generate import _simple_warn, _simple_info, \
-    find_autosummary_in_files, _underline
+    find_autosummary_in_files
+if version_info[0:2] >= (1, 5):
+    from sphinx.ext.autosummary.generate import _underline
 
+## NEW: app kwarg added in 1.7 (ignored in previous)
 def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
                               warn=_simple_warn, info=_simple_info,
                               base_path=None, builder=None, template_dir=None,
-                              imported_members=False):
+                              imported_members=False, app=None):
     # type: (List[unicode], unicode, unicode, Callable, Callable, unicode, Builder, unicode, bool) -> None  # NOQA
 
     showed_sources = list(sorted(sources))
@@ -54,11 +63,12 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
             template_dirs.insert(0, template_dir)
         template_loader = FileSystemLoader(template_dirs)  # type: ignore
     template_env = SandboxedEnvironment(loader=template_loader)
-    template_env.filters['underline'] = _underline
+    if version_info[0:2] >= (1, 5): ## NEW: unconditional in 1.5, 1.6
+        template_env.filters['underline'] = _underline
 
-    # replace the builtin html filters
-    template_env.filters['escape'] = rst_escape
-    template_env.filters['e'] = rst_escape
+        # replace the builtin html filters
+        template_env.filters['escape'] = rst_escape
+        template_env.filters['e'] = rst_escape
 
     # read
     items = find_autosummary_in_files(sources)
@@ -141,10 +151,16 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
                 ## END NEW
             elif doc.objtype == 'class':
                 ns['members'] = dir(obj)
+                ## NEW: conditional on imported kwarg, since always default
+                ## (and True) on 1.7+
                 ns['methods'], ns['all_methods'] = \
-                    get_members(obj, 'method', ['__init__'], imported=imported_members)
+                    get_members(obj, 'method', ['__init__'],
+                                imported = True if version_info[0:2] >= (1, 7)
+                                else imported_members)
                 ns['attributes'], ns['all_attributes'] = \
-                    get_members(obj, 'attribute', imported=imported_members)
+                    get_members(obj, 'attribute',
+                                imported = True if version_info[0:2] >= (1, 7)
+                                else imported_members)
                 ## NEW
                 # Try to get stuff that's only in attributes
                 if hasattr(obj, '__module__'):
@@ -188,7 +204,14 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
 
     # descend recursively to new files
     if new_files:
-        generate_autosummary_docs(new_files, output_dir=output_dir,
-                                  suffix=suffix, warn=warn, info=info,
-                                  base_path=base_path, builder=builder,
-                                  template_dir=template_dir)
+        ## NEW: Conditional on app kwarg added (to support 1.7+)
+        if version_info[0:2] >= 1.7:
+            generate_autosummary_docs(new_files, output_dir=output_dir,
+                                      suffix=suffix, warn=warn, info=info,
+                                      base_path=base_path, builder=builder,
+                                      template_dir=template_dir, app=app)
+        else:
+            generate_autosummary_docs(new_files, output_dir=output_dir,
+                                      suffix=suffix, warn=warn, info=info,
+                                      base_path=base_path, builder=builder,
+                                      template_dir=template_dir)
