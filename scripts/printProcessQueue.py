@@ -66,24 +66,22 @@ def output_text(items):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--html", action='store_true',
-                        help="Output in html",
-                        default=False)
-    parser.add_argument("-e", "--exist",  action='store_true',
-                        help="return 1 if processqueue is empty 0 otherwise",
-                        default=False)
+                        help="Output in html")
     parser.add_argument("-q", "--quiet",  action='store_true',
-                        help="Do not display output", 
-                        default=False)
-    parser.add_argument("-c", "--count", action='store_true',
-                        help="Count how many files in the process queue", 
-                        default=False)
+                        help="Do not display output")
     parser.add_argument("-o", "--output",
                         help="Write output to a file")
     parser.add_argument(
         'database', action='store', type=str,
         help='Name of database (or sqlite file), i.e. mission, to open.')
-
+    returncode = parser.add_mutually_exclusive_group()
+    returncode.add_argument("-e", "--exist",  action='store_true',
+                            help="Exit code 1 if queue empty; 0 (True) if not.")
+    returncode.add_argument("-c", "--count", action='store_true',
+                            help="Set exit code to count of files in queue.")
     options = parser.parse_args()
+    if options.quiet and (options.html or options.output):
+        parser.error('--html and -o are useless with -q.')
 
     dbu = DButils.DButils(options.database)
     items = dbu.ProcessqueueGetAll()
