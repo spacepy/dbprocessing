@@ -15,11 +15,6 @@ import string
 class DBformatter(string.Formatter):
     """String formatter extended/modified for DButils
 
-    :cvar SPECIAL_FIELDS: indexed by field name; each element contains
-                          a fully-formatted representation of the field
-                          and a regular expression that should match it.
-    :type SPECIAL_FIELDS: dict
-    
     .. note:: As this is currently implemented, L{regex} may not handle
        {{ and }} properly, since regex expansion is applied I{after}
        the basic formatting is done, and thus {{ and }} are already
@@ -58,6 +53,9 @@ class DBformatter(string.Formatter):
         'nnn': ('{nnn}', '\d\d\d'),
         'nnnn': ('{nnnn}', '\d\d\d\d'),
     }
+    """indexed by field name; each element contains a fully-formatted
+       representation of the field and a regular expression that should match
+       it. (:class:`dict`)"""
 
     def format(self, format_string, *args, **kwargs):
         """Expand base format to handle datetime and special dbp keywords

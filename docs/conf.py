@@ -36,7 +36,7 @@ if not thisdir in sys.path:
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.2.4'
+needs_sphinx = '1.3'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -331,6 +331,10 @@ intersphinx_mapping = {
 }
 
 import sphinx.ext.autosummary.generate
-import patches.autosummary_v1
-sphinx.ext.autosummary.generate.generate_autosummary_docs = \
-    patches.autosummary_v1.generate_autosummary_docs
+if (1, 3) <= sphinx.version_info[0:2] <= (1, 7):
+    import patches.autosummary_v1p6
+    sphinx.ext.autosummary.generate.generate_autosummary_docs = \
+        patches.autosummary_v1p6.generate_autosummary_docs
+else:
+    raise RuntimeError('Unsupported version of Sphinx: {}.{}'.format(
+        *sphinx.version_info[0:2]))
