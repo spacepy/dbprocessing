@@ -59,6 +59,12 @@ extensions = [
 autosummary_generate = True
 numpydoc_show_class_members = False
 
+rst_epilog = """
+--------------------------
+
+**Release**: |version| **Doc generation date**: |today|
+"""
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
