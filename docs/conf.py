@@ -16,14 +16,19 @@ import sys
 import sysconfig
 import os
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(
-    0, os.path.abspath(
-        os.path.join('..', 'build', 'lib.{0}-{1}.{2}'.format(
-            sysconfig.get_platform(), *sys.version_info[:2]))))
+# Take the sphinx script's path out and just use standard paths.
+sys.path.append(sys.path.pop(0))
+# Add build directory to the path, preferring version-specific.
+buildbase = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), '..', 'build'))
+for pth in ('lib', # Prepending, so add low-priority paths first.
+            'lib.{0}-{1}.{2}'.format(sysconfig.get_platform(),
+                                     *sys.version_info[:2]),
+            ):
+    buildpath = os.path.join(buildbase, pth)
+    if os.path.isdir(buildpath):
+        if not buildpath in sys.path:
+            sys.path.insert(0, buildpath)
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
