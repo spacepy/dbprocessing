@@ -5,7 +5,6 @@ All dbprocessing functionality is in submodules of this module.
 .. rubric:: Modules
 
 .. autosummary::
-   :toctree:
 
    DBfile
    DBlogging
