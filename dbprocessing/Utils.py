@@ -72,9 +72,9 @@ def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
     :param dt: The datetime object to format, defaults to now()
     :type dt: datetime.datetime
     :param microseconds: Should the microseconds be included, default False
-    :type microseconds : bool
+    :type microseconds: bool
     :param brackets: Which brackets to encase the time in, default ('[', ']')
-    :type brackets : str
+    :type brackets: str
 
     :return: Iso formatted string
     :rtype: str

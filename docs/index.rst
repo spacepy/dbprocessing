@@ -16,20 +16,8 @@ dbprocessing
 API documentation
 -----------------
 
-.. toctree::
-    :maxdepth: 1
+.. autosummary::
+    :toctree: autosummary
 
-    DBfile
-    DBlogging
     dbprocessing
-    DBqueue
-    DBstrings
-    DButils
-    Diskfile
-    inspector
-    module
-    reports
-    runMe
-    tables
-    Utils
-    Version
+
