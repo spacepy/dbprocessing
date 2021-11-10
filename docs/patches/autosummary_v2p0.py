@@ -1,59 +1,53 @@
-"""Patches to extend autosummary for Sphinx 1.x
+"""Patches to extend autosummary for Sphinx 2.0 (and 1.8)
 
 Sphinx autosummary doesn't get all attributes, and it doesn't include
 data members. These patches address those limitations.
 """
 
 # Monkey-patch to put data items in automodule
-# This STARTS verbatim from 1.6.7, then new code is commented with ##
-# 1.5 is functionally same as 1.6 (with type hints and structured
-# a little different, but compatible.)
-# 1.3, 1.4 identical to each other, require some conditionals
-# 1.7 differs more from 1.6 but handled by conditionals.
+# This STARTS verbatim from 2.0.1, then new code is commented with ##
+# Also works w/o change on 1.8 (only difference is type hints)
 import os.path  ## NEW
 from jinja2 import FileSystemLoader, TemplateNotFound
 from jinja2.sandbox import SandboxedEnvironment
 
-from sphinx import package_dir, version_info
+from sphinx import package_dir
 from sphinx.ext.autosummary import import_by_name, get_documenter
 from sphinx.jinja2glue import BuiltinTemplateLoader
 from sphinx.pycode import ModuleAnalyzer  ## NEW
-from sphinx.util.osutil import ensuredir
+from sphinx.locale import __
 from sphinx.util.inspect import safe_getattr
-if version_info[0:2] >= (1, 5):  ## NEW: unconditional in 1.6
-    from sphinx.util.rst import escape as rst_escape
-
-## NEW: _underline broken out (in same line for 1.6)
+from sphinx.util.osutil import ensuredir
+from sphinx.util.rst import escape as rst_escape
+## NEW: these imports bring in definitions that are available in original
 from sphinx.ext.autosummary.generate import _simple_warn, _simple_info, \
-    find_autosummary_in_files
-if version_info[0:2] >= (1, 5):
-    from sphinx.ext.autosummary.generate import _underline
+    find_autosummary_in_files, _underline
 
-## NEW: app kwarg added in 1.7 (ignored in previous)
+
 def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
                               warn=_simple_warn, info=_simple_info,
                               base_path=None, builder=None, template_dir=None,
                               imported_members=False, app=None):
-    # type: (List[unicode], unicode, unicode, Callable, Callable, unicode, Builder, unicode, bool) -> None  # NOQA
+    # type: (List[str], str, str, Callable, Callable, str, Builder, str, bool, Any) -> None
 
     showed_sources = list(sorted(sources))
     if len(showed_sources) > 20:
         showed_sources = showed_sources[:10] + ['...'] + showed_sources[-10:]
-    info('[autosummary] generating autosummary for: %s' %
+    info(__('[autosummary] generating autosummary for: %s') %
          ', '.join(showed_sources))
 
     if output_dir:
-        info('[autosummary] writing to %s' % output_dir)
+        info(__('[autosummary] writing to %s') % output_dir)
 
     if base_path is not None:
         sources = [os.path.join(base_path, filename) for filename in sources]
 
     # create our own templating environment
-    template_dirs = None  # type: List[unicode]
+    template_dirs = None  # type: List[str]
     template_dirs = [os.path.join(package_dir, 'ext',
                                   'autosummary', 'templates')]
 
-    template_loader = None  # type: BaseLoader
+    template_loader = None  # type: Union[BuiltinTemplateLoader, FileSystemLoader]
     if builder is not None:
         # allow the user to override the templates
         template_loader = BuiltinTemplateLoader()
@@ -61,14 +55,13 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
     else:
         if template_dir:
             template_dirs.insert(0, template_dir)
-        template_loader = FileSystemLoader(template_dirs)  # type: ignore
+        template_loader = FileSystemLoader(template_dirs)
     template_env = SandboxedEnvironment(loader=template_loader)
-    if version_info[0:2] >= (1, 5): ## NEW: unconditional in 1.5, 1.6
-        template_env.filters['underline'] = _underline
+    template_env.filters['underline'] = _underline
 
-        # replace the builtin html filters
-        template_env.filters['escape'] = rst_escape
-        template_env.filters['e'] = rst_escape
+    # replace the builtin html filters
+    template_env.filters['escape'] = rst_escape
+    template_env.filters['e'] = rst_escape
 
     # read
     items = find_autosummary_in_files(sources)
@@ -101,7 +94,7 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
         new_files.append(fn)
 
         with open(fn, 'w') as f:
-            doc = get_documenter(obj, parent)
+            doc = get_documenter(app, obj, parent)
 
             if template_name is not None:
                 template = template_env.get_template(template_name)
@@ -112,26 +105,24 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
                 except TemplateNotFound:
                     template = template_env.get_template('autosummary/base.rst')
 
-            def get_members(obj, typ, include_public=[], imported=False):
-                # type: (Any, unicode, List[unicode], bool) -> Tuple[List[unicode], List[unicode]]  # NOQA
-                items = []  # type: List[unicode]
+            def get_members(obj, typ, include_public=[], imported=True):
+                # type: (Any, str, List[str], bool) -> Tuple[List[str], List[str]]
+                items = []  # type: List[str]
                 for name in dir(obj):
                     try:
                         value = safe_getattr(obj, name)
                     except AttributeError:
                         continue
-                    documenter = get_documenter(value, obj)
+                    documenter = get_documenter(app, value, obj)
                     if documenter.objtype == typ:
-                        if typ == 'method':
-                            items.append(name)
-                        elif imported or getattr(value, '__module__', None) == obj.__name__:
+                        if imported or getattr(value, '__module__', None) == obj.__name__:
                             # skip imported members if expected
                             items.append(name)
                 public = [x for x in items
                           if x in include_public or not x.startswith('_')]
                 return public, items
 
-            ns = {}  # type: Dict[unicode, Any]
+            ns = {}  # type: Dict[str, Any]
 
             if doc.objtype == 'module':
                 ns['members'] = dir(obj)
@@ -143,24 +134,18 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
                     get_members(obj, 'exception', imported=imported_members)
                 ## NEW
                 ns['data'], ns['all_data'] = \
-                                   get_members(obj, 'data',
-                                               imported=imported_members)
+                    get_members(obj, 'data', imported=imported_members)
                 ns['attributes'], ns['all_attributes'] = \
-                                 get_members(obj, 'attribute',
-                                             imported=imported_members)
+                    get_members(obj, 'attribute', imported=imported_members)
                 ## END NEW
             elif doc.objtype == 'class':
                 ns['members'] = dir(obj)
-                ## NEW: conditional on imported kwarg, since always default
-                ## (and True) on 1.7+
+                ns['inherited_members'] = \
+                    set(dir(obj)) - set(obj.__dict__.keys())
                 ns['methods'], ns['all_methods'] = \
-                    get_members(obj, 'method', ['__init__'],
-                                imported = True if version_info[0:2] >= (1, 7)
-                                else imported_members)
+                    get_members(obj, 'method', ['__init__'])
                 ns['attributes'], ns['all_attributes'] = \
-                    get_members(obj, 'attribute',
-                                imported = True if version_info[0:2] >= (1, 7)
-                                else imported_members)
+                    get_members(obj, 'attribute')
                 ## NEW
                 # Try to get stuff that's only in attributes
                 if hasattr(obj, '__module__'):
@@ -200,18 +185,11 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
             ns['underline'] = len(name) * '='
 
             rendered = template.render(**ns)
-            f.write(rendered)  # type: ignore
+            f.write(rendered)
 
     # descend recursively to new files
     if new_files:
-        ## NEW: Conditional on app kwarg added (to support 1.7+)
-        if version_info[0:2] >= 1.7:
-            generate_autosummary_docs(new_files, output_dir=output_dir,
-                                      suffix=suffix, warn=warn, info=info,
-                                      base_path=base_path, builder=builder,
-                                      template_dir=template_dir, app=app)
-        else:
-            generate_autosummary_docs(new_files, output_dir=output_dir,
-                                      suffix=suffix, warn=warn, info=info,
-                                      base_path=base_path, builder=builder,
-                                      template_dir=template_dir)
+        generate_autosummary_docs(new_files, output_dir=output_dir,
+                                  suffix=suffix, warn=warn, info=info,
+                                  base_path=base_path, builder=builder,
+                                  template_dir=template_dir, app=app)
