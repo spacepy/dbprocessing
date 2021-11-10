@@ -1,9 +1,13 @@
 {% extends "!layout.html" %}
 
+{% if sphinx_version.split(".")[0] == "1" %}
+    {% set script_files = script_files + ["_static/copybutton.js"] %}
+{% endif %}
 {%- block scripts %}
     {{ super() }}
-    <script type="text/javascript" src="{{ pathto('_static/copybutton.js', 1) }}"></script>
-
+    {% if sphinx_version.split(".")[0] != "1" %}
+        <script type="text/javascript" src="{{ pathto('_static/copybutton.js', 1) }}"></script>
+    {% endif %}
 {%- endblock %}
 
 {% block rootrellink %}
