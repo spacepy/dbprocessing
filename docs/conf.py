@@ -335,6 +335,10 @@ if (1, 3) <= sphinx.version_info[0:2] <= (1, 7):
     import patches.autosummary_v1p6
     sphinx.ext.autosummary.generate.generate_autosummary_docs = \
         patches.autosummary_v1p6.generate_autosummary_docs
+elif (1, 8) <= sphinx.version_info[0:2] <= (2, 0):
+    import patches.autosummary_v2p0
+    sphinx.ext.autosummary.generate.generate_autosummary_docs = \
+        patches.autosummary_v2p0.generate_autosummary_docs
 else:
     raise RuntimeError('Unsupported version of Sphinx: {}.{}'.format(
         *sphinx.version_info[0:2]))
