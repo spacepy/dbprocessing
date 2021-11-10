@@ -147,7 +147,7 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
                 ns['attributes'], ns['all_attributes'] = \
                     get_members(obj, 'attribute')
                 ## NEW
-                # Try to get stuff that's only in attributes
+                # Try to get stuff that's only in class attributes
                 if hasattr(obj, '__module__'):
                     realmodule = obj.__module__
                 elif hasattr(parent, '__module__'):
