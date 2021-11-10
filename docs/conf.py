@@ -331,18 +331,22 @@ intersphinx_mapping = {
 }
 
 import sphinx.ext.autosummary.generate
-if (1, 3) <= sphinx.version_info[0:2] <= (1, 7):
+if (1, 3) <= sphinx.version_info[:2] <= (1, 7):
     import patches.autosummary_v1p6
     sphinx.ext.autosummary.generate.generate_autosummary_docs = \
         patches.autosummary_v1p6.generate_autosummary_docs
-elif (1, 8) <= sphinx.version_info[0:2] <= (2, 0):
+elif (1, 8) <= sphinx.version_info[:2] <= (2, 0):
     import patches.autosummary_v2p0
     sphinx.ext.autosummary.generate.generate_autosummary_docs = \
         patches.autosummary_v2p0.generate_autosummary_docs
-elif (2, 1) <= sphinx.version_info[0:2] <= (2, 1):
+elif (2, 1) <= sphinx.version_info[:2] <= (2, 1):
     import patches.autosummary_v2p1
     sphinx.ext.autosummary.generate.generate_autosummary_docs = \
         patches.autosummary_v2p1.generate_autosummary_docs
+elif (2, 2) <= sphinx.version_info[:2] <= (2, 4):
+    import patches.autosummary_v2p4
+    sphinx.ext.autosummary.generate.generate_autosummary_content = \
+        patches.autosummary_v2p4.generate_autosummary_content
 else:
     raise RuntimeError('Unsupported version of Sphinx: {}.{}'.format(
-        *sphinx.version_info[0:2]))
+        *sphinx.version_info[:2]))
