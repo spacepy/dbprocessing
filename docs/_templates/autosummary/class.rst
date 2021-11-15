@@ -42,7 +42,7 @@
    {% block attributes_defns %}
    {% if attributes %}
    {% for item in attributes %}
-   .. autoinstanceattribute::  {{ item }}
+   .. autoattribute::  {{ item }}
    {%- endfor %}
    {% endif %}
    {% endblock %}
