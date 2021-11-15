@@ -347,9 +347,3 @@ elif (2, 2) <= sphinx.version_info[:2] <= (3, 0):
     import patches.autosummary_v2p4
     sphinx.ext.autosummary.generate.generate_autosummary_content = \
         patches.autosummary_v2p4.generate_autosummary_content
-elif (3, 1) <= sphinx.version_info[:2] <= (3, 4):
-    # No patching necessary; this functionality is in Sphinx now
-    pass
-else:
-    raise RuntimeError('Unsupported version of Sphinx: {}.{}'.format(
-        *sphinx.version_info[:2]))
