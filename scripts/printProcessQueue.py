@@ -91,14 +91,17 @@ if __name__ == '__main__':
     parser.add_argument(
         '-p', '--product', nargs='+',
         help='Limit result and counts to these product IDs or names.')
+    parser.add_argument(
+        "-s", "--sort", action='store_true',
+        help="Sort output by date, then product (default: in queue order).")
     returncode = parser.add_mutually_exclusive_group()
     returncode.add_argument("-e", "--exist",  action='store_true',
                             help="Exit code 1 if queue empty; 0 (True) if not.")
     returncode.add_argument("-c", "--count", action='store_true',
                             help="Set exit code to count of files in queue.")
     options = parser.parse_args()
-    if options.quiet and (options.html or options.output):
-        parser.error('--html and -o are useless with -q.')
+    if options.quiet and (options.html or options.output or options.sort):
+        parser.error('--html, -o, and -s are useless with -q.')
 
     dbu = DButils.DButils(options.database)
     items = dbu.ProcessqueueGetAll()
@@ -109,7 +112,9 @@ if __name__ == '__main__':
         prod_ids = [p.product_id for p in products]
         traceback = [tb for tb in traceback if tb['product'].product_id
                      in prod_ids]
-
+    if options.sort:
+        traceback.sort(key=lambda x: (x['file'].utc_file_date,
+                                      x['product'].product_name))
     if not options.quiet:
         out = (output_html if options.html else output_text)(
             traceback, products)
