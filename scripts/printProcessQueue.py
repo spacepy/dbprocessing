@@ -51,7 +51,7 @@ def output_html(items, products=None):
         output += "    </table>\n"
     output += '    <h2>{0}</h2>\n'.format('processQueue')
     output +="""    <table>
-        <tr><th>file_id</th><th>filename</th><th>product</th></tr>
+        <tr><th>file #</th><th>filename</th><th>product</th></tr>
 """
     for index, item in enumerate(items):
         if( index % 2 == 0 ):
