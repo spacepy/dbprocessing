@@ -340,6 +340,15 @@ Prints the process queue.
 
    The name of the file to output to (if not specified, output to stdout).
 
+.. option:: -p product [product ...], --product product [product ...]
+
+   Product IDs or name to include in output. May specify multiple products;
+   all other products will be ignored (not included in output or :option:`-c`
+   and :option:`-e` counts). Because this may be used to specify multiple
+   (space-separated) options, use ``--`` to end the list of products before
+   specifying the database (or use ``-p`` as the last option). Adds a table of
+   included products to the output, before the queue output itself.
+
 .. option:: -q, --quiet
 
    Quiet mode: produce no output. Mutually exclusive with :option:`--html`,

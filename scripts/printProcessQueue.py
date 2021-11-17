@@ -7,7 +7,7 @@ import sys
 
 from dbprocessing import DButils
 
-def output_html(items):
+def output_html(items, products=None):
     output = """<!DOCTYPE html>
 <html>
   <head>
@@ -38,6 +38,17 @@ def output_html(items):
     output += '    <h1>{0}</h1>\n'.format(dbu.mission)
     output += '    <h2>{0}</h2>\n'.format(datetime.datetime.utcnow().isoformat())
 
+    if products:
+        output += '    <h2>{0}</h2>\n'.format('Products')
+        output +="""    <table>
+        <tr><th>product_id</th><th>product</th></tr>
+"""
+        for i, prod in enumerate(products):
+            output += '        <tr{}>'.format(
+                " class='alt'" if i % 2 else '')
+            output += '<td>{0}</td><td>{1}</td></tr>\n'.format(
+                prod.product_id, prod.product_name)
+        output += "    </table>\n"
     output += '    <h2>{0}</h2>\n'.format('processQueue')
     output +="""    <table>
         <tr><th>file_id</th><th>filename</th><th>product</th></tr>
@@ -53,11 +64,14 @@ def output_html(items):
     output += "    </table>\n  </body>\n</html>"
     return output
 
-def output_text(items):
+def output_text(items, products=None):
     output = dbu.mission + '\n'
     output += datetime.datetime.utcnow().isoformat() + '\n'
+    if products:
+        output += 'Products\n{}\n'.format('\n'.join([
+            '{}\t{}'.format(p.product_id, p.product_name)
+            for p in products]))
     output += 'ProcessQueue\n'
-
     for index, item in enumerate(items):
         output += '{0}\t{1}\t{2}\n'.format(index, item['file'].filename, item['product'].product_name)
 
@@ -74,6 +88,9 @@ if __name__ == '__main__':
     parser.add_argument(
         'database', action='store', type=str,
         help='Name of database (or sqlite file), i.e. mission, to open.')
+    parser.add_argument(
+        '-p', '--product', nargs='+',
+        help='Limit result and counts to these product IDs or names.')
     returncode = parser.add_mutually_exclusive_group()
     returncode.add_argument("-e", "--exist",  action='store_true',
                             help="Exit code 1 if queue empty; 0 (True) if not.")
@@ -85,10 +102,17 @@ if __name__ == '__main__':
 
     dbu = DButils.DButils(options.database)
     items = dbu.ProcessqueueGetAll()
+    traceback = [dbu.getTraceback('File', v) for v in items]
+    products = None if options.product is None\
+               else [dbu.getEntry('Product', p) for p in options.product]
+    if products:
+        prod_ids = [p.product_id for p in products]
+        traceback = [tb for tb in traceback if tb['product'].product_id
+                     in prod_ids]
 
     if not options.quiet:
-        traceback = [dbu.getTraceback('File', v) for v in items]
-        out = (output_html if options.html else output_text)(traceback)
+        out = (output_html if options.html else output_text)(
+            traceback, products)
         if options.output is None:
             print(out)
         else:
@@ -96,6 +120,6 @@ if __name__ == '__main__':
                 output.write(out)
     del dbu
     if options.exist:
-        sys.exit(not(items))
+        sys.exit(not(traceback))
     if options.count:
-        sys.exit(min(len(items), 255))
+        sys.exit(min(len(traceback), 255))
