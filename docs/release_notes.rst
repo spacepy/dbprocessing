@@ -36,6 +36,9 @@ queue state (`87
 <https://github.com/spacepy/dbprocessing/issues/87>`_, `88
 <https://github.com/spacepy/dbprocessing/pull/88>`_).
 
+Added option :option:`printProcessQueue --product` to filter output
+(`93 <https://github.com/spacepy/dbprocessing/pull/93>`_).
+
 Deprecations and removals
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
