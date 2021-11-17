@@ -26,15 +26,15 @@ format but are not in database, and symlink them to the incoming directory
 so they can be ingested (`54 <https://github.com/spacepy/dbprocessing/
 pull/54>`_).
 
-Python 3 support was added.  (`77 <https://github.com/spacepy/dbprocessing/
+Python 3 support was added (`77 <https://github.com/spacepy/dbprocessing/
 pull/77>`_).
 
 Added options :option:`printProcessQueue --count`,
 :option:`printProcessQueue --exist`, and :option:`printProcessQueue
 --quiet` to allow flow control in shell scripts based on the process
-queue state. (`87
+queue state (`87
 <https://github.com/spacepy/dbprocessing/issues/87>`_, `88
-<https://github.com/spacepy/dbprocessing/pull/88>`_)
+<https://github.com/spacepy/dbprocessing/pull/88>`_).
 
 Deprecations and removals
 ^^^^^^^^^^^^^^^^^^^^^^^^^
