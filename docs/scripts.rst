@@ -352,7 +352,13 @@ Prints the process queue.
 .. option:: -q, --quiet
 
    Quiet mode: produce no output. Mutually exclusive with :option:`--html`,
-   :option:`-o`, :option:`--output`.
+   :option:`-o`, :option:`--output`, :option:`-s`, :option:`--sort`.
+
+.. option:: -s, --sort
+
+   Sort the output. Primary sort by UTC file date, secondary by product name.
+   Default is to output by the order in the process queue, i.e., the order
+   in which files are considered for processing.
 
 .. _scripts_ProcessQueue_py:
 
