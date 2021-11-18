@@ -1,3 +1,5 @@
+"""Handling of version numbers"""
+
 from __future__ import division
 from __future__ import print_function
 
@@ -5,13 +7,16 @@ from functools import total_ordering
 
 
 class VersionError(Exception):
-    """Error class for Version that calls out that an invalid version has been specified"""
+    """Error class for Version
+
+    Calls out that an invalid version has been specified"""
     pass
 
 @total_ordering
 class Version(object):
     """
     A version class to simplify pushing around version information
+
     Handles Boolean operators (>, <, =, !=) and database interface for version is also implemented in another module
 
     The version scheme is X,Y,Z where:

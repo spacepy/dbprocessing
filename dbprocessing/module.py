@@ -1,5 +1,6 @@
 """
-class is meant as a wrapper for the modules script (http://modules.sourceforge.net)
+Wrapper for environment modules script (http://modules.sourceforge.net)
+
 as used on the LANL scheme
 """
 from __future__ import print_function
@@ -9,6 +10,8 @@ import re
 import subprocess
 
 class module(object):
+    """Support for using/loading environment modules"""
+
     def __init__(self, *args):
         """
         Commands are entered as args to this class then parsed
@@ -47,8 +50,7 @@ class module(object):
     @classmethod
     def get_env(self, *args):
         """
-        Return a complete environment suitable for passing through to
-        subprocess.call()
+        Return a complete environment suitable for using in subprocess.call()
 
         :keyward args : Arguments passed straight through to module
 

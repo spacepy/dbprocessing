@@ -67,7 +67,9 @@ def toDatetime(dt, end=False):
 
 def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
     """
-    Return a string of the date format for printing on the screen, if dt is None return now.
+    Return a string of the date format for printing on the screen
+
+    If dt is None return now.
 
     :param dt: The datetime object to format, defaults to now()
     :type dt: datetime.datetime
@@ -95,6 +97,7 @@ def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
 def progressbar(count, blocksize, totalsize, text='Download Progress'):
     """
     Print a progress bar with urllib.urlretrieve reporthook functionality
+
     Taken from spacepy
 
     :param count: The current count of the progressbar
@@ -122,6 +125,7 @@ def progressbar(count, blocksize, totalsize, text='Download Progress'):
 def chunker(seq, size):
     """
     Return a long iterable in a tuple of shorter lists.
+
     Taken from http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
 
     :param seq: Iterable to split up
@@ -154,7 +158,9 @@ def unique(seq):
 
 def expandDates(start_time, stop_time):
     """
-    Given a start and a stop date make all the dates in between, inclusive on the ends
+    Given a start and a stop date make all the dates in between
+
+    Inclusive on the ends
 
     :param start_time: Date to start the list
     :type start_time: datetime.datetime
@@ -186,6 +192,7 @@ def daterange_to_dates(daterange):
 def parseDate(inval):
     """
     Given a date of the for yyyy-mm-dd parse to a datetime.
+
     This is just a wrapper around datetime.datetime.strptime
     If the format is wrong ValueError is raised. 
 
@@ -200,8 +207,9 @@ def parseDate(inval):
 
 def parseVersion(inval):
     """
-    Given a format of the form x.y.z parse to a Version, this is a wrapper
-    around Version.Version.fromString()
+    Given a format of the form x.y.z parse to a Version
+
+    This is a wrapperaround Version.Version.fromString()
 
     :param inval: String Version representation of the form xx.yy.zz
     :type inval: str
@@ -216,6 +224,7 @@ def parseVersion(inval):
 def flatten(l):
     """
     Flatten an irregularly nested list of lists
+
     Taken from http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
 
     :param l: Nested list of lists to flatten
@@ -295,6 +304,7 @@ def strargs_to_args(strargs):
 def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
     """
     Do any substitutions that are needed to put thing in the right place
+
     Honored substitutions used as {Y}{PRODUCT}{DATE}
 
     .. todo:: This may be useless/could be made more useful
@@ -379,7 +389,8 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
 def split_code_args(args):
     """
     Split a string with a bunch of command line arguments into a list
-    as needed by Popen
+
+    As needed by Popen
 
     This is different thatn just split() since we have to keep options
     together with the flags
@@ -403,7 +414,9 @@ def split_code_args(args):
 
 def processRunning(pid):
     """
-    Given a PID see if it is currently running. Taken from from http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
+    Given a PID see if it is currently running.
+
+    Taken from from http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
 
     :param pid: a pid
     :type pid: long

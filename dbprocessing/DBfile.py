@@ -1,3 +1,5 @@
+"""Representations of data files"""
+
 from __future__ import absolute_import
 from __future__ import print_function
 
@@ -16,10 +18,12 @@ class DBfileError(Exception):
 
 
 class DBfile(object):
-    """
-    DBfile class is an extension of Diskfile that takes a physical file on disk and
-    maps it to the database file entry, this is not mapped to te file table in the DB
-    but instead a bridge between the two.
+    """Maps a physical file on disk to database file entry.
+
+    DBfile class is an extension of Diskfile that takes a physical
+    file on disk and maps it to the database file entry, this is not
+    mapped to the file table in the DB but instead a bridge between
+    the two.
     """
 
     def __init__(self, diskfile, dbu, makeDiskFile=False):

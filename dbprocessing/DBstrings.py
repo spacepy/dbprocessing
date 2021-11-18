@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-from __future__ import print_function
-
 """String handling for dbprocessing
 
 Contains functions/objects useful in handling strings related to
 dbprocessing: parsing, formatting, etc.
 """
+
+from __future__ import print_function
 
 __author__ = 'Jonathan Niehof <jniehof@lanl.gov>'
 

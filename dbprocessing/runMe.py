@@ -1,3 +1,8 @@
+"""Support for running processing codes
+
+Interface for running the codes that make data files for the chain.
+"""
+
 from __future__ import print_function
 from __future__ import absolute_import
 
