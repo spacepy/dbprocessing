@@ -37,6 +37,15 @@
    {% endif %}
    {% endblock %}
 
+   {% block attributes %}
+   {% if attributes %}
+   .. rubric:: Attributes
+   {% for item in attributes %}
+   | :data:`{{ item }}`
+   {%- endfor %}
+   {% endif %}
+   {% endblock %}
+
    {% block exceptions %}
    {% if exceptions %}
    .. rubric:: Exceptions
@@ -69,6 +78,14 @@
 
    {% for item in exceptions %}
    .. autoexception:: {{ item }}
+   {%- endfor %}
+   {% endif %}
+   {% endblock %}
+
+   {% block attributes_defns %}
+   {% if attributes %}
+   {% for item in attributes %}
+   .. autodata::  {{ item }}
    {%- endfor %}
    {% endif %}
    {% endblock %}
