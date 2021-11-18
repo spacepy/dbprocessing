@@ -1,7 +1,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
-from collections import namedtuple
 import datetime
 import glob
 from operator import itemgetter, attrgetter
@@ -22,12 +21,6 @@ from . import Utils
 from .Utils import dateForPrinting as DFP
 from . import Version
 
-
-runObj = namedtuple('runObj', 'runme time probfile')
-"""
-used in _start_a_run() and runner() to hold the runme object that is running,
-the time it started, and the probfile pointer
-"""
 
 class ProcessException(Exception):
     """Class for errors in running processes"""
