@@ -12,6 +12,7 @@ from jinja2 import FileSystemLoader, TemplateNotFound
 from jinja2.sandbox import SandboxedEnvironment
 
 from sphinx import package_dir
+import sphinx.errors  ## NEW
 from sphinx.ext.autosummary import import_by_name, get_documenter
 from sphinx.jinja2glue import BuiltinTemplateLoader
 from sphinx.pycode import ModuleAnalyzer  ## NEW
@@ -157,14 +158,18 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
                 if realmodule:
                     #Keyed by a tuple of (class name, attribute name)
                     #Result is a list of docstrings
-                    docattrs = ModuleAnalyzer.for_module(
-                        realmodule).find_attr_docs()
-                    moreattrs = [k[1] for k in docattrs.keys()
-                                 if k[1] not in ns['all_attributes']
-                                 and k[0] == obj.__name__]
-                    ns['all_attributes'].extend(moreattrs)
-                    ns['attributes'].extend(
-                        [a for a in moreattrs if not a.startswith('_')])
+                    try:
+                        docattrs = ModuleAnalyzer.for_module(
+                            realmodule).find_attr_docs()
+                    except sphinx.errors.PycodeError:
+                        pass  # No source code (e.g. internal module)
+                    else:
+                        moreattrs = [k[1] for k in docattrs.keys()
+                                     if k[1] not in ns['all_attributes']
+                                     and k[0] == obj.__name__]
+                        ns['all_attributes'].extend(moreattrs)
+                        ns['attributes'].extend(
+                            [a for a in moreattrs if not a.startswith('_')])
                 ## END NEW
 
             parts = name.split('.')
