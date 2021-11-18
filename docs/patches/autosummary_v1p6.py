@@ -6,6 +6,8 @@ data members. These patches address those limitations.
 
 # Monkey-patch to put data items in automodule
 # This STARTS verbatim from 1.6.7, then new code is commented with ##
+# From sphinx/ext/autosummary/generate.py,
+# Copyright 2007-2018 by the Sphinx team, BSD license
 # 1.5 is functionally same as 1.6 (with type hints and structured
 # a little different, but compatible.)
 # 1.3, 1.4 identical to each other, require some conditionals
