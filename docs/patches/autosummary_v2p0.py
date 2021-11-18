@@ -6,6 +6,8 @@ data members. These patches address those limitations.
 
 # Monkey-patch to put data items in automodule
 # This STARTS verbatim from 2.0.1, then new code is commented with ##
+# From sphinx/ext/autosummary/generate.py,
+# Copyright 2007-2019 by the Sphinx team, BSD license
 # Also works w/o change on 1.8 (only difference is type hints)
 import os.path  ## NEW
 from jinja2 import FileSystemLoader, TemplateNotFound

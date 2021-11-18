@@ -6,6 +6,8 @@ data members. These patches address those limitations.
 
 # Monkey-patch to put data items in automodule
 # This STARTS verbatim from 2.4.4, then new code is commented with ##
+# From sphinx/ext/autosummary/generate.py,
+# Copyright 2007-2020 by the Sphinx team, BSD license
 # 2.3 is identical to 2.4. 2.2 is handled with conditionals.
 # 3.0 identical to 2.4 except wording of one warning.
 from typing import Any, Callable, Dict, List, Set, Tuple
