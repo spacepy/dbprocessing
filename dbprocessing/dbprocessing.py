@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""High-level implementation of the dbprocessing processing queue."""
+
 from __future__ import absolute_import
 from __future__ import print_function
 
@@ -24,9 +26,9 @@ from sqlalchemy.exc import IntegrityError
 
 
 class ProcessQueue(object):
-    """
-    Main code used to process the Queue, looks in incoming and builds all
-    possible files
+    """Main code used to process the Queue.
+
+    Looks in incoming and builds all possible files
 
     @author: Brian Larsen
     @organization: Los Alamos National Lab
@@ -37,7 +39,18 @@ class ProcessQueue(object):
 
     def __init__(self,
                  mission, dryrun=False, echo=False):
+        """Initializes the process queue
 
+        Parameters
+        ----------
+        mission : str
+            Mission database, as in :class:`~dbprocessing.DButils.DButils`.
+        dryrun : bool
+            Treat all functionality as "dry run", make no changes.
+        echo : bool
+            Log all SQL statements (as in
+            :class:`~dbprocessing.DButils.DButils`).
+        """
         self.dryrun = dryrun
         self.mission = mission
         self.tempdir = None
@@ -52,9 +65,7 @@ class ProcessQueue(object):
         DBlogging.dblogger.debug("Entering ProcessQueue")
 
     def __del__(self):
-        """
-        attempt a bit of up
-        """
+        """Clean up (remove temporary files and close database)"""
         self.rm_tempdir()
         try:
             del self.dbu
@@ -217,9 +228,7 @@ class ProcessQueue(object):
                 T0 = time.time()
 
     def figureProduct(self, filename=None):
-        """
-        This function imports the inspectors and figures out which inspectors claim the file
-        """
+        """Imports inspectors and figures out which inspectors claim the file"""
         if filename is None:
             filename = self.filename
         act_insp = self.dbu.getActiveInspectors()
@@ -472,6 +481,20 @@ class ProcessQueue(object):
         return self.dbu.ProcessqueueRawadd(f_ids, incVersion)
 
     def reprocessByCode(self, id_in, startDate=None, endDate=None, incVersion=None):
+        """Add files made by a code to the queue for reprocessing.
+
+        Parameters
+        ----------
+        id_in : :class:`str` or :class:`int`
+            ID or filename of code to reprocess
+        startDate : :class:`~datetime.datetime`, optional
+            First date to reprocess (default all)
+        endDate : :class:`~datetime.datetime`, optional
+            Last date to reprocess (default all)
+        incVersion : :class:`int` {0, 1, 2}, optional
+            Which version number to increment: major (0), minor (1),
+            subminor (2). Forces reprocessing. (default do not force).
+        """
         try:
             code_id = self.dbu.getCodeID(id_in)
             return self._reprocessBy(code=code_id, startDate=startDate, endDate=endDate,
@@ -480,6 +503,20 @@ class ProcessQueue(object):
             DBlogging.dblogger.error('No code_id {0} found in the DB'.format(id_in))
 
     def reprocessByProduct(self, id_in, startDate=None, endDate=None, incVersion=None):
+        """Add files of a particular product to the queue for reprocessing.
+
+        Parameters
+        ----------
+        id_in : :class:`str` or :class:`int`
+            ID or name of code to reprocess
+        startDate : :class:`~datetime.datetime`, optional
+            First date to reprocess (default all)
+        endDate : :class:`~datetime.datetime`, optional
+            Last date to reprocess (default all)
+        incVersion : :class:`int` {0, 1, 2}, optional
+            Which version number to increment: major (0), minor (1),
+            subminor (2). Forces reprocessing (default do not force).
+        """
         try:
             prod_id = self.dbu.getProductID(id_in)
             return self._reprocessBy(product=prod_id, startDate=startDate, endDate=endDate,
@@ -488,10 +525,40 @@ class ProcessQueue(object):
             DBlogging.dblogger.error('No product_id {0} found in the DB'.format(id_in))
 
     def reprocessByDate(self, startDate=None, endDate=None, incVersion=None, level=None):
+        """Add files to the queue for reprocessing, by file date.
+
+        Parameters
+        ----------
+        startDate : :class:`~datetime.datetime`, optional
+            First date to reprocess (default all)
+        endDate : :class:`~datetime.datetime`, optional
+            Last date to reprocess (default all)
+        incVersion : :class:`int` {0, 1, 2}, optional
+            Which version number to increment: major (0), minor (1),
+            subminor (2). Forces reprocessing (default do not force).
+        level : :class:`int`, optional
+            Only reprocess files of this level (default all)
+        """
         return self._reprocessBy(startDate=startDate, endDate=endDate,
                                  incVersion=incVersion, level=level)
 
     def reprocessByInstrument(self, id_in, level=None, startDate=None, endDate=None, incVersion=None):
+        """Add files for an instrument to the queue for reprocessing
+
+        Parameters
+        ----------
+        id_in : :class:`str` or :class:`int`
+            ID or name of instrument to reprocess
+        level : :class:`int`, optional
+            Only reprocess files of this level (default all)
+        startDate : :class:`~datetime.datetime`, optional
+            First date to reprocess (default all)
+        endDate : :class:`~datetime.datetime`, optional
+            Last date to reprocess (default all)
+        incVersion : :class:`int` {0, 1, 2}, optional
+            Which version number to increment: major (0), minor (1),
+            subminor (2). Forces reprocessing (default do not force).
+        """
         try:
             inst_id = self.dbu.getInstrumentID(id_in)
             return self._reprocessBy(instrument=inst_id, level=level, startDate=startDate, endDate=endDate,

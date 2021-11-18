@@ -1,14 +1,7 @@
 #!/usr/bin/env python
-from __future__ import print_function
-
-
 """
-classes as backup to making reports
-"""
+Support for making reports from dbprocessing logs
 
-
-
-"""
 things included are:
     - number and list of files ingested
     - number and list of files requested for ingestion that failed
@@ -19,6 +12,9 @@ TODO include later
     - any errors or anomalies reported (TODO not done)
 
 """
+from __future__ import print_function
+
+
 
 import os
 import re
@@ -64,6 +60,7 @@ class logfile(object):
         self.errors = self._errors()
 
     def setTimerange(self, timerange):
+        """Sets the time range for this report"""
         if len(timerange) != 2:
             raise(ValueError('timerange must be a list/tuple of 2 datetime objects'))
         self.timerange = timerange
@@ -153,6 +150,8 @@ class logfile(object):
         return [lines[v] for v in ind]
 
 class HTMLbase(object):
+    """Support comparisons based on time stored in this object"""
+    
     def __eq__(self, other):
         try:
             return self.dt == other.dt
@@ -190,6 +189,8 @@ class HTMLbase(object):
             return self.dt.strftime('%Y-%m-%d') <= other.dt
 
 class commandsRun(HTMLbase):
+    """Report on commands that have been run by the chain"""
+
     def __init__(self, inStr):
         """
         pass in the line and parse it grabbing what we need
@@ -231,6 +232,8 @@ class commandsRun(HTMLbase):
 
 
 class ingested(HTMLbase):
+    """Report files that have been ingested in to the chain"""
+
     def __init__(self, inStr):
         """
         pass in the line and parse it grabbing what we need
@@ -278,6 +281,8 @@ class ingested(HTMLbase):
 
 
 class movedToError(HTMLbase):
+    """Report files that have moved to the dbprocessing error directory"""
+
     def __init__(self, inStr):
         """
         pass in the lig line and parse it saving what we want
@@ -314,6 +319,7 @@ class movedToError(HTMLbase):
 
 
 class errors(HTMLbase):
+    """Report all ERRORs logged by dbprocessing"""
     def __init__(self, inStr):
         """
         parse the error and collect what we want

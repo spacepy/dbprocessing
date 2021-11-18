@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
+Support for inspectors, which determine product type for a given file.
+
 Inspector requirements:
     - One product per inspector file
     - Must implement a class called Inspector(inspector.inspector)
@@ -66,9 +68,9 @@ class DefaultFormatter(DBstrings.DBformatter):
 
 
 class inspector(object):
-    """
-    ABC for inspectors to be sure the user has implemented what is required
-    and to provide for utility routes common to many inspectors
+    """ ABC for inspectors to be sure the user has implemented what is required
+
+    Provides utility routes common to many inspectors
     """
 
     def __init__(self, filename, dbu, product, **kwargs):
@@ -93,6 +95,7 @@ class inspector(object):
     def inspect(self, filename, kwargs):
         """
         required method to populate the DiskFile object
+
         can take in some keyword arguments specified in the db
         """
         return None
@@ -166,7 +169,7 @@ class inspector(object):
     #==============================================================================
     def extract_YYYYMMDD(self):
         """
-        go through the filename and extract the first valid YYYYMMDD as a datetime
+        go through the filename, extract first valid YYYYMMDD as a datetime
         """
         return extract_YYYYMMDD(self.filename)
 

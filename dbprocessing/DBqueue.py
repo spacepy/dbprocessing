@@ -1,9 +1,16 @@
+"""General deque implementation for dbprocessing"""
+
 from __future__ import print_function
 
 from collections import deque
 
 
 class DBqueue(deque):
+    """General deque
+
+    Extension to :class:`~collections.deque` to add methods
+    :meth:`popiter` and :meth:`popleftiter`.
+    """
     def popleftiter(self):
         """
         Allow a for loop to iterate and pop items from the DBqueue

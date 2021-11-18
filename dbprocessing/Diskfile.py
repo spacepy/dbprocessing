@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""Information regarding a file as stored on disk."""
+
 from __future__ import absolute_import
 from __future__ import print_function
 
@@ -32,8 +34,9 @@ class FilenameError(Exception):
 
 class WriteError(Exception):
     """
-    Exception that a file is not write able by the script, probably doesn't exist or in a ro directory
+    Exception that a file is not write able by the script
 
+    probably doesn't exist or in a ro directory
     """
     def __init__(self, *params):
         super(WriteError, self).__init__(*params)
@@ -43,7 +46,6 @@ class WriteError(Exception):
 class InputError(Exception):
     """
     Exception that input is bad to the DiskFile class
-
     """
     def __init__(self, *params):
         super(InputError, self).__init__(*params)
@@ -55,7 +57,6 @@ class DigestError(Exception):
     Exception that is thrown by calcDigest.
 
     .. note: maybe just combine this with ReadError for the current purpose
-
     """
     def __init__(self, *params):
         super(DigestError, self).__init__(*params)
@@ -64,15 +65,18 @@ class DigestError(Exception):
 
 class Diskfile(object):
     """
-    Diskfile class contains methods for dealing with files on disk,
-    all parsing for what mission files belong to is continued in here
+    Diskfile class contains methods for dealing with files on disk
+    
+    All parsing for what mission files belong to is continued in here
     to add a new mission code must be added here.
     """
 
     def __init__(self, infile, dbu):
         """
-        setup a Diskfile class, takes in a filename and creates a params dict to hold information about the file
-        then tests to see what mission the file is from
+        setup a Diskfile class
+
+        takes in a filename and creates a params dict to hold information
+        about the file then tests to see what mission the file is from
         
         :param infile: a file to create a Diskfile around
         :type infile: str
@@ -120,7 +124,7 @@ class Diskfile(object):
 
     def checkAccess(self):
         """
-        A few simple tests of the input file to be sure the script has the correct access
+        Tests of the input file to be sure the script has the correct access
         """
         # need both read and write access
         self.READ_ACCESS = os.access(self.infile, os.R_OK)

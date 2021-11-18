@@ -1,3 +1,10 @@
+"""Medium-level interface to dbprocessing databases.
+
+Provides interface specific to dbprocessing databases (not general SQL
+databases) and performs most functionality for retrieving, changing, etc.
+of records.
+"""
+
 from __future__ import absolute_import
 from __future__ import print_function
 
@@ -57,18 +64,22 @@ from . import __version__
 
 
 class DBError(Exception):
+    """Error in accessing the database"""
     pass
 
 
 class DBProcessingError(Exception):
+    """Higher-level error (used only for failures in logging)"""
     pass
 
 
 class FilenameParse(Exception):
+    """Not used"""
     pass
 
 
 class DBNoData(Exception):
+    """Expected data not found in the database"""
     pass
 
 
@@ -104,8 +115,9 @@ def postgresql_url(databasename):
 
 
 class DButils(object):
-    """
-    Utility routines for the DBProcessing class, all of these may be user called but are meant to
+    """Utility routines for DBProcessing class
+
+    All of these may be user called but are meant to
     be internal routines for DBProcessing
     """
 
@@ -159,8 +171,7 @@ class DButils(object):
     ####################################
 
     def openDB(self, engine, db_var=None, verbose=False, echo=False):
-        """
-        Setup python to talk to the database, this is where it is, name and password.
+        """Setup python to talk to the database
 
         :param engine: DB engine to connect to
         :type engine: str
@@ -243,8 +254,9 @@ class DButils(object):
             #####################################
 
     def currentlyProcessing(self):
-        """
-        Checks the db to see if it is currently processing, don't want to do 2 at the same time
+        """Checks the db to see if it is currently processing
+
+        Ensures not doing 2 at the same time
 
         :return: false or the pid
         :rtype: bool or int
@@ -378,7 +390,7 @@ class DButils(object):
 
     def checkDiskForFile(self, file_id, fix=False):
         """
-        Check the file system to see if the file exits or not as it says in the db
+        Check if the file existence on disk matches database record
 
         :param file_id: id of the file to check
         :type file_id: int
@@ -407,8 +419,8 @@ class DButils(object):
             return True
 
     def ProcessqueueFlush(self):
-        """
-        remove everything from the process queue
+        """remove everything from the process queue
+
         This is as optimized as it can be
         """
         length = self.ProcessqueueLen()
@@ -586,8 +598,8 @@ class DButils(object):
         return ans
 
     def ProcessqueueClean(self, dryrun=False):
-        """
-        go through the process queue and clear out lower versions of the same files
+        """Keep only latest version of each file in the process queue.
+
         this is determined by product and utc_file_date
         also sorts by level, date
         """
@@ -1045,7 +1057,9 @@ class DButils(object):
 
     def delFilefilelink(self, f, commit = True):
         """
-        Remove entries from Filefilelink, it will remove if the file is in either column
+        Remove entries from Filefilelink
+
+        Will remove if the file is in either column
         """
         f = self.getFileID(f)  # change a name to a number
         n1 = self.session.query(self.Filefilelink).filter_by(source_file=f).delete()
@@ -1069,6 +1083,7 @@ class DButils(object):
     def delProduct(self, pp):
         """
         Removes a product from the db
+
         Note: untested!
         """
         prod = self.getEntry('Product', pp)
@@ -1078,7 +1093,9 @@ class DButils(object):
     def delProductProcessLink(self, ll):
         """
         Removes a product from the db
+
         :param list ll: two element list: process_id, product_id
+
         Note: untested!
         """
         link = self.getEntry('Productprocesslink', ll)
@@ -1088,6 +1105,7 @@ class DButils(object):
     def purgeProcess(self, proc, commit = True):
         """
         Remove process and productprocesslink
+
         :param DButils.Process proc: ID for process to be deleted.
         """
         sq=self.session.query(self.Productprocesslink.input_product_id)\
@@ -1544,8 +1562,11 @@ class DButils(object):
         return d1.file_id
 
     def codeIsActive(self, ec_id, date):
-        """
-        Given a ec_id and a date is that code active for that date and is newest version
+        """Determine if a code is active and newest version.
+
+
+        Given a ec_id and a date is that code active for that date and
+        is newest version
 
         :param ec_id: executable code id to see if is active
         :param date: date object to use when checking
@@ -1577,6 +1598,7 @@ class DButils(object):
     def getFileFullPath(self, filename):
         """
         Return the full path to a file Given the name or id
+
         (name or id is based on type)
 
         TODO, this is really slow, this query made it a lot faster but I bet it can get better
@@ -1744,6 +1766,7 @@ class DButils(object):
     def file_id_Clean(self, invals):
         """
         Given a list of file objects clean out older versions of matching files
+
         matching is defined as same product_id and same utc_file_date
         """
         tmp = []
@@ -1792,6 +1815,7 @@ class DButils(object):
                  limit=None,
                  startTime=None,
                  endTime=None):
+        """Query database for file records, with filters"""
         # if a datetime.datetime comes in this does not work, make them datetime.date
         startDate = Utils.datetimeToDate(startDate)
         endDate = Utils.datetimeToDate(endDate)
@@ -1872,7 +1896,7 @@ class DButils(object):
 
     def getFilesByProductTime(self, product_id, daterange, newest_version=False):
         """
-        Return the files in the db by product id with any data in range specified
+        Return the files in the db by product id with any data in date range
         """
         return self.getFiles(startTime=min(daterange),
                              endTime=max(daterange),
@@ -1889,7 +1913,7 @@ class DButils(object):
 
     def getFilesByProduct(self, prod_id, newest_version=False):
         """
-        Given a product_id or name return all the file instances associated with it
+        Given a product_id or name return all the files associated with it
 
         if newest is set return only the newest files
         """
@@ -1938,7 +1962,9 @@ class DButils(object):
 
     def getActiveInspectors(self):
         """
-        Query the db and return a list of all the active inspector file names [(filename, description, arguments, product), ...]
+        Query the db and return a list of all the active inspector file names
+
+        [(filename, description, arguments, product), ...]
         """
         activeInspector = namedtuple('activeInspector', 'path description arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
@@ -1992,6 +2018,7 @@ class DButils(object):
                        sat_name):
         """
         Returns the satellite ID for an input satellite name
+
         :param sat_name: the satellite name to look up the id
         :type sat_name: str
 
@@ -2027,7 +2054,9 @@ class DButils(object):
 
     def getAllCodesFromProcess(self, proc_id):
         """
-        Given a process id return the code ids that performs that process and the valid dates
+        Given a process id return the code ids that performs that process
+
+        Also returns the valid dates for each code
 
         :return: Code id and dates that perform a process
         :rtype: truple(int, datetime.date, datetime.date)
@@ -2096,8 +2125,7 @@ class DButils(object):
         return self.getDirectory('inspectordir', default=self.CodeDirectory)
 
     def checkIncoming(self, glb='*'):
-        """
-        Check the incoming directory for the current mission and add those files to the getting list
+        """Check the incoming directory for the current mission
 
         :return: processing list of file ids
         :rtype: list
@@ -2122,8 +2150,7 @@ class DButils(object):
 
     def getDirectory(self, column, default=None):
         """
-        Generic directory lookup function, gives directory for the specified
-        column.
+        Look up directory for the specified column.
 
         The mission rootdir may be absolute or relative to current path.
         Directory requested may be in db as absolute or relative to mission
@@ -2205,7 +2232,7 @@ class DButils(object):
 
     def list_release(self, rel_num, fullpath=True):
         """
-        Given a release number return a list of all the filenames with the release
+        Given a release number return all the filenames with the release
         """
         sq = self.session.query(self.Release.file_id).filter_by(release_num=rel_num).all()
         sq = list(map(itemgetter(0), sq))
@@ -2244,7 +2271,7 @@ class DButils(object):
 
     def getTraceback(self, table, in_id, in_id2=None):
         """
-        Master routine for all the getXXXTraceback functions, this will make for less code
+        Master routine for all the getXXXTraceback functions
 
         this is some large select statements with joins in them, these are tested and do work
         """
