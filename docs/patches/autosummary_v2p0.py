@@ -138,6 +138,23 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
                     get_members(obj, 'data', imported=imported_members)
                 ns['attributes'], ns['all_attributes'] = \
                     get_members(obj, 'attribute', imported=imported_members)
+                # Get module-level data attributes
+                realmodule = getattr(obj, '__name__', None)
+                if realmodule:
+                    #Keyed by a tuple of (class name, attribute name)
+                    #Result is a list of docstrings
+                    try:
+                        docattrs = ModuleAnalyzer.for_module(
+                            realmodule).find_attr_docs()
+                    except sphinx.errors.PycodeError:
+                        pass  # No source code (e.g. internal module)
+                    else:
+                        moreattrs = [k[1] for k in docattrs.keys()
+                                     if k[1] not in ns['all_attributes']
+                                     and k[0] == '']  # module-level only
+                        ns['all_attributes'].extend(moreattrs)
+                        ns['attributes'].extend(
+                            [a for a in moreattrs if not a.startswith('_')])
                 ## END NEW
             elif doc.objtype == 'class':
                 ns['members'] = dir(obj)
