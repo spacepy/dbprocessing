@@ -23,10 +23,17 @@ setting up a new processing chain.
 See :doc:`ConfigurationFiles` for a full description of the config file
 format and capability.
 
-.. option:: config_file The name of the config file to ingest
-.. option:: -m <dbname>, --mission <dbname> The database to apply the config file to
-.. option:: -v, --verify  Verify the config file then stop
+.. option:: config_file
 
+   The name of the config file to ingest
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   The database to apply the config file to
+
+.. option:: -v, --verify
+
+   Verify the config file then stop (do not apply to database)
 
 clearProcessingFlag.py
 ----------------------
@@ -34,8 +41,13 @@ clearProcessingFlag.py
 
 Clear a processing flag (lock) on a database that has crashed.
 
-.. option:: database The name of the database to unlock
-.. option:: message Log message to insert into the database
+.. option:: database
+
+   Filename of the database to unlock
+
+.. option:: message
+
+   Log message to insert into the database
 
 compareDB.py
 ------------
@@ -56,12 +68,29 @@ configFromDB.py
 
 Build a config file from an existing database.
 
-.. option:: filename The filename to save the config
-.. option:: -m <dbname>, --mission <dbname> The database to to connect to
-.. option:: -f, --force Force the creation of the config file, allows overwrite
-.. option:: -s, --satellite The name of the satellite for the config file
-.. option:: -i, --instrument The name of the instrument for the config file
-.. option:: -c, --nocomments Make the config file without a comment header block on top
+.. option:: filename
+
+   The filename to save the config
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   The database to connect to
+
+.. option:: -f, --force
+
+   Force the creation of the config file, allows overwrite
+
+.. option:: -s <satellite>, --satellite <satellite>
+
+   The name of the satellite for the config file
+
+.. option:: -i <instrument>, --instrument <instrument>
+
+   The name of the instrument for the config file
+
+.. option:: -c, --nocomments
+
+   Make the config file without a comment header block on top
 
 .. warning:: This is untested and not fully useful yet.
 
@@ -75,7 +104,9 @@ Creates a coverage plot based on config file input. This script is
 useful for determining which files may be missing from a processing
 chain. See note on :ref:`scripts_htmlCoverage`.
 
-.. option:: configfile The config file to read.
+.. option:: configfile
+
+   The config file to read.
 
 .. warning:: Has some bugs. Doesn't catch most recent files reliably or something.
 
@@ -106,14 +137,37 @@ dbOnlyFiles.py
 
 Show files in database but not on disk. Additionally, this can remove files from the db that are only in the db.
 
-.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -f, --fix Fix the database exists_on_disk field
-.. option:: -m <dbname>, --mission <dbname> elected mission database
-.. option:: --echo echo sql queries for debugging
-.. option:: -n, --newest Only check the newest files
-.. option:: --startID The File id to start on
-.. option:: -v, --verbose Print out each file as it is checked
+.. option:: -s <date>, --startDate <date>
+
+   Date to start reprocessing (e.g. 2012-10-02)
+
+.. option:: -e <date>, --endDate <date>
+
+   Date to end reprocessing (e.g. 2012-10-25)
+
+.. option:: -f, --fix
+
+   Fix the database exists_on_disk field
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: --echo
+
+   echo sql queries for debugging
+
+.. option:: -n, --newest
+
+   Only check the newest files
+
+.. option:: --startID <file_id>
+
+   The File id to start on
+
+.. option:: -v, --verbose
+
+   Print out each file as it is checked
 
 .. _scripts_DBRunner:
 
@@ -157,7 +211,7 @@ triggering such processing.
 
    Do not include optional inputs
 
-.. option:: -n, --num-proc
+.. option:: -n <count>, --num-proc <count>
 
    Number of processes to run in parallel
 
@@ -184,7 +238,9 @@ deleteAllDBFiles.py
 
 Deletes all file entries in the database.
 
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
 
 deleteFromDBifNotOnDisk.py
 --------------------------
@@ -192,9 +248,17 @@ deleteFromDBifNotOnDisk.py
 
 Finds all files that are in the DB but not found on the DB
 
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-.. option:: --fix Remove the files from the DB (make a backup first)
-.. option:: --echo Echo sql queries for debugging
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: --fix
+
+   Remove the files from the DB (make a backup first)
+
+.. option:: --echo
+
+   Echo sql queries for debugging
 
 flushProcessQueue.py
 --------------------
@@ -202,7 +266,9 @@ flushProcessQueue.py
 
 Clears the ProcessQueue of a database.
 
-.. option:: Database The name of the database to wipe the ProcesQueue of.
+.. option:: database
+
+   The name of the database to wipe the ProcessQueue of.
 
 histogramCodes.py
 -----------------
@@ -243,10 +309,22 @@ makeLatestSymlinks.py
 
 In a given directory, make symlinks to all the newest versions of files into another directory
 
-.. option:: config The config file
-.. option:: --verbose Print out verbose information
-.. option:: -l, --list Instead of syncing list the sections of the conf file
-.. option:: -f, --filter Comma separated list of strings that must be in the sync conf name (e.g. -f hope,rbspa)
+.. option:: config
+
+   The config file
+
+.. option:: --verbose
+
+   Print out verbose information
+
+.. option:: -l, --list
+
+   Instead of syncing list the sections of the conf file
+
+.. option:: -f <filter_list>, --filter <filter_list>
+
+   Comma separated list of strings that must be in the sync conf name
+   (e.g. ``-f hope,rbspa``)
 
 .. warning:: There's no documentation on the config file
 
@@ -290,9 +368,17 @@ possibleProblemDates.py
 
 A database scrub/validation routine.
 
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-.. option:: --fix Fix the issues (make a backup first)
-.. option:: --echo Echo sql queries for debugging
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: --fix
+
+   Fix the issues (make a backup first)
+
+.. option:: --echo
+
+   Echo sql queries for debugging
 
 .. warning:: Worth looking into and cleaning up a bit; may have sharp edges.
 
@@ -302,8 +388,13 @@ printInfo.py
 
 Prints a table of info about files or products or processes.
 
-.. option:: database The name of the database to print table of
-.. option:: field Either Product or Mission (more to come)
+.. option:: database
+
+   The name of the database to print table of
+
+.. option:: field
+
+   Either Product or Mission (more to come)
 
 .. _scripts_printProcessQueue:
 
@@ -336,11 +427,11 @@ Prints the process queue.
 
    Provide output in HTML (default text).
 
-.. option:: -o filename, --output filename
+.. option:: -o <filename>, --output <filename>
 
    The name of the file to output to (if not specified, output to stdout).
 
-.. option:: -p product [product ...], --product product [product ...]
+.. option:: -p <product> [<product> ...], --product <product> [<product> ...]
 
    Product IDs or name to include in output. May specify multiple products;
    all other products will be ignored (not included in output or :option:`-c`
@@ -377,8 +468,13 @@ Deletes individual files from the database. Pending note on this
 deletes it and everything that depends on it. delete might not, which
 might leave loose ends." Not clear which "delete" this refers to.
 
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-.. option:: -r, --recursive Recursive removal
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: -r, --recursive
+
+   Recursive removal
 
 reprocessByAll.py
 -----------------
@@ -386,10 +482,21 @@ reprocessByAll.py
 
 Goes through the database and adds all the files that are a certain level to the processqueue so that the next ProcessQueue -p will run them
 
-.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -l <level>, --level <level> The level to reprocess for
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
+.. option:: -s <date>, --startDate <date>
+
+   Date to start reprocessing (e.g. 2012-10-02)
+
+.. option:: -e <date>, --endDate <date>
+
+   Date to end reprocessing (e.g. 2012-10-25)
+
+.. option:: -l <level>, --level <level>
+
+   The level to reprocess for
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
 
 .. warning:: Should work, probably doesn't
 
@@ -399,11 +506,25 @@ reprocessByCode.py
 
 Goes through the database and adds all the files that went into the code to the processqueue so that the next ProcessQueue -p will run them
 
-.. option:: codeID code to reprocess for
-.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-.. option:: --force Force the reprocessing. Speicify which version number to increment (1,2,3)
+.. option:: codeID
+
+   code to reprocess for
+
+.. option:: -s <date>, --startDate <date>
+
+   Date to start reprocessing (e.g. 2012-10-02)
+
+.. option:: -e <date>, --endDate <date>
+
+   Date to end reprocessing (e.g. 2012-10-25)
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: --force
+
+   Force the reprocessing. Specify which version number to increment (1,2,3)
 
 .. warning:: Should work, probably doesn't
 
@@ -417,13 +538,27 @@ them.
 
 This code works and is likely the one that should be used most of the
 time for reprocessing files. (Used as the default for do everything on
-a date range, maybe reprocessByAll should go away.
+a date range, maybe reprocessByAll should go away.)
 
-.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-.. option:: --echo Echo sql queries for debugging
-.. option:: --force Force the reprocessing. Speicify which version number to increment (1,2,3)
+.. option:: -s <date>, --startDate <date>
+
+   Date to start reprocessing (e.g. 2012-10-02)
+
+.. option:: -e <date>, --endDate <date>
+
+   Date to end reprocessing (e.g. 2012-10-25)
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: --echo
+
+   Echo sql queries for debugging
+
+.. option:: --force {0,1,2}
+
+   Force the reprocessing. Specify which version number to increment (0,1,2)
 
 reprocessByInstrument.py
 ------------------------
@@ -431,12 +566,27 @@ reprocessByInstrument.py
 
 Goes through the database and adds all the files that are a certain instrument and level to the processqueue so that the next ProcessQueue -p will run them
 
-.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-.. option:: -l <level>, --level <level> The level to reprocess for the given instrument
+.. option:: -s <date>, --startDate <date>
+
+   Date to start reprocessing (e.g. 2012-10-02)
+
+.. option:: -e <date>, --endDate <date>
+
+   Date to end reprocessing (e.g. 2012-10-25)
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: -l <level>, --level <level>
+
+   The level to reprocess for the given instrument
+
 .. option:: --echo Echo sql queries for debugging
-.. option:: --force Force the reprocessing. Specify which version number to increment (1,2,3)
+
+.. option:: --force {0,1,2}
+
+   Force the reprocessing. Specify which version number to increment (0,1,2)
 
 reprocessByProduct.py
 ---------------------
@@ -448,11 +598,25 @@ This reprocessing script works and is used all the time; it's been
 tested much more heavily than the others and is used all the time for
 individual processing.
 
-.. option:: -s <date>, --startDate <date> Date to start reprocessing (e.g. 2012-10-02)
-.. option:: -e <date>, --endDate <date> Date to end reprocessing (e.g. 2012-10-25)
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
-.. option:: --echo Echo sql queries for debugging
-.. option:: --force Force the reprocessing. Specify which version number to increment (1,2,3)
+.. option:: -s <date>, --startDate <date>
+
+   Date to start reprocessing (e.g. 2012-10-02)
+
+.. option:: -e <date>, --endDate <date>
+
+   Date to end reprocessing (e.g. 2012-10-25)
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: --echo
+
+   Echo sql queries for debugging
+
+.. option:: --force {0,1,2}
+
+   Force the reprocessing. Specify which version number to increment (0,1,2)
 
 updateSHAsum.py
 ---------------
@@ -460,8 +624,13 @@ updateSHAsum.py
 
 Goes into the database and update the shasum entry for a file that is changed after ingestion.
 
-.. option:: infile File to update the shasum of
-.. option:: -m <dbname>, --mission <dbname> Selected mission database
+.. option:: infile
+
+   File to update the shasum of
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
 
 updateUnixTime.py
 -----------------
