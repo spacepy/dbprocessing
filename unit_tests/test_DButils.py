@@ -83,6 +83,17 @@ class DBUtilsEmptyTests(TestSetup):
         self.assertEqual('/rootdir/errors', self.dbu.getErrorPath())
         self.assertEqual('/rootdir', self.dbu.getInspectorDirectory())
 
+    def test_addProcessNoOutput(self):
+        """Add a process with no output product"""
+        # This needs to be on "empty" db because our test non-empty
+        # doesn't allow null output product (old database)
+        pid = self.dbu.addProcess('no_output1', '', 'RUN')
+        self.assertIsNone(self.dbu.getEntry('Process', pid).output_product)
+        pid = self.dbu.addProcess('no_output2', None, 'RUN')
+        self.assertIsNone(self.dbu.getEntry('Process', pid).output_product)
+        pid = self.dbu.addProcess('no_output3', 0, 'RUN')
+        self.assertEqual(0, self.dbu.getEntry('Process', pid).output_product)
+
 
 class DBUtilsOtherTests(TestSetup):
     """Tests that are not processqueue or get or add"""

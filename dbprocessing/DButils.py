@@ -902,7 +902,7 @@ class DButils(object):
             raise ValueError("output_timebase invalid choice")
 
         p1 = self.Process()
-        p1.output_product = output_product
+        p1.output_product = Utils.toNone(output_product)
         p1.process_name = process_name
         p1.extra_params = Utils.toNone(extra_params)
         p1.output_timebase = output_timebase
