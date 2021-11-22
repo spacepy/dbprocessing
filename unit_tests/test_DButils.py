@@ -91,7 +91,8 @@ class DBUtilsEmptyTests(TestSetup):
         self.assertIsNone(self.dbu.getEntry('Process', pid).output_product)
         pid = self.dbu.addProcess('no_output2', None, 'RUN')
         self.assertIsNone(self.dbu.getEntry('Process', pid).output_product)
-        pid = self.dbu.addProcess('no_output3', 0, 'RUN')
+        # Verify product ID of zero isn't smashed
+        pid = self.dbu.addProcess('output_pid_zero', 0, 'DAILY')
         self.assertEqual(0, self.dbu.getEntry('Process', pid).output_product)
 
 
