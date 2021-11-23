@@ -38,6 +38,59 @@ config file format and capability.
 
    Verify the config file then stop (do not apply to database)
 
+addProductProcessLink.py
+------------------------
+.. program:: addProductProcessLink.py
+
+Add a new entry to the product-process link table, so that an existing
+product is added as a new input to an existing process.
+
+.. option:: -n <dbname>, --name <dbname>
+
+   The mission database to update.
+
+.. option:: -c <process>, --proc <process>
+
+   Name or ID of the process to update.
+
+.. option:: -d <product>, --prod <product>
+
+   Name or ID of the product to now make an input to :option:`--proc`.
+
+.. option:: -o, --opt
+
+   Make :option:`--prod` a mandatory input to :option:`--proc`. Default:
+   new input is optional.
+
+.. option:: -y, --yday
+
+   Also provide previous day of :option:`--prod` when making a particular
+   day using :option:`--proc`.
+
+.. option:: -t, --tmrw
+
+   Also provide next day of :option:`--prod` when making a particular
+   day using :option:`--proc`.
+
+changeProductDir.py
+-------------------
+.. program:: changeProductDir.py
+
+Change the directory storing a product, and move all files of that
+product to the new directory.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   The mission database to update.
+
+.. option:: product
+
+   Name or ID of the product to change.
+
+.. option:: newdir
+
+   New directory to move the file to.
+
 clearProcessingFlag.py
 ----------------------
 .. program:: clearProcessingFlag.py
@@ -261,6 +314,52 @@ other tables; does not remove file from disk.
 
    Selected mission database
 
+fast_data.py
+------------
+.. program:: fast_data.py
+
+Delete old versions of files, by date. Used for files that may be
+rapidly reprocessed, and thus old versions may not be of interest. The
+assumption is that files *before* a certain cutoff date have
+potentially been referenced and should be retained, and only files
+after that cutoff date are subject to removal.
+
+Removes all Level0 files, and all of their children, that are not the
+newest version and are newer than the cut off date. It will still keep
+the records of the files in the dbprocessing database, but sets
+exists_on_disk to false.
+
+The newest version of a file is never deleted. Files which are in the
+release table are also not deleted.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: --cutoff <date>
+
+   Specify the cutoff date; only delete files newer than this date. This
+   is specified by the *file* date, i.e. the data of data in the file,
+   not the timestamp of the file on the disk. Required, in form YYYY-MM-DD.
+
+.. option:: -a <directory>, --archive <directory>
+
+   If specified, move files to this archive directory rather than deleting.
+
+.. option:: --reap-files
+
+   Remove all matching files from disk (or archives if using :option:`-a`).
+   Files remain in the database but are marked as not existing on disk.
+
+.. option:: --reap-records
+
+   Remove matching files from the database *if* they are marked as not existing
+   on disk. Will also remove all references to the file from other tables.
+
+.. option:: --verbose
+
+   Print the name of files as they are deleted (from disk or database).
+
 flushProcessQueue.py
 --------------------
 .. program:: flushProcessQueue.py
@@ -453,7 +552,7 @@ possibleProblemDates.py
 -----------------------
 .. program:: possibleProblemDates.py
 
-Check for various possible database inconsistencies.
+Check for various possible database inconsistencies. See also `scrubber.py`_.
 
 .. option:: -m <dbname>, --mission <dbname>
 
@@ -686,6 +785,22 @@ to each deleted feile from the database. Does not remove from disk.
 
    Verbose: print all files removed.
 
+replaceArgsWithRootdir.py
+-------------------------
+.. program:: replaceArgsWithRootdir.py
+
+Replace all references to the root directory of a mission in code
+arguments with ``{ROOTDIR}``, so that future changes to the mission's
+root directory will propagate to the arguments. I.e. replace explicit
+hardcoded references to a reference that will always expand to the
+current value.
+
+.. note:: Currently only works on sqlite databases.
+
+.. option:: mission
+
+   Mission database to update
+
 reprocessByCode.py
 ------------------
 .. program:: reprocessByCode.py
@@ -822,6 +937,17 @@ individual processing.
 .. option:: --force {0,1,2}
 
    Force the reprocessing. Specify which version number to increment (0,1,2)
+
+scrubber.py
+-----------
+.. program:: scrubber.py
+
+Checks a database for possible inconsistencies or problems. See also
+`possibleProblemDates.py`_
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Mission database to check
 
 updateSHAsum.py
 ---------------
