@@ -29,15 +29,15 @@ pull/54>`_).
 Python 3 support was added (`77 <https://github.com/spacepy/dbprocessing/
 pull/77>`_).
 
-Added options :option:`printProcessQueue --count`,
-:option:`printProcessQueue --exist`, and :option:`printProcessQueue
+Added options :option:`printProcessQueue.py --count`,
+:option:`printProcessQueue.py --exist`, and :option:`printProcessQueue.py
 --quiet` to allow flow control in shell scripts based on the process
 queue state (`87
 <https://github.com/spacepy/dbprocessing/issues/87>`_, `88
 <https://github.com/spacepy/dbprocessing/pull/88>`_).
 
-Added options :option:`printProcessQueue --product` to filter output
-and :option:`printProcessQueue --sort` to sort output
+Added options :option:`printProcessQueue.py --product` to filter output
+and :option:`printProcessQueue.py --sort` to sort output
 (`93 <https://github.com/spacepy/dbprocessing/pull/93>`_).
 
 Deprecations and removals

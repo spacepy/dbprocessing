@@ -3,20 +3,43 @@ Configuration Files
 
 Basics
 ------
-Configuration files in this project are INI files. The configuration file consists of sections,
-led by a [section] header and followed by name=value properties.
 
-Note that leading whitespace is removed from values.
-The optional values can contain format strings which refer to other values in the same section,
-or values in a special DEFAULT section. Additional defaults can be provided on initialization
-and retrieval.
+Configuration files in this project are INI files as supported by the
+:mod:`configparser` Python module. Refer to that documentation for
+all the detailed features of the format.
 
-Note that leading whitespace is removed from values. Configuration files may include comments,
-prefixed by '#' or ';'. Comments may appear on their own in an otherwise empty line, or may be
-entered in lines holding values or section names. In the latter case, they need to be preceded
-by a whitespace character to be recognized as a comment. (For backwards compatibility, only ;
-starts an inline comment, while # does not.)
+The files consist of sections, delimited by a ``[section]`` header and
+containing ``name=value`` properties. Leading whitespace is removed
+from values. Lines starting with ``#`` or ``;`` are treated as
+comments.
 
+.. _configurationfiles_makeLatestSymlinks:
+
+makeLatestSymlinks.py
+---------------------
+.. code-block:: ini
+
+    [isois]
+    # Directory containing the data files
+    sourcedir = ~/dbp_py3/data/ISOIS/level1/
+    # Directory to make the symlinks in
+    destdir = ~/tmp/
+    # First date to link
+    startdate = 2010-01-01
+    # Last date to link
+    enddate = 2021-01-01
+    # Number of days before present not to link (e.g. to keep internal-only)
+    deltadays = 60
+    # glob for files to match
+    filter = psp_isois_l1-sc-hk_*.cdf
+    # Link directories as well as files
+    linkdirs = True
+    # Mode to use when making output directory
+    outmode = 775
+    # Do not limit based on date (i.e., ignore date options; they're still required)
+    nodate = False
+
+.. _configurationfiles_coveragePlot:
 
 coveragePlot.py
 ---------------
@@ -89,6 +112,8 @@ coveragePlot.py
     yticklabel3 = M75
     yticklabel4 = HIGH
     yticklabel5 = FULL
+
+.. _configurationfiles_addFromConfig:
 
 addFromConfig.py
 ----------------

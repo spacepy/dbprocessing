@@ -15,13 +15,14 @@ directory.
 
 addFromConfig.py
 ----------------
-.. program:: addFromConfig
+.. program:: addFromConfig.py
 
 Adds data to a database from a config file. This is the second step in
 setting up a new processing chain.
 
-See :doc:`ConfigurationFiles` for a full description of the config file
-format and capability.
+See the :ref:`configuration file documentation
+<configurationfiles_addFromConfig>` for a full description of the
+config file format and capability.
 
 .. option:: config_file
 
@@ -37,9 +38,19 @@ format and capability.
 
 clearProcessingFlag.py
 ----------------------
-.. program:: clearProcessingFlag
+.. program:: clearProcessingFlag.py
+
+.. index::
+   single: processing flag
 
 Clear a processing flag (lock) on a database that has crashed.
+
+The :meth:`DButils.startLogging()
+<dbprocessing.DButils.DButils.startLogging>` method locks the database
+to avoid conflicts from simultaneous processing. This is only
+currently used by `ProcessQueue.py`_; if it crashes before
+completion, the lock will still be set and needs to be cleared before
+running `ProcessQueue.py`_ again.
 
 .. option:: database
 
@@ -47,7 +58,7 @@ Clear a processing flag (lock) on a database that has crashed.
 
 .. option:: message
 
-   Log message to insert into the database
+   Log message to insert into the database, noting reason for the unlock.
 
 compareDB.py
 ------------
@@ -64,9 +75,11 @@ compared by filename. Output is printed to the screen.
 
 configFromDB.py
 ---------------
-.. program:: configFromDB
+.. program:: configFromDB.py
 
 Build a config file from an existing database.
+
+.. warning:: This is untested and not fully useful yet.
 
 .. option:: filename
 
@@ -92,62 +105,61 @@ Build a config file from an existing database.
 
    Make the config file without a comment header block on top
 
-.. warning:: This is untested and not fully useful yet.
-
 .. _scripts_coveragePlot:
 
 coveragePlot.py
 ---------------
-.. program:: coveragePlot
+.. program:: coveragePlot.py
 
 Creates a coverage plot based on config file input. This script is
 useful for determining which files may be missing from a processing
-chain. See note on :ref:`scripts_htmlCoverage`.
+chain. Either this or `htmlCoverage.py`_ works (probably this)
 
 .. option:: configfile
 
-   The config file to read.
+   The config file to read. See the :ref:`configuration file
+   documentation <configurationfiles_coveragePlot>`.
 
-.. warning:: Has some bugs. Doesn't catch most recent files reliably or something.
-
-See :doc:`ConfigurationFiles` for a full description of the config file
-format and capability.
-
+.. warning:: Has some bugs, possibly not catching most recent files reliably.
 
 CreateDB.py
 -----------
-.. program:: CreateDB
+.. program:: CreateDB.py
 
-Create an empty sqlite database for use in dbprocessing.
-(currently creates a RBSP database, this should be updated as an option).
+Create an empty database with all dbprocessing tables.
 
 This is the first step in the setup of a new processing chain.
 
 .. option:: -d <dialect>, --dialect <dialect>
 
-   sqlalchemy dialect to use, ``sqlite`` (default) or ``postgresql``
+   sqlalchemy dialect to use, ``sqlite`` (default) or ``postgresql``.
+   If ``postgresql``, database must exist, this script will set up
+   the tables.
 
 .. option:: dbname
 
-   The name of the database to create
+   The name of the database to create (filename if using sqlite).
 
 dbOnlyFiles.py
 --------------
 .. program:: dbOnlyFiles.py
 
-Show files in database but not on disk. Additionally, this can remove files from the db that are only in the db.
+Show file ID of files which are recorded in the database as being on
+disk, but where the file is not present on disk. Optionally mark these
+missing files in the database as not being on disk.
 
 .. option:: -s <date>, --startDate <date>
 
-   Date to start reprocessing (e.g. 2012-10-02)
+   First date to check (e.g. 2012-10-02)
 
 .. option:: -e <date>, --endDate <date>
 
-   Date to end reprocessing (e.g. 2012-10-25)
+   Last date to check, inclusive (e.g. 2012-10-25)
 
 .. option:: -f, --fix
 
-   Fix the database exists_on_disk field
+   Update database ``exists_on_disk`` to ``False`` for files which
+   are not present.
 
 .. option:: -m <dbname>, --mission <dbname>
 
@@ -175,7 +187,9 @@ DBRunner.py
 -----------
 .. program:: DBRunner.py
 
-Used to demo run codes for certain dates out of the database. This primarily used in testing can also be used to reprocess files as needed
+Directly execute codes in the database. Although primarily used in
+testing, this can also be used to reprocess files as needed, or to
+execute codes with no input products.
 
 As is typical, processes for which there are no input files for a date will
 not be run. However, if a process has no input *products*, dates specified
@@ -201,11 +215,11 @@ triggering such processing.
 
 .. option:: -s <date>, --startDate <date>
 
-   Date to start search (e.g. 2012-10-02 or 20121002)
+   First date to run code for (e.g. 2012-10-02 or 20121002)
 
 .. option:: -e <date>, --endDate <date>
 
-   Date to end search (e.g. 2012-10-25 or 20121025)
+   Last date to run code, inclusive (e.g. 2012-10-25 or 20121025)
 
 .. option:: --nooptional
 
@@ -217,52 +231,37 @@ triggering such processing.
 
 .. option:: -i, --ingest
 
-   Ingest created files into the database. This will also add them to the
-   process queue, to be built into further products by ProcessQueue -p.
-   (Default: create in current directory and do not add to database.)
+   Ingest created files into the database. This will also add them to
+   the process queue, to be built into further products by
+   :option:`ProcessQueue.py -p`.  (Default: create in current
+   directory and do not add to database.)
 
 .. option:: -u, --update
 
    Only run files that have not yet been created or with updated codes.
-   Mutually exclusive with --force, -v. (Default: run all.)
+   Mutually exclusive with :option:`--force`, :option:`-v`. (Default: run all.)
 
 .. option:: --force {0,1,2}
 
    Run all files in given date range and always increment version
-   (0: interface; 1: quality; 2: revision). Mutually exclusive with -u, -v.
+   (0: interface; 1: quality; 2: revision). Mutually exclusive with
+   :option:`-u`, :option:`-v`.
    (Default: run all but do not increment version.)
 
 deleteAllDBFiles.py
 -------------------
-.. program:: deleteAllDBFiles
+.. program:: deleteAllDBFiles.py
 
-Deletes all file entries in the database.
-
-.. option:: -m <dbname>, --mission <dbname>
-
-   Selected mission database
-
-deleteFromDBifNotOnDisk.py
---------------------------
-.. program:: deleteFromDBifNotOnDisk
-
-Finds all files that are in the DB but not found on the DB
+Deletes all file entries in the database. Removes all references in
+other tables; does not remove file from disk.
 
 .. option:: -m <dbname>, --mission <dbname>
 
    Selected mission database
-
-.. option:: --fix
-
-   Remove the files from the DB (make a backup first)
-
-.. option:: --echo
-
-   Echo sql queries for debugging
 
 flushProcessQueue.py
 --------------------
-.. program:: flushProcessQueue
+.. program:: flushProcessQueue.py
 
 Clears the ProcessQueue of a database.
 
@@ -272,13 +271,36 @@ Clears the ProcessQueue of a database.
 
 histogramCodes.py
 -----------------
-may or may not still work, read logs to find out what codes take a long time to run
+Reads log files to find how long codes took to run; creates a histogram
+(PNG output) for each code, showing the number of runs for each runtime.
+
+.. option:: logfile
+
+   Log file to read, specify multiple times to read many log files.
 
 .. _scripts_htmlCoverage:
 
 htmlCoverage.py
 ---------------
-either this or :ref:`scripts_coveragePlot` works, not both.
+Create HTML file with table showing the versions of products present
+in the database by date.
+
+.. note::
+
+   Either this or :ref:`scripts_coveragePlot` works, not both.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Desired mission database
+
+.. option:: -d <deltadays>, --deltadays <deltadays>
+
+   Provide output this many days past the last file in the database.
+   (Default: 3)
+
+.. option:: outbase
+
+   String to use at the beginning of each html output file.
 
 .. _scripts_linkUningested:
 
@@ -307,11 +329,21 @@ makeLatestSymlinks.py
 ---------------------
 .. program:: makeLatestSymlinks
 
-In a given directory, make symlinks to all the newest versions of files into another directory
+Create symbolic links to the latest version of files.
+
+For a directory containing files ("source"), creates symlinks in a
+different directory ("destination"). For each file in source, only the
+latest version will be linked in the destination.  Useful for having
+one directory with all version of files and a different directory with
+just the latest versions for each product and date.
+
+.. note:: Operates strictly on the basis of filenames; does not access the
+	  database.
 
 .. option:: config
 
-   The config file
+   The config file. See the :ref:`configuration file documentation
+   <configurationfiles_makeLatestSymlinks>` for details.
 
 .. option:: --verbose
 
@@ -325,8 +357,6 @@ In a given directory, make symlinks to all the newest versions of files into ano
 
    Comma separated list of strings that must be in the sync conf name
    (e.g. ``-f hope,rbspa``)
-
-.. warning:: There's no documentation on the config file
 
 .. _MigrateDB:
 
@@ -352,21 +382,76 @@ Will display all possible changes and prompt for confirmation.
 
 missingFilesByProduct.py
 ------------------------
-Attempt to reprocess files that are missing, 90% solution, not used much, but did work
+.. program:: missingFilesByProduct.py
+
+Find files which appear to be missing (based on gaps in the sequence)
+and, optionally, attempt to reprocess them.
+
+.. note:: 90% solution, not used much, but did work
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: product_id
+
+   ID of product to check for gaps.
+
+.. option:: -s <date>, --startDate <date>
+
+   First date to check (e.g. 2012-10-02). Default 2021-08-30.
+
+.. option:: -e <date>, --endDate <date>
+
+   Last date to check, inclusive (e.g. 2012-10-25). Default today.
+
+.. option:: -p, --process
+
+   Add missing dates to the queue for processing. Files added are
+   from the parent product of the missing product, so :option:`--parent`
+   is required.
+
+.. option:: --parent <parent_id>
+
+   Product ID of the parent product, i.e. the product which is used as input
+   to :option:`product_id`.
+
+.. option:: --echo
+
+   echo sql queries for debugging
+
+.. option:: -f <filter>, --filter <filter>
+
+   Unused. Intended to be space-separated globs to filter filenames.
+
 
 missingFiles.py
 ---------------
-.. program:: missingFiles
+.. program:: missingFiles.py
 
-Prints out what's missing, based on noncontiguous date ranges
+Reprocesses all missing files, based on noncontiguous date
+ranges. Implemented as multiple calls to `missingFilesByProduct.py`_.
 
 .. warning:: Maybe works, maybe not
 
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: -s <date>, --startDate <date>
+
+   First date to check (e.g. 2012-10-02). Default 2021-08-30.
+
+.. option:: -e <date>, --endDate <date>
+
+   Last date to check, inclusive (e.g. 2012-10-25). Default today.
+
+
 possibleProblemDates.py
 -----------------------
-.. program:: possibleProblemDates
+.. program:: possibleProblemDates.py
 
-A database scrub/validation routine.
+Check for various possible database inconsistencies.
 
 .. option:: -m <dbname>, --mission <dbname>
 
@@ -374,7 +459,7 @@ A database scrub/validation routine.
 
 .. option:: --fix
 
-   Fix the issues (make a backup first)
+   Fix the issues. No backups are made, and not all problems are fixable.
 
 .. option:: --echo
 
@@ -384,9 +469,9 @@ A database scrub/validation routine.
 
 printInfo.py
 ------------
-.. program:: printInfo
+.. program:: printInfo.py
 
-Prints a table of info about files or products or processes.
+Print summary information about entries in the database.
 
 .. option:: database
 
@@ -394,15 +479,32 @@ Prints a table of info about files or products or processes.
 
 .. option:: field
 
-   Either Product or Mission (more to come)
+   Table for which to print information: ``Code``, ``File``, ``Mission``,
+   ``Process``, or ``Product``.
+
+.. option:: -s <date>, --startDate <date>
+
+   First date to check (e.g. 2012-10-02). Only used for :option:`field`
+   of ``File``.
+
+.. option:: -e <date>, --endDate <date>
+
+   Last date to check, inclusive (e.g. 2012-10-25). Only used for
+   :option:`field` of ``File``.
+
+.. option:: -p <product>, --product <product>
+
+   Product ID or name to print files for, if :option:`field` is ``File``.
+   Otherwise unused.
 
 .. _scripts_printProcessQueue:
 
 printProcessQueue.py
 --------------------
-.. program:: printProcessQueue
+.. program:: printProcessQueue.py
 
-Prints the process queue.
+Prints the process queue, i.e., the list of files to consider as
+potential inputs for processing.
 
 .. option:: database
 
@@ -455,18 +557,119 @@ Prints the process queue.
 
 ProcessQueue.py
 ---------------
-.. program:: ProcessQueue
+.. program:: ProcessQueue.py
 
-The main thing
+The main script of dbprocessing. Operates in one of two modes. If
+:option:`-i` is specified, attempts to ingest new files from the
+incoming directory into the database. As files are ingested, they are
+added to the process queue. If :option:`-p` is specified, processes
+the process queue. For each file on the queue, consider all possible
+files that can be made from it. If those files are not up-to-date
+(i.e., are not newer than the codes that make those files and all its
+input files), run the relevant codes to make those new files. These
+new files are ingested, added to the process queue, and similarly
+evaluated; the script does not return until the process queue is
+empty.
+
+The normal use of dbprocessing is regular calls to
+:option:`ProcessQueue.py -i` followed by :option:`ProcessQueue.py -p`.
+
+.. option:: -i, --ingest
+
+   Ingest files: evaluate all files in the incoming directory, attempt
+   to add them to the database, move them to the appropriate directory
+   for their identified product, and add them to the process queue.
+
+.. option:: -p, --process
+
+   Process files: make all possible out-of-date outputs of all of
+   the inputs on the process queue, and add these new files to the
+   process queue. Repeat until the queue is empty.
+
+Common options
+^^^^^^^^^^^^^^
+These options are used with :option:`ProcessQueue.py -i` and
+:option:`ProcessQueue.py -p`.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   The mission database to connect to
+
+.. option:: -l <loglevel>, --log-level <loglevel>
+
+   Set the logging level; messages of at least this priority are written
+   to the log. Default ``debug``. See :meth:`~logging.Logger.setLevel` for
+   valid levels.
+
+.. option:: --echo
+
+   echo sql queries for debugging
+
+.. option:: -d, --dryrun
+
+   Only perform a dry run, do not perform ingest/process.
+
+   .. warning::
+
+      This is implemented via the ``dryrun`` kwarg to
+      :class:`~dbprocessing.dbprocessing.ProcessQueue` and has not
+      been fully tested (there may be side effects).
+
+.. option:: -r, --report
+
+   Make an HTML report
+
+   .. note::
+
+      Not implemented.
+
+Ingest mode options
+^^^^^^^^^^^^^^^^^^^
+These options are only used with :option:`ProcessQueue.py -i`.
+
+.. option:: --glb <glob>
+
+   Only import files from the incoming directory if their name matches
+   this pattern. See :mod:`glob` for details. Default ``*``, which will
+   match all files but ignore files that start with ``.``.
+
+Process mode options
+^^^^^^^^^^^^^^^^^^^^
+These options are only used with :option:`ProcessQueue.py -p`.
+
+.. option:: -n <numproc>, --num-proc <numproc>
+
+   Number of processes to run at once. This is the number of processing
+   codes to launch at a given time to create new files; each may itself
+   use multiple processors. Default 2.
+
+.. option:: -o <process>, --only <process>
+
+   Comma-separated list of processes (IDs or names) to run. Other
+   processes will not be run, as if they did not exist. This does
+   not affect the removal of files from the process queue: a file
+   is removed from the queue and evaluated for possible processing,
+   and processing only proceeds if potential processes are on the
+   provided list. The file is not returned to the queue if any other
+   processes are skipped.
+
+.. option:: -s
+
+   Skip processes with a RUN timebase. Because these processes do not
+   create an output file, they are never "up to date" and it may be useful
+   to skip them to avoid extra processing time.
+
 
 purgeFileFromDB.py
 ------------------
-.. program:: purgeFileFromDB
+.. program:: purgeFileFromDB.py
 
-Deletes individual files from the database. Pending note on this
-"different than delete how? This might be the one to use. purge
-deletes it and everything that depends on it. delete might not, which
-might leave loose ends." Not clear which "delete" this refers to.
+Deletes individual files from the database. Also removes all references
+to each deleted feile from the database. Does not remove from disk.
+
+.. option:: filename
+
+   Name of the file to remove; specify multiple files to remove them all.
 
 .. option:: -m <dbname>, --mission <dbname>
 
@@ -474,41 +677,28 @@ might leave loose ends." Not clear which "delete" this refers to.
 
 .. option:: -r, --recursive
 
-   Recursive removal
+   Recursive removal: remove not only this file, but all files for
+   which it is an input.
 
-reprocessByAll.py
------------------
-.. program:: reprocessByAll
+.. option:: -v, --verbose
 
-Goes through the database and adds all the files that are a certain level to the processqueue so that the next ProcessQueue -p will run them
-
-.. option:: -s <date>, --startDate <date>
-
-   Date to start reprocessing (e.g. 2012-10-02)
-
-.. option:: -e <date>, --endDate <date>
-
-   Date to end reprocessing (e.g. 2012-10-25)
-
-.. option:: -l <level>, --level <level>
-
-   The level to reprocess for
-
-.. option:: -m <dbname>, --mission <dbname>
-
-   Selected mission database
-
-.. warning:: Should work, probably doesn't
+   Verbose: print all files removed.
 
 reprocessByCode.py
 ------------------
-.. program:: reprocessByCode
+.. program:: reprocessByCode.py
 
-Goes through the database and adds all the files that went into the code to the processqueue so that the next ProcessQueue -p will run them
+Add all files made by a given code to the process queue, so they will
+be evaluated as inputs on the next run of :option:`ProcessQueue.py
+-p`.
 
-.. option:: codeID
+.. warning:: Should work, probably doesn't
 
-   code to reprocess for
+.. option:: code
+
+   Name or ID of code to reprocess. Files *made by this code* will be
+   added to the process queue to be considered as inputs; this is
+   *not* the code which will be run when those files are reprocessed.
 
 .. option:: -s <date>, --startDate <date>
 
@@ -522,23 +712,21 @@ Goes through the database and adds all the files that went into the code to the 
 
    Selected mission database
 
-.. option:: --force
+.. option:: --force {0,1,2}
 
-   Force the reprocessing. Specify which version number to increment (1,2,3)
-
-.. warning:: Should work, probably doesn't
+   Force the reprocessing. Specify which version number to increment (0,1,2)
 
 reprocessByDate.py
 ------------------
-.. program:: reprocessByDate
+.. program:: reprocessByDate.py
 
 Goes through the database and adds all the files that are in a date
-range to the processqueue so that the next ProcessQueue -p will run
-them.
+range to the process queue so that the next :option:`ProcessQueue.py
+-p` will run them.
 
 This code works and is likely the one that should be used most of the
 time for reprocessing files. (Used as the default for do everything on
-a date range, maybe reprocessByAll should go away.)
+a date range.)
 
 .. option:: -s <date>, --startDate <date>
 
@@ -560,11 +748,21 @@ a date range, maybe reprocessByAll should go away.)
 
    Force the reprocessing. Specify which version number to increment (0,1,2)
 
+.. option:: --level <level>
+
+   Only reprocess files of this level.
+
 reprocessByInstrument.py
 ------------------------
-.. program:: reprocessByInstrument
+.. program:: reprocessByInstrument.py
 
-Goes through the database and adds all the files that are a certain instrument and level to the processqueue so that the next ProcessQueue -p will run them
+Adds all database files of a particular instrument to the process
+queue so that the next :option:`ProcessQueue.py -p` will run them.
+
+.. option:: instrument
+
+   The instrument to reprocess; only products of this instrument
+   are added to the process queue. Name or ID.
 
 .. option:: -s <date>, --startDate <date>
 
@@ -590,13 +788,18 @@ Goes through the database and adds all the files that are a certain instrument a
 
 reprocessByProduct.py
 ---------------------
-.. program:: reprocessByProduct
+.. program:: reprocessByProduct.py
 
-Goes through the database and adds all the files that are a certain product and put then to the processqueue so that the next ProcessQueue -p will run them.
+Adds all database files of a particular product to the process
+queue so that the next :option:`ProcessQueue.py -p` will run them.
 
 This reprocessing script works and is used all the time; it's been
 tested much more heavily than the others and is used all the time for
 individual processing.
+
+.. option:: product
+
+   Add files of this product, ID or name.
 
 .. option:: -s <date>, --startDate <date>
 
@@ -620,9 +823,10 @@ individual processing.
 
 updateSHAsum.py
 ---------------
-.. program:: updateSHAsum
+.. program:: updateSHAsum.py
 
-Goes into the database and update the shasum entry for a file that is changed after ingestion.
+Update the stored shasum for a file; useful if the file were changed after
+ingestion.
 
 .. option:: infile
 
@@ -657,7 +861,7 @@ in the directory ``examples/scripts``.
 
 addVerboseProvenance.py
 -----------------------
-.. program:: addVerboseProvenance
+.. program:: addVerboseProvenance.py
 
 Go into the database and get the verbose provenance for a file
 then add that to the global attrs for the CDF file.
