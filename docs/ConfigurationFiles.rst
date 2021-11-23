@@ -13,106 +13,6 @@ containing ``name=value`` properties. Leading whitespace is removed
 from values. Lines starting with ``#`` or ``;`` are treated as
 comments.
 
-.. _configurationfiles_makeLatestSymlinks:
-
-makeLatestSymlinks.py
----------------------
-.. code-block:: ini
-
-    [isois]
-    # Directory containing the data files
-    sourcedir = ~/dbp_py3/data/ISOIS/level1/
-    # Directory to make the symlinks in
-    destdir = ~/tmp/
-    # First date to link
-    startdate = 2010-01-01
-    # Last date to link
-    enddate = 2021-01-01
-    # Number of days before present not to link (e.g. to keep internal-only)
-    deltadays = 60
-    # glob for files to match
-    filter = psp_isois_l1-sc-hk_*.cdf
-    # Link directories as well as files
-    linkdirs = True
-    # Mode to use when making output directory
-    outmode = 775
-    # Do not limit based on date (i.e., ignore date options; they're still required)
-    nodate = False
-
-.. _configurationfiles_coveragePlot:
-
-coveragePlot.py
----------------
-.. code-block:: ini 
-
-    #############################
-    # sample config file
-    #############################
-    ## ##################
-    ## # Substitutions
-    ## # {TODAY}
-    ## # {N DAYS}  -> add N days to the previous where N is an int
-
-
-    ## ##################
-    ## # Required elements
-
-    [settings]
-    mission = ~/RBSP_MAGEIS.sqlite
-    outformat = pdf
-    filename_format = MagEIS_L3_Coverage_{TODAY}
-    startdate = 20120901
-    enddate = {TODAY} + {7 DAYS}
-
-
-    ## ###############################################
-    ## # Plots
-    ## ###############################################
-    [panel]
-    ## # in the panel section we define what will be plotted
-    ## # N keys pf plotN define subplots
-    ## # daysperplot gives the days per plot that will be on each page
-    plot1 = plot1
-    plot2 = plot2
-    daysperplot = 60
-    title = MagEIS L3 Coverage
-    preset = green
-    missing = red
-    expected = grey
-
-    ## [plot1]
-    ## # in the plot section rows are defined bottom up
-    ## # ylabel is what to put on the plot ylabel
-    ## # productN is the product to plot
-    ## # yticklabelN is what to call each product
-    ## # productN_glob is a glob that a file has to match in order to be valid
-    ## # productN_version is a minimum version allowed for files (e.g. 4.0.0)
-    ylabel = RBSP-A
-    product1 = rbspa_int_ect-mageisLOW-L3
-    product2 = rbspa_int_ect-mageisM35-L3
-    product3 = rbspa_int_ect-mageisM75-L3
-    product4 = rbspa_int_ect-mageisHIGH-L3
-    product5 = rbspa_int_ect-mageis-L3
-    yticklabel1 = LOW
-    yticklabel2 = M35
-    yticklabel3 = M75
-    yticklabel4 = HIGH
-    yticklabel5 = FULL
-
-
-    ## [plot2]
-    ylabel = RBSP-B
-    product1 = rbspb_int_ect-mageisLOW-L3
-    product2 = rbspb_int_ect-mageisM35-L3
-    product3 = rbspb_int_ect-mageisM75-L3
-    product4 = rbspb_int_ect-mageisHIGH-L3
-    product5 = rbspb_int_ect-mageis-L3
-    yticklabel1 = LOW
-    yticklabel2 = M35
-    yticklabel3 = M75
-    yticklabel4 = HIGH
-    yticklabel5 = FULL
-
 .. _configurationfiles_addFromConfig:
 
 addFromConfig.py
@@ -319,3 +219,104 @@ addFromConfig.py
     code_arguments = 
     code_cpu = 1
     code_ram = 1
+
+.. _configurationfiles_coveragePlot:
+
+coveragePlot.py
+---------------
+.. code-block:: ini 
+
+    #############################
+    # sample config file
+    #############################
+    ## ##################
+    ## # Substitutions
+    ## # {TODAY}
+    ## # {N DAYS}  -> add N days to the previous where N is an int
+
+
+    ## ##################
+    ## # Required elements
+
+    [settings]
+    mission = ~/RBSP_MAGEIS.sqlite
+    outformat = pdf
+    filename_format = MagEIS_L3_Coverage_{TODAY}
+    startdate = 20120901
+    enddate = {TODAY} + {7 DAYS}
+
+
+    ## ###############################################
+    ## # Plots
+    ## ###############################################
+    [panel]
+    ## # in the panel section we define what will be plotted
+    ## # N keys pf plotN define subplots
+    ## # daysperplot gives the days per plot that will be on each page
+    plot1 = plot1
+    plot2 = plot2
+    daysperplot = 60
+    title = MagEIS L3 Coverage
+    preset = green
+    missing = red
+    expected = grey
+
+    ## [plot1]
+    ## # in the plot section rows are defined bottom up
+    ## # ylabel is what to put on the plot ylabel
+    ## # productN is the product to plot
+    ## # yticklabelN is what to call each product
+    ## # productN_glob is a glob that a file has to match in order to be valid
+    ## # productN_version is a minimum version allowed for files (e.g. 4.0.0)
+    ylabel = RBSP-A
+    product1 = rbspa_int_ect-mageisLOW-L3
+    product2 = rbspa_int_ect-mageisM35-L3
+    product3 = rbspa_int_ect-mageisM75-L3
+    product4 = rbspa_int_ect-mageisHIGH-L3
+    product5 = rbspa_int_ect-mageis-L3
+    yticklabel1 = LOW
+    yticklabel2 = M35
+    yticklabel3 = M75
+    yticklabel4 = HIGH
+    yticklabel5 = FULL
+
+
+    ## [plot2]
+    ylabel = RBSP-B
+    product1 = rbspb_int_ect-mageisLOW-L3
+    product2 = rbspb_int_ect-mageisM35-L3
+    product3 = rbspb_int_ect-mageisM75-L3
+    product4 = rbspb_int_ect-mageisHIGH-L3
+    product5 = rbspb_int_ect-mageis-L3
+    yticklabel1 = LOW
+    yticklabel2 = M35
+    yticklabel3 = M75
+    yticklabel4 = HIGH
+    yticklabel5 = FULL
+
+.. _configurationfiles_makeLatestSymlinks:
+
+makeLatestSymlinks.py
+---------------------
+.. code-block:: ini
+
+    [isois]
+    # Directory containing the data files
+    sourcedir = ~/dbp_py3/data/ISOIS/level1/
+    # Directory to make the symlinks in
+    destdir = ~/tmp/
+    # First date to link
+    startdate = 2010-01-01
+    # Last date to link
+    enddate = 2021-01-01
+    # Number of days before present not to link (e.g. to keep internal-only)
+    deltadays = 60
+    # glob for files to match
+    filter = psp_isois_l1-sc-hk_*.cdf
+    # Link directories as well as files
+    linkdirs = True
+    # Mode to use when making output directory
+    outmode = 775
+    # Do not limit based on date (i.e., ignore date options; they're still required)
+    nodate = False
+
