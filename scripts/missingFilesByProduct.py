@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser.add_argument("--parent", type=int, default=None,
                         help="The parent product ID  to enable processing of the missing files")
     parser.add_argument("--echo", default=False, action='store_true',
-                        help="But the database in echo mode")
+                        help="Put the database in echo mode")
     parser.add_argument('product_id', action='store', type=int,
                         help='Product ID to check.')
 
