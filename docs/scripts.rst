@@ -13,6 +13,8 @@ tested and verified to work, or are moving to that status. They are
 maintained as part of dbprocessing. They are in the ``scripts``
 directory.
 
+All scripts will take an option ``-h`` to provide brief usage help.
+
 addFromConfig.py
 ----------------
 .. program:: addFromConfig.py
@@ -869,52 +871,82 @@ Either put out to the same file or a different file
 
 .. warning:: This code has not been fully tested or used; never worked.
 
+.. option:: infile
+
+   Input CDF file
+
+.. option:: outfile
+
+   Output CDF file; input is copied to this file with the provenance added.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database
+
+.. option:: -i, --inplace
+
+   Edit the existing CDF file in place instead of making a new output file.
+
 dataToIncoming.py
 -----------------
-Concept, never actually used. supposed to be one script + config file
-to handle all incoming data for RBSP-ECT, but we wound up using
-separate scripts for everything
+Concept, never actually used. Intended as a single script which would be
+used (in conjunction with a configuration file) to handle all incoming
+data for RBSP-ECT, to ingest all new files to the database. In practice,
+used separate scripts for each sensor on the suite.
 
 hopeCoverageHTML.py
 -------------------
-delete
+Produce a table with days that had coverage of HOPE data. See
+`coveragePlot.py`_ and `htmlCoverage.py`_ for more generic implementation.
 
 hope_query.py
 -------------
-delete
+Print information on HOPE files for particular days, and particular
+spacecraft. See `printInfo.py`_ for similar generic output.
 
 link_missing_ql_mag_l2_mag.py
 -----------------------------
 RBSP-ECT had some inputs available initially in a quicklook format and
 then later in a definitive level 2 format. The database treated QL as
-"required,", L2 "optional". We don't support "either or but prefer
-this one", so this links them together and the wrapper handles the
-actual priority
+"required,", L2 "optional". dbprocessing doesn't support "either or
+but prefer this one", so this links them together and the wrapper
+handles the actual selection of the file according to priority.
 
 magephem-pre-CoverageHTML.py
 ----------------------------
-Probably works. Delete?
+Produce a table with days that had coverage of predictive magnetic
+ephemeris data. See `coveragePlot.py`_ and `htmlCoverage.py`_ for more
+generic implementation.
 
 updateCode.py
 -------------
-New version of code, rerun based on that, better done through config files (although can't be done that way) and then run reprocessByCode
+Helper to help deploy a new version of a code. Designed to copy an
+existing code entry and increment its version.
+
+Ideally would also add all files that are inputs to the code to the
+process queue, but this was not implemented.
 
 updateProducts.py
 -----------------
-probably broken
+Intended to update products based on an updated configuration
+file. Probably broken.
 
 weeklyReport.py
 ---------------
-unused, probably broken, delete
+Reads dbprocessing log files to produce an HTML report of activity
+over a given period of time. Unused and probably broken.
 
 writeDBhtml.py
 --------------
-unused, probably broken, delete
+Produces an HTML summary of a mission products and processes. Unused
+and probably broken.
 
 writeProcessConf.py
 -------------------
-probably not used
+Write the configuration file fragment for a particular process. Not
+used. See `configFromDB.py`_.
 
 writeProductsConf.py
 --------------------
-probably not used
+Write the configuration file fragment for a particular product. Not
+used. See `configFromDB.py`_.
