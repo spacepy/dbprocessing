@@ -286,6 +286,13 @@ class runMe(object):
     utc_file_date - datetime.date
     process_id - process to run (int)
     input_files - the files that exist to run with (list of int)
+
+    .. warning::
+       As this object holds a reference to
+       :class:`~dbprocessing.DButils.DButils`, both directly and within
+       a reference to :class:`~dbprocessing.dbprocessing.ProcessQueue`,
+       that database should be closed before the program terminates.
+       Deleting this object will ordinarily suffice.
     """
     def __init__(self, dbu, utc_file_date, process_id, input_files, pq, version_bump = None, force=False):
         DBlogging.dblogger.debug("Entered runMe {0}, {1}, {2}, {3}".format(dbu, utc_file_date, process_id, input_files))

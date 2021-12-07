@@ -35,6 +35,12 @@ class ProcessQueue(object):
     @contact: balarsen@lanl.gov
 
     @version: V1: 02-Dec-2010 (BAL)
+
+    .. warning::
+       As this object holds a reference to
+       :class:`~dbprocessing.DButils.DButils`, that database should be
+       closed before the program terminates. Deleting this object will
+       ordinarily suffice.
     """
 
     def __init__(self,

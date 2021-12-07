@@ -119,6 +119,15 @@ class DButils(object):
 
     All of these may be user called but are meant to
     be internal routines for DBProcessing
+
+    .. warning::
+       It is strongly encouraged to make sure the database is closed before
+       the program terminates, either by calling :meth:`closeDB` or deleting
+       instances of this object (with an explicit :ref:`del <del>` or by
+       allowing it to go out of scope.) If this object still exists at
+       interpreter exit, it will attempt to close the database, but the
+       functionality to do so may have already been torn down. See for
+       example `Python issue 39513 <https://bugs.python.org/issue39513>`_.
     """
 
     def __init__(self, mission='Test', db_var=None, echo=False, engine=None):
