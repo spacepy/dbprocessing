@@ -67,9 +67,8 @@ documentation (except Python sample code).
 All documentation must be in rST (reStructuredText) format except where
 another format is explicitly required.
 
-Section headings should follow the `recommended convention from Sphinx
-<https://www.sphinx-doc.org/en/master/usage/restructuredtext/
-basics.html#sections>`_ with the clarification that most files should be
+Section headings should follow the :ref:`recommended convention from Sphinx
+<sphinx:rst-sections>` with the clarification that most files should be
 considered chapters. Parts are very rare and may involve a separate directory,
 e.g. "User guide", "Developer Guide."
 
@@ -100,8 +99,8 @@ in the "docs" directory, which github treats specially. Files that are parsed
 by github must still end with the ``.rst`` extension (and github should
 render them correctly as rST), but must also be `parseable as Markdown
 <https://gist.github.com/dupuy/1855764>`_. ``dbprocessing`` may eventually
-`enable Sphinx parsing of Markdown <https://www.sphinx-doc.org/en/1.8/usage/
-markdown.html>`_ if necessary to support these files.
+:doc:`enable Sphinx parsing of Markdown <sphinx:usage/markdown>` if necessary
+to support these files.
 
 See also :doc:`github`.
 
