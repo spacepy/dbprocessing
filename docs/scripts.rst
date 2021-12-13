@@ -91,6 +91,8 @@ product to the new directory.
 
    New directory to move the file to.
 
+.. _scripts_clearProcessingFlag_py:
+
 clearProcessingFlag.py
 ----------------------
 .. program:: clearProcessingFlag.py
