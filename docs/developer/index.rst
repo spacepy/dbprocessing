@@ -14,6 +14,7 @@ Developer Information
    repository
    structure
    release
-   notes	      
+   notes
+   tables
    todo
    ../CONTRIBUTING

@@ -33,6 +33,10 @@ for pth in ('lib', # Prepending, so add low-priority paths first.
 thisdir = os.path.abspath(os.path.dirname(__file__))
 if not thisdir in sys.path:
     sys.path.insert(0, thisdir)
+# And extentions under this directory
+_extdir = os.path.join(thisdir, '_ext')
+if not _extdir in sys.path:
+    sys.path.insert(0, _extdir)
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -58,6 +62,7 @@ extensions = [
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
+    'sql',
 ]
 
 autosummary_generate = True
