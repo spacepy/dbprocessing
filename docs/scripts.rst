@@ -897,7 +897,9 @@ queue so that the next :option:`ProcessQueue.py -p` will run them.
 
    The level to reprocess for the given instrument
 
-.. option:: --echo Echo sql queries for debugging
+.. option:: --echo
+
+   Echo sql queries for debugging
 
 .. option:: --force {0,1,2}
 
