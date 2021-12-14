@@ -46,21 +46,14 @@ needs_sphinx = '1.3'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-try: #Sphinx 1.4 and later replaces pngmath with imgmath
-    import sphinx.ext.imgmath
-    imgmath = 'sphinx.ext.imgmath'
-except ImportError:
-    imgmath = 'sphinx.ext.pngmath'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.graphviz',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    imgmath,
     'sphinx.ext.viewcode',
     'numpydoc',
-    'sphinx.ext.inheritance_diagram',
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
     'sql',
