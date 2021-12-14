@@ -1,0 +1,288 @@
+digraph g { graph [ rankdir = "LR" ];
+splines=compound;
+
+"code" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">code</font></td></tr>
+            <tr><td align="center" port="code_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>code_id</b></td><td bgcolor="#FFE080" align="left" port="code_id_out">Integer</td></tr>
+            <tr><td align="center" port="filename_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>filename</b></td><td bgcolor="#FFE080" align="left" port="filename_out">String</td></tr>
+            <tr><td align="center" port="relative_path_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>relative_path</b></td><td bgcolor="#FFE080" align="left" port="relative_path_out">String</td></tr>
+            <tr><td align="center" port="code_start_date_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>code_start_date</b></td><td bgcolor="#FFE080" align="left" port="code_start_date_out">Date</td></tr>
+            <tr><td align="center" port="code_stop_date_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>code_stop_date</b></td><td bgcolor="#FFE080" align="left" port="code_stop_date_out">Date</td></tr>
+            <tr><td align="center" port="code_description_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>code_description</b></td><td bgcolor="#FFE080" align="left" port="code_description_out">Text</td></tr>
+            <tr><td align="center" port="process_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>process_id</b></td><td bgcolor="#FFE080" align="left" port="process_id_out">Integer</td></tr>
+            <tr><td align="center" port="interface_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>interface_version</b></td><td bgcolor="#FFE080" align="left" port="interface_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="quality_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>quality_version</b></td><td bgcolor="#FFE080" align="left" port="quality_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="revision_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>revision_version</b></td><td bgcolor="#FFE080" align="left" port="revision_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="output_interface_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>output_interface_version</b></td><td bgcolor="#FFE080" align="left" port="output_interface_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="active_code_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>active_code</b></td><td bgcolor="#FFE080" align="left" port="active_code_out">Boolean</td></tr>
+            <tr><td align="center" port="date_written_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>date_written</b></td><td bgcolor="#FFE080" align="left" port="date_written_out">Date</td></tr>
+            <tr><td align="center" port="shasum_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>shasum</b></td><td bgcolor="#FFE080" align="left" port="shasum_out">String</td></tr>
+            <tr><td align="center" port="newest_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>newest_version</b></td><td bgcolor="#FFE080" align="left" port="newest_version_out">Boolean</td></tr>
+            <tr><td align="center" port="arguments_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>arguments</b></td><td bgcolor="#FFE080" align="left" port="arguments_out">Text</td></tr>
+            <tr><td align="center" port="ram_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>ram</b></td><td bgcolor="#FFE080" align="left" port="ram_out">Float</td></tr>
+            <tr><td align="center" port="cpu_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>cpu</b></td><td bgcolor="#FFE080" align="left" port="cpu_out">SmallInteger</td></tr>
+
+        </table>
+>];
+
+"file" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">file</font></td></tr>
+            <tr><td align="center" port="file_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>file_id</b></td><td bgcolor="#FFE080" align="left" port="file_id_out">Integer</td></tr>
+            <tr><td align="center" port="filename_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>filename</b></td><td bgcolor="#FFE080" align="left" port="filename_out">String</td></tr>
+            <tr><td align="center" port="utc_file_date_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>utc_file_date</b></td><td bgcolor="#FFE080" align="left" port="utc_file_date_out">Date</td></tr>
+            <tr><td align="center" port="utc_start_time_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>utc_start_time</b></td><td bgcolor="#FFE080" align="left" port="utc_start_time_out">DateTime</td></tr>
+            <tr><td align="center" port="utc_stop_time_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>utc_stop_time</b></td><td bgcolor="#FFE080" align="left" port="utc_stop_time_out">DateTime</td></tr>
+            <tr><td align="center" port="data_level_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>data_level</b></td><td bgcolor="#FFE080" align="left" port="data_level_out">Float</td></tr>
+            <tr><td align="center" port="interface_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>interface_version</b></td><td bgcolor="#FFE080" align="left" port="interface_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="quality_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>quality_version</b></td><td bgcolor="#FFE080" align="left" port="quality_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="revision_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>revision_version</b></td><td bgcolor="#FFE080" align="left" port="revision_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="verbose_provenance_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>verbose_provenance</b></td><td bgcolor="#FFE080" align="left" port="verbose_provenance_out">Text</td></tr>
+            <tr><td align="center" port="check_date_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>check_date</b></td><td bgcolor="#FFE080" align="left" port="check_date_out">DateTime</td></tr>
+            <tr><td align="center" port="quality_comment_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>quality_comment</b></td><td bgcolor="#FFE080" align="left" port="quality_comment_out">Text</td></tr>
+            <tr><td align="center" port="caveats_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>caveats</b></td><td bgcolor="#FFE080" align="left" port="caveats_out">Text</td></tr>
+            <tr><td align="center" port="file_create_date_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>file_create_date</b></td><td bgcolor="#FFE080" align="left" port="file_create_date_out">DateTime</td></tr>
+            <tr><td align="center" port="met_start_time_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>met_start_time</b></td><td bgcolor="#FFE080" align="left" port="met_start_time_out">Float</td></tr>
+            <tr><td align="center" port="met_stop_time_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>met_stop_time</b></td><td bgcolor="#FFE080" align="left" port="met_stop_time_out">Float</td></tr>
+            <tr><td align="center" port="exists_on_disk_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>exists_on_disk</b></td><td bgcolor="#FFE080" align="left" port="exists_on_disk_out">Boolean</td></tr>
+            <tr><td align="center" port="quality_checked_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>quality_checked</b></td><td bgcolor="#FFE080" align="left" port="quality_checked_out">Boolean</td></tr>
+            <tr><td align="center" port="product_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>product_id</b></td><td bgcolor="#FFE080" align="left" port="product_id_out">Integer</td></tr>
+            <tr><td align="center" port="shasum_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>shasum</b></td><td bgcolor="#FFE080" align="left" port="shasum_out">String</td></tr>
+            <tr><td align="center" port="process_keywords_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>process_keywords</b></td><td bgcolor="#FFE080" align="left" port="process_keywords_out">Text</td></tr>
+
+        </table>
+>];
+
+"filecodelink" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">filecodelink</font></td></tr>
+            <tr><td align="center" port="resulting_file_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>resulting_file</b></td><td bgcolor="#FFE080" align="left" port="resulting_file_out">Integer</td></tr>
+            <tr><td align="center" port="source_code_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>source_code</b></td><td bgcolor="#FFE080" align="left" port="source_code_out">Integer</td></tr>
+
+        </table>
+>];
+
+"filefilelink" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">filefilelink</font></td></tr>
+            <tr><td align="center" port="source_file_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>source_file</b></td><td bgcolor="#FFE080" align="left" port="source_file_out">Integer</td></tr>
+            <tr><td align="center" port="resulting_file_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>resulting_file</b></td><td bgcolor="#FFE080" align="left" port="resulting_file_out">Integer</td></tr>
+
+        </table>
+>];
+
+"inspector" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">inspector</font></td></tr>
+            <tr><td align="center" port="inspector_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>inspector_id</b></td><td bgcolor="#FFE080" align="left" port="inspector_id_out">Integer</td></tr>
+            <tr><td align="center" port="filename_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>filename</b></td><td bgcolor="#FFE080" align="left" port="filename_out">String</td></tr>
+            <tr><td align="center" port="relative_path_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>relative_path</b></td><td bgcolor="#FFE080" align="left" port="relative_path_out">String</td></tr>
+            <tr><td align="center" port="description_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>description</b></td><td bgcolor="#FFE080" align="left" port="description_out">Text</td></tr>
+            <tr><td align="center" port="interface_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>interface_version</b></td><td bgcolor="#FFE080" align="left" port="interface_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="quality_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>quality_version</b></td><td bgcolor="#FFE080" align="left" port="quality_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="revision_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>revision_version</b></td><td bgcolor="#FFE080" align="left" port="revision_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="output_interface_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>output_interface_version</b></td><td bgcolor="#FFE080" align="left" port="output_interface_version_out">SmallInteger</td></tr>
+            <tr><td align="center" port="active_code_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>active_code</b></td><td bgcolor="#FFE080" align="left" port="active_code_out">Boolean</td></tr>
+            <tr><td align="center" port="date_written_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>date_written</b></td><td bgcolor="#FFE080" align="left" port="date_written_out">Date</td></tr>
+            <tr><td align="center" port="shasum_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>shasum</b></td><td bgcolor="#FFE080" align="left" port="shasum_out">String</td></tr>
+            <tr><td align="center" port="newest_version_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>newest_version</b></td><td bgcolor="#FFE080" align="left" port="newest_version_out">Boolean</td></tr>
+            <tr><td align="center" port="arguments_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>arguments</b></td><td bgcolor="#FFE080" align="left" port="arguments_out">Text</td></tr>
+            <tr><td align="center" port="product_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>product</b></td><td bgcolor="#FFE080" align="left" port="product_out">Integer</td></tr>
+
+        </table>
+>];
+
+"instrument" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">instrument</font></td></tr>
+            <tr><td align="center" port="instrument_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>instrument_id</b></td><td bgcolor="#FFE080" align="left" port="instrument_id_out">Integer</td></tr>
+            <tr><td align="center" port="instrument_name_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>instrument_name</b></td><td bgcolor="#FFE080" align="left" port="instrument_name_out">String</td></tr>
+            <tr><td align="center" port="satellite_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>satellite_id</b></td><td bgcolor="#FFE080" align="left" port="satellite_id_out">Integer</td></tr>
+
+        </table>
+>];
+
+"instrumentproductlink" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">instrumentproductlink</font></td></tr>
+            <tr><td align="center" port="instrument_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>instrument_id</b></td><td bgcolor="#FFE080" align="left" port="instrument_id_out">Integer</td></tr>
+            <tr><td align="center" port="product_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>product_id</b></td><td bgcolor="#FFE080" align="left" port="product_id_out">Integer</td></tr>
+
+        </table>
+>];
+
+"logging" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">logging</font></td></tr>
+            <tr><td align="center" port="logging_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>logging_id</b></td><td bgcolor="#FFE080" align="left" port="logging_id_out">Integer</td></tr>
+            <tr><td align="center" port="currently_processing_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>currently_processing</b></td><td bgcolor="#FFE080" align="left" port="currently_processing_out">Boolean</td></tr>
+            <tr><td align="center" port="pid_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>pid</b></td><td bgcolor="#FFE080" align="left" port="pid_out">Integer</td></tr>
+            <tr><td align="center" port="processing_start_time_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>processing_start_time</b></td><td bgcolor="#FFE080" align="left" port="processing_start_time_out">DateTime</td></tr>
+            <tr><td align="center" port="processing_end_time_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>processing_end_time</b></td><td bgcolor="#FFE080" align="left" port="processing_end_time_out">DateTime</td></tr>
+            <tr><td align="center" port="comment_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>comment</b></td><td bgcolor="#FFE080" align="left" port="comment_out">Text</td></tr>
+            <tr><td align="center" port="mission_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>mission_id</b></td><td bgcolor="#FFE080" align="left" port="mission_id_out">Integer</td></tr>
+            <tr><td align="center" port="user_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>user</b></td><td bgcolor="#FFE080" align="left" port="user_out">String</td></tr>
+            <tr><td align="center" port="hostname_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>hostname</b></td><td bgcolor="#FFE080" align="left" port="hostname_out">String</td></tr>
+
+        </table>
+>];
+
+"logging_file" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">logging_file</font></td></tr>
+            <tr><td align="center" port="logging_file_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>logging_file_id</b></td><td bgcolor="#FFE080" align="left" port="logging_file_id_out">Integer</td></tr>
+            <tr><td align="center" port="logging_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>logging_id</b></td><td bgcolor="#FFE080" align="left" port="logging_id_out">Integer</td></tr>
+            <tr><td align="center" port="file_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>file_id</b></td><td bgcolor="#FFE080" align="left" port="file_id_out">Integer</td></tr>
+            <tr><td align="center" port="code_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>code_id</b></td><td bgcolor="#FFE080" align="left" port="code_id_out">Integer</td></tr>
+            <tr><td align="center" port="comments_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>comments</b></td><td bgcolor="#FFE080" align="left" port="comments_out">Text</td></tr>
+
+        </table>
+>];
+
+"mission" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">mission</font></td></tr>
+            <tr><td align="center" port="mission_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>mission_id</b></td><td bgcolor="#FFE080" align="left" port="mission_id_out">Integer</td></tr>
+            <tr><td align="center" port="mission_name_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>mission_name</b></td><td bgcolor="#FFE080" align="left" port="mission_name_out">String</td></tr>
+            <tr><td align="center" port="rootdir_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>rootdir</b></td><td bgcolor="#FFE080" align="left" port="rootdir_out">String</td></tr>
+            <tr><td align="center" port="incoming_dir_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>incoming_dir</b></td><td bgcolor="#FFE080" align="left" port="incoming_dir_out">String</td></tr>
+            <tr><td align="center" port="codedir_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>codedir</b></td><td bgcolor="#FFE080" align="left" port="codedir_out">String</td></tr>
+            <tr><td align="center" port="inspectordir_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>inspectordir</b></td><td bgcolor="#FFE080" align="left" port="inspectordir_out">String</td></tr>
+            <tr><td align="center" port="errordir_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>errordir</b></td><td bgcolor="#FFE080" align="left" port="errordir_out">String</td></tr>
+
+        </table>
+>];
+
+"process" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">process</font></td></tr>
+            <tr><td align="center" port="process_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>process_id</b></td><td bgcolor="#FFE080" align="left" port="process_id_out">Integer</td></tr>
+            <tr><td align="center" port="process_name_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>process_name</b></td><td bgcolor="#FFE080" align="left" port="process_name_out">String</td></tr>
+            <tr><td align="center" port="output_product_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>output_product</b></td><td bgcolor="#FFE080" align="left" port="output_product_out">Integer</td></tr>
+            <tr><td align="center" port="output_timebase_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>output_timebase</b></td><td bgcolor="#FFE080" align="left" port="output_timebase_out">String</td></tr>
+            <tr><td align="center" port="extra_params_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>extra_params</b></td><td bgcolor="#FFE080" align="left" port="extra_params_out">Text</td></tr>
+
+        </table>
+>];
+
+"processqueue" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">processqueue</font></td></tr>
+            <tr><td align="center" port="file_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>file_id</b></td><td bgcolor="#FFE080" align="left" port="file_id_out">Integer</td></tr>
+            <tr><td align="center" port="version_bump_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>version_bump</b></td><td bgcolor="#FFE080" align="left" port="version_bump_out">SmallInteger</td></tr>
+
+        </table>
+>];
+
+"product" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">product</font></td></tr>
+            <tr><td align="center" port="product_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>product_id</b></td><td bgcolor="#FFE080" align="left" port="product_id_out">Integer</td></tr>
+            <tr><td align="center" port="product_name_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>product_name</b></td><td bgcolor="#FFE080" align="left" port="product_name_out">String</td></tr>
+            <tr><td align="center" port="instrument_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>instrument_id</b></td><td bgcolor="#FFE080" align="left" port="instrument_id_out">Integer</td></tr>
+            <tr><td align="center" port="relative_path_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>relative_path</b></td><td bgcolor="#FFE080" align="left" port="relative_path_out">String</td></tr>
+            <tr><td align="center" port="level_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>level</b></td><td bgcolor="#FFE080" align="left" port="level_out">Float</td></tr>
+            <tr><td align="center" port="format_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>format</b></td><td bgcolor="#FFE080" align="left" port="format_out">Text</td></tr>
+            <tr><td align="center" port="product_description_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>product_description</b></td><td bgcolor="#FFE080" align="left" port="product_description_out">Text</td></tr>
+
+        </table>
+>];
+
+"productprocesslink" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">productprocesslink</font></td></tr>
+            <tr><td align="center" port="process_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>process_id</b></td><td bgcolor="#FFE080" align="left" port="process_id_out">Integer</td></tr>
+            <tr><td align="center" port="input_product_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>input_product_id</b></td><td bgcolor="#FFE080" align="left" port="input_product_id_out">Integer</td></tr>
+            <tr><td align="center" port="optional_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>optional</b></td><td bgcolor="#FFE080" align="left" port="optional_out">Boolean</td></tr>
+            <tr><td align="center" port="yesterday_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>yesterday</b></td><td bgcolor="#FFE080" align="left" port="yesterday_out">Integer</td></tr>
+            <tr><td align="center" port="tomorrow_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>tomorrow</b></td><td bgcolor="#FFE080" align="left" port="tomorrow_out">Integer</td></tr>
+
+        </table>
+>];
+
+"release" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">release</font></td></tr>
+            <tr><td align="center" port="file_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>file_id</b></td><td bgcolor="#FFE080" align="left" port="file_id_out">Integer</td></tr>
+            <tr><td align="center" port="release_num_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>release_num</b></td><td bgcolor="#FFE080" align="left" port="release_num_out">String</td></tr>
+
+        </table>
+>];
+
+"satellite" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">satellite</font></td></tr>
+            <tr><td align="center" port="satellite_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>satellite_id</b></td><td bgcolor="#FFE080" align="left" port="satellite_id_out">Integer</td></tr>
+            <tr><td align="center" port="satellite_name_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>satellite_name</b></td><td bgcolor="#FFE080" align="left" port="satellite_name_out">String</td></tr>
+            <tr><td align="center" port="mission_id_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>mission_id</b></td><td bgcolor="#FFE080" align="left" port="mission_id_out">Integer</td></tr>
+
+        </table>
+>];
+
+"unixtime" [
+    shape=none
+    label=<
+        <table border="0" cellpadding="5" cellspacing="0" cellborder="1">
+            <tr><td colspan="3" bgcolor="#E0B010" valign="BOTTOM"><font point-size="18" face="bold">unixtime</font></td></tr>
+            <tr><td align="center" port="file_id_in" sides="ltb"  bgcolor="#FFF0B0">&#9919;</td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>file_id</b></td><td bgcolor="#FFE080" align="left" port="file_id_out">Integer</td></tr>
+            <tr><td align="center" port="unix_start_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>unix_start</b></td><td bgcolor="#FFE080" align="left" port="unix_start_out">Integer</td></tr>
+            <tr><td align="center" port="unix_stop_in" sides="ltb"  bgcolor="#FFF0B0"></td><td align="left" sides="rtb" bgcolor="#FFF0B0"><b>unix_stop</b></td><td bgcolor="#FFE080" align="left" port="unix_stop_out">Integer</td></tr>
+
+        </table>
+>];
+code:process_id_out:e -> process:process_id_in:w
+file:product_id_out:e -> product:product_id_in:w
+filecodelink:resulting_file_out:e -> file:file_id_in:w
+filecodelink:source_code_out:e -> code:code_id_in:w
+filefilelink:resulting_file_out:e -> file:file_id_in:w
+filefilelink:source_file_out:e -> file:file_id_in:w
+inspector:product_out:e -> product:product_id_in:w
+instrument:satellite_id_out:e -> satellite:satellite_id_in:w
+instrumentproductlink:instrument_id_out:e -> instrument:instrument_id_in:w
+instrumentproductlink:product_id_out:e -> product:product_id_in:w
+logging:mission_id_out:e -> mission:mission_id_in:w
+logging_file:code_id_out:e -> code:code_id_in:w
+logging_file:file_id_out:e -> file:file_id_in:w
+logging_file:logging_id_out:e -> logging:logging_id_in:w
+process:output_product_out:e -> product:product_id_in:w
+processqueue:file_id_out:e -> file:file_id_in:w
+product:instrument_id_out:e -> instrument:instrument_id_in:w
+productprocesslink:input_product_id_out:e -> product:product_id_in:w
+productprocesslink:process_id_out:e -> process:process_id_in:w
+release:file_id_out:e -> file:file_id_in:w
+satellite:mission_id_out:e -> mission:mission_id_in:w
+unixtime:file_id_out:e -> file:file_id_in:w
+}

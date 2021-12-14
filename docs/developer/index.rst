@@ -12,7 +12,6 @@ Developer Information
    github
    pull_requests
    repository
-   structure
    release
    notes
    tables
