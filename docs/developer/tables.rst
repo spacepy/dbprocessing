@@ -2,6 +2,14 @@
 Tables
 ######
 
+..
+   Much of this file is auto-generated
+
+   For the skeleton with just the table and column names, see
+   developer/scripts/table_docs.py
+
+   For the relationship diagram, see developer/scripts/table_graph.py
+
 The SQL database tables used in dbprocessing, and their columns, are
 summarized here.
 
@@ -24,6 +32,8 @@ summarized here.
 :sql:table:`satellite`             Satellite (for grouping related products)
 :sql:table:`unixtime`              Unix start/stop time for files
 ================================== =============================================
+
+.. graphviz:: ../images/schema.dot
 
 .. sql:table:: code
 

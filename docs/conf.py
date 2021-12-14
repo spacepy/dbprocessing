@@ -53,6 +53,7 @@ except ImportError:
     imgmath = 'sphinx.ext.pngmath'
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.graphviz',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',

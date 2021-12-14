@@ -132,6 +132,8 @@ jobs:
            at: ~/.local
        - run:
            command: |
+             sudo apt update
+             sudo apt install graphviz
              rm -f ./setup.cfg # So sphinx-build doesn't go in ~/dbUtils
              pip install --user "docutils<0.16"
              pip install --user sphinx numpy
