@@ -1,6 +1,6 @@
-#############
+*************
 Documentation
-#############
+*************
 
 `Sphinx <http://www.sphinx-doc.org/>`_ documentation is stored in the ``sphinx`` directory.
 

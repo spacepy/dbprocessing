@@ -1,6 +1,6 @@
-##############
+**************
 Code standards
-##############
+**************
 
 Code in ``dbprocessing`` should follow consistent standards to maximize
 readability.
