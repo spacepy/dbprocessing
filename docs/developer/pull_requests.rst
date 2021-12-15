@@ -1,6 +1,6 @@
-##########################
+**************************
 Working With Pull Requests
-##########################
+**************************
 
 Documented here is the procedure for working with pull requests (PRs)
 in the ``dbprocessing`` project. It does not include details on working

@@ -1,6 +1,6 @@
-#####
+*****
 Tests
-#####
+*****
 
 There are two types of testing done with this project. Unit tests, which test if the individual pieces work, and functional tests, which test if the pieces work together
 

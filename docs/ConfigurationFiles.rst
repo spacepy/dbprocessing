@@ -1,8 +1,9 @@
+*******************
 Configuration Files
-===================
+*******************
 
 Basics
-------
+======
 
 Configuration files in this project are INI files as supported by the
 :mod:`configparser` Python module. Refer to that documentation for
@@ -16,7 +17,7 @@ comments.
 .. _configurationfiles_addFromConfig:
 
 addFromConfig.py
-----------------
+================
 .. code-block:: ini 
 
     # Honored database substitutions used as {Y}{MILLI}{PRODUCT}
@@ -223,7 +224,7 @@ addFromConfig.py
 .. _configurationfiles_coveragePlot:
 
 coveragePlot.py
----------------
+===============
 .. code-block:: ini 
 
     #############################
@@ -297,7 +298,7 @@ coveragePlot.py
 .. _configurationfiles_makeLatestSymlinks:
 
 makeLatestSymlinks.py
----------------------
+=====================
 .. code-block:: ini
 
     [isois]

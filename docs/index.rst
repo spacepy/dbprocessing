@@ -1,5 +1,6 @@
+############
 dbprocessing
-============
+############
 .. toctree::
    :maxdepth: 1
 
@@ -13,8 +14,9 @@ dbprocessing
    COPYRIGHT
    CONTRIBUTORS
 
+*****************
 API documentation
------------------
+*****************
 
 .. autosummary::
     :toctree: autosummary
