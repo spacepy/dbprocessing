@@ -229,7 +229,7 @@ def generate_autosummary_docs(sources, output_dir=None, suffix='.rst',
     # descend recursively to new files
     if new_files:
         ## NEW: Conditional on app kwarg added (to support 1.7+)
-        if version_info[0:2] >= 1.7:
+        if version_info[0:2] >= (1, 7):
             generate_autosummary_docs(new_files, output_dir=output_dir,
                                       suffix=suffix, warn=warn, info=info,
                                       base_path=base_path, builder=builder,
