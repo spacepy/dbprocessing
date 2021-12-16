@@ -105,9 +105,9 @@ Clear a processing flag (lock) on a database that has crashed.
 The :meth:`DButils.startLogging()
 <dbprocessing.DButils.DButils.startLogging>` method locks the database
 to avoid conflicts from simultaneous processing. This is only
-currently used by `ProcessQueue.py`_; if it crashes before
+currently used by :ref:`scripts_ProcessQueue_py`; if it crashes before
 completion, the lock will still be set and needs to be cleared before
-running `ProcessQueue.py`_ again.
+running `scripts_ProcessQueue_py` again.
 
 .. option:: database
 
@@ -129,6 +129,8 @@ compared by filename. Output is printed to the screen.
 .. option:: -m <dbname>, --mission <dbname>
 
    Mission database. Specify twice, for the two missions to compare.
+
+.. _scripts_configFromDB_py:
 
 configFromDB.py
 ---------------
@@ -162,7 +164,7 @@ Build a config file from an existing database.
 
    Make the config file without a comment header block on top
 
-.. _scripts_coveragePlot:
+.. _scripts_coveragePlot_py:
 
 coveragePlot.py
 ---------------
@@ -170,7 +172,7 @@ coveragePlot.py
 
 Creates a coverage plot based on config file input. This script is
 useful for determining which files may be missing from a processing
-chain. Either this or `htmlCoverage.py`_ works (probably this)
+chain. Either this or :ref:`scripts_htmlCoverage_py` works (probably this).
 
 .. option:: configfile
 
@@ -251,8 +253,8 @@ execute codes with no input products.
 As is typical, processes for which there are no input files for a date will
 not be run. However, if a process has no input *products*, dates specified
 will be run, depending on the values of :option:`--force` and
-:option:`--update`. This is unlike `ProcessQueue.py`_, which has no way of
-triggering such processing.
+:option:`--update`. This is unlike :ref:`scripts_ProcessQueue_py`, which
+has no way of triggering such processing.
 
 .. option:: process_id
 
@@ -381,7 +383,7 @@ Reads log files to find how long codes took to run; creates a histogram
 
    Log file to read, specify multiple times to read many log files.
 
-.. _scripts_htmlCoverage:
+.. _scripts_htmlCoverage_py:
 
 htmlCoverage.py
 ---------------
@@ -390,7 +392,7 @@ in the database by date.
 
 .. note::
 
-   Either this or :ref:`scripts_coveragePlot` works, not both.
+   Either this or :ref:`scripts_coveragePlot_py` works, not both.
 
 .. option:: -m <dbname>, --mission <dbname>
 
@@ -461,7 +463,7 @@ just the latest versions for each product and date.
    Comma separated list of strings that must be in the sync conf name
    (e.g. ``-f hope,rbspa``)
 
-.. _MigrateDB:
+.. _scripts_MigrateDB_py:
 
 MigrateDB.py
 ------------
@@ -482,6 +484,8 @@ Will display all possible changes and prompt for confirmation.
 .. option:: -y, --yes
 
    Process possible changes without asking for confirmation.
+
+.. _scripts_missingFilesByProduct_py:
 
 missingFilesByProduct.py
 ------------------------
@@ -533,7 +537,8 @@ missingFiles.py
 .. program:: missingFiles.py
 
 Reprocesses all missing files, based on noncontiguous date
-ranges. Implemented as multiple calls to `missingFilesByProduct.py`_.
+ranges. Implemented as multiple calls to
+:ref:`scripts_missingFilesByProduct_py`.
 
 .. warning:: Maybe works, maybe not
 
@@ -549,6 +554,7 @@ ranges. Implemented as multiple calls to `missingFilesByProduct.py`_.
 
    Last date to check, inclusive (e.g. 2012-10-25). Default today.
 
+.. _scripts_possibleProblemDates_py:
 
 possibleProblemDates.py
 -----------------------
@@ -570,6 +576,8 @@ Check for various possible database inconsistencies. See also `scrubber.py`_.
 
 .. warning:: Worth looking into and cleaning up a bit; may have sharp edges.
 
+.. _scripts_printInfo_py:
+	     
 printInfo.py
 ------------
 .. program:: printInfo.py
@@ -947,7 +955,7 @@ scrubber.py
 .. program:: scrubber.py
 
 Checks a database for possible inconsistencies or problems. See also
-`possibleProblemDates.py`_
+:ref:`scripts_possibleProblemDates_py`.
 
 .. option:: -m <dbname>, --mission <dbname>
 
@@ -974,7 +982,7 @@ updateUnixTime.py
 
 Rewrites all Unix timestamps in a file, recalculating them from the UTC
 start/stop time. This is not needed if adding a Unix timestamp table
-to an existing database (see :ref:`MigrateDB`); it is only required
+to an existing database (see :ref:`scripts_MigrateDB_py`); it is only required
 if the algorithm for populating the Unix timestamps changes and a database
 has been created with the older algorithm.
 
@@ -1027,12 +1035,13 @@ used separate scripts for each sensor on the suite.
 hopeCoverageHTML.py
 -------------------
 Produce a table with days that had coverage of HOPE data. See
-`coveragePlot.py`_ and `htmlCoverage.py`_ for more generic implementation.
+:ref:`scripts_coveragePlot_py` and :ref:`scripts_htmlCoverage_py` for more
+generic implementation.
 
 hope_query.py
 -------------
 Print information on HOPE files for particular days, and particular
-spacecraft. See `printInfo.py`_ for similar generic output.
+spacecraft. See :ref:`scripts_printInfo_py` for similar generic output.
 
 link_missing_ql_mag_l2_mag.py
 -----------------------------
@@ -1045,8 +1054,8 @@ handles the actual selection of the file according to priority.
 magephem-pre-CoverageHTML.py
 ----------------------------
 Produce a table with days that had coverage of predictive magnetic
-ephemeris data. See `coveragePlot.py`_ and `htmlCoverage.py`_ for more
-generic implementation.
+ephemeris data. See :ref:`scripts_coveragePlot_py` and
+:ref:`scripts_htmlCoverage_py` for more generic implementation.
 
 updateCode.py
 -------------
@@ -1074,9 +1083,9 @@ and probably broken.
 writeProcessConf.py
 -------------------
 Write the configuration file fragment for a particular process. Not
-used. See `configFromDB.py`_.
+used. See :ref:`scripts_configFromDB_py`.
 
 writeProductsConf.py
 --------------------
 Write the configuration file fragment for a particular product. Not
-used. See `configFromDB.py`_.
+used. See :ref:`scripts_configFromDB_py`.
