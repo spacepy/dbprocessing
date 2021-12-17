@@ -68,8 +68,16 @@ rst_epilog = """
 **Release**: |version| **Doc generation date**: |today|
 """
 
+import sphinx
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+# autosummary templates for classes are different across versions,
+# version number is based on the minimum of the one that works
+if (1, 3) <= sphinx.version_info[:2] <= (3, 3):
+    tempver = (1, 3)
+elif (3, 4) <= sphinx.version_info[:2]:
+    tempver = (3, 4)
+templates_path.append('_templates_{}p{}'.format(*tempver))
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -112,7 +120,7 @@ language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_templates']
+exclude_patterns = ['_templates*']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -346,3 +354,7 @@ elif (2, 2) <= sphinx.version_info[:2] <= (3, 0):
     import patches.autosummary_v2p4
     sphinx.ext.autosummary.generate.generate_autosummary_content = \
         patches.autosummary_v2p4.generate_autosummary_content
+elif (3, 1) <= sphinx.version_info[:2] <= (3, 5):
+    import patches.autosummary_v3p1
+    sphinx.ext.autosummary.generate.generate_autosummary_content = \
+        patches.autosummary_v3p1.generate_autosummary_content
