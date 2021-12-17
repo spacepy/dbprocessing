@@ -5,6 +5,7 @@ dbprocessing
    :maxdepth: 1
 
    README
+   concepts
    release_notes
    developer/index
    scripts

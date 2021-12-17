@@ -682,6 +682,9 @@ new files are ingested, added to the process queue, and similarly
 evaluated; the script does not return until the process queue is
 empty.
 
+.. seealso::
+   :ref:`concepts_ingest`, :ref:`concepts_processing`
+
 The normal use of dbprocessing is regular calls to
 :option:`ProcessQueue.py -i` followed by :option:`ProcessQueue.py -p`.
 

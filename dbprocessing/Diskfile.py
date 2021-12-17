@@ -90,6 +90,7 @@ class Diskfile(object):
         self.filename = os.path.basename(self.infile)
 
         self.params = {}
+        """Parameters of this file, i.e. metadata (:class:`dict`)"""
         self.params['filename'] = self.filename
         self.params['utc_file_date'] = None
         self.params['utc_start_time'] = None

@@ -11,7 +11,8 @@ Tables
    For the relationship diagram, see developer/scripts/table_graph.py
 
 The SQL database tables used in dbprocessing, and their columns, are
-summarized here.
+summarized here. :py:meth:`~dbprocessing.DButils.DButils.getEntry` will,
+in most cases, return a record from any table.
 
 ================================== =============================================
 :sql:table:`code`                  Executable data-producing codes
@@ -38,9 +39,10 @@ summarized here.
 .. sql:table:: code
 
    Table describing a single executable script, used for creating
-   output files from input files. Note each version of a code has its
-   own entry (with no explicit connection between them), and a given
-   script may be referred to/used by more than one code entry.
+   output files from input files (see :ref:`concepts_codes`). Note each
+   version of a code has its own entry (with no explicit connection between
+   them), and a given script may be referred to/used by more than one code
+   entry.
 
 .. sql:column:: code_id
 
@@ -172,8 +174,9 @@ summarized here.
 
 .. sql:table:: file
 
-   A single data file; conceptually maps to a single file on disk. Related,
-   but not identical, to :py:class:`~dbprocessing.Diskfile.Diskfile` and
+   A single data :ref:`file <concepts_files>`; conceptually maps to a single
+   file on disk. Related, but not identical, to
+   :py:class:`~dbprocessing.Diskfile.Diskfile` and
    :py:class:`~dbprocessing.DBfile.DBfile`. Much of this information is
    populated by the :py:class:`~dbprocessing.inspector.inspector`. See
    also :py:meth:`~dbprocessing.DButils.DButils.addFile`.
@@ -366,9 +369,12 @@ summarized here.
 
 .. sql:table:: inspector
 
-   An :py:class:`~dbprocessing.inspector.inspector` is a small piece of
+   An :ref:`inspector <concepts_inspectors>` is a small piece of
    code which examines (inspects) a file to determine its product and
    various metadata for dbprocessing; this table describes the codes.
+
+   .. seealso::
+      :py:class:`~dbprocessing.inspector.inspector`
 
 .. sql:column:: inspector_id
 
@@ -632,7 +638,8 @@ summarized here.
 
 .. sql:table:: mission
 
-   The mission for the data held in this database. A mission may pertain
+   The :ref:`mission <concepts_missions>` for the data held in this database.
+   A mission may pertain
    to multiple satellites, e.g. the Van Allen Probes mission had RBSP-A
    and RBSP-B. The hierarchy of association is :sql:table:`instrument`,
    :sql:table:`satellite`, :sql:table:`mission`, where each relation is
@@ -723,8 +730,8 @@ summarized here.
 
 .. sql:table:: process
 
-   A process which converts files of input product(s) to a file of an
-   output product.
+   A :ref:`process <concepts_processes>`, which converts files of input
+   product(s) to a file of an output product.
 
 .. sql:column:: process_id
 
@@ -760,9 +767,10 @@ summarized here.
 
 .. sql:table:: processqueue
 
-   Queue of files which are to be evaluated as potential inputs to processes.
-   :std:option:`ProcessQueue.py -p` will evaluate all products which can be
-   built using these as inputs, and create any which are out of date.
+   Queue of files which are to be evaluated as potential inputs to processes
+   see :ref:`concepts_process_queue`. :std:option:`ProcessQueue.py -p` will
+   evaluate all products which can be built using these as inputs, and create
+   any which are out of date.
 
 .. sql:column:: file_id
 
@@ -788,7 +796,7 @@ summarized here.
 .. sql:table:: product
 
    A generalization or "type" of a file; every file is an instance of a
-   product.
+   :ref:`product <concepts_products>`.
 
 .. sql:column:: product_id
 

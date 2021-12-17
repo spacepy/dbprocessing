@@ -24,6 +24,9 @@ class Version(object):
     * Y is the quality version, incremented when a change is made to a file that affects quality
     * Z is the revision version, incremented when a revision has been done to a code or file, as minor as fixing a typo
 
+    .. seealso::
+       :ref:`concepts_versions`
+
     .. note:: The interface version starts at 1
 
     :attribute interface: The interface version for the object
