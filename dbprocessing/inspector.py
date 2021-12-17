@@ -3,26 +3,13 @@
 """
 Support for inspectors, which determine product type for a given file.
 
-Inspector requirements:
-    - One product per inspector file
-    - Must implement a class called Inspector(inspector.inspector)
-    - Must implement the abstract method inspect(kwargs)
-    - Must implement code_name = 'codename.py' at the self level
-    - inspect() must return anything that is not None for a valid match
-        - It also must populate the following items:
-            * self.diskfile.params['utc_file_date'] : date object
-            * self.diskfile.params['utc_start_time'] : datetime object
-            * self.diskfile.params['utc_stop_time'] : datetime object
-            * self.diskfile.params['version'] : Version object
-            * self.diskfile.params['check_date'] : None (optional)
-            * self.diskfile.params['verbose_provenance'] : string (optional)
-            * self.diskfile.params['quality_comment'] : string (optional)
-            * self.diskfile.params['caveats'] : string (optional)
-            * self.diskfile.params['release_number'] : int (optional)
-            * self.diskfile.params['met_start_time'] : long (optional)
-            * self.diskfile.params['met_stop_time'] : long (optional)
-            * self.diskfile.params['quality_checked'] : bool (optional)
-            * self.diskfile.params['process_keywords'] : str (optional)
+To write an inspector, create a Python module (i.e. a .py file). This file
+must contain a single class, named ``Inspector``, which inherits from
+:class:`inspector`. This class must have a class member ``code_name``
+with the name of the inspector file, and implement the
+:meth:`~inspector.inspect` method (see that documentation for details).
+A :sql:table:`inspector` record must also then be created referencing the
+inspector file and with any necessary keywords.
 """
 from __future__ import absolute_import
 from __future__ import print_function
@@ -70,21 +57,35 @@ class DefaultFormatter(DBstrings.DBformatter):
 class inspector(object):
     """ ABC for inspectors to be sure the user has implemented what is required
 
-    Provides utility routes common to many inspectors
+    Provides utility routines common to many inspectors
     """
+    code_name = None
+    """Override this in child class, with the name of the inspector file
+       (:class:`str`)"""
 
     def __init__(self, filename, dbu, product, **kwargs):
         """"""
         DBlogging.dblogger.debug("Entered inspector {0} with kwargs: {1}".format(self.code_name, kwargs))
         self.dbu = dbu # give us access to DButils
+        """Open database. (:class:`~dbprocessing.DButils.DButils`)"""
         self.filename = filename
+        """Full path to the file being inspected. (:class:`str`)"""
         self.basename = os.path.basename(self.filename)
+        """Filename (only, no directory) of the file being inspected.
+        (:class:`str`)"""
         self.dirname = os.path.dirname(self.filename)
+        """Full path to the directory containing the file. (:class:`str`)"""
         self.product = product
+        """Product ID for which this inspector is being called.
+           (:class:`int`)"""
         self.filenameformat = self.dbu.getEntry('Product', self.product).format
+        """Format to match the filename. (:class:`str`)"""
         DBformatter = DefaultFormatter() #must instantiate class
         self.filenameregex = DBformatter.re(self.filenameformat)
+        """Regular expression that will match a valid filename, derived from
+           :data:`filenameformat`. (:class:`str`)"""
         self.diskfile = Diskfile.Diskfile(self.filename, self.dbu)
+        """File metadata to populate. (:class:`.Diskfile.Diskfile`)"""
         insp = self.inspect(kwargs)
         if insp is None:
             self.diskfile = None
@@ -93,10 +94,80 @@ class inspector(object):
 
     @abstractmethod
     def inspect(self, filename, kwargs):
-        """
-        required method to populate the DiskFile object
+        """Override this method to implement an inspector
 
-        can take in some keyword arguments specified in the db
+        If the input file is not a match for this product, nothing else
+        should be updated.
+
+        If the input file is a match for the product, must update
+        :data:`~dbprocessing.Diskfile.Diskfile.params` dict of
+        :data:`diskfile` with the following keys, which map directly
+        to columns of the :sql:table:`file` table in the database:
+
+           utc_file_date (:class:`~datetime.date`)
+              Characteristic date of the file.
+              (:sql:column:`~file.utc_file_date`)
+
+           utc_start time (:class:`~datetime.datetime`)
+              Timestamp of first record in the file.
+              (:sql:column:`~file.utc_start_time`)
+
+           utc_stop time (:class:`~datetime.datetime`)
+              Timestamp of last record in the file.
+              (:sql:column:`~file.utc_stop_time`)
+
+           version (:class:`~dbprocessing.Version.Version`)
+              Version of the file.
+              (:sql:column:`~file.interface_version`,
+              :sql:column:`~file.quality_version`,
+              :sql:column:`~file.revision_version`)
+
+        The following keys may be updated, but are optional:
+
+           check_date (:class:`~datetime.datetime`)
+              :sql:column:`~file.check_date`
+
+           verbose_provenance (:class:`str`)
+              :sql:column:`~file.verbose_provenance`
+
+           quality_comment (:class:`str`)
+              :sql:column:`~file.quality_comment`
+
+           caveats (:class:`str`)
+              :sql:column:`~file.caveats`
+
+           met_start_time (:class:`int`)
+              :sql:column:`~file.met_start_time`
+
+           met_stop_time (:class:`int`)
+              :sql:column:`~file.met_stop_time`
+
+           quality_checked (:class:`bool`)
+              :sql:column:`~file.quality_checked`
+
+           process_keywords (:class:`str`)
+              :sql:column:`~file.process_keywords`
+
+        The inspector may use the non-private instance attributes of
+        :class:`this class <dbprocessing.inspector.inspector>`, including
+        access to the database (although this should be done with care,
+        as the inspector is called during active phases of processing).
+        It is also expected that the inspector will open the file for reading;
+        writing to the data file is highly discouraged at this point.
+
+        Parameters
+        ----------
+        filename : str
+            Not used; use :data:`filename` attribute instead.
+
+        kwargs : dict
+            Keyword arguments provided in :sql:column:`inspector.arguments`.
+
+        Returns
+        -------
+        any
+            ``None`` if the file passed in is not a match for the product,
+            and anything else if it is.
         """
         return None
 
