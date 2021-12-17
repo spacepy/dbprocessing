@@ -105,11 +105,12 @@ to support these files.
 See also :doc:`github`.
 
 These documentation files are "magic" to github:
-   * `CODE_OF_CONDUCT <https://docs.github.com/en/github/
-     building-a-strong-community/adding-a-code-of-conduct-to-your-project>`_
+   * `CODE_OF_CONDUCT <https://docs.github.com/en/communities/
+     setting-up-your-project-for-healthy-contributions/
+     adding-a-code-of-conduct-to-your-project>`_
      (:doc:`../CODE_OF_CONDUCT`)
-   * `CONTRIBUTING <https://docs.github.com/en/github/
-     building-a-strong-community/
+   * `CONTRIBUTING <https://docs.github.com/en/communities/
+     setting-up-your-project-for-healthy-contributions/
      setting-guidelines-for-repository-contributors>`_
      (:doc:`../CONTRIBUTING`)
    * LICENSE
@@ -118,13 +119,15 @@ These documentation files are "magic" to github:
      (:doc:`../README`)
 
 The github documentation on `community profiles
-<https://docs.github.com/en/github/building-a-strong-community/
+<https://docs.github.com/en/communities/
+setting-up-your-project-for-healthy-contributions/
 about-community-profiles-for-public-repositories>`_ can help determine whether
 these files are being parsed properly by github.
 
-More information on possible locations for these files is (somewhat obscurely)
-in the `github documentation for setting default versions <https://
-docs.github.com/en/github/building-a-strong-community/
+More information on possible locations for these files is
+in the `github documentation on community health files <https://
+docs.github.com/en/communities/
+setting-up-your-project-for-healthy-contributions/
 creating-a-default-community-health-file>`_.
 
 Release Notes

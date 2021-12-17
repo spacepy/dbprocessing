@@ -77,9 +77,10 @@ stable/>`_ and `PyGithub <https://pygithub.readthedocs.io/en/latest/
 introduction.html>`_. On Ubuntu these are packaged as ``python-git`` and
 ``python-github`` (or ``python3-git`` and ``python3-github``.)
 
-You need a `Github token <https://docs.github.com/en/free-pro-team@latest/
-github/authenticating-to-github/creating-a-personal-access-token>`_ to avoid
-`throttling <https://developer.github.com/v3/#rate-limiting>`_. No scopes are
+You need a `Github token <https://docs.github.com/en/authentication/
+keeping-your-account-and-data-secure/creating-a-personal-access-token>`_
+to avoid `throttling <https://docs.github.com/en/rest/overview/
+resources-in-the-rest-api#rate-limiting>`_. No scopes are
 required.
 
 Run the script with your token and the name of the last release tag. The

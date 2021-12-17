@@ -18,19 +18,20 @@ Several documentation files are also rendered by Github. See
 Issue and Pull Request Templates
 ================================
 These files are in the ``.github`` directory of the repository, and documented
-`at GitHub <https://docs.github.com/en/github/building-a-strong-community/
+`at GitHub <https://docs.github.com/en/communities/
+using-templates-to-encourage-useful-issues-and-pull-requests/
 about-issue-and-pull-request-templates>`_.
 
 Settings
 ========
-See `repository permissions <https://docs.github.com/en/github/
-setting-up-and-managing-organizations-and-teams/
-repository-permission-levels-for-an-organization>`_.
+See `repository roles <https://docs.github.com/en/organizations/
+managing-access-to-your-organizations-repositories/
+repository-roles-for-an-organization>`_.
      
 Website
 =======
 This is stored on a separate branch; `this page <https://docs.github.com/
-en/github/working-with-github-pages/
+en/pages/getting-started-with-github-pages/
 configuring-a-publishing-source-for-your-github-pages-site>`_ describes
 how it is rendered.
 
@@ -50,9 +51,10 @@ repository).
 We require status checks to pass before merging to master; in the GitHub
 branch settings, this takes the form of a branch protection rule that requires
 the CircleCI ``main`` workflow to succeed on the PR. `This document
-<https://support.circleci.com/hc/en-us/articles/
-360004346254-Workflow-status-checks-never-completes-because-
-of-ci-circleci-Waiting-for-status-to-be-reported>`_ appears to state
+<https://web.archive.org/web/20210304061613/
+https://support.circleci.com/hc/en-us/articles/
+360004346254-Workflow-status-checks-never-completes-because-of-
+ci-circleci-Waiting-for-status-to-be-reported>`_ appears to state
 the top-level circleci check should not be selected, but it may predate
 pipelines. The ``main`` workflow appears to work; if it fails, the checks
 can be expanded to identify the failed job (rather than requiring all

@@ -64,7 +64,7 @@ You can search for pull requests by author and reviewer at
 <https://github.com/spacepy/dbprocessing/pulls>. In the ``Filters`` box,
 enter ``is:pr author:USERNAME`` or ``is:pr reviewed-by:USERNAME``. Further
 search options are described at
-<https://docs.github.com/articles/searching-issues>.
+<https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests>.
 
 Becoming an administrator
 -------------------------
