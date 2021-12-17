@@ -126,7 +126,7 @@ def chunker(seq, size):
     """
     Return a long iterable in a tuple of shorter lists.
 
-    Taken from http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
+    Taken from https://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
 
     :param seq: Iterable to split up
     :type seq: iterable
@@ -225,7 +225,7 @@ def flatten(l):
     """
     Flatten an irregularly nested list of lists
 
-    Taken from http://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists-in-python
+    Taken from https://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists
 
     :param l: Nested list of lists to flatten
     :type l: list
@@ -416,7 +416,7 @@ def processRunning(pid):
     """
     Given a PID see if it is currently running.
 
-    Taken from from http://stackoverflow.com/questions/568271/check-if-pid-is-not-in-use-in-python
+    Taken from from https://stackoverflow.com/questions/568271/how-to-check-if-there-exists-a-process-with-a-given-pid-in-python
 
     :param pid: a pid
     :type pid: long

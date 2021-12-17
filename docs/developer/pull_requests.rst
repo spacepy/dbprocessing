@@ -23,15 +23,18 @@ a distinction between different pull requests. Submitting a pull
 request from master, even of your fork, makes it difficult to have two
 open PRs, and make cleanup after a PR is merged very difficult.
 
-Before working on an issue, then, `fork <https://docs.github.com/en/github/
-getting-started-with-github/fork-a-repo>`_ the `spacepy/dbprocessing
+Before working on an issue, then, `fork <https://docs.github.com/en/
+get-started/quickstart/fork-a-repo>`_ the `spacepy/dbprocessing
 repository <https://github.com/spacepy/dbprocessing/>`_. Make a `branch
-<https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/
+<https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/
+proposing-changes-to-your-work-with-pull-requests/
 about-branches>`_. Work on the branch locally and, when complete, `push
-the branch <https://docs.github.com/en/github/using-git/
+the branch <https://docs.github.com/en/get-started/using-git/
 pushing-commits-to-a-remote-repository>`_ to your fork. Then `open a pull
-request <https://docs.github.com/en/github/
-collaborating-with-issues-and-pull-requests/creating-a-pull-request>`_
+request <https://docs.github.com/en/pull-requests/
+collaborating-with-pull-requests/
+proposing-changes-to-your-work-with-pull-requests/
+creating-a-pull-request>`_
 against ``spacepy/dbprocessing master``.
 
 If you use CircleCI, `unfollow your fork before submitting a PR
@@ -40,17 +43,18 @@ If you use CircleCI, `unfollow your fork before submitting a PR
 
 The preferred flow of code is summarized:
 
-    1. Code is created on a `branch <https://docs.github.com/en/github/
-       collaborating-with-issues-and-pull-requests/about-branches>`_ of a
+    1. Code is created on a `branch <https://docs.github.com/en/pull-requests/
+       collaborating-with-pull-requests/
+       proposing-changes-to-your-work-with-pull-requests/about-branches>`__ of a
        fork, not directly on `master`.
     2. Code enters the ``dbprocessing`` repository via pull requests.    
        This applies to contributors and developers alike; developers do
        not push directly. (Usually PRs are relative to the ``master`` branch
        but in some cases a topic branch may be created.)
     3. Code enters the ``master`` branch of a fork by `syncing upstream
-       to the fork <https://docs.github.com/en/github/
-       collaborating-with-issues-and-pull-requests/syncing-a-fork>`_ after
-       the pull request has been merged.
+       to the fork <https://docs.github.com/en/pull-requests/
+       collaborating-with-pull-requests/working-with-forks/
+       syncing-a-fork>`_ after the pull request has been merged.
 
 When creating the PR, following the provided template as closely as
 possible will facilitate its review.
@@ -60,7 +64,7 @@ close that issue. (``Closes`` is preferred to ``fixes`` because e.g
 closing an enhancement issue is not exactly a fix.) Referencing
 other related issues or PRs is also encouraged, e.g. ``see #x``.
 Avoid the `issue-closing magic words <https://docs.github.com/en/
-free-pro-team@latest/github/managing-your-work-on-github/
+issues/tracking-your-work-with-issues/
 linking-a-pull-request-to-an-issue>`_ unless closing the issue,
 in which case ``closes`` is preferred.
 
@@ -89,8 +93,8 @@ to make it stand out).
 Reviews and updating
 ====================
 
-Developers will `review <https://docs.github.com/en/github/
-collaborating-with-issues-and-pull-requests/
+Developers will `review <https://docs.github.com/en/pull-requests/
+collaborating-with-pull-requests/reviewing-changes-in-pull-requests/
 reviewing-proposed-changes-in-a-pull-request>`_ PRs for inclusion, but
 reviews and comments are welcome from all.
 Our experience has been that using the github interface to suggest
@@ -108,13 +112,14 @@ updated.
 
 In some cases the master branch of the repository may have changed in a
 way that's incompatible with the changes in the pull request. The solution
-is to `rebase <https://docs.github.com/en/github/using-git/about-git-rebase>`_
+is to `rebase <https://docs.github.com/en/get-started/using-git/
+about-git-rebase>`_
 the topic branch against the new master. (The easiest way to do this is to
 update the fork master from the upstream master, then rebase the branch.)
 In the case of a conflict rebase, this can get messy...feel free to ask
 for help. A developer may be able to perform the rebase if `maintainer
-edits are enabled <https://docs.github.com/en/github/
-collaborating-with-issues-and-pull-requests/
+edits are enabled <https://docs.github.com/en/pull-requests/
+collaborating-with-pull-requests/working-with-forks/
 allowing-changes-to-a-pull-request-branch-created-from-a-fork>`_.
 After the rebase, the updated branch will have to be `force-pushed
 <https://stackoverflow.com/questions/5509543/
@@ -156,22 +161,26 @@ In order to be merged, a pull request must:
 Developers pledge to make an effort to review pull requests within one week.
 
 Pull requests are merged via the `rebase and merge method
-<https://docs.github.com/en/github/administering-a-repository/
+<https://docs.github.com/en/repositories/
+configuring-branches-and-merges-in-your-repository/
+configuring-pull-request-merges/
 about-merge-methods-on-github>`_. This maintains a linear history and
 also makes it clear both who authored the commit and who approved it
 for the repository.
 
 Once all conditions are met, a developer can `perform the merge
-<https://docs.github.com/en/github/
-collaborating-with-issues-and-pull-requests/merging-a-pull-request>`_.
+<https://docs.github.com/en/pull-requests/
+collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/
+merging-a-pull-request>`_.
 
 Post-merge cleanup
 ==================
 After merge, the contents of the pull request are in two separate sets
 of commits: the original commits on the topic branch, and new commits on
 master. To finish cleanup, the `fork should be synchronized to the
-updated master <https://docs.github.com/en/github/
-collaborating-with-issues-and-pull-requests/syncing-a-fork>`_ and the
-`topic branch deleted <https://docs.github.com/en/github/
-collaborating-with-issues-and-pull-requests/
+updated master <https://docs.github.com/en/pull-requests/
+collaborating-with-pull-requests/working-with-forks/syncing-a-fork>`_ and the
+`topic branch deleted <https://docs.github.com/en/pull-requests/
+collaborating-with-pull-requests/
+proposing-changes-to-your-work-with-pull-requests/
 creating-and-deleting-branches-within-your-repository>`_.
