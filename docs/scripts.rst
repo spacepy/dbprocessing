@@ -15,6 +15,8 @@ directory.
 
 All scripts will take an option ``-h`` to provide brief usage help.
 
+.. _scripts_addFromConfig_py:
+
 addFromConfig.py
 ----------------
 .. program:: addFromConfig.py
@@ -180,6 +182,8 @@ chain. Either this or :ref:`scripts_htmlCoverage_py` works (probably this).
    documentation <configurationfiles_coveragePlot>`.
 
 .. warning:: Has some bugs, possibly not catching most recent files reliably.
+
+.. _scripts_CreateDB_py:
 
 CreateDB.py
 -----------

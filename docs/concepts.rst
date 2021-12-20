@@ -242,6 +242,14 @@ and:
 
 The ingestion process is run via :option:`ProcessQueue.py -i`.
 
+One subtle feature is the ability to put files directly in their final
+location and ingest them later. This is useful if, e.g., keeping a directory
+in sync with a remote server. If a symbolic link to a file is placed in
+the incoming directory, steps 1, 2, and 4 above are performed, and the
+link deleted. The file pointed to by the link should already be in its
+final location according to its product: the file is not moved if it is
+in the "wrong" location, and this can cause problems finding it later!
+
 .. _concepts_process_queue:
 
 Process Queue
@@ -304,6 +312,29 @@ information) by instrument, for convenience.
 The mission has one other major function: all filesystem structure
 (including data product locations but also incoming directory,
 processing codes, etc.) is determined by mission.
+
+   root directory
+      All data paths are specified relative to the root. This does
+      not mean dbprocessing controls all directories under this;
+      it will only touch directories which are specified as the
+      appropriate directory for a :ref:`product <concepts_products>`.
+      Other filesystems, symlinks, etc. can be mounted under this;
+      dbprocessing simply builds a named path from this root. This can
+      simply be the root directory of the filesystem tree ``/``, but
+      that is not recommended.
+
+   incoming directory
+      This is the directory into which all new files are placed for
+      ingestion into the database (and subsequent use as inputs). There
+      is no restriction on this, although it helps to be on the same
+      filesystem as the root directory to avoid copying files.
+
+   code directory
+      Code paths are specified relative to this directory. This can be
+      the same as the root directory, but that is not recommended. In
+      practice it is often helpful to have two subdirectories of the
+      code directory, one for :ref:`inspectors <concepts_inspectors>`
+      and one for :ref:`processing scripts <concepts_codes>`.
 
 In practice, there is one mission per database.
 
