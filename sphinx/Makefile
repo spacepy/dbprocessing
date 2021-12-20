@@ -49,7 +49,7 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)/* ../docs/autosummary/*.rst
+	rm -rf $(BUILDDIR)/* ../docs/autosummary/*.rst ../docs/developer/autosummary/*.rst
 
 .PHONY: html
 html:

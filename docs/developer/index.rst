@@ -5,6 +5,7 @@ Developer Information
 .. toctree::
    :maxdepth: 1
 
+   api
    build
    tests
    code_standards
