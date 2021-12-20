@@ -17,4 +17,5 @@ Developer Information
    notes
    tables
    todo
+   inspector_examples
    ../CONTRIBUTING

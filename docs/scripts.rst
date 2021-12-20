@@ -28,6 +28,12 @@ See the :ref:`configuration file documentation
 <configurationfiles_addFromConfig>` for a full description of the
 config file format and capability.
 
+This can be run multiple times against a database to populate information
+from several config files; this is a means of, for instance, having
+multiple satellites or instruments in a single database. Existing
+entries in the database are left as-is; entries which do not exist are
+added.
+
 .. option:: config_file
 
    The name of the config file to ingest
@@ -39,6 +45,12 @@ config file format and capability.
 .. option:: -v, --verify
 
    Verify the config file then stop (do not apply to database)
+
+Example usage:
+
+.. code-block:: sh
+
+   addFromConfig.py –m mychain.sqlite setup.config
 
 addProductProcessLink.py
 ------------------------
@@ -118,6 +130,12 @@ running `scripts_ProcessQueue_py` again.
 .. option:: message
 
    Log message to insert into the database, noting reason for the unlock.
+
+Example usage:
+
+.. code-block:: sh
+
+   clearProcessingFlag.py mychain.sqlite "crash fix"
 
 compareDB.py
 ------------
@@ -202,6 +220,12 @@ This is the first step in the setup of a new processing chain.
 .. option:: dbname
 
    The name of the database to create (filename if using sqlite).
+
+Example usage:
+
+.. code-block:: sh
+
+   CreateDB.py mychain.sqlite
 
 dbOnlyFiles.py
 --------------

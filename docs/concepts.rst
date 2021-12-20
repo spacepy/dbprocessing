@@ -49,6 +49,15 @@ A file has certain properties:
       not guaranteed to have had the same history. Version treatments
       are consistent across dbprocessing; see :ref:`concepts_versions`.
 
+   data_level
+      The "level" of the data, following the convention that level 0
+      is processed into level 1, level 1 into 2, etc. This is only used
+      to sort processing: all level 0 files are evaluated for possible
+      new output products before level 1, etc., so that a newly-created
+      level 1 file is available as input to level 2 before attempting
+      to process level 2 files with old level 1 files as inputs. The
+      level may be fractional to extend this concept.
+
 Files that have the same structure and are considered part of the same
 data set; they are described as having the same :ref:`product
 <concepts_products>`. Again this is frequently reflected in the filename.
@@ -442,6 +451,36 @@ mission; they are handled somewhat differently from the above.
       Root data directory of a mission, i.e. :sql:column:`mission.rootdir`.
       Because most paths specified in the database are relative, this is
       primarily useful if specifying additional command line arguments.
+
+The following are used in the
+:ref:`config file <configurationfiles_addFromConfig>` and are expanded
+when added to the database, unlike the above which are stored as-is in
+the database and expanded when used.
+
+     MISSION
+        Mission name
+
+     SPACECRAFT
+        Satellite name
+
+     INSTRUMENT
+        Instrument name
+
+Since each configuration file can only have a single mission, spacecraft,
+and instrument, the above are unique within the config file.
+
+Examples of using substitutions to define :ref:`product <concepts_products>`
+:sql:column:`~product.format`:
+
+   ``rbspa_ect_hope_L2_20130212_v1.2.3.cdf``
+      described as ``{SPACECRAFT}_{PRODUCT}_{DATE}_v{VERSION}.cdf``,
+      where ``{SPACECRAFT}`` and ``{PRODUCT}`` would be expanded when
+      the config file is parsed, and ``{DATE}``, ``{VERSION}`` when a
+      filename is parsed or generated. The product section in this case
+      may be called ``product_ect_hope_L2``.
+
+   ``20131034_ns41_L1.cdf``
+      described as ``{DATE}_{SPACECRAFT}_{PRODUCT}.cdf``.
 
 .. seealso::
    :class:`~dbprocessing.DBstrings.DBformatter`

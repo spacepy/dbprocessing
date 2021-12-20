@@ -221,6 +221,192 @@ addFromConfig.py
     code_cpu = 1
     code_ram = 1
 
+mission
+-------
+This section defines the :ref:`mission <concepts_missions>`; this configuration
+only supports one mission per database. The keys map directly to the fields
+in the :sql:table:`mission` table:
+
+   * :sql:column:`~mission.rootdir`
+   * :sql:column:`~mission.mission_name`
+   * :sql:column:`~mission.incoming_dir`
+
+satellite
+---------
+Although a database may contain multiple satellites, products can only be
+defined within a single config file for a single satellite. (Multiple config
+files can be used to add multiple satellites.)
+
+The ``satellite_name`` key specified the name of the satellite as in
+:sql:column:`satellite.satellite_name`; the instrument and products in
+this file will all be associated with the satellite of this name.
+
+instrument
+----------
+As with ``satellite``, this section specifies, via ``instrument_name``,
+the instrument (:sql:column:`instrument.instrument_name`) with which
+all the products in this file will be associated.
+
+product
+-------
+Each section starting with ``product_`` defines a
+:ref:`product <concepts_products>`. An entry in the :sql:table:`product`
+table will be added for each section; the keys map to columns of the table.
+
+   product_name
+      :sql:column:`~product.product_name`
+
+   relative_path
+      :sql:column:`~product.product_name`
+
+   level
+      :sql:column:`~product.product_name`
+
+   format
+      :sql:column:`~product.product_name`
+
+   product_description
+      :sql:column:`~product.product_name` (may be blank)
+
+Boolean values can be expressed in the config file in a number of
+ways, e.g. ``0``/``1``, ``True``/``False``. Dates are expressed as
+``YYYY-MM-DD``.
+
+A single entry in the :sql:table:`inspector` table is also added,
+associated with this product (via :sql:column:`inspector.product`).
+
+   inspector_filename
+      :sql:column:`~inspector.filename`
+
+   inspector_relative_path
+      :sql:column:`~inspector.relative_path`
+
+   inspector_description
+      :sql:column:`~inspector.description`
+
+   inspector_version
+      :sql:column:`~inspector.interface_version`.
+      :sql:column:`~inspector.quality_version`.
+      :sql:column:`~inspector.revision_version`
+
+   inspector_output_interface
+      :sql:column:`~inspector.output_interface_version`
+
+   inspector_active
+      :sql:column:`~inspector.active_code`
+
+   inspector_date_written
+      :sql:column:`~inspector.date_written`
+
+   inspector_newest_version
+      :sql:column:`~inspector.newest_version`
+
+   inspector_arguments
+      :sql:column:`~inspector.arguments` (may be blank)
+
+process
+-------
+Each section starting with ``process_`` defines a
+:ref:`process <concepts_processes>`. An entry in the :sql:table:`process`
+table will be added for each section; the keys map to columns of the table:
+
+   process_name
+      :sql:column:`~process.process_name`
+
+   output_product
+      :sql:column:`~process.output_product`. This is specified in the config
+      file as a name, and mapped to the :sql:column:`~product.product_id`.
+      If the product exists in the same config file, it must be the name
+      of the product section, including the ``product_``. If the product
+      is already in the database, it must be specified as the
+      :sql:column:`~product.product_name`. (Making this more flexible is
+      planned.)
+
+   output_timebase
+      :sql:column:`~process.output_timebase`
+
+   extra_params
+      :sql:column:`~process.extra_params`
+
+Keys starting with ``optional_input`` or ``required_input`` create
+entries in the :sql:table:`productprocesslink` table. They must be
+named sequentially, e.g.:
+
+   * ``required_input1``
+   * ``required_input2``
+   * ``optional_input1``
+
+etc.
+
+The *values* of each entry are ordinarily the name of a product. As
+with the output product, if the product exists in the same config
+file, it must be the name of the product section, including the
+``product_``. If the product is already in the database, it must be
+specified as the :sql:column:`~product.product_name`.
+
+If the key starts with ``optional``, the
+:sql:column:`~productprocesslink.optional` column is ``True``; otherwise
+it is ``False``.
+
+To specify the inclusion of previous or following days of input data
+(i.e. to set :sql:column:`~productprocesslink.yesterday` and
+:sql:column:`~productprocesslink.tomorrow`, use a different format, of
+``("name", days_before, days_after)``. For example, to specify the
+product from section ``product_level2`` as a required input, and use
+one day prior to the current day as input and no addition days after,
+use:
+
+.. code-block:: ini
+
+   required_input1 = ("product_level2", 1, 0)
+
+The product name is only in quotes if using this form.
+
+Finally, an entry is created in the :sql:table:`code` table, with
+:sql:column:`~code.process_id` set to associate it with this
+process. Ini key to column mappings are:
+
+   code_filename
+      :sql:column:`~code.filename`
+
+   code_relative_path
+      :sql:column:`~code.relative_path`
+
+   code_start_date
+      :sql:column:`~code.code_start_date`
+
+   code_stop_date
+      :sql:column:`~code.code_stop_date`
+
+   code_description
+      :sql:column:`~code.code_description`
+
+   code_version
+      :sql:column:`~inspector.interface_version`.
+      :sql:column:`~inspector.quality_version`.
+      :sql:column:`~inspector.revision_version`
+
+   code_output_interface
+      :sql:column:`~code.output_interface_version`
+
+   code_active
+      :sql:column:`~code.active_code`
+
+   code_date_written
+      :sql:column:`~code.date_written`
+
+   code_newest_version
+      :sql:column:`~code.newest_version`
+
+   code_arguments
+      :sql:column:`~code.arguments`
+
+   code_cpu
+      :sql:column:`~code.cpu`
+
+   code_ram
+      :sql:column:`~code.ram`
+
 .. _configurationfiles_coveragePlot:
 
 coveragePlot.py

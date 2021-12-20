@@ -3,11 +3,23 @@
 """
 Support for inspectors, which determine product type for a given file.
 
-To write an inspector, create a Python module (i.e. a .py file). This file
-must contain a single class, named ``Inspector``, which inherits from
-:class:`inspector`. This class must have a class member ``code_name``
-with the name of the inspector file, and implement the
-:meth:`~inspector.inspect` method (see that documentation for details).
+To write an inspector, create a Python module (i.e. a .py file).
+
+   * This file will need to import :mod:`~dbprocessing.inspector` and
+     :mod:`~dbprocessing.Version` (since it must create a
+     :class:`~dbprocessing.Version.Version`).
+   * This file may import :mod:`~dbprocessing.DBlogging` to permit logging
+     of its work.
+   * This file must contain a single class
+   * The class must be named ``Inspector`` and inherit from
+     :class:`inspector`.
+   * The class must have a class member ``code_name`` with the name of the
+     inspector file
+   * The class must implement the :meth:`~inspector.inspect` method (see that
+     documentation for details).
+
+See also :doc:`../inspector_examples`.
+
 A :sql:table:`inspector` record must also then be created referencing the
 inspector file and with any necessary keywords.
 """
