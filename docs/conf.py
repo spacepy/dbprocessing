@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import re
 import sys
 import sysconfig
 import os
@@ -65,7 +66,7 @@ numpydoc_show_class_members = False
 rst_epilog = """
 --------------------------
 
-**Release**: |version| **Doc generation date**: |today|
+**Release**: |release| **Doc generation date**: |today|
 """
 
 import sphinx
@@ -101,7 +102,7 @@ author = u'dbprocessing contributors'
 #
 # The short X.Y version.
 from dbprocessing import __version__
-version = __version__
+version = re.split('[^.0-9]', __version__)[0]
 # The full version, including alpha/beta/rc tags.
 release = __version__
 
