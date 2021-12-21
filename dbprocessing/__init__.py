@@ -1,4 +1,4 @@
-"""dbprocessing main module
+"""dbprocessing main module.
 
 All dbprocessing functionality is in submodules of this module.
 

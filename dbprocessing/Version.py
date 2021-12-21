@@ -1,4 +1,4 @@
-"""Handling of version numbers"""
+"""Handling of version numbers for codes and files, including comparisons."""
 
 from __future__ import division
 from __future__ import print_function

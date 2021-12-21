@@ -1,4 +1,4 @@
-"""General deque implementation for dbprocessing"""
+"""General deque implementation, used for processing queue."""
 
 from __future__ import print_function
 

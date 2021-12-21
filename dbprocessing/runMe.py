@@ -1,7 +1,4 @@
-"""Support for running processing codes
-
-Interface for running the codes that make data files for the chain.
-"""
+"""Support for running codes to make data files, as defined in database."""
 
 from __future__ import print_function
 from __future__ import absolute_import

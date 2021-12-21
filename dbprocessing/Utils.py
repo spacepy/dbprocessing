@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Class to hold random utilities of use throughout this code
+Various utilities of use throughout this code.
 """
 from __future__ import print_function
 

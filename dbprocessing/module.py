@@ -1,5 +1,5 @@
 """
-Wrapper for environment modules script (http://modules.sourceforge.net)
+Wrapper for environment modules script (http://modules.sourceforge.net).
 
 as used on the LANL scheme
 """
