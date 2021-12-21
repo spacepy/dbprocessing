@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""String handling for dbprocessing
+"""String handling for dbprocessing.
 
 Contains functions/objects useful in handling strings related to
 dbprocessing: parsing, formatting, etc.

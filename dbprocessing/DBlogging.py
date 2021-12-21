@@ -1,4 +1,4 @@
-"""Support for logging information from the dbprocessing chain"""
+"""Support for logging information from the dbprocessing chain."""
 
 from __future__ import print_function
 

@@ -1,4 +1,4 @@
-"""Medium-level interface to dbprocessing databases.
+"""Direct interfacing to dbprocessing databases.
 
 Provides interface specific to dbprocessing databases (not general SQL
 databases) and performs most functionality for retrieving, changing, etc.

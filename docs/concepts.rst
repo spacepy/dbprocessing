@@ -305,6 +305,13 @@ at the same time.
 
 Processing is executed via :option:`ProcessQueue.py -p`.
 
+Output files are created in a temporary directory and then moved to their
+final location. If a processing code exits with non-zero (i.e. error) status,
+the console output from that code is placed in the
+:sql:column:`error directory <mission.errordir>`, along with the output
+file if it has been created (this may, of course, be only a partial file,
+given the error).
+
 .. _concepts_missions:
 
 Missions
@@ -490,3 +497,26 @@ QA Loop
 The QA loop was designed for RBSP-ECT to permit e.g. the validation of
 level 1 files before generating level 2. It was not used in production,
 but may eventually be documented and tested for other use.
+
+Logs
+====
+All actions are logged to files in a designated directory, by default
+``dbprocessing_logs`` in the user's home directory.
+
+Logs are daily files with names in the form
+``dbprocessing_DATABASE.log.YYYY-MM-DD``. ``DATABASE`` is the name of the
+mission database being processed. Initially dbprocessing logs to a file
+``dbprocessing_log.log.YYYY-MM-DD`` until the database is fully opened,
+and then switches to the database-specific file. Some small utilities may
+not perform this switch.
+
+Log files are rotated (and named) according to the UTC day. Timestamps
+within the log files are also in UTC.
+
+.. envvar:: DBPROCESSING_LOG_DIR
+
+   Directory to contain log files. Can use ``~`` and similar to specify
+   directories relative a user's home directory.
+
+.. seealso::
+   :mod:`~dbprocessing.DBlogging`

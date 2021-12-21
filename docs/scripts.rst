@@ -1,6 +1,6 @@
-********************
-dbprocessing Scripts
-********************
+*******
+Scripts
+*******
 
 .. contents::
    :depth: 1
@@ -14,6 +14,15 @@ maintained as part of dbprocessing. They are in the ``scripts``
 directory.
 
 All scripts will take an option ``-h`` to provide brief usage help.
+
+The most commonly used scripts are:
+
+===================================== =========================================
+:ref:`scripts_CreateDB_py`            Create dbprocessing tables in a database
+:ref:`scripts_addFromConfig_py`       Add project-specific relationships to db
+:ref:`scripts_ProcessQueue_py`        Ingest input files; process to new files
+:ref:`scripts_clearProcessingFlag_py` Reset the lock if processing crashes
+===================================== =========================================
 
 .. _scripts_addFromConfig_py:
 

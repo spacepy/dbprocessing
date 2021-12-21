@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Support for making reports from dbprocessing logs
+Support for making reports from dbprocessing logs.
 
 things included are:
     - number and list of files ingested

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Table definitions for dbprocessing
+"""Table definitions for dbprocessing.
 
 Contains definitions for all database tables, keyed by table name and
 suitable for passing as arguments to the :class:`~sqlalchemy.schema.Table`
