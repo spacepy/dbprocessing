@@ -32,6 +32,14 @@ class logfile(object):
     def __init__(self, filename, timerange=None):
         """
         read in the file and collect what we need
+
+        Parameters
+        ----------
+        filename : :class:`str`
+           Log file to read
+        timerange : :class:`~collections.abc.Sequence`, optional
+            Start and end time of log timestamps to process, default all.
+            (:class:`~datetime.datetime`)
         """
         if not os.path.isfile(filename):
             raise(ValueError('filename does not exist'))
@@ -44,6 +52,7 @@ class logfile(object):
         self.movedToError = []
         self.commandsRun = []
         self.errors = []
+        """All lines in the log with errors (:class:`list` of :class:`str`)"""
 
         self.filename = filename
         self._logData = open(self.filename, 'r').readlines()
@@ -60,12 +69,26 @@ class logfile(object):
         self.errors = self._errors()
 
     def setTimerange(self, timerange):
-        """Sets the time range for this report"""
+        """Sets the time range for this report
+
+        Parameters
+        ----------
+        timerange : :class:`~collections.abc.Sequence`, optional
+            Start and end time of log timestamps to process, default all.
+            (:class:`~datetime.datetime`)
+        """
         if len(timerange) != 2:
             raise(ValueError('timerange must be a list/tuple of 2 datetime objects'))
         self.timerange = timerange
 
     def _firstLastDate(self):
+        """Get first and last date within the log file
+
+        Returns
+        -------
+        :class:`tuple` of :class:`str`
+            YYYYMMDD of first and last date
+        """
         first = dup.parse(self._logData[0].split(',')[0])
         last = dup.parse(self._logData[-1].split(',')[0])
         return first, last
@@ -73,6 +96,11 @@ class logfile(object):
     def _error(self):
         """
         a list of all the error entries
+
+        Returns
+        -------
+        :class:`list`
+            All lines from the log that are for ERROR entries.
         """
         lines = []
         for line in self._logData:
@@ -83,7 +111,12 @@ class logfile(object):
 
     def _errors(self):
         """
-        build up the class objects
+        Convert all error lines to HTML report fragments
+
+        Returns
+        -------
+        :class:`list`
+            HTML report for each error (:class:`errors`).
         """
         lines = []
         for line in self.error:
@@ -93,6 +126,11 @@ class logfile(object):
     def _info(self):
         """
         a list of all the INFO entries
+
+        Returns
+        -------
+        :class:`list`
+            All lines from the log that are for INFO entries.
         """
         lines = []
         for line in self._logData:
@@ -104,6 +142,11 @@ class logfile(object):
     def _debug(self):
         """
         a list of all the DEBUG entries
+
+        Returns
+        -------
+        :class:`list`
+            All lines from the log that are for DEBUG entries.
         """
         lines = []
         for line in self._logData:
@@ -115,7 +158,14 @@ class logfile(object):
     def _ingested(self):
         """
         return list of files ingested
+
         file_id	filename	 product
+
+        Returns
+        -------
+        :class:`list`
+            HTML report fragments for all file ingestions reported in the
+            log. (:class:`ingested`)
         """
         lines = []
         for line in self.info:
@@ -127,6 +177,12 @@ class logfile(object):
     def _movedToError(self):
         """
         all the files that were moved to error
+
+        Returns
+        -------
+        :class:`list`
+            HTML report fragments for all file moves to error reported in the
+            log. (:class:`movedToError`)
         """
         lines = []
         for line in self.info:
@@ -138,6 +194,12 @@ class logfile(object):
     def _commandsRun(self):
         """
         return a list of the unique commands run
+
+        Returns
+        -------
+        :class:`list`
+            HTML report fragments for unique command executions reported in the
+            log. (:class:`commandsRun`)
         """
         lines = []
         for line in self.info:
@@ -148,6 +210,7 @@ class logfile(object):
         names = [v.filename for v in lines]
         uniq, ind = np.unique(names, return_index=True)
         return [lines[v] for v in ind]
+
 
 class HTMLbase(object):
     """Support comparisons based on time stored in this object"""
@@ -188,12 +251,18 @@ class HTMLbase(object):
         except TypeError:
             return self.dt.strftime('%Y-%m-%d') <= other.dt
 
+
 class commandsRun(HTMLbase):
     """Report on commands that have been run by the chain"""
 
     def __init__(self, inStr):
         """
         pass in the line and parse it grabbing what we need
+
+        Parameters
+        ----------
+        inStr : :class:`str`
+            Line from log file
         """
         global dbu
         self.dt = dup.parse(inStr.split(',')[0])
@@ -205,6 +274,11 @@ class commandsRun(HTMLbase):
     def htmlheader(self):
         """
         return a string html header
+
+        Returns
+        -------
+        :class:`str`
+            HTML table row header
         """
         outStr = '<tr>'
         for attr in ['filename', ]:
@@ -215,6 +289,16 @@ class commandsRun(HTMLbase):
     def html(self, alt=False):
         """
         return a html string for this
+
+        Parameters
+        ----------
+        alt : :class:`bool`, default False
+            Alternate line (used to style every other table row differently).
+
+        Returns
+        -------
+        :class:`str`
+            HTML table row for this entry.
         """
         if alt:
             outStr = '<tr class="alt">'
@@ -230,13 +314,17 @@ class commandsRun(HTMLbase):
         return outStr
 
 
-
 class ingested(HTMLbase):
     """Report files that have been ingested in to the chain"""
 
     def __init__(self, inStr):
         """
         pass in the line and parse it grabbing what we need
+
+        Parameters
+        ----------
+        inStr : :class:`str`
+            Line from log file
         """
         global dbu
         self.dt = dup.parse(inStr.split(',')[0])
@@ -255,6 +343,11 @@ class ingested(HTMLbase):
     def htmlheader(self):
         """
         return a string html header
+
+        Returns
+        -------
+        :class:`str`
+            HTML table row header
         """
         outStr = '<tr>'
         for attr in ['dt', 'file_id', 'filename', 'product_name', 'level']:
@@ -265,6 +358,16 @@ class ingested(HTMLbase):
     def html(self, alt=False):
         """
         return a html string for this
+
+        Parameters
+        ----------
+        alt : :class:`bool`, default False
+            Alternate line (used to style every other table row differently).
+
+        Returns
+        -------
+        :class:`str`
+            HTML table row for this entry.
         """
         if alt:
             outStr = '<tr class="alt">'
@@ -285,7 +388,12 @@ class movedToError(HTMLbase):
 
     def __init__(self, inStr):
         """
-        pass in the lig line and parse it saving what we want
+        pass in the log line and parse it saving what we want
+
+        Parameters
+        ----------
+        inStr : :class:`str`
+            Line from log file
         """
         self.dt = dup.parse(inStr.split(',')[0])
         self.filename = os.path.basename(inStr.split()[-4]) # this is hopefully always constant
@@ -293,6 +401,11 @@ class movedToError(HTMLbase):
     def htmlheader(self):
         """
         return a string html header
+
+        Returns
+        -------
+        :class:`str`
+            HTML table row header
         """
         outStr = '<tr>'
         for attr in ['dt', 'filename', 'movedTo']:
@@ -303,6 +416,16 @@ class movedToError(HTMLbase):
     def html(self, alt=False):
         """
         return a html string for this
+
+        Parameters
+        ----------
+        alt : :class:`bool`, default False
+            Alternate line (used to style every other table row differently).
+
+        Returns
+        -------
+        :class:`str`
+            HTML table row for this entry.
         """
         if alt:
             outStr = '<tr class="alt">'
@@ -323,6 +446,11 @@ class errors(HTMLbase):
     def __init__(self, inStr):
         """
         parse the error and collect what we want
+
+        Parameters
+        ----------
+        inStr : :class:`str`
+            Line from log file
         """
         self.dt = dup.parse(inStr.split(',')[0])
         m = re.findall( r'^.*,\d\d\d\s\-\s(.*)\s\-\sERROR\s\-\s(.*)$' , inStr.strip())
@@ -332,6 +460,11 @@ class errors(HTMLbase):
     def htmlheader(self):
         """
         return a string html header
+
+        Returns
+        -------
+        :class:`str`
+            HTML table row header
         """
         outStr = '<tr>'
         for attr in ['dt', 'Codename', 'Error message']:
@@ -342,6 +475,16 @@ class errors(HTMLbase):
     def html(self, alt=False):
         """
         return a html string for this
+
+        Parameters
+        ----------
+        alt : :class:`bool`, default False
+            Alternate line (used to style every other table row differently).
+
+        Returns
+        -------
+        :class:`str`
+            HTML table row for this entry.
         """
         if alt:
             outStr = '<tr class="alt">'

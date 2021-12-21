@@ -34,12 +34,12 @@ def definition(name):
 
     Parameters
     ----------
-    name : str
+    name : :class:`str`
         Name of the table to get definition for, see :data:`names`.
 
     Returns
     -------
-    tuple
+    :class:`tuple`
         Arguments for :class:`~sqlalchemy.schema.Table` constructor, such that
         it can be called
         ``Table(name, metadata, *dbprocessing.tables.definition[name])``

@@ -92,14 +92,14 @@ def postgresql_url(databasename):
 
     Parameters
     ----------
-    databasename : str
+    databasename : :class:`str`
         Name of the database
 
     Returns
     -------
-    str
+    :class:`str`
         Full postgresql URL, suitable for use in
-        :func:`~sqlalchemy.engine.create_engine`
+        :func:`~sqlalchemy.create_engine`
     """
     # If no host, defaults to Unix domain on localhost.
     hostport = os.environ.get('PGHOST', '')
@@ -134,15 +134,22 @@ class DButils(object):
         """
         Initialize the DButils class
 
-        :param mission: Name of the mission
-        :type mission: str
-        :param db_var: Does nothing.
-        :param echo: if True, the Engine will log all statements as well as a repr() of their parameter lists to the logger
-        :type echo: bool
-        :param engine: DB engine to connect to (e.g sqlite, postgresql).
-                       Defaults to sqlite if mission is an existing file, else
-                       postgresql.
-        :type engine: str
+        Parameters
+        ----------
+        mission : :class:`str`
+            Name of the mission
+        echo : :class:`bool`, default False
+            if True, the Engine will log all statements as well as a
+            repr() of their parameter lists to the logger
+        engine : :class:`str`, optional
+            DB engine to connect to (e.g sqlite, postgresql).
+            Defaults to sqlite if mission is an existing file, else
+            postgresql.
+
+        Other Parameters
+        ----------------
+        db_var
+            Does nothing
         """
         self.dbIsOpen = False
         if mission is None:
@@ -169,9 +176,12 @@ class DButils(object):
 
     def __repr__(self):
         """
-        @summary: Print out something useful when one prints the class instance
+        Print out something useful when one prints the class instance
 
-        :return: DBProcessing class instance for mission <mission name>
+        Returns
+        -------
+        str
+            DBProcessing class instance for mission <mission name>
         """
         return 'DBProcessing class instance for mission ' + self.mission + ', version: ' + __version__
 
@@ -182,13 +192,20 @@ class DButils(object):
     def openDB(self, engine, db_var=None, verbose=False, echo=False):
         """Setup python to talk to the database
 
-        :param engine: DB engine to connect to
-        :type engine: str
-        :param db_var: Does nothing.
-        :param echo: if True, the Engine will log all statements as well as a repr() of their parameter lists to the logger
-        :type echo: bool
-        :param verbose: if True, will print out extra debugging
-        :type verbose: bool
+        Parameters
+        ----------
+        engine : :class:`str`
+            DB engine to connect to
+        verbose : :class:`bool`, default False
+            if True, will print out extra debugging
+        echo : :class:`bool`, default False
+            if True, the Engine will log all statements as well as a
+            repr() of their parameter lists to the logger
+
+        Other Parameters
+        ----------------
+        db_var
+            Does nothing
         """
         if self.dbIsOpen == True:
             return
@@ -226,6 +243,11 @@ class DButils(object):
     def _createTableObjects(self, verbose=False):
         """
         cycle through the database and build classes for each of the tables
+
+        Parameters
+        ----------
+        verbose : :class:`bool`, default False
+            if True, will print out extra debugging
         """
         DBlogging.dblogger.debug("Entered _createTableObjects()")
 
@@ -267,9 +289,13 @@ class DButils(object):
 
         Ensures not doing 2 at the same time
 
-        :return: false or the pid
-        :rtype: bool or int
+        Returns
+        -------
+        :class:`bool` or :class:`int`
+            False or the current process id
 
+        Examples
+        --------
         >>>  pnl.currentlyProcessing()
         """
         DBlogging.dblogger.info("Checking currently_processing")
@@ -288,10 +314,15 @@ class DButils(object):
         """
         Query the db and reset a processing flag
 
-        :param comment: the comment to enter into the processing log DB
-        :type comment: str
-        :return: True - Success, False - Failure
-        :rtype: bool
+        Parameters
+        ----------
+        comment : :class:`str`
+            the comment to enter into the processing log DB
+
+        Returns
+        -------
+        :class:`bool`
+            True - Success, False - Failure
         """
         sq2 = self.session.query(self.Logging).filter_by(currently_processing=True).count()
         if sq2 and comment is None:
@@ -339,27 +370,29 @@ class DButils(object):
         """
         Add an entry to the logging table
 
-        :param currently_processing: is the db currently processing?
-        :type currently_processing: bool
-        :param processing_start_time: the time the processing started
-        :type processing_start_time: datetime.datetime
-        :param mission_id: the mission id the processing if for
-        :type mission_id: int
-        :param user: the user doing the processing
-        :type user: str
-        :param hostname: the hostname that initiated the processing
-        :type hostname: str
+        Parameters
+        ----------
+        currently_processing : :class:`bool`
+            is the db currently processing?
+        processing_start_time : :class:`~datetime.datetime`
+            the time the processing started
+        mission_id : :class:`int`
+            the :sql:column:`~mission.mission_id` the processing is for
+        user : :class:`str`
+            the user doing the processing
+        hostname : :class:`str`
+            the hostname that initiated the processing
+        pid : :class:`int`, optional
+            the process id that did the processing, default null
+        processing_end_time : :class:`~datetime.datetime`, optional
+            the time the processing stopped, default null
+        comment : :class:`str`
+            comment about the processing run
 
-        :keyword pid: the process id that id the processing
-        :type pid: int
-        :keyword processing_end_time: the time the processing stopped
-        :type processing_end_time: datetime.datetime
-        :keyword comment: comment about the processing run
-        :type comment: str
-
-        :return: instance of the Logging class
-        :rtype: Logging
-
+        Returns
+        -------
+        Logging
+            instance of the class for the :sql:table:`logging` table.
         """
         l1 = self.Logging()
         l1.currently_processing = currently_processing
@@ -378,8 +411,10 @@ class DButils(object):
         """
         Finish the entry to the processing table in the DB, logging
 
-        :param comment: (optional) a comment to insert into he DB
-        :type param: str
+        Parameters
+        ----------
+        comment : :class:`str`
+            a comment to insert into the DB
         """
         try:
             self.__p1
@@ -401,15 +436,18 @@ class DButils(object):
         """
         Check if the file existence on disk matches database record
 
-        :param file_id: id of the file to check
-        :type file_id: int
+        Parameters
+        ----------
+        file_id : :class:`int`
+            :sql:column:`~file.file_id` of the file to check
+        fix : :class:`bool`, default False
+            set to have the DB fixed to match the file system
+            this is **NOT** sure to be safe
 
-        :keyword fix: (optional) set to have the DB fixed to match the file system
-           this is **NOT** sure to be safe
-        :type fix: bool
-
-        :returns: Return true is consistent, False otherwise
-        :rtype: bool
+        Returns
+        -------
+        :class:`bool`
+            True if consistent, False otherwise
         """
         sq = self.getEntry('File', file_id)
         if sq.exists_on_disk:
@@ -441,6 +479,14 @@ class DButils(object):
     def ProcessqueueRemove(self, item, commit = True):
         """
         remove a file from the queue by name or number
+
+        Parameters
+        ----------
+        item : :class:`int` or :class:`str`
+            :sql:column:`~file.filename` or :sql:column:`~file.file_id`
+            of file to remove from the process queue.
+        commit : :class:`bool`, default True
+            Commit changes to the database when done.
         """
         # if the input is a file name need to handle that
         if isinstance(item, str_classes) \
@@ -457,6 +503,17 @@ class DButils(object):
     def ProcessqueueGetAll(self, version_bump=False):
         """
         Return the entire contents of the process queue
+
+        Parameters
+        ----------
+        version_bump : :class:`bool`, default False
+            Include the version bump information
+
+        Returns
+        -------
+        :class:`list`
+            All :sql:column:`~file.file_id` in the process queue, optionally
+            the :sql:column:`~processqueue.version_bump` information as well.
         """
         pqdata = self.session.query(self.Processqueue).all()
 
@@ -473,14 +530,16 @@ class DButils(object):
         Push a file onto the process queue (onto the right)
 
         Parameters
-        ==========
-        fileid : (int, string)
-            the file id (or name to put on the process queue)
+        ----------
+        fileid : :class:`int` or :class:`str`
+            the :sql:column:`~file.file_id` or :sql:column:`~file.filename`
+            to put on the process queue.
 
         Returns
-        =======
-        file_id : int
-            the file_id that was passed in, but grabbed from the db
+        -------
+        file_id : :class:`int`
+            :sql:column:`~file.file_id` of the file placed on queue,
+            as grabbed from the db.
         """
         if not hasattr(fileid, '__iter__'):
             fileid = [fileid]
@@ -530,13 +589,13 @@ class DButils(object):
            IS safe against adding ids that are already in the queue.
 
         Parameters
-        ==========
-        fileid : (int, listlike)
-            the file id (or lisklike of file ids)
+        ----------
+        fileid : :class:`int` or :class:`~collections.abc.Iterable`
+            the :sql:column:`~file.file_id` or sequence of file ids to add
 
         Returns
-        =======
-        num : int
+        -------
+        num : :class:`int`
             the number of entries added to the processqueue
         """
         current_q = set(self.ProcessqueueGetAll())
@@ -564,6 +623,11 @@ class DButils(object):
     def ProcessqueueLen(self):
         """
         Return the number of files in the process queue
+
+        Returns
+        -------
+        :class:`int`
+            Count of files in the queue
         """
 
         return self.session.query(self.Processqueue).count()
@@ -573,14 +637,15 @@ class DButils(object):
         pop a file off the process queue (from the left)
 
         Other Parameters
-        ================
-        index : int
+        ----------------
+        index : :class:`int`
             the index in the queue to pop
 
         Returns
-        =======
-        file_id : int
-            the file_id of the file popped from the queue
+        -------
+        file_id : :class:`int`
+            the :sql:column:`~processqueue.file_id` of the :sql:table:`file`
+            popped from the queue
         """
         val = self.ProcessqueueGet(index=index, instance=True)
         self.session.delete(val)
@@ -592,9 +657,10 @@ class DButils(object):
         Get the file at the head of the queue (from the left)
 
         Returns
-        =======
-        file_id : int
-            the file_id of the file popped from the queue
+        -------
+        file_id : :class:`int`
+            the :sql:column:`~processqueue.file_id` of the :sql:table:`file`
+            popped from the queue
         """
         if index < 0:  # enable the python from the end indexing
             index = self.ProcessqueueLen() + index
@@ -609,8 +675,13 @@ class DButils(object):
     def ProcessqueueClean(self, dryrun=False):
         """Keep only latest version of each file in the process queue.
 
-        this is determined by product and utc_file_date
-        also sorts by level, date
+        This is determined by :sql:column:`~file.product_id` and
+        :sql:column:`~file.utc_file_date`. Also sorts queue by level, date
+
+        Parameters
+        ----------
+        dryrun : :class:`bool`, default False
+            Do not actually make changes to the queue.
         """
 
         # BAL 30 March 2017 Trying a different method here that might be cleaner
@@ -691,8 +762,15 @@ class DButils(object):
         """
         quesry the database, is this filename or file_id newest version?
 
-        @param filename: filename or file_id
-        @return: Ture is file is lastest_version, False is not
+        Parameters
+        ----------
+        filename : :class:`int` or :class:`str`
+            filename or file_id
+
+        Returns
+        -------
+        :class:`bool`
+            True is file is lastest_version, False is not
         """
         file = self.getEntry('File', filename)
         product_id = file.product_id
@@ -712,11 +790,24 @@ class DButils(object):
         """
         removes a file from the DB
 
-        :param filename: name of the file to remove (or a list of names)
-        :param recursive: remove all files that depend on the Given
+        Parameters
+        ----------
+        filename : :class:`str` or :class:`~collections.abc.Iterable`
+            name of the file to remove (or a list of names)
+        recursive : :class:`bool`, default False
+            remove all files that depend on the given file
 
-        if recursive then it removes all files that depend on the one to remove
+        Other Parameters
+        ----------------
+        verbose : :class:`bool`, default False
+            if True, will print out extra debugging
+        trust_id : :class:`bool`, default False
+            if True, assumes ``filename`` is a valid file id
+        commit : :class:`bool`, default True
+            Commit changes to the database when done.
 
+        Examples
+        --------
         >>>  pnl._purgeFileFromDB('Test-one_R0_evinst-L1_20100401_v0.1.1.cdf')
         """
         # if not an iterable make it a iterable
@@ -771,8 +862,10 @@ class DButils(object):
         """
         Return dictionaries of satellite, mission objects
 
-        :return: dictionaries of satellite, mission objects
-        :rtype: dict
+        Returns
+        -------
+        :class:`dict`
+            dictionaries of satellite, mission objects
         """
         ans = []
         sats = self.session.query(self.Satellite).all()
@@ -783,8 +876,10 @@ class DButils(object):
         """
         Return dictionaries of instrument traceback dictionaries
 
-        :return: dictionaries of instrument traceback dictionaries
-        :rtype: dict
+        Returns
+        -------
+        :class:`dict`
+            dictionaries of instrument traceback dictionaries
         """
         ans = []
         insts = self.session.query(self.Instrument).all()
@@ -794,6 +889,17 @@ class DButils(object):
     def getAllCodes(self, active=True):
         """
         Return a list of all codes
+
+        Parameters
+        ----------
+        active : :class:`bool`, default False
+            Only return codes which are marked :sql:column:`~code.active_code`
+            and :sql:column:`~code.newest_version`.
+
+        Returns
+        -------
+        :class:`list`
+            All codes
         """
         ans = []
         if active:
@@ -817,13 +923,40 @@ class DButils(object):
         """
         Return all the file names in the database
 
-        :param bool fullPath: Return the fullPath or just filename
-        :param int level: Filter by given level
-        :param int product: Filter by given product
-        :param int limit: Limit number of results
+        All parameters are optional; if not specified, default is "all".
 
-        :return: List of strs with the filename
-        :rtype: list
+        Parameters
+        ----------
+        fullPath : :class:`bool`, default True
+            Return full path (if False, just filename)
+        startDate : :class:`~datetime.datetime`, optional
+            First date to include, based on
+            :sql:column:`~file.utc_file_date`
+        endDate : :class:`~datetime.datetime`, optional
+            Last date to include (inclusive)
+        level : :class:`float`, optional
+            Only include files of this level.
+        product : :class:`int`, optional
+            :sql:column:`~product.product_id` of files to include
+        code : :class:`int`, optional
+            Only return files created by code with ID of
+            :sql:column:`~code.code_id`
+        instrument : :class:`int`, optional
+            Only return files with instrument
+            :sql:column:`~instrument.instrument_id`
+        exists : :class:`bool`, default False
+            Only return files that exist on disk, based on
+            :sql:column:`~file.exists_on_disk`.
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date)
+        limit : :class:`int`
+            Limit number of results, default all
+
+        Returns
+        -------
+        :class:`list` of :class:`str`
+            Filename of all files matching requirements.
         """
 
         files = self.getFiles(startDate, endDate, level, product, code, instrument, exists, newest_version, limit)
@@ -850,17 +983,21 @@ class DButils(object):
         into the database as nulls, and the default will be determined
         at runtime.
 
-        :param mission_name: the name of the mission
-        :type mission_name: str
-        :param rootdir: the root directory of the mission
-        :type rootdir: str
-        :param str incoming_dir: directory for incoming files
-        :param str codedir: directory containing codes (optional; see
-                            :meth:`getCodeDirectory`)
-        :param str inspectordir: directory containing product inspectors
-                                 (optional; see :meth:`getInspectorDirectory`)
-        :param str errordir: directory to contain error files (optional;
-                             see :meth:`getErrorPath`)
+        Parameters
+        ----------
+        mission_name : :class:`str`
+            the name of the mission
+        rootdir : :class:`str`
+            the root directory of the mission
+        incoming_dir : :class:`str`
+            directory for incoming files
+        codedir : :class:`str`, optional
+            directory containing codes; default, see :meth:`getCodeDirectory`
+        inspectordir : :class:`str`, optional
+            directory containing product inspectors; default, see
+            :meth:`getInspectorDirectory`)
+        errordir : :class:`str`, optional
+            directory to contain error files; default, see :meth:`getErrorPath`
         """
         mission_name = str(mission_name)
         rootdir = str(rootdir)
@@ -891,8 +1028,17 @@ class DButils(object):
         """
         Add a satellite to the database
 
-        :param satellite_name: the name of the mission
-        :type satellite_name: str
+        Parameters
+        ----------
+        satellite_name : :class:`str`
+            the name of the satellite
+        mission_id : :class:`int`
+            :sql:column:`mission.mission_id` of mission to add to
+
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`satellite.satellite_id` of newly-added satellite.
         """
         satellite_name = str(satellite_name)
         s1 = self.Satellite()
@@ -912,12 +1058,24 @@ class DButils(object):
         """
         Add a process to the database
 
-        :param process_name: the name of the process
-        :type process_name: str
-        :param output_product: the output product id
-        :type output_product: int
-        :keyword extra_params: extra parameters to pass to the code
-        :type extra_params: str
+        Parameters
+        ----------
+        process_name : :class:`str`
+            the name of the process (:sql:column:`~process.process_name`).
+        output_product : :class:`int`
+            the output product id (:sql:column:`~process.output_product`).
+        output_timebase : :class:`str`
+            Timebase to use for output files, options ``RUN``, ``ORBIT``,
+            ``DAILY``, ``WEEKLY``, ``MONTHLY``, ``YEARLY``, ``FILE``
+            (:sql:column:`~process.output_timebase`).
+        extra_params : :class:`str`, optional
+            extra parameters to pass to the code
+            (:sql:column:`~process.extra_params`).
+
+        Other Parameters
+        ----------------
+        trigger
+            Unused.
         """
         if output_timebase not in ['RUN', 'ORBIT', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'FILE']:
             raise ValueError("output_timebase invalid choice")
@@ -942,14 +1100,18 @@ class DButils(object):
         """
         Add a product to the database
 
-        :param product_name: the name of the product
-        :type product_name: str
-        :param instrument_id: the instrument   the product is from
-        :type instrument_id: int
-        :param relative_path: relative path for the product
-        :type relative_path: str
-        :param format: the format of the product files
-        :type format: str
+        Adds record to :sql:table:`product`.
+
+        Parameters
+        ----------
+        product_name : :class:`str`
+            the name of the product
+        instrument_id : :class:`int`
+            the instrument the product is from
+        relative_path : :class:`str`
+            relative path for the product
+        format : :class:`str`
+            the format of the product filenames
         """
         p1 = self.Product()
         p1.instrument_id = instrument_id
@@ -965,6 +1127,15 @@ class DButils(object):
     def updateProductSubs(self, product_id):
         """
         Update an existing product performing the {} replacements
+
+        Updates the database, replacing the generic ``{}`` references
+        with the actual values for the product.
+
+        Parameters
+        ----------
+        product_id : :class:`int` or :class:`str`
+            :sql:column:`~product.product_id` or
+            :sql:column:`~product.product_name` of product to update
         """
         # need to do {} replacement, have to do it as a modification
         p1 = self.getEntry('Product', product_id)
@@ -982,6 +1153,14 @@ class DButils(object):
     def updateInspectorSubs(self, insp_id):
         """
         Update an existing inspector performing the {} replacements
+
+        Updates the database, replacing the generic ``{}`` references
+        with the actual values for the inspector.
+
+        Parameters
+        ----------
+        insp_id : :class:`int`
+            :sql:column:`~inspector.inspector_id` of inspector to update.
         """
         # need to do {} replacement, have to do it as a modification
         p1 = self.getEntry('Inspector', insp_id)
@@ -995,6 +1174,15 @@ class DButils(object):
     def updateProcessSubs(self, proc_id):
         """
         Update an existing product performing the {} replacements
+
+        Updates the database, replacing the generic ``{}`` references
+        with the actual values for the process.
+
+        Parameters
+        ----------
+        proc_id : :class:`int` or :class:`str`
+            :sql:column:`~process.process_id` or
+            :sql:column:`~process.process_name` of process to update
         """
         # need to do {} replacement, have to do it as a modification
         p1 = self.getEntry('Process', proc_id)
@@ -1015,16 +1203,21 @@ class DButils(object):
         """
         Add a product process link to the database
 
-        :param input_product_id: id of the product to link
-        :type input_product_id: int
-        :param process_id: id of the process to link
-        :type process_id: int
-        :param optional: if the input product is necessary
-        :type optional: boolean
-        :param yesterday: How many extra days back do you need
-        :type yesterday: int
-        :param tomorrow: How many extra days forward do you need
-        :type tomorrow: int
+        Connects input product to output via :sql:table:`productprocesslink`.
+
+        Parameters
+        ----------
+        input_product_id : :class:`int`
+            :sql:column:`~product.product_id` of the input product.
+        process_id : :class:`int`
+            :sql:column:`process.process_id` of the process for which
+            ``input_product_id`` is an input.
+        optional : :class:`bool`
+            if the input product is optional (vs. required)
+        yesterday : :class:`int`, default 0
+            How many extra days back do you need
+        tomorrow : :class:`int`, default 0
+            How many extra days forward do you need
         """
         ppl1 = self.Productprocesslink()
         ppl1.input_product_id = self.getProductID(input_product_id)
@@ -1042,12 +1235,16 @@ class DButils(object):
                         resulting_file_id,
                         source_code):
         """
-        Add a file code  link to the database
+        Add a file code link to the database
 
-        :param resulting_file_id: id of the product to link
-        :type resulting_file_id: int
-        :param source_code: id of the code
-        :type source_code: int
+        Connects file to code that made it via :sql:table:`filecodelink`.
+
+        Parameters
+        ----------
+        resulting_file_id : :class:`int`
+            :sql:column:`~file.file_id` of the created file
+        source_code : :class:`int`
+            :sql:column:`~code.code_id` of the code that created the file
         """
         fcl1 = self.Filecodelink()
         fcl1.resulting_file = resulting_file_id
@@ -1058,7 +1255,12 @@ class DButils(object):
 
     def delInspector(self, i):
         """
-        Removes an inspector form the db
+        Removes an inspector from the db
+
+        Parameters
+        ----------
+        i : :class:`int`
+            :sql:column:`inspector.inspector_id` of inspector to delete
         """
         insp = self.getEntry('Inspector', i)
         self.session.delete(insp)
@@ -1068,7 +1270,17 @@ class DButils(object):
         """
         Remove entries from Filefilelink
 
-        Will remove if the file is in either column
+        Remove record from :sql:table:`filefilelink` if the file is in
+        either :sql:column:`~filefilelink.source_file` or
+        :sql:column:`~filefilelink.resulting_file`.
+
+        Parameters
+        ----------
+        f : :class:`int` or :class:`str`
+            :sql:column:`~file.file_id` or :sql:column:`~file.filename`
+            of file to remove from link.
+        commit : :class:`bool`, default True
+            Commit changes to the database when done.
         """
         f = self.getFileID(f)  # change a name to a number
         n1 = self.session.query(self.Filefilelink).filter_by(source_file=f).delete()
@@ -1080,7 +1292,18 @@ class DButils(object):
 
     def delFilecodelink(self, f, commit = True):
         """
-        Remove entries from Filecodelink fore a Given file
+        Remove entries from Filecodelink for a Given file
+
+        Remove record from :sql:table:`filecodelink` if the file was
+        created by a code.
+
+        Parameters
+        ----------
+        f : :class:`int` or :class:`str`
+            :sql:column:`~file.file_id` or :sql:column:`~file.filename`
+            of file to unassociate with code.
+        commit : :class:`bool`, default True
+            Commit changes to the database when done.
         """
         f = self.getFileID(f)  # change a name to a number
         n2 = self.session.query(self.Filecodelink).filter_by(resulting_file=f).delete()
@@ -1093,7 +1316,11 @@ class DButils(object):
         """
         Removes a product from the db
 
-        Note: untested!
+        Parameters
+        ----------
+        pp : :class:`int` or :class:`str`
+            :sql:column:`~product.product_id` or
+            :sql:column:`~product.product_name` of product to remove.
         """
         prod = self.getEntry('Product', pp)
         self.session.delete(prod)
@@ -1103,9 +1330,16 @@ class DButils(object):
         """
         Removes a product from the db
 
-        :param list ll: two element list: process_id, product_id
+        Parameters
+        ----------
+        ll : :class:`list`
+            Two elements, :sql:column:`~productprocesslink.process_id`
+            and :sql:column:`~productprocesslink.input_product_id` of
+            record to remove from :sql:table:`productprocesslink`.
 
-        Note: untested!
+        Notes
+        -----
+        Untested!
         """
         link = self.getEntry('Productprocesslink', ll)
         self.session.delete(link)
@@ -1115,7 +1349,15 @@ class DButils(object):
         """
         Remove process and productprocesslink
 
-        :param DButils.Process proc: ID for process to be deleted.
+        Removes a :sql:table:`process` record from the database and all
+        :sql:table:`productprocesslink` records for that process.
+
+        Parameters
+        ----------
+        proc : :class:`int`
+            :sql:column:`~process.process_id` of process to delete.
+        commit : :class:`bool`, default True
+            Commit changes to the database when done.
         """
         sq=self.session.query(self.Productprocesslink.input_product_id)\
                        .filter_by(process_id=proc.process_id)
@@ -1133,13 +1375,16 @@ class DButils(object):
                         resulting_file_id,
                         source_file, ):
         """
-        Add a file file  link to the database
+        Add a file file link to the database
 
-        :param source_file: id of the product to link
-        :type source_file: int
-        :param resulting_file_id: id of the process to link
-        :type resulting_file_id: int
+        Links a file to one of its input files via :sql:table:`filefilelink`.
 
+        Parameters
+        ----------
+        resulting_file_id : :class:`int`
+            :sql:column:`~file.file_id` of the output file.
+        source_file : :class:`int`
+            :sql:column:`~file.file_id` of the input file.
         """
         ffl1 = self.Filefilelink()
         ffl1.source_file = source_file
@@ -1152,12 +1397,17 @@ class DButils(object):
                                  instrument_id,
                                  product_id):
         """
-        Add a instrument product  link to the database
+        Add a instrument product link to the database
 
-        :param instrument_id: id of the instrument to link
-        :type instrument_id: int
-        :param product_id: id of the product to link
-        :type product_id: int
+        Links a product to its instrument via
+        :sql:table:`instrumentproductlink`.
+
+        Parameters
+        ----------
+        instrument_id : :class:`int`
+            :sql:column:`~instrument.instrument_id` of the instrument.
+        product_id : :class:`int`
+            :sql:column:`~product.product_id` of the product.
         """
         ipl1 = self.Instrumentproductlink()
         ipl1.instrument_id = instrument_id
@@ -1172,10 +1422,16 @@ class DButils(object):
         """
         Add a Instrument to the database
 
-        :param instrument_name: the name of the mission
-        :type instrument_name: str
-        :param satellite_id: the root directory of the mission
-        :type satellite_id: int
+        Creates record in :sql:table:`instrument`.
+
+        Parameters
+        ----------
+        instrument_name : :class:`str`
+            The name of the instrument
+            (:sql:column:`~instrument.instrument_name`).
+        satellite_id : :class:`int`
+            :sql:column:`~satellite.satellite_id` of the satellite
+            associated with the instrument.
         """
         i1 = self.Instrument()
 
@@ -1210,31 +1466,45 @@ class DButils(object):
         """
         Add an executable code to the DB
 
-        :param filename: the filename of the code
-        :type filename: str
-        :param relative_path: the relative path (relative to mission base dir)
-        :type relative_path: str
-        :param code_start_date: start of validity of the code (datetime)
-        :type code_start_date: datetime
-        :param code_stop_date: end of validity of the code (datetime)
-        :type code_stop_date: datetime
-        :param code_description: description of the code (50 char)
-        :type code_description: str
-        :param process_id: the id of the process this code is part of
-        :type process_id: int
-        :param version: the version of the code
-        :type version: Version.Version
-        :param active_code: Boolean True means the code is active
-        :type active_code: Boolean
-        :param date_written: the date the cod was written
-        :type date_written: date
-        :param output_interface_version: the interface version of the output (effects the data file names)
-        :type output_interface_version: int
-        :param newest_version: is this code the newest version in the DB?
-        :type newest_version: bool
+        Creates a record in :sql:table:`code` table.
 
-        :return: the code_id of the newly inserted code
-        :rtype: int
+        Parameters
+        ----------
+        filename : :class:`str`
+            the filename of the code.
+        relative_path : :class:`str`
+            the relative path (relative to mission code directory).
+        code_start_date : :class:`~datetime.datetime`
+            start of validity of the code.
+        code_stop_date : :class:`~datetime.datetime`
+            end of validity of the code.
+        code_description : :class:`str`
+            description of the code (50 char).
+        process_id : :class:`int`
+            :sql:column:`~process.process_id` of the process this code
+            implements.
+        version : :class:`.Version` or :class:`str`
+            Version of the code.
+        active_code : :class:`bool`
+            if the code is active.
+        code_date_written : :class:`~datetime.datetime`
+            date the code was written.
+        output_interface_version : :class:`int`
+           Interface version of files produced by the code.
+        newest_version : :class:`bool`
+           Is the code the newest version.
+        arguments : :class:`str`, optional
+           Additional command line arguments to pass to the code, default
+           none (no extra arguments).
+        cpu : :class:`int`, default 1
+           Relative CPU usage of code (usually in terms of threads).
+        ram : :class:`float`, default 1
+           Relative memory usage of code.
+
+        Returns
+        -------
+        code_id : :class:`int`
+            :sql:column:`~code.code_id` of newly created record.
         """
         if isinstance(version, str_classes):
             version = Version.Version.fromString(version)
@@ -1273,30 +1543,39 @@ class DButils(object):
                      product,
                      arguments=None):
         """
-        Add an executable code to the DB
+        Add an inspector to the DB.
 
-        :param filename: the filename of the code
-        :type filename: str
-        :param relative_path: the relative path (relative to mission base dir)
-        :type relative_path: str
-        :param description: description of the code (50 char)
-        :type description: str
-        :param product: the id of the product this inspector finds
-        :type product: int
-        :param version: the version of the code
-        :type version: Version.Version
-        :param active_code: Boolean True means the code is active
-        :type active_code: Boolean
-        :param date_written: the date the cod was written
-        :type date_written: date
-        :param output_interface_version: the interface version of the output (effects the data file names)
-        :type output_interface_version: int
-        :param newest_version: is this code the newest version in the DB?
-        :type newest_version: bool
+        Creates a record in :sql:table:`inspector` table.
 
-        :return: the inspector_id of the newly inserted code
-        :rtype: int
+        Parameters
+        ----------
+        filename : :class:`str`
+            the filename of the inspector
+        relative_path : :class:`str`
+            the relative path (relative to mission inspector directory).
+        description : :class:`str`
+            description of the inspector (50 char).
+        version : :class:`.Version` or :class:`str`
+            Version of the code.
+        active_code : :class:`bool`
+            if the inspector is active.
+        date_written : :class:`~datetime.datetime`
+            date the inspector was written.
+        output_interface_version : :class:`int`
+           Written to database, but not used.
+        newest_version : :class:`bool`
+           Is the inspector the newest version.
+        product : :class:`int`
+           :sql:column:`~product.product_id` of the product this inspector
+           identifies.
+        arguments : :class:`str`, optional
+           Additional keywords to pass to the :meth:`~.inspector.inspect`
+           method, default none (no extra arguments).
 
+        Returns
+        -------
+        inspector_id : :class:`int`
+            :sql:column:`~inspector.inspector_id` of newly created record.
         """
         if isinstance(version, str_classes):
             version = Version.Version.fromString(version)
@@ -1323,6 +1602,23 @@ class DButils(object):
     def _nameSubProduct(self, inStr, product_id):
         """
         In inStr replace the standard {} with the names
+
+        Parameters
+        ----------
+        inStr : :class:`str`
+           String on which to do substitutions
+        product_id : :class:`int`
+           :sql:column:`~product.product_id` of product to use in
+           performing substitutions.
+
+        Returns
+        -------
+        :class:`str`
+            ``inStr`` with substitutions performed.
+
+        See Also
+        --------
+        :ref:`concepts_substitutions`
         """
         if inStr is None:
             return inStr
@@ -1365,6 +1661,23 @@ class DButils(object):
     def _nameSubInspector(self, inStr, inspector_id):
         """
         In inStr replace the standard {} with the names
+
+        Parameters
+        ----------
+        inStr : :class:`str`
+           String on which to do substitutions
+        inspector_id : :class:`int`
+           :sql:column:`~inspector.inspector_id` of inspector to use in
+           performing substitutions.
+
+        Returns
+        -------
+        :class:`str`
+            ``inStr`` with substitutions performed.
+
+        See Also
+        --------
+        :ref:`concepts_substitutions`
         """
         if inStr is None:
             return inStr
@@ -1392,6 +1705,23 @@ class DButils(object):
     def _nameSubProcess(self, inStr, process_id):
         """
         In inStr replace the standard {} with the names
+
+        Parameters
+        ----------
+        inStr : :class:`str`
+           String on which to do substitutions
+        process_id : :class:`int`
+           :sql:column:`~process.process_id` of process to use in
+           performing substitutions.
+
+        Returns
+        -------
+        :class:`str`
+            ``inStr`` with substitutions performed.
+
+        See Also
+        --------
+        :ref:`concepts_substitutions`
         """
         p_id = self.getProcessID(process_id)
         if inStr is None:
@@ -1417,6 +1747,23 @@ class DButils(object):
     def _nameSubFile(self, inStr, file_id):
         """
         In inStr replace the standard {} with the names
+
+        Parameters
+        ----------
+        inStr : :class:`str`
+           String on which to do substitutions
+        file_id : :class:`int`
+           :sql:column:`~file.file_id` of file to use in
+           performing substitutions.
+
+        Returns
+        -------
+        :class:`str`
+            ``inStr`` with substitutions performed.
+
+        See Also
+        --------
+        :ref:`concepts_substitutions`
         """
         if inStr is None:
             return inStr
@@ -1449,8 +1796,8 @@ class DButils(object):
         """
         Close the database connection
 
-        :keyword verbose: (optional) print information out to the command line
-
+        Examples
+        --------
         >>>  pnl.closeDB()
         """
         if self.dbIsOpen == False:
@@ -1484,42 +1831,54 @@ class DButils(object):
                 process_keywords=None,
                 quality_checked=None):
         """
-        Add a datafile to the database
+        Add a datafile to the database.
 
-        :param filename: filename to add
-        :type filename: str
-        :param data_level: the data level of the file
-        :type data_level: float
-        :param version: the version of te file to create
-        :type version: Version.Version
-        :param file_create_date: date the fie was created
-        :type file_create_date: datetime.datetime
-        :param exists_on_disk: does the file exist on disk?
-        :type exists_on_disk: bool
-        :param product_id: the product id of he product he file belongs to
-        :type product_id: int
+        Adds record to :sql:table:`file`.
 
-        :keyword utc_file_date: The UTC date of the file
-        :type utc_file_date: datetime.date
-        :keyword utc_start_time: utc start time of the file
-        :type utc_start_time: datetime.datetime
-        :keyword utc_end_time: utc end time of the file
-        :type utc_end_time: datetime.datetime
-        :keyword check_date: the date the file was quality checked
-        :type check_date: datetime.datetime
-        :keyword verbose_provenance: Verbose provenafnce of the file
-        :type verbose_provenance: str
-        :keyword quality_comment: comment on quality from quality check
-        :type quality_comment: str
-        :keyword caveats: caveats associated with the file
-        :type caveates: str
-        :keyword met_start_time: met start time of the file
-        :type met_start_time: int
-        :keyword met_stop_time: met stop time of the file
-        :type met_stop_time: int
+        Parameters
+        ----------
+        filename : :class:`str`
+            Filename to add.
+        data_level : :class:`float`
+            The data level of the file.
+        version : :class:`.Version`
+            The version of the file to create.
+        file_create_date : :class:`~datetime.datetime`
+            Date and time the file was created.
+        exists_on_disk : :class:`bool`
+            Does the file exist on disk.
+        product_id : :class:`int`
+            :sql:column:`~product.product_id` of the product the file
+            belongs to.
+        utc_file_date : :class:`~datetime.date`
+            The UTC date of the file.
+        utc_start_time : :class:`~datetime.datetime`
+            UTC of first timestamp in file.
+        utc_end_time : :class:`~datetime.datetime`
+            UTC of last timestamp in file.
+        check_date : :class:`~datetime.datetime`
+            The date the file was quality checked.
+        verbose_provenance : :class:`str`
+            Verbose provenance of the file.
+        quality_comment : :class:`str`
+            Comment on quality from quality check.
+        caveats : :class:`str`
+            Caveats on use of file.
+        met_start_time : :class:`int`
+            MET of first timestamp in file.
+        met_stop_time : :class:`int`
+            MET of last timestamp in file.
 
-        :return: file_id of the newly inserted file
-        :rtype: int
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~file.file_id` of the newly inserted file record.
+
+        Notes
+        -----
+        All arguments are technically optional, but the insertion to the
+        database may fail if an argument is not provided for a column
+        which requires a non-NULL value. See :sql:table:`file`.
         """
         utc_start_time = Utils.toDatetime(utc_start_time)
         utc_stop_time = Utils.toDatetime(utc_stop_time)
@@ -1573,15 +1932,20 @@ class DButils(object):
     def codeIsActive(self, ec_id, date):
         """Determine if a code is active and newest version.
 
+        Parameters
+        ----------
+        ec_id : :class:`int` or :class:`str`
+            :sql:column:`~code.code_id` or
+            :sql:column:`~code.code_description` of the code to check.
+        date : :class:`~datetime.date`
+            Check if code is valid for files on this date (corresponds
+            to :sql:column:`~file.utc_file_date`).
 
-        Given a ec_id and a date is that code active for that date and
-        is newest version
-
-        :param ec_id: executable code id to see if is active
-        :param date: date object to use when checking
-
-        :return: True if the code is active for that date, False otherwise
-
+        Returns
+        -------
+        :class:`bool`
+            If code is active, newest version, and ``date`` falls within
+            the code's valid date range.
         """
         # can only be one here (sq)
         code = self.getEntry('Code', ec_id)
@@ -1606,12 +1970,20 @@ class DButils(object):
 
     def getFileFullPath(self, filename):
         """
-        Return the full path to a file Given the name or id
-
-        (name or id is based on type)
+        Return the full path to a file given the name or id
 
         TODO, this is really slow, this query made it a lot faster but I bet it can get better
 
+        Parameters
+        ----------
+        filename : :class:`str` or :class:`int`
+            :sql:column:`~file.filename` or :sql:column:`~file.file_id`
+            of file to look up.
+
+        Returns
+        -------
+        :class:`str`
+            Full path to the file.
         """
         if isinstance(filename, str_classes):
             filename = self.getFileID(filename)
@@ -1628,7 +2000,18 @@ class DButils(object):
         """
         Given a product id return all the processes that use that as an input
 
-        Use getProductID if have a name (or not sure)
+        Use :meth:`getProductID` if have a name (or not sure).
+
+        Parameters
+        ----------
+        product : :class:`int`
+            :sql:column:`~product.product_id` of product.
+
+        Returns
+        -------
+        :class:`list` of :class:`int`
+            :sql:column:`~process.process_id` of all processes which use
+            ``product`` as an input.
         """
         DBlogging.dblogger.debug("Entered getProcessFromInputProduct: {0}".format(product))
         sq = self.session.query(self.Productprocesslink.process_id).filter_by(input_product_id=product).all()
@@ -1637,6 +2020,22 @@ class DButils(object):
     def getProcessFromOutputProduct(self, outProd):
         """
         Gets process from the db that have the output product
+
+        Parameters
+        ----------
+        outProd : :class:`int`
+            :sql:column:`~product.product_id` of product.
+
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~process.process_id` of process which produces
+            ``product`` as an output.
+
+        Notes
+        -----
+        Assumes there is only one product that makes a process; this is
+        common but not necessarily enforced.
         """
         DBlogging.dblogger.debug("Entered getProcessFromOutputProduct: {0}".format(outProd))
         p_id = self.getProductID(outProd)
@@ -1649,12 +2048,28 @@ class DButils(object):
     def getRunProcess(self):
         """
         Return a list of the processes who's output_timebase is "RUN"
+
+        Returns
+        -------
+        :class:`list`
+            Full :sql:table:`process` record for all ``RUN`` timebase processes.
         """
         return self.session.query(self.Process).filter_by(output_timebase='RUN').all()
 
     def getProcessID(self, proc_name):
         """
         Given a process name return its id
+
+        Parameters
+        ----------
+        proc_name : :class:`str` or :class:`int`
+            :sql:column:`~process.process_name` or
+            :sql:column:`~process.process_id`.
+
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~process.process_id`.
         """
         try:
             proc_id = int(proc_name)
@@ -1668,14 +2083,38 @@ class DButils(object):
     def getSatelliteMission(self, sat_name):
         """
         Given a satellite or satellite id return the mission
+
+        Parameters
+        ----------
+        sat_name : :class:`int` or :class:`str`
+            :sql:column:`~satellite.satellite_id` or
+            :sql:column:`~satellite.satellite_name`.
+
+        Returns
+        -------
+        various
+            Complete record from :sql:table:`mission` table.
         """
         return self.getTraceback('Satellite', sat_name)['mission']
 
     def getInstrumentID(self, name, satellite_id=None):
         """
-        Return the instrument_id for a Given instrument
+        Return the instrument_id for a given instrument.
 
-        :return: instrument_id - the instrument ID
+        Parameters
+        ----------
+        name : :class:`str` or :class:`int`
+            :sql:column:`~instrument.instrument_name` or
+            :sql:column:`~instrument.instrument_id`.
+        satellite_id : :class:`int` or :class:`str`
+            Only return results for satellite with this
+            :sql:column:`~satellite.satellite_id` or
+            :sql:column:`~satellite.satellite_name`.
+
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~instrument.instrument_id`.
         """
         try:
             i_id = int(name)
@@ -1699,13 +2138,36 @@ class DButils(object):
             return sq[0].instrument_id
 
     def getMissions(self):
-        """Return a list of all the missions"""
+        """Return a list of all the missions
+
+        Returns
+        -------
+        :class:`list` of :class:`str`
+            Names of all missions in the database.
+
+        Notes
+        -----
+        Ordinarily there is only one mission per database.
+        """
         sq = self.session.query(self.Mission.mission_name)
         return list(map(itemgetter(0), sq.all()))
 
     def renameFile(self, filename, newname):
         """
         Rename a file in the db
+
+        Parameters
+        ----------
+        filename : :class:`str` or :class:`int`
+            :sql:column:`~file.filename` or :sql:column:`~file.file_id`
+            of file to rename.
+        newname : :class:`str`
+            New name to write to database.
+
+        Notes
+        -----
+        Does not rename the file on disk. Operates on filename only
+        (not entire path).
         """
         f = self.getEntry('File', filename)
         f.filename = newname
@@ -1716,11 +2178,16 @@ class DButils(object):
         """
         Return the fileID for the input filename
 
-        :param filename: filename to return the fileid of
-        :type filename: str
+        Parameters
+        ----------
+        filename : :class:`str` or :class:`int`
+            :sql:column:`~file.filename` or :sql:column:`~file.file_id`
+            of file to look up.
 
-        :return: file_id: file_id of the input file
-        :rtype: int
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~file.file_id` of input file.
         """
         if isinstance(filename, self.File):
             return filename.file_id
@@ -1741,13 +2208,18 @@ class DButils(object):
 
     def getCodeID(self, codename):
         """
-        Return the codeID for the input code
+        Return the codeID for a code's filename.
 
-        :param codename: filename to return the fileid of
-        :type filename: str
+        Parameters
+        ----------
+        codename : :class:`str` or :class:`int`
+            :sql:column:`~code.filename` or :sql:column:`~code.code_id`
+            of code to look up.
 
-        :return: code_id: code_id of the input file
-        :rtype: int
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~code.code_id` of given code.
         """
         try:
             c_id = int(codename)
@@ -1766,6 +2238,17 @@ class DButils(object):
     def getFileDates(self, file_id):
         """
         Given a file_id or name return the dates it spans
+
+        Parameters
+        ----------
+        file_id :  :class:`int` or :class:`str`
+            :sql:column:`~file.file_id` or :sql:column:`~file.filename`
+            of file to look up.
+
+        Returns
+        -------
+        :class:`list` of :class:`~datetime.datetime`
+            First and last UTC timestamp of file.
         """
         sq = self.getEntry('File', file_id)
         start_time = sq.utc_start_time.date()
@@ -1774,9 +2257,22 @@ class DButils(object):
 
     def file_id_Clean(self, invals):
         """
-        Given a list of file objects clean out older versions of matching files
+        Given a list of file IDs return only newest versions of matching files.
 
-        matching is defined as same product_id and same utc_file_date
+        Matching is defined as same :sql:column:`~file.product_id` and
+        same :sql:column:`~file.utc_file_date`.
+
+        Parameters
+        ----------
+        invals : :class:`list` of :class:`int` or of :class:`str`
+            All :sql:column:`~file.file_id` or :sql:column:`~file.filename`
+            to check.
+
+        Returns
+        -------
+        :class:`list` of :class:`int`
+            Those :sql:column:`~file.file_id` from ``invals`` which are
+            the newest version of that file.
         """
         tmp = []
         for i in invals:
@@ -1791,13 +2287,23 @@ class DButils(object):
 
     def getInputProductID(self, process_id, range=False):
         """
-        Return the fileID for the input filename
+        Return the input products for a particular process.
 
-        :param process_id: process_id to return the input_product_id for
-        :type process_id: int
+        Parameters
+        ----------
+        process_id : :class:`int`
+            :sql:column:`~process.process_id` of process to look up.
+        range : :class:`bool`, default False
+            Also return number of days in past/future to use as inputs.
 
-        :return: list of input_product_ids
-        :rtype: list
+        Returns
+        -------
+        :class:`list`
+           Result of query: each element has
+           :sql:column:`~productprocesslink.input_product_id` and
+           :sql:column:`~productprocesslink.optional`; if ``range``,
+           then also :sql:column:`~productprocesslink.yesterday` and
+           :sql:column:`~productprocesslink.tomorrow`.
         """
         columns = [self.Productprocesslink.input_product_id,
                    self.Productprocesslink.optional]
@@ -1824,7 +2330,48 @@ class DButils(object):
                  limit=None,
                  startTime=None,
                  endTime=None):
-        """Query database for file records, with filters"""
+        """
+        Query database for file records, with filters.
+
+        All parameters are optional; if not specified, default is "all".
+
+        Parameters
+        ----------
+        startDate : :class:`~datetime.datetime`, optional
+            First date to include, based on
+            :sql:column:`~file.utc_file_date`
+        endDate : :class:`~datetime.datetime`, optional
+            Last date to include (inclusive)
+        level : :class:`float`, optional
+            Only include files of this level.
+        product : :class:`int`, optional
+            :sql:column:`~product.product_id` of files to include
+        code : :class:`int`, optional
+            Only return files created by code with ID of
+            :sql:column:`~code.code_id`
+        instrument : :class:`int`, optional
+            Only return files with instrument
+            :sql:column:`~instrument.instrument_id`
+        exists : :class:`bool`, default False
+            Only return files that exist on disk, based on
+            :sql:column:`~file.exists_on_disk`.
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date)
+        limit : :class:`int`
+            Limit number of results, default all
+        startTime : :class:`~datetime.datetime`, optional
+            Include files containing timestamps at or after this time,
+            :sql:column:`~file.utc_start_time`
+        endTime : :class:`~datetime.datetime`, optional
+            Include files containing timestamps at or before this time,
+            :sql:column:`~file.utc_stop_time`
+
+        Returns
+        -------
+        :class:`list`
+            File records of all files matching requirements.
+        """
         # if a datetime.datetime comes in this does not work, make them datetime.date
         startDate = Utils.datetimeToDate(startDate)
         endDate = Utils.datetimeToDate(endDate)
@@ -1896,7 +2443,23 @@ class DButils(object):
 
     def getFilesByProductDate(self, product_id, daterange, newest_version=False):
         """
-        Return the files in the db by product id with utc_file_date in range specified
+        Return the files by product id with utc_file_date in range specified
+
+        Parameters
+        ----------
+        product_id : :class:`int`
+            :sql:column:`~product.product_id` of files to include.
+        daterange : :class:`list` of :class:`~datetime.datetime`
+            First and last date to include, based on
+            :sql:column:`~file.utc_file_date`.
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date).
+
+        Returns
+        -------
+        :class:`list`
+            File records of all files matching requirements.
         """
         return self.getFiles(startDate=min(daterange),
                              endDate=max(daterange),
@@ -1906,6 +2469,27 @@ class DButils(object):
     def getFilesByProductTime(self, product_id, daterange, newest_version=False):
         """
         Return the files in the db by product id with any data in date range
+
+        A file with a UTC time range overlapping at all with ``daterange``
+        is considered a match, so a returned file may also include some
+        times outside of the range.
+
+        Parameters
+        ----------
+        product_id : :class:`int`
+            :sql:column:`~product.product_id` of files to include.
+        daterange : :class:`list` of :class:`~datetime.datetime`
+            Range of times to include, based on
+            :sql:column:`~file.utc_start_time` and
+            :sql:column:`~file.utc_stop_time`.
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date).
+
+        Returns
+        -------
+        :class:`list`
+            File records of all files matching requirements.
         """
         return self.getFiles(startTime=min(daterange),
                              endTime=max(daterange),
@@ -1915,6 +2499,20 @@ class DButils(object):
     def getFilesByDate(self, daterange, newest_version=False):
         """
         Return files in the db with utc_file_date in the range specified
+
+        Parameters
+        ----------
+        daterange : :class:`list` of :class:`~datetime.datetime`
+            First and last date to include, based on
+            :sql:column:`~file.utc_file_date`.
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date).
+
+        Returns
+        -------
+        :class:`list`
+            File records of all files matching requirements.
         """
         return self.getFiles(startDate=min(daterange),
                              endDate=max(daterange),
@@ -1924,14 +2522,45 @@ class DButils(object):
         """
         Given a product_id or name return all the files associated with it
 
-        if newest is set return only the newest files
+        Parameters
+        ----------
+        prod_id : :class:`int` or :class:`str`
+            :sql:column:`~product.product_id` or
+            :sql:column:`~product.product_name` of files to include.
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date).
+
+        Returns
+        -------
+        :class:`list`
+            File records of all files matching requirements.
         """
 
         return self.getFiles(product=self.getProductID(prod_id), newest_version=newest_version)
 
     def getFilesByInstrument(self, inst_id, level=None, newest_version=False, id_only=False):
         """
-        Given an instrument_if return all the file instances associated with it
+        Given an instrument_id return all the file instances associated with it
+
+        Parameters
+        ----------
+        inst_id : :class:`int` or :class:`str`
+            Only return files with this
+            :sql:column:`~instrument.instrument_id` or
+            :sql:column:`~instrument.instrument_name`
+        level : :class:`float`, optional
+            Only include files of this level, default all.
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date)
+        id_only : :class:`bool`, default False
+            Only return file IDs, not complete file record.
+
+        Returns
+        -------
+        :class:`list`
+            File records of all files matching requirements.
         """
         inst_id = self.getInstrumentID(inst_id)  # name or number
         files = self.getFiles(instrument=inst_id, level=level, newest_version=newest_version)
@@ -1943,6 +2572,23 @@ class DButils(object):
     def getFilesByCode(self, code_id, newest_version=False, id_only=False):
         """
         Given a code_id (or name) return the files that were created using it
+
+        Parameters
+        ----------
+        code_id : :class:`int` or :class:`str`
+            Only return files created by code with this
+            :sql:column:`~code.code_id` or
+            :sql:column:`~code.code_description`
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date)
+        id_only : :class:`bool`, default False
+            Only return file IDs, not complete file record.
+
+        Returns
+        -------
+        :class:`list`
+            File records of all files matching requirements.
         """
         files = self.getFiles(code=code_id, newest_version=newest_version)
 
@@ -1963,6 +2609,43 @@ class DButils(object):
                       limit=None):
         """
         Return all the file ids in the database
+        All parameters are optional; if not specified, default is "all".
+
+        Parameters
+        ----------
+        startDate : :class:`~datetime.datetime`, optional
+            First date to include, based on
+            :sql:column:`~file.utc_file_date`
+        endDate : :class:`~datetime.datetime`, optional
+            Last date to include (inclusive)
+        level : :class:`float`, optional
+            Only include files of this level.
+        product : :class:`int`, optional
+            :sql:column:`~product.product_id` of files to include
+        code : :class:`int`, optional
+            Only return files created by code with ID of
+            :sql:column:`~code.code_id`
+        instrument : :class:`int`, optional
+            Only return files with instrument
+            :sql:column:`~instrument.instrument_id`
+        exists : :class:`bool`, default False
+            Only return files that exist on disk, based on
+            :sql:column:`~file.exists_on_disk`.
+        newest_version : :class:`bool`, default False
+            Only return files that are the newest version
+            (of their product and date)
+        limit : :class:`int`
+            Limit number of results, default all
+
+        Returns
+        -------
+        :class:`list` of :class:`int`:
+            File ID of all files matching requirements.
+
+        Other Parameters
+        ----------------
+        fullPath : :class:`bool`, default True
+            unused
         """
         files = self.getFiles(startDate=startDate, endDate=endDate, level=level, product=product, code=code,
                               instrument=instrument, exists=exists, newest_version=newest_version, limit=limit)
@@ -1971,9 +2654,17 @@ class DButils(object):
 
     def getActiveInspectors(self):
         """
-        Query the db and return a list of all the active inspector file names
+        Query the db and returns all active inspectors
 
-        [(filename, description, arguments, product), ...]
+        Returns
+        -------
+        :class:`list` of :class:`tuple`
+            For each active inspector, returns full filename (from
+            :sql:column:`~inspector.relative_path` and
+            :sql:column:`~inspector.filename`),
+            :sql:column:`~inspector.description`,
+            :sql:column:`~inspector.arguments`, and
+            :sql:column:`~inspector.product`.
         """
         activeInspector = namedtuple('activeInspector', 'path description arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
@@ -1982,7 +2673,18 @@ class DButils(object):
 
     def getChildrenProcesses(self, file_id):
         """
-        Given a file ID return all the processes that use this as input
+        Given a file, return all the processes that use this as input
+
+        Parameters
+        ----------
+        file_id : :class:`int` or :class:`str`
+            :sql:column:`~file.file_id` or :sql:column:`~file.filename`
+
+        Returns
+        -------
+        :class:`list` of :class:`int`
+            :sql:column:`~productprocesslink.process_id` for all processes
+            which can use the given file as input.
         """
         DBlogging.dblogger.debug("Entered getChildrenProcesses():  file_id: {0}".format(file_id))
         product_id = self.getEntry('File', file_id).product_id
@@ -1994,10 +2696,17 @@ class DButils(object):
         """
         Return the product ID for an input product name
 
-        :param product_name: the name of the product to et the id of
-        :type product_name: str
+        Parameters
+        ----------
+        product_name : :class:`str`
+            the name of the product to get the id of. Also supports a
+            sequence of names, a single product ID (to confirm existence),
+            or a sequence of product IDs.
 
-        :return: product_id -the product  ID for the input product name
+        Returns
+        -------
+        product_id : :class:`int`
+            the product ID for the input product name
         """
         is_sequence, is_name = False, False # Assume input is a product ID
         try:
@@ -2028,10 +2737,18 @@ class DButils(object):
         """
         Returns the satellite ID for an input satellite name
 
-        :param sat_name: the satellite name to look up the id
-        :type sat_name: str
+        Parameters
+        ----------
+        sat_name : :class:`str`
+            the :sql:column:`~satellite.satellite_name` to get the id of.
+            Also supports a sequence of names, a single satellite ID
+            (to confirm existence), or a sequence of satellite IDs.
 
-        :return: satellite_id - the requested satellite  ID
+        Returns
+        -------
+        satellite_id : :class:`int`
+            the :sql:column:`~satellite.satellite_id` for the input
+            satellite name
         """
         try:
             sat_id = int(sat_name)
@@ -2048,6 +2765,17 @@ class DButils(object):
     def getCodePath(self, code_id):
         """
         Given a code_id list return the full name (path and all) of the code
+
+        Parameters
+        ----------
+        code_id : :class:`int` or :class:`str`
+            :sql:column:`~code.code_id` or :sql:column:`~code.code_description`
+            of code to look up.
+
+        Returns
+        -------
+        :class:`str`
+            Full path to code.
         """
         code = self.getEntry('Code', code_id)
         if not code.active_code:  # not an active code
@@ -2056,7 +2784,19 @@ class DButils(object):
 
     def getCodeVersion(self, code_id):
         """
-        Given a code_id the code version
+        Given a code_id get the code version
+        Given a code_id list return the full name (path and all) of the code
+
+        Parameters
+        ----------
+        code_id : :class:`int` or :class:`str`
+            :sql:column:`~code.code_id` or :sql:column:`~code.code_description`
+            of code to look up.
+
+        Returns
+        -------
+        :class:`.Version`
+            Version of the code.
         """
         code = self.getEntry('Code', code_id)
         return Version.Version(code.interface_version, code.quality_version, code.revision_version)
@@ -2067,9 +2807,17 @@ class DButils(object):
 
         Also returns the valid dates for each code
 
-        :return: Code id and dates that perform a process
-        :rtype: truple(int, datetime.date, datetime.date)
+        Parameters
+        ----------
+        proc_id : :class:`int`
+            :sql:column:`~process.process_id` of process to look up.
 
+        Returns
+        -------
+        :class:`list` of :class:`tuple`
+            For every active, newest version code that implements the process,
+            :sql:column:`~code.code_id`, :sql:column:`~code.code_start_date`,
+            and :sql:column:`~code.code_stop_date`.
         """
         DBlogging.dblogger.debug("Entered getAllCodesFromProcess: {0}".format(proc_id))
         # will have as many values as there are codes for a process
@@ -2083,10 +2831,27 @@ class DButils(object):
 
     def getCodeFromProcess(self, proc_id, utc_file_date):
         """
-        Given a process id return the code id that makes performs that process
+        Given a process id return the code id that performs that process
+        on a particular date.
 
-        :return: Code id that performs the process
-        :rtype: int
+        Parameters
+        ----------
+        proc_id : :class:`int`
+            :sql:column:`~process.process_id` of process to look up.
+        utc_file_date : :class:`~datetime.datetime`
+            Date on which the code must be valid.
+
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~code.code_id` for the active, newest version code
+            that implements the process, and is valid on the given date.
+            Returns :data:`None` if there is no match.
+
+        Raises
+        ------
+        DBError
+            If there is more than one matching code.
         """
         DBlogging.dblogger.debug("Entered getCodeFromProcess: {0}".format(proc_id))
         # will have as many values as there are codes for a process
@@ -2102,10 +2867,13 @@ class DButils(object):
 
     def getMissionDirectory(self):
         """
-        Return the base directory for the current mission
+        Return the root directory for the current mission
 
-        :return: base directory for current mission
-        :rtype: str
+        Returns
+        -------
+        :class:`str`
+            Root directory for current mission (i.e.
+            :sql:column:`~mission.rootdir`).
         """
         try:
             return os.path.abspath(os.path.expanduser(
@@ -2117,27 +2885,48 @@ class DButils(object):
 
     def getCodeDirectory(self):
         """
-        Return the base directory for the current mission
+        Return the code directory for the current mission
 
-        :return: base directory for current mission
-        :rtype: str
+        Returns
+        -------
+        :class:`str`
+            Code directory for current mission (i.e.
+            :sql:column:`~mission.codedir`, if defined).
+
+        See Also
+        --------
+        :meth:`getDirectory`
         """
         return self.getDirectory('codedir', default=self.MissionDirectory)
 
     def getInspectorDirectory(self):
         """
-        Return the base directory for the current mission
+        Return the inspector directory for the current mission
 
-        :return: base directory for current mission
-        :rtype: str
+        Returns
+        -------
+        :class:`str`
+            Inspector directory for current mission (i.e.
+            :sql:column:`~mission.inspectordir`, if defined).
+
+        See Also
+        --------
+        :meth:`getDirectory`
         """
         return self.getDirectory('inspectordir', default=self.CodeDirectory)
 
     def checkIncoming(self, glb='*'):
         """Check the incoming directory for the current mission
 
-        :return: processing list of file ids
-        :rtype: list
+        Parameters
+        ----------
+        glb : :class:`str`, optional
+            Glob pattern that files must match.
+
+        Returns
+        -------
+        :class:`list` of :class:`str`
+            All files in the incoming directory
         """
         path = self.getIncomingPath()
         DBlogging.dblogger.debug("Looking for files in {0}".format(path))
@@ -2146,13 +2935,33 @@ class DButils(object):
 
     def getIncomingPath(self):
         """
-        Return the incoming path for the current mission
+        Return the incoming directory for the current mission
+
+        Returns
+        -------
+        :class:`str`
+            Incoming directory for current mission (i.e.
+            :sql:column:`~mission.incoming_dir`).
+
+        See Also
+        --------
+        :meth:`getDirectory`
         """
         return self.getDirectory('incoming_dir')
 
     def getErrorPath(self):
         """
-        Return the error path for the current mission
+        Return the error directory for the current mission
+
+        Returns
+        -------
+        :class:`str`
+            Error directory for current mission (i.e.
+            :sql:column:`~mission.errordir`, if defined).
+
+        See Also
+        --------
+        :meth:`getDirectory`
         """
         #print(os.path.join(self.getCodeDirectory(),'errors'))
         return self.getDirectory('errordir', default=os.path.join(self.CodeDirectory, 'errors'))
@@ -2164,6 +2973,15 @@ class DButils(object):
         The mission rootdir may be absolute or relative to current path.
         Directory requested may be in db as absolute or relative to mission
         root. Home dir references are expanded.
+
+        Parameters
+        ----------
+        column : :class:`str`
+            Name of column in :sql:table:`mission` to look up.
+
+        default : :class:`str`, optional
+            Default to return if directory not found in mission table,
+            default :data:`None`.
         """
         try:
             mission = self.session.query(self.Mission).one()
@@ -2181,7 +2999,18 @@ class DButils(object):
 
     def getFilecodelink_byfile(self, file_id):
         """
-        Given a file_id return the code_id associated with it, or None
+        Given a file_id return the code_id that created it, or None
+
+        Parameters
+        ----------
+        file_id : :class:`int` or :class:`str`
+            :sql:column:`~file.file_id` or :sql:column:`~file.filename` of
+            the file to look up.
+
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~code.code_id` of the code that created the file.
         """
         DBlogging.dblogger.debug("Entered getFilecodelink_byfile: file_id={0}".format(file_id))
         f_id = self.getFileID(file_id)
@@ -2193,7 +3022,18 @@ class DButils(object):
 
     def getFilecodelink_bycode(self, code_id):
         """
-        Given a file_id return the code_id associated with it, or None
+        Given a code_id return the file_id of all files it created
+
+        Parameters
+        ----------
+        code_id : :class:`int` or :class:`str`
+            :sql:column:`~code.code_id` or :sql:column:`~code.code_description`
+            of the code to look up.
+
+        Returns
+        -------
+        :class:`~sqlalchemy.orm.Query`
+            :sql:column:`~file.file_id` of all files created by the code.
         """
         DBlogging.dblogger.debug("Entered getFilecodelink_bycode: code_id={0}".format(code_id))
         code_id = self.getCodeID(code_id)
@@ -2203,6 +3043,20 @@ class DButils(object):
     def getMissionID(self, mission_name):
         """
         Given a mission name return its ID
+
+        Parameters
+        ----------
+        mission_name : :class:`str`
+            Name of mission, i.e. :sql:column:`~mission.mission_name`.
+
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~mission.mission_id` for the corresponding mission.
+
+        See Also
+        --------
+        :ref:`concepts_missions`
         """
         try:
             m_id = int(mission_name)
@@ -2219,6 +3073,15 @@ class DButils(object):
     def tag_release(self, rel_num):
         """
         Tag all the newest versions of files to a release number (integer)
+
+        Parameters
+        ----------
+        rel_num : :class:`int`
+            Tag all "newest version" files as part of this release.
+
+        See Also
+        --------
+        :ref:`concepts_releases`
         """
         newest_files = self.getFiles(newest_version=True)
 
@@ -2230,6 +3093,20 @@ class DButils(object):
     def addRelease(self, filename, release, commit=False):
         """
         Given a filename or file_id add an entry to the release table
+
+        Parameters
+        ----------
+        filename : :class:`int` or :class:`str`
+            :sql:column:`~file.filename` or :sql:column:`~file.file_id`
+            of file to add to a release.
+        release : :class:`int`
+            Release number to add file to.
+        commit : :class:`bool`, default False
+            Commit changes to the database when done.
+
+        See Also
+        --------
+        :ref:`concepts_releases`
         """
         f_id = self.getFileID(filename)  # if a number
         rel = self.Release()
@@ -2242,6 +3119,18 @@ class DButils(object):
     def list_release(self, rel_num, fullpath=True):
         """
         Given a release number return all the filenames with the release
+
+        Parameters
+        ----------
+        rel_num : :class:`int`
+            Release number to list
+        fullpath : :class:`bool`, default True
+            Include full path to files (not just filenames)
+
+        Returns
+        -------
+        :class:`list` of :class:`str`
+            All filenames in the release.
         """
         sq = self.session.query(self.Release.file_id).filter_by(release_num=rel_num).all()
         sq = list(map(itemgetter(0), sq))
@@ -2255,6 +3144,18 @@ class DButils(object):
     def checkFileSHA(self, file_id):
         """
         Given a file id or name check the db checksum and the file checksum
+
+        Parameters
+        ----------
+        file_id : :class:`int` or :class:`str`
+            :sql:column:`~file.filename` or :sql:column:`~file.file_id`
+            of file to check
+
+        Returns
+        -------
+        :class:`bool`
+            If the calculated checksum of file on disk matches the
+            checksum in the database.
         """
         db_sha = self.getEntry('File', file_id).shasum
         disk_sha = calcDigest(self.getFileFullPath(file_id))
@@ -2265,7 +3166,17 @@ class DButils(object):
         """
         Check files in the DB, return inconsistent files and why
 
-        :return: A list of tuple with the results. 1 is a bad checksum, 2 is not found
+        Parameters
+        ----------
+        limit : :class:`int`
+            Maximum number of files to check, default all
+
+        Returns
+        -------
+        :class:`list` of :class:`tuple`
+            All files with problems. Each element is
+            (:sql:column:`~file.filename`, result), where "result" is 1
+            for a bad checksum and 2 if file not found on disk.
         """
         files = self.getAllFilenames(fullPath=False, limit=limit)
         ## check of existence and checksum
@@ -2282,7 +3193,36 @@ class DButils(object):
         """
         Master routine for all the getXXXTraceback functions
 
+        The "traceback" is the set of records across tables that are
+        relevant to one particular record
+
         this is some large select statements with joins in them, these are tested and do work
+
+        Parameters
+        ----------
+        table : :class:`str`
+            Name of the :doc:`table </developer/tables>` to look up.
+        in_id : :class:`int`
+            ID, usually primary key on the table, for the record
+            to look up.
+
+        Returns
+        -------
+        :class:`dict`
+            Keyed by table name, values are records from that table
+            (instances of table types created by
+            :class:`~sqlalchemy.sql.schema.Table`).
+
+        Other Parameters
+        ----------------
+        in_id2
+            Not used.
+
+        Examples
+        --------
+        >>> tb = dbu.getTraceback('File', 500)
+        >>> tb.['product'].product_name
+        u'rbspb_int_ect-mageisM35-ns-L05'
         """
         retval = { }
         if table.capitalize() == 'File':
@@ -2458,6 +3398,18 @@ class DButils(object):
     def getProductsByInstrument(self, inst_id):
         """
         Get all the products for a Given instrument
+
+        Parameters
+        ----------
+        inst_id : :class:`int` or :class:`str`
+            :sql:column:`~instrument.instrument_id` or
+            :sql:column:`~instrument.instrument_name` for instrument
+
+        Returns
+        -------
+        :class:`list` of :class:`int`
+            :sql:column:`~product.product_id` for every product
+            associated with this instrument.
         """
         inst_id = self.getInstrumentID(inst_id)
         sq = self.session.query(self.Instrumentproductlink.product_id).filter_by(instrument_id=inst_id).all()
@@ -2469,6 +3421,17 @@ class DButils(object):
     def getProductsByLevel(self, level):
         """
         Get all the products for a Given level
+
+        Parameters
+        ----------
+        level : :class:`float`
+            Data level to look up
+
+        Returns
+        -------
+        :class:`list` of :class:`int`
+            :sql:column:`~product.product_id` for every product
+            with :sql:column:`~product.level` equal to ``level``.
         """
         sq = self.session.query(self.Product.product_id).filter_by(level=level).all()
         if sq:
@@ -2479,6 +3442,17 @@ class DButils(object):
     def getAllProcesses(self, timebase='all'):
         """
         Get all processes
+
+        Parameters
+        ----------
+        timebase : :class:`str`, optional
+            Limit to products with this
+            :sql:column:`~process.output_timebase` (default: all).
+
+        Returns
+        -------
+        :class:`~sqlalchemy.orm.Query`
+            :sql:table:`process` table records
         """
         if timebase == 'all':
             procs = self.session.query(self.Process).all()
@@ -2488,13 +3462,36 @@ class DButils(object):
 
     def getProcessTimebase(self, process_id):
         """
-        Return the timebase for a product
+        Return the timebase for a process
+
+        Parameters
+        ----------
+        process_id : :class:`int` or :class:`str`
+            :sql:column:`~process.process_id` or
+            :sql:column:`~process.process_name` of the desired process.
+
+        Returns
+        -------
+        :class:`str`
+            :sql:column:`~process.output_timebase` for the process.
         """
         return self.getEntry('Process', process_id).output_timebase
 
     def getAllProducts(self, id_only=False):
         """
         Return a list of all products as instances
+
+        Parameters
+        ----------
+        id_only : :class:`bool`, default False
+            Return only the :sql:column:`~product.product_id`,
+            instead of the entire record.
+
+        Returns
+        -------
+        :class:`~sqlalchemy.orm.Query` or :class:`list` of :class:`int`
+            Complete :sql:table:`product` records for all products,
+            or just :sql:column:`~product.product_id` (if ``id_only``).
         """
         prods = self.session.query(self.Product).all()
         if id_only:
@@ -2504,17 +3501,28 @@ class DButils(object):
     def getEntry(self, table, args):
         """Return entry instance from any table in DB
 
-        :param str table: Name of the table
-        :param args: Argument to identify entry. This is first tried as a
-                     primary key (integer or sequence of integers); if that
-                     fails, then assumed to be a name and used for a lookup
-                     via get[table]ID.
-        :returns: Matching column from the table. If there is no primary
-                  key match and the table does not support name lookup,
-                  returns ``None``.
-        :raises DBNoData: if argument is not found as primary key
-                          and name lookup fails (but not if name lookup
-                          is not available).
+        Parameters
+        ----------
+        table : :class:`str`
+            Name of the table
+        args : :class:`int` or :class:`str`
+            Argument to identify entry. This is first tried as a
+            primary key (integer or sequence of integers); if that
+            fails, then assumed to be a name and used for a lookup
+            via get[table]ID.
+
+        Returns
+        -------
+        various types
+            Matching column from the table. If there is no primary
+            key match and the table does not support name lookup,
+            returns ``None``.
+
+        Raises
+        ------
+        DBNoData
+            if argument is not found as primary key and name lookup fails
+            (but not if name lookup is not available).
         """
         retval = None
         if isinstance(args, (int, collections.Iterable)) \
@@ -2536,6 +3544,21 @@ class DButils(object):
     def getFileParents(self, file_id, id_only=False):
         """
         Given a file_id (or filename) return the files that went into making it
+
+        Parameters
+        ----------
+        file_id : :class:`int` or :class:`str`
+            :sql:column:`~file.file_id` or :sql:column:`~file.filename`
+            of the file of interest.
+        id_only : :class:`bool`, default False
+            Return only the :sql:column:`~file.file_id`,
+            instead of the entire record.
+
+        Returns
+        -------
+        :class:`~sqlalchemy.orm.Query` or :class:`list` of :class:`int`
+            Complete :sql:table:`file` records for all input files,
+            or just :sql:column:`~file.file_id` (if ``id_only``).
         """
         file_id = self.getFileID(file_id)
         f_ids = self.session.query(self.Filefilelink.source_file).filter_by(resulting_file=file_id).all()
@@ -2551,6 +3574,17 @@ class DButils(object):
     def getFileVersion(self, fileid):
         """
         Return the version instance for a file
+
+        Parameters
+        ----------
+        fileid : :class:`int` or :class:`str`
+            :sql:column:`~file.file_id` or :sql:column:`~file.filename`
+            of the file of interest.
+
+        Returns
+        -------
+        :class:`~.Version.Version`
+            Version of the file.
         """
         if not isinstance(fileid, self.File):
             fileid = self.getEntry('File', fileid)
@@ -2561,6 +3595,17 @@ class DButils(object):
     def getChildTree(self, inprod):
         """
         Given an input product return a list of its output product ids
+
+        Parameters
+        ----------
+        inprod : :class:`int`
+            :sql:column:`~product.product_id` of the input product.
+
+        Returns
+        -------
+        :class:`list` of :class:`int`
+            :sql:column:`~product.product_id` of all products that can
+            be made from ``inprod``.
         """
         out_proc = self.getProcessFromInputProduct(inprod)
         out_prod = [self.getEntry('Process', op).output_product
@@ -2573,6 +3618,17 @@ class DButils(object):
         go through the db and return a tree of all products and their parents
 
         This will allow for a run all the non done files script
+
+        Returns
+        -------
+        :class:`list`
+            Each entry has two elements: a :sql:column:`~product.product_id`
+            and another list of :sql:column:`~product.product_id` for all
+            product that can be made from it.
+
+        See Also
+        --------
+        :meth:`getChildTree`
         """
         prods = self.getAllProducts()
         prods = sorted(prods, key=lambda x: x.level)
@@ -2591,9 +3647,16 @@ class DButils(object):
         only active one, so sets both ``newest_version`` and
         ``active_code`` fields in the database.
 
-        :param int code_id: ID or filename (str) of the code to change.
-        :param bool is_newest: Set to newest (True) or not-newest, inactive
-                               (False, default).
+        Parameters
+        ----------
+        code_id : :class:`int` or :class:`str`
+            :sql:column:`~code.code_id` or
+            :sql:column:`~code.code_description` for code to update.
+
+        is_newest : :class:`bool`, default False
+            Set :sql:column:`~code.newest_version` and
+            :sql:column:`~code.active_code` (True), or not newest, and
+            inactive (False).
         """
         DBlogging.dblogger.debug\
             ("Entered updateCodeNewestVersion: code_id={0}, is_newest={1}"\
@@ -2639,35 +3702,46 @@ class DButils(object):
         .. note:: Written and tested for code table. Not thoroughly
                   tested for others.
 
-        :param str table: Name of the table to edit.
-        :param int my_id: Specifies row to edit; most commonly the numerical
-                          ID (primary key) but also supports string matching
-                          on other columns as provided by :meth:`getEntry`.
-        :param str column: name of column to edit
-        :param str my_str: String to add or replace. (Optional; required with
-                           ``ins_after``, ``ins_before``, ``replace_str``).
-        :param str after_flag: Only replace string in words immediately
-                               following this word. Only supported in
-                               ``arguments`` column of ``code`` table
-                               (optional; default: replace in all).
-        :param str ins_after: Value to insert ``my_str`` after.
-                              (Optional; conflicts with ``ins_before``,
-                              ``replace_str``, ``combine``).
-        :param str ins_before: Value to insert ``my_str`` before.
-                               (Optional; conflicts with ``ins_after``,
-                               ``replace_str``, ``combine``).
-        :param str replace_str: Value to replace with ``my_str``.
-                                (Optional; conflicts with ``ins_after``,
-                                ``ins_before``, ``combine``).
-        :param bool combine: If true, combine all instances of words after
-                             the word in ``after_flag``. (Optional;
-                             conflicts with ``ins_after``, ``ins_before``,
-                             ``replace_str``).
-        :raises ValueError: for any invalid combination of arguments.
-        :raises RuntimeError: if multiple rows match ``my_id``.
+        Parameters
+        ----------
+        table : :class:`str`
+            Name of the table to edit.
+        my_id : :class:`int`
+            Record to edit; most commonly the numerical ID (primary key)
+            but also supports string matching on other columns as provided
+            by :meth:`getEntry`.
+        column : :class:`str`
+            name of column to edit
+        my_str : :class:`str`, optional
+            String to add or replace. Required with
+            ``ins_after``, ``ins_before``, ``replace_str``.
+        after_flag : :class:`str`, optional
+            Only replace string in words immediately following this word.
+            Only supported in ``arguments`` column of ``code`` table.
+            Default: replace in all.
+        ins_after : :class:`str`, optional
+            Value to insert ``my_str`` after. Conflicts with ``ins_before``,
+            ``replace_str``, ``combine``.
+        ins_before : :class:`str`, optional
+            Value to insert ``my_str`` before. Conflicts with ``ins_after``,
+            ``replace_str``, ``combine``.
+        replace_str : :class:`str`, optional
+            Value to replace with ``my_str``. Conflicts with ``ins_after``,
+            ``ins_before``, ``combine``.
+        combine : :class:`bool`, default False
+            If true, combine all instances of words after the word in
+            ``after_flag``. Conflicts with ``ins_after``, ``ins_before``,
+            ``replace_str``.
 
-        :examples:
+        Raises
+        ------
+        ValueError
+            for any invalid combination of arguments.
+        RuntimeError
+            if multiple rows match ``my_id``.
 
+        Examples
+        --------
         All examples assume an open :class:`DButils` instance in ``dbu`` and
         an existing code of ID 1. These examples use command line flags
         but the treatment of strings is general.

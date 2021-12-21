@@ -492,11 +492,15 @@ Examples of using substitutions to define :ref:`product <concepts_products>`
 .. seealso::
    :class:`~dbprocessing.DBstrings.DBformatter`
 
+.. _concepts_qa_loop:
+
 QA Loop
 =======
 The QA loop was designed for RBSP-ECT to permit e.g. the validation of
 level 1 files before generating level 2. It was not used in production,
 but may eventually be documented and tested for other use.
+
+.. _concepts_logs:
 
 Logs
 ====
@@ -520,3 +524,17 @@ within the log files are also in UTC.
 
 .. seealso::
    :mod:`~dbprocessing.DBlogging`
+
+.. _concepts_releases:
+
+Releases
+========
+
+dbprocessing supports the concept of regular public releases of data. Any
+file may be included in any number of releases (including zero), and a release
+may contain any number of files. A release is described by a single number
+and the list of files in it.
+
+.. seealso::
+   :sql:table:`release`
+   :meth:`~dbprocessing.DButils.DButils.addRelease`

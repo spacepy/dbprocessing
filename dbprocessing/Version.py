@@ -17,23 +17,27 @@ class Version(object):
     """
     A version class to simplify pushing around version information
 
-    Handles Boolean operators (>, <, =, !=) and database interface for version is also implemented in another module
+    Handles Boolean operators (>, <, =, !=) and database interface for
+    version is also implemented in another module.
 
     The version scheme is X,Y,Z where:
-    * X is the interface version, incremented only when the interface to a file or code changes
-    * Y is the quality version, incremented when a change is made to a file that affects quality
-    * Z is the revision version, incremented when a revision has been done to a code or file, as minor as fixing a typo
+        * X is the interface version, incremented only when the interface
+          to a file or code changes
+        * Y is the quality version, incremented when a change is made to a
+          file that affects quality
+        * Z is the revision version, incremented when a revision has been
+          done to a code or file, as minor as fixing a typo
 
-    .. seealso::
-       :ref:`concepts_versions`
+    See Also
+    --------
+    :ref:`concepts_versions`
 
-    .. note:: The interface version starts at 1
+    Notes
+    -----
+    The interface version starts at 1.
 
-    :attribute interface: The interface version for the object
-    :attribute quality: The quality version for the object
-    :attribute revision: The revision version for the object
-
-    :Example:
+    Examples
+    --------
 
     >>> import Version
     >>> v = Version.Version(1,1,1)
@@ -62,16 +66,21 @@ class Version(object):
         """
         Sets the class attributes
 
-        :param interface_version: The interface version for the object
-        :type interface_version: int
-        :param quality_version: The quality version for the object
-        :type quality_version: int
-        :param revision_version: The revision version for the object
-        :type revision_version: int
+        Parameters
+        ----------
+        interface_version : int
+            The interface version for the object
+        quality_version : int
+            The quality version for the object
+        revision_version : int
+            The revision version for the object
         """
         self.interface = int(interface_version)
-        self.revision = int(revision_version)
+        """The interface version for the object"""
         self.quality = int(quality_version)
+        """The quality version for the object"""
+        self.revision = int(revision_version)
+        """The revision version for the object"""
         self._checkVersion()
 
     @staticmethod
@@ -79,10 +88,15 @@ class Version(object):
         """
         Given a string of the form x.y.z return a Version object
 
-        :param inval: String in the form xx.yy.zz
-        :type inval: str
-        :return: Version instance created from the string
-        :rtype: :class:`Version`
+        Parameters
+        ----------
+        inval : :class:`str`
+            Version in the form xx.yy.zz
+
+        Returns
+        -------
+        :class:`Version`
+            Version instance created from the string
         """
         return Version(*inval.split('.'))
 
@@ -137,7 +151,14 @@ class Version(object):
         """
         Subtract works on each version number
 
-        :param other: The other Version object
-        :type other: Version
+        Parameters
+        ----------
+        other : :class:`Version`
+            The other Version object
+
+        Returns
+        -------
+        :class:`list`
+            Three-element difference of each version number
         """
         return [self.interface - other.interface, self.quality - other.quality, self.revision - other.revision]

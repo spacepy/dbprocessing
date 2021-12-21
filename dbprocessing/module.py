@@ -16,13 +16,17 @@ class module(object):
         """
         Commands are entered as args to this class then parsed
 
-        :keyword args : Arguments passed straight through to module
+        Parameters
+        ----------
+        args : :class:`list` of :class:`str`
+            Arguments passed straight through to module
         
-        :examples:
-
-        mod = module('load', 'icy')
+        Examples
+        --------
+        >>> mod = module('load', 'icy')
         """
         self.env = os.environ.copy()
+        """Environment variables (:class:`dict`)"""
         command = "modulecmd python "+' '.join(args)
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
         retval = p.communicate()
@@ -30,7 +34,14 @@ class module(object):
 
     def _parse(self, inval):
         """
-        Parse the module call and return an environment
+        Parse the module call and updates environment.
+
+        Makes changes to :data:`env`.
+
+        Parameters
+        ----------
+        inval : :class:`str`
+            Output of module call
         """
         regex = re.compile(r'^os\.environ\[(.*)\]$')
         for val in inval:
@@ -50,12 +61,19 @@ class module(object):
     @classmethod
     def get_env(self, *args):
         """
-        Return a complete environment suitable for using in subprocess.call()
+        Return a complete environment.
 
-        :keyward args : Arguments passed straight through to module
+        Parameters
+        ----------
+        args : :class:`list` of :class:`str`
+           Arguments to pass direction to module command.
 
-        :return:dictionary containg the request environment
-        :rtype: dict
+        Returns
+        -------
+        :class:`dict`
+            Environment variables, starting with current environment and
+            modified by the module commands. Suitable as ``env`` argument
+            in :func:`subprocess.call`.
         """
         m = module(*args)
         return m.env

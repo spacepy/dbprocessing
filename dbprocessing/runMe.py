@@ -32,6 +32,16 @@ class ProcessException(Exception):
 def mk_tempdir(suffix='_dbprocessing'):
     """
     Create a secure temp directory
+
+    Returns
+    -------
+    :class:`str`
+        Path to resulting directory.
+
+    Other Parameters
+    ----------------
+    suffix : :class:`str`, default ``_dbprocessing``
+        Suffix to include on the directory name
     """
     tempdir = tempfile.mkdtemp(suffix=suffix)
     DBlogging.dblogger.debug("Created temp directory: {0}".format(tempdir))
@@ -40,6 +50,11 @@ def mk_tempdir(suffix='_dbprocessing'):
 def rm_tempdir(tempdir):
     """
     Remove the temp directory
+
+    Parameters
+    ----------
+    :class:`str`
+        Path to directory to remove.
     """
     name = tempdir
     shutil.rmtree(tempdir)
@@ -49,6 +64,16 @@ def rm_tempdir(tempdir):
 def _extract_files(cmdline):
     """
     Given a command line extract out the files that are input to the process
+
+    Parameters
+    ----------
+    cmdline: :class:`str` or :class:`~collections.abc.Sequence`
+        Command line to parse
+
+    Returns
+    -------
+    :class:`list` of :class:`str`
+        All files named in the command line.
     """
     # is the input a list, if so make it a string
     if hasattr(cmdline, '__iter__'):
@@ -81,6 +106,16 @@ def _extract_files(cmdline):
 def _pokeFile(filename):
     """
     Given a filename open it non-blocking and see if it works
+
+    Parameters
+    ----------
+    filename : :class:`str`
+        Path to file
+
+    Returns
+    -------
+    :class:`str`
+        Status of the check: ``NOFILE``, ``OTHER``, ``FILE``, ``ERROR``.
     """
     try:
         fp = os.open(filename, os.O_NONBLOCK, os.O_RDONLY)
@@ -97,14 +132,22 @@ def _pokeFile(filename):
 
 def _start_a_run(runme):
     """
-    Given a runme that we want to start poke the all the files to be sure the automunter has them all up
+    Given a runme that we want to start poke the all the files.
 
-    intermediate steps:
-    1) need to extract all the files that will be used for the process and poke them all
-       with a os.open with non-blocking.  This will make sure the automounter has seen attempts
-       on them all
-    2) Then if the open works close it and move all.  If it fails, note that and move on.
-    3) Start the process after all opened and closed
+    This poke makes sure the automunter has them all up
+
+    Intermediate steps:
+        1. need to extract all the files that will be used for the process
+           and poke them all with a :func:`os.open` with non-blocking. This
+           will make sure the automounter has seen attempts on them all.
+        2. Then if the open works close it and move all.  If it fails, note
+           that and move on.
+        3. Start the process after all opened and closed.
+
+    Parameters
+    ----------
+    runme : :class:`runMe`
+        Runner object to check.
     """
     # processes[subprocess.Popen(runme.cmdline, stdout=fp, stderr=fp)] = (runme, time.time(), fp )
     files2poke = _extract_files(runme.cmdline)
@@ -131,16 +174,25 @@ def runner(runme_list, dbu, MAX_PROC=2, rundir=None):
     """
     Go through a list of runMe objects and run them
 
-    .. todo:: This function can be made a smart as one wants, for now it is not made to be smart, but flexible
+    .. todo:: This function can be made a smart as one wants, for now it is
+        not made to be smart, but flexible
 
-    :param runme_list: List of runMe objects that need to be run
-    :type runme_list: list
+    Parameters
+    ----------
+    runme_list : :class:`list` of :class:`runMe`
+        List of runMe objects that need to be run.
+    dbu : :class:`.DButils`
+        Open database connection.
+    MAX_PROC : :class:`int`, default 2
+        Maximum number of processes to run at once.
+    rundir : :class:`str`, optional
+        Directory to run in, default use a freshly-created temp directory.
 
-    :param rundir: Directory to run in, if None then use a temp directory
-    :type rundir: str
-
-    :return: number of processes that successfully completed, number of processes that failed
-    :rtype: tuple(int, int)
+    Returns
+    -------
+    :class:`tuple` of :class:`int`
+        number of processes that successfully completed, number of processes
+        that failed.
     """
     ############################################################
     # 1) build up the command line and store in a commands list
@@ -279,19 +331,36 @@ class runMe(object):
     """
     class holds all the info it takes to run a process
 
-    dbu - DButils instance
-    utc_file_date - datetime.date
-    process_id - process to run (int)
-    input_files - the files that exist to run with (list of int)
-
-    .. warning::
-       As this object holds a reference to
-       :class:`~dbprocessing.DButils.DButils`, both directly and within
-       a reference to :class:`~dbprocessing.dbprocessing.ProcessQueue`,
-       that database should be closed before the program terminates.
-       Deleting this object will ordinarily suffice.
+    Warnings
+    --------
+    As this object holds a reference to
+    :class:`~dbprocessing.DButils.DButils`, both directly and within
+    a reference to :class:`~dbprocessing.dbprocessing.ProcessQueue`,
+    that database should be closed before the program terminates.
+    Deleting this object will ordinarily suffice.
     """
-    def __init__(self, dbu, utc_file_date, process_id, input_files, pq, version_bump = None, force=False):
+    def __init__(self, dbu, utc_file_date, process_id, input_files, pq,
+                 version_bump = None, force=False):
+        """
+        Parameters
+        ----------
+        dbu : :class:`.DButils`
+            Open database connection.
+        utc_file_date : :class:`~datetime.date`
+            Characteristic date of the file being created.
+        process_id : :class:`int`
+            :sql:column:`~process.process_id` of process to run.
+        input_files : :class:`list` of :class:`int`
+            :sql:column:`~file.file_id` of all input files.
+        pq : :class:`.ProcessQueue`
+            ProcessQueue instance
+        version_bump : :class:`int`, optional
+            Which element of the output version to bump. Forces output if
+            specified. Default: run only on changed inputs, and bump version
+            according to the normal rules.
+        force : :class:`bool`, default False
+            Force processing regardless of version bumping or out-of-date.
+        """
         DBlogging.dblogger.debug("Entered runMe {0}, {1}, {2}, {3}".format(dbu, utc_file_date, process_id, input_files))
         if isinstance(utc_file_date, datetime.datetime):
             utc_file_date = utc_file_date.date()
@@ -455,6 +524,11 @@ class runMe(object):
         """
         check the filename we created and see if it is in the, if it is we will
         not process with that name
+
+        Returns
+        -------
+        :class:`int` or :class:`bool`
+            :sql:column:`~file.file_id` of newly created file, or False.
         """
         try:
             DBlogging.dblogger.debug("Filename: {0} check in db".format(self.filename))
@@ -467,8 +541,13 @@ class runMe(object):
 
     def _codeVerChange(self, f_id_db):
         """
-        since the file was in the db, is the code that made that the same as what
-        we want to use now?
+        since the file was in the db, is the code that made that the same as
+        what we want to use now?
+
+        Parameters
+        ----------
+        f_id_db : :class:`int`
+            :sql:column:`~file.file_id` of file to check
         """
         db_code_id = self.dbu.getFilecodelink_byfile(f_id_db)
         DBlogging.dblogger.debug("f_id_db: {0}   db_code_id: {1}".format(f_id_db, db_code_id))
@@ -508,6 +587,17 @@ class runMe(object):
         """
         given a list of the difference in versions (comes form version-version)
         increment self.output_version
+
+        Parameters
+        ----------
+        ver_diff : :class:`list`
+            Three-element list, corresponding to each component of the version
+            to increment. Element greater than zero means increment that.
+
+        Returns
+        ------
+        :class:`bool`
+            if any element of version was incremented.
         """
         if ver_diff[2] > 0:
             self.output_version.incRevision()
@@ -525,11 +615,23 @@ class runMe(object):
 
     def _parentsChanged(self, f_id_db):
         """
-        go through a files parents and see if any of the parents have new versions
-        not used in this processing, if so increment the correct version number
+        go through a files parents and see if any parents have new versions
+
+        If parents have new versions not used in this processing, increment.
+        the correct version number
         ** this is decided by the parents only have revision then revision inc
             if a parent has a quality inc then inc quality
         ** if there are extra parents then we want to rerun with a new quality
+
+        Parameters
+        ----------
+        f_id_db : :class:`int`
+            :sql:column:`~file.file_id` of file to check
+
+        Returns
+        -------
+        :class:`bool`
+            if any parent (input) files have changed since this file was made.
         """
         parents = self.dbu.getFileParents(f_id_db)
         if not parents:
@@ -593,11 +695,10 @@ class runMe(object):
         """
         Moves a file from location to incoming
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 18-Apr-2012 (BAL)
+        Parameters
+        ----------
+        fname : :class:`str`
+            Full path to file to move into incoming.
         """
         inc_path = self.dbu.getIncomingPath()
         if os.path.isfile(os.path.join(inc_path, os.path.basename(fname))):
@@ -613,11 +714,11 @@ class runMe(object):
         """
         Moves a file from incoming to error
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
 
-        @version: V1: 02-Dec-2010 (BAL)
+        Parameters
+        ----------
+        fname : :class:`str`
+            Full path to file to move into error directory.
         """
         DBlogging.dblogger.debug("Entered moveToError: {0}".format(fname))
 
@@ -661,7 +762,19 @@ class runMe(object):
         """
         make a command line for actually doing this running
 
-        NOTE: creates a temp directory that needs to be cleaned!!
+        Parameters
+        ----------
+        rundir : :class:`str`, optional
+            Directory to run in, default use a freshly-created temp directory.
+
+        Other Parameters
+        ----------------
+        force : :class:`bool`, default False
+            Not used.
+
+        Notes
+        -----
+        Creates a temp directory that needs to be cleaned!!
         """
         # build the command line we are to run
         cmdline = [self.codepath]
