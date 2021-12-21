@@ -15,6 +15,13 @@ class DBqueue(deque):
         """
         Allow a for loop to iterate and pop items from the DBqueue
 
+        Yields
+        ------
+        any
+            Leftmost (0th) item in queue.
+
+        Examples
+        --------
         >>> a = DBqueue([1,2,3])
         >>>  for i in a.popleftiter():
         ...:     print(i)
@@ -29,6 +36,13 @@ class DBqueue(deque):
         """
         Allow a for loop to iterate and pop items from the DBqueue
 
+        Yields
+        ------
+        any
+            Rightmost (last) item in queue.
+
+        Examples
+        --------
         >>> a = DBqueue([1,2,3])
         >>>  for i in a.poptiter():
         ...:     print(i)

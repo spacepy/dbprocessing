@@ -834,7 +834,7 @@ in most cases, return a record from any table.
 
 .. sql:column:: level
 
-   Numerical level of this file; somewhat redundant with
+   Numerical level of this product; somewhat redundant with
    :sql:column:`file.data_level`.
    (:py:class:`~sqlalchemy.types.Float`,
    :py:obj:`NOT NULL <sqlalchemy.schema.Column.params.nullable>`)

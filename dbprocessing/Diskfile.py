@@ -56,7 +56,9 @@ class DigestError(Exception):
     """
     Exception that is thrown by calcDigest.
 
-    .. note: maybe just combine this with ReadError for the current purpose
+    Notes
+    -----
+    Maybe just combine this with ReadError for the current purpose
     """
     def __init__(self, *params):
         super(DigestError, self).__init__(*params)
@@ -78,19 +80,23 @@ class Diskfile(object):
         takes in a filename and creates a params dict to hold information
         about the file then tests to see what mission the file is from
         
-        :param infile: a file to create a Diskfile around
-        :type infile: str
-        :param dbu: pass in the current session so that a new connection is not made
-        :type dbu: :class:`.DButils`
+        Parameters
+        ----------
+        infile : :class:`str`
+            Full path to file to create a Diskfile around
+        dbu : :class:`.DButils`
+            Pass in the current session so that a new connection is not made
         """
         self.infile = infile
+        """Path to the input file. Not validated to be either relative
+           or absolute. (:class:`str`)"""
         self.checkAccess()
 
         self.path = os.path.dirname(self.infile)
         self.filename = os.path.basename(self.infile)
 
         self.params = {}
-        """Parameters of this file, i.e. metadata (:class:`dict`)"""
+        """Parameters of this file, i.e. metadata. (:class:`dict`)"""
         self.params['filename'] = self.filename
         self.params['utc_file_date'] = None
         self.params['utc_start_time'] = None
@@ -125,7 +131,17 @@ class Diskfile(object):
 
     def checkAccess(self):
         """
-        Tests of the input file to be sure the script has the correct access
+        Tests of the input file to be sure the script has the correct access.
+
+        Takes no inputs; returns no values. Uses :data:`file` and raises
+        exceptions if checks fail.
+
+        Raises
+        ------
+        ReadError
+            If file isn't readable.
+        WriteError
+            If file isn't writeable.
         """
         # need both read and write access
         self.READ_ACCESS = os.access(self.infile, os.R_OK)
@@ -142,12 +158,15 @@ class Diskfile(object):
 def calcDigest(infile):
     """Calculate the SHA1 digest from a file.
 
-    :param infile: Path to the file
-    :type infile: str
+    Parameters
+    ----------
+    infile : :class:`str`
+        Path to the file.
 
-    :return: Hex digits of the file, SHA1 (40 bytes)
-    :rtype: str
-
+    Returns
+    -------
+    hash : :class:`str`
+        Hex digits of the file's SHA1 hash (40 bytes).
     """
     m = hashlib.sha1()
     try:

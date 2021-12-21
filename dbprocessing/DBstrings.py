@@ -15,17 +15,12 @@ import string
 class DBformatter(string.Formatter):
     """String formatter extended/modified for DButils
 
-    .. note:: As this is currently implemented, L{regex} may not handle
-       {{ and }} properly, since regex expansion is applied I{after}
-       the basic formatting is done, and thus {{ and }} are already
-       replaced with { and }. In this case, {{Y}} would be replaced
-       with the {Y} regex. One solution to this may be to put a
-       callback in L{QuietFormatter} to allow other handling of
-       unmatched fields. Callback would have to be specified at
-       class construction time and be same for the life of the formatter
-       Also, it might make more sense to let the exception throw if fields
-       aren't filled.
-
+    Notes
+    -----
+    As this is currently implemented, :meth:`re` may not handle
+    ``{{`` and ``}}`` properly, since regex expansion and basic formatting
+    occur in two different steps, and thus ``{{`` and ``}}`` are already
+    replaced with ``{`` and ``}`` in the second step.
     """
 
     SPECIAL_FIELDS = {
@@ -61,13 +56,38 @@ class DBformatter(string.Formatter):
         """Expand base format to handle datetime and special dbp keywords
 
         This is the top-level function to call.
+
+        Parameters
+        ----------
+        format_string : :class:`str`
+            String with format specifiers.
+
+        Returns
+        -------
+        :class:`str`
+            The formatted string.
         """
         self.expand_datetime(kwargs)
         return super(DBformatter, self).format(
             self.expand_format(format_string), *args, **kwargs)
 
     def re(self, format_string, *args, **kwargs):
-        """Like L{format}, but substitute regexp for unspecified fields"""
+        """Format with regexp for unspecified fields.
+
+        Similar to :meth:`format`, but any fields which are not specified
+        are replaced wth regular expressions according to
+        :data:`SPECIAL_FIELDS`.
+
+        Parameters
+        ----------
+        format_string : :class:`str`
+            String with format specifiers.
+
+        Returns
+        -------
+        :class:`str`
+            The formatted string.
+        """
         self.expand_datetime(kwargs)
         return super(DBformatter, self).format(
             self.expand_format(format_string, kwargs), *args, **kwargs)
@@ -75,13 +95,34 @@ class DBformatter(string.Formatter):
     def expand_datetime(self, kwargs):
         """Expands datetime keyword into special keywords. Helper function!
 
-        A single datetime keyword may be provided to L{format}; this
+        A single datetime keyword may be provided to :meth:`format`; this
         function expands that datetime keyword into all the fields that
         may be provided by the datetime object and inserts those keywords
-        into L{kwargs}.
+        into ``kwargs``.
 
-        :param kwargs: list of keywords passed to L{format}
-        :type kwargs: dict.
+        Parameters
+        ----------
+        kwargs : :class:`dict`
+            keywords passed to :meth:`format`. Updated in place.
+
+        Examples
+        --------
+        >>> kwargs = { 'datetime': datetime.datetime(2010, 1, 1) }
+        >>> dbprocessing.DBstrings.DBformatter().expand_datetime(kwargs)
+        >>> kwargs
+        {'DATE': '20100101',
+         'H': 0,
+         'M': 0,
+         'MICRO': 0,
+         'MILLI': 0,
+         'S': 0,
+         'Y': 2010,
+         'b': 'Jan',
+         'd': 1,
+         'datetime': datetime.datetime(2010, 1, 1, 0, 0),
+         'j': 1,
+         'm': 1,
+         'y': 10}
         """
         if 'datetime' in kwargs:
             dt = kwargs['datetime']
@@ -117,25 +158,30 @@ class DBformatter(string.Formatter):
 
         Helper function!
 
-        For every field defined in L{SPECIAL_FIELDS}, if there is no format
-        spec nor conversion specified, replace it on the output with the
-        full format spec in L{SPECIAL_FIELDS}.
+        For every field defined in :data:`SPECIAL_FIELDS`, if there is no
+        format spec nor conversion specified, replace it on the output
+        with the full format spec in :data:`SPECIAL_FIELDS`.
 
         If the format spec/conversion is not provided or matches that in
-        L{SPECIAL_FIELDS}, and the field is not found in L{kwargs}, replace
-        with the regular expression from L{SPECIAL_FIELDS}.
+        :data:`SPECIAL_FIELDS`, and the field is not found in ``kwargs``,
+        replace with the regular expression from :data:`SPECIAL_FIELDS`.
 
         Everything else is returned verbatim.
 
-        :param format_string: the format string to convert
-        :type format_string: str
-        :param kwargs: provided keywords to check for existence. If not
-                       supplied, do no regex substitution.
-        :type kwargs: dict
-        :return: L{format_string} with the fields defined in L{SPECIAL_FIELDS}
-                 expanded to full format specifiers and replaced by
-                 regular expressions, as desired.
-        :rtype: str
+        Parameters
+        ----------
+        format_string : :class:`str`
+            The format string to convert.
+        kwargs : :class:`dict`
+            Provided keywords to check for existence. If not supplied, do
+            no regex substitution.
+
+        Returns
+        -------
+        :class:`str`
+            ``format_string`` with the fields defined in :data:`SPECIAL_FIELDS`
+            expanded to full format specifiers and replaced by regular
+            expressions, as desired.
         """
         result = []
         for literal, field, format, conversion in self.parse(format_string):
@@ -167,17 +213,31 @@ class DBformatter(string.Formatter):
         Converse of parse. Takes literal text, field name, format spec,
         and conversion and assembles into a full field spec.
 
-        :param literal: any literal text preceding the field definition
-        :type literal: str
-        :param field: name of the field
-        :type field: str
-        :param format: format specification to apply to L{field}
-        :type format: str
-        :param conversion: conversion to apply to L{field}
-        :type conversion: str
-        :return: a full format spec that will parse into L{literal},
-                 L{field}, L{format}, L{conversion}
-        :rtype: str
+        Parameters
+        ----------
+        literal : :class:`str`
+            any literal text preceding the field definition
+        field : :class:`str`
+            name of the field
+        format : :class:`str`
+            format specification to apply to ``field``
+        conversion : :class:`str`
+            conversion to apply to ``field``
+
+        Returns
+        -------
+        :class:`str`
+            A full format spec that will parse into ``literal``, ``field``,
+            ``format``, ``conversion``
+
+        Examples
+        --------
+        >>> f = dbprocessing.DBstrings.DBformatter()
+        >>> parsed = list(f.parse('The year is {Y}'))
+        >>> parsed[0]
+        ('The year is ', 'Y', '', None)
+        >>> f.assemble(*parsed[0])
+        'The year is {Y}'
         """
         if not field and not conversion and not format:
             return literal

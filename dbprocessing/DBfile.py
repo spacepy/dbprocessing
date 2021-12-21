@@ -32,12 +32,16 @@ class DBfile(object):
 
         .. todo:: Do we need this keyword or the functionality?
 
-        :param diskfile: A file name or diskfile instance to create a DBfile from
-        :type diskfile: str or :class:`.Diskfile`
-        :param dbu: Pass in the current :class:`.DButils` session so that a new connection is not made
-        :type dbu: :class:`.DButils`
-        :param makeDiskFile: If true, diskfile is a filename and needs a Diskfile made.
-        :type makeDiskFile: bool
+        Parameters
+        ----------
+        diskfile : :class:`str` or :class:`.Diskfile`
+            A file name or diskfile instance to create a DBfile from
+        dbu : :class:`~.DButils.DButils`, optional
+            Current database connection. If not specified, creates a
+            new connection.
+        makeDiskFile : :class:`bool`, default False
+            If true, ``diskfile`` is a filename and needs a
+            :class:`.Diskfile` made.
         """
         if makeDiskFile:
             diskfile = Diskfile.Diskfile(diskfile, dbu)
@@ -54,10 +58,12 @@ class DBfile(object):
 
     def addFileToDB(self):
         """
-        Wrapper around DButils.addFile to take params dict to keywords
+        Wrapper around :meth:`~.DButils.addFile` to take params dict to keywords
 
-        :return: The file_id of the newly added file
-        :rtype: long
+        Returns
+        -------
+        :class:`int`
+            :sql:column:`~file.file_id` of the newly added file
         """
         return self.dbu.addFile(**self.diskfile.params)
 
@@ -65,8 +71,10 @@ class DBfile(object):
         """
         Query the DB and get the directory that the file should exist in
 
-        :return: The full path for the DBfile
-        :rtype: str
+        Returns
+        -------
+        :class:`str`
+            The full path for the DBfile
         """
         relative_path = self.dbu.session.query(self.dbu.Product.relative_path).filter_by(
             product_id=self.diskfile.params['product_id'])
@@ -85,12 +93,14 @@ class DBfile(object):
         """
         Move the DBfile from its current location to where it belongs
 
-        If the file is a symbolic link it is assumed already in the target directory and not
+        If the file is a symbolic link it is assumed already in the target
+        directory and not
         moved, the link is just removed
 
-        :return: The from and to arguments to move with full path info
-        :rtype: tuple(str, str)
-
+        Returns
+        -------
+        :class:`tuple` of :class:`str`
+            from and to arguments to move with full path info
         """
         path = self.getDirectory()
         ## need to do path replacements

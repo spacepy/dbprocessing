@@ -30,17 +30,12 @@ class ProcessQueue(object):
 
     Looks in incoming and builds all possible files
 
-    @author: Brian Larsen
-    @organization: Los Alamos National Lab
-    @contact: balarsen@lanl.gov
-
-    @version: V1: 02-Dec-2010 (BAL)
-
-    .. warning::
-       As this object holds a reference to
-       :class:`~dbprocessing.DButils.DButils`, that database should be
-       closed before the program terminates. Deleting this object will
-       ordinarily suffice.
+    Warnings
+    --------
+    As this object holds a reference to
+    :class:`~dbprocessing.DButils.DButils`, that database should be
+    closed before the program terminates. Deleting this object will
+    ordinarily suffice.
     """
 
     def __init__(self,
@@ -50,14 +45,16 @@ class ProcessQueue(object):
         Parameters
         ----------
         mission : str
-            Mission database, as in :class:`~dbprocessing.DButils.DButils`.
-        dryrun : bool
+            Mission database, as in :class:`.DButils`.
+        dryrun : bool, default False
             Treat all functionality as "dry run", make no changes.
-        echo : bool
+        echo : bool, default False
             Log all SQL statements (as in
             :class:`~dbprocessing.DButils.DButils`).
         """
         self.dryrun = dryrun
+        self.filename = None
+        """Full path to file currently being processed (:class:`str`)"""
         self.mission = mission
         self.tempdir = None
         dbu = DButils.DButils(self.mission, echo=echo)
@@ -82,9 +79,10 @@ class ProcessQueue(object):
         """
         Setter for filename, this is cleaner than just random sets
 
-        :param filename: filename to set to self.filename
-        :type filename: str
-        :return: None
+        Parameters
+        ----------
+        filename : :class:`str`
+            filename to set to :data:`filename`
         """
         self.filename = filename
         self.basename = os.path.basename(self.filename)
@@ -112,11 +110,10 @@ class ProcessQueue(object):
         """
         Goes out to incoming and grabs all files there adding them to self.queue
 
-        @author: Brian Larsen
-        @organization: Los Alamos National Lab
-        @contact: balarsen@lanl.gov
-
-        @version: V1: 02-Dec-2010 (BAL)
+        Parameters
+        ----------
+        glb : :class:`str`, optional
+            Glob pattern that files must match.
         """
         DBlogging.dblogger.debug("Entered checkIncoming:")
 
@@ -136,6 +133,11 @@ class ProcessQueue(object):
     def moveToError(self, fname):
         """
         Moves a file from incoming to error
+
+        Parameters
+        ----------
+        fname : :class:`str`
+            Full path to file to move to error.
         """
         DBlogging.dblogger.debug("Entered moveToError: {0}".format(fname))
 
@@ -156,6 +158,11 @@ class ProcessQueue(object):
     def diskfileToDB(self, df):
         """
         given a diskfile go through and do all the steps to add it into the db
+
+        Parameters
+        ----------
+        df : :class:`.Diskfile`
+            File to add to database.
         """
         if df is None:
             DBlogging.dblogger.info("Found no product moving to error, {0}".format(self.basename))
@@ -234,7 +241,13 @@ class ProcessQueue(object):
                 T0 = time.time()
 
     def figureProduct(self, filename=None):
-        """Imports inspectors and figures out which inspectors claim the file"""
+        """Imports inspectors and figures out which inspectors claim the file
+
+        Parameters
+        ----------
+        filename : :class:`str`, optional
+            Full path to file to check, default :data:`filename`.
+        """
         if filename is None:
             filename = self.filename
         act_insp = self.dbu.getActiveInspectors()
@@ -359,12 +372,16 @@ class ProcessQueue(object):
         """
         go through and all the runMe's and add to the runme_list variable
 
-        :param int file_id: file ID of the file for which children will be built
-        :param bool skip_run: Skip RUN timebase processes if True
-                              (default False)
-        :param str run_procs: If provided, comma-separated list of process IDs
-                              or process names to run; other processes are
-                              ignored. (Default: all possible processes).
+        Parameters
+        ----------
+        file_id : :class:`int`
+            file ID of the file for which children will be built
+        skip_run : :class:`bool`, default False
+            Skip RUN timebase processes if True
+        run_procs : :class:`str`, optional
+            If provided, comma-separated list of process IDs
+            or process names to run; other processes are
+            ignored. (Default: all possible processes).
         """
 
         # if processes to run specified, turn into list of IDs
@@ -472,7 +489,26 @@ class ProcessQueue(object):
         Given parameters, add all files to processqueue so that next
         -p run they will be reprocessed
 
-        incVersion sets which of the version numbers to increment {0}.{1}.{2}
+        All parameters are optional; if not specified, default is "all".
+
+        Parameters
+        ----------
+        startDate : :class:`~datetime.datetime`, optional
+            First date to add to process queue
+        endDate : :class:`~datetime.datetime`, optional
+            Last date to add to process queue (inclusive)
+        level : :class:`float`, optional
+            Only add files of this level.
+        product : :class:`int`, optional
+            :sql:column:`~product.product_id` of files to add
+        code : :class:`int`, optional
+            Only add files created by code with ID of
+            :sql:column:`~code.code_id` 
+        instrument : :class:`int`, optional
+            Only add files with instrument
+            :sql:column:`~instrument.instrument_id`
+        incVersion : :class:`int`, optional
+            Force processing and increment this version number, {0}.{1}.{2}
         """
         startDate = Utils.datetimeToDate(startDate)
         endDate = Utils.datetimeToDate(endDate)
@@ -542,7 +578,7 @@ class ProcessQueue(object):
         incVersion : :class:`int` {0, 1, 2}, optional
             Which version number to increment: major (0), minor (1),
             subminor (2). Forces reprocessing (default do not force).
-        level : :class:`int`, optional
+        level : :class:`float`, optional
             Only reprocess files of this level (default all)
         """
         return self._reprocessBy(startDate=startDate, endDate=endDate,

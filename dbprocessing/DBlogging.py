@@ -85,8 +85,8 @@ def change_logfile(logname=None):
 
     Parameters
     ----------
-    logname : str, optional
-        Name to include in full log filename, default ``log``.
+    logname : :class:`str`, default "log"
+        Name to include in full log filename.
     """
     global LOG_FILENAME, handler, formatter, dblogger
     basename = 'dbprocessing_{0}'.format(logname if logname else 'log')

@@ -76,7 +76,18 @@ class inspector(object):
        (:class:`str`)"""
 
     def __init__(self, filename, dbu, product, **kwargs):
-        """"""
+        """
+        Parameters
+        ----------
+        filename : :class:`str`
+            Path to file to inspect.
+        dbu : :class:`.DButils`
+            Open database connection.
+        product : :class:`int`
+            Product ID; verify if passed-in file is instance of this product.
+        kwargs : :class:`dict`
+            Keyword arguments passed through to :meth:`inspect` (as a dict).
+        """
         DBlogging.dblogger.debug("Entered inspector {0} with kwargs: {1}".format(self.code_name, kwargs))
         self.dbu = dbu # give us access to DButils
         """Open database. (:class:`~dbprocessing.DButils.DButils`)"""
@@ -201,8 +212,13 @@ class inspector(object):
 
     def __call__(self):
         """
-        do the check if the file is of the given type
-        return None if not or the Diskfile object if so
+        Do the check if the file is of the given product
+
+        Returns
+        -------
+        :class:`.Diskfile`
+            :data:`diskfile` if the file matches the product, or
+            :data:`None` if it doesn't.
         """
         match = self.diskfile
         if match is not None:
@@ -253,6 +269,11 @@ class inspector(object):
     def extract_YYYYMMDD(self):
         """
         go through the filename, extract first valid YYYYMMDD as a datetime
+
+        Returns
+        -------
+        :class:`~datetime.datetime`
+            First date found in :data:`filename`, or :data:`None`.
         """
         return extract_YYYYMMDD(self.filename)
 
@@ -261,11 +282,15 @@ def extract_YYYYMMDD(filename):
     """
     Go through the filename and extract the first valid YYYYMMDD as a datetime
 
-    :param filename: Filename to parse for a YYYYMMDD format
-    :type filename: str
+    Parameters
+    ----------
+    filename : :class:`str`
+        Filename to parse for a YYYYMMDD format
 
-    :return: The datetime found in the filename or None
-    :rtype: datetime.datetime or None
+    Returns
+    -------
+    :class:`~datetime.datetime`
+        First date found in ``filename``, or :data:`None`.
     """
     # cmp = re.compile("[12][90]\d2[01]\d[0-3]\d")
     # return a datetime if there is one from YYYYMMDD
@@ -284,11 +309,15 @@ def extract_YYYYMM(filename):
     """
     Go through the filename and extract the first valid YYYYMM as a datetime
 
-    :param filename: Filename to parse for a YYYYMM format
-    :type filename: str
+    Parameters
+    ----------
+    filename : :class:`str`
+        Filename to parse for a YYYYMMDD format
 
-    :return: The date found in the filename or None
-    :rtype: datetime.date or None
+    Returns
+    -------
+    :class:`~datetime.datetime`
+        First day of first month found in ``filename``, or :data:`None`.
     """
     # cmp = re.compile("[12][90]\d2[01]\d[0-3]\d")
     # return a datetime if there is one from YYYYMMDD
@@ -307,10 +336,15 @@ def valid_YYYYMMDD(inval):
     """
     Checks if input is valid YYYYMMDD
 
-    :param inval: Input to check if valid
-    :type inval: str
-    :return: Return True if valid, False otherwise
-    :rtype: bool
+    Parameters
+    ----------
+    inval : :class:`str`
+        String to evaluate as possible YYYYMMDD
+
+    Returns
+    -------
+    :class:`bool`
+        ``True`` if valid YYYYMMDD.
     """
     try:
         ans = datetime.datetime.strptime(inval, "%Y%m%d")
@@ -323,13 +357,22 @@ def extract_Version(filename, basename=False):
     """
     Go through the filename and pull out the first valid vX.Y.Z
 
-    :param filename: Filename to check for version
-    :type filename: str
-    :keyword basename: True if to return version and the basename, false if just version
-    :type basename: bool
+    Parameters
+    ----------
+    filename : :class:`str`
+        Filename to check for version
 
-    :return: The first valid version string as an object
-    :rtype: :class:`.Version` or tuple(:class:`.Version`, base)
+    Returns
+    -------
+    :class:`.Version`
+        First valid version found in filename. If ``basename``,
+        :class:`tuple` of version (:class:`.Version`) and
+        basename (:class:`str`).
+
+    Other Parameters
+    ----------------
+    basename : :class:`bool`, default False
+        Include the basename after the version as well.
     """
     res = re.search("[vV]\d+\.\d+\.\d+\.", filename)
     ver = None

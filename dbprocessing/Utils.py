@@ -28,12 +28,17 @@ except NameError:
 
 def datetimeToDate(dt):
     """
-    given an input datetime.datetime or datetime.date return a datetime.date 
+    Given an input datetime.datetime or datetime.date return a datetime.date
     
-    :param dt: input to convert 
-    :type dt: datetime.datetime or datetime.date
-    :return: datetime.date
-    :rtype: datetime.date
+    Parameters
+    ----------
+    dt : :class:`~datetime.datetime` or :class:`~datetime.date`
+        input to convert
+
+    Returns
+    -------
+    :class:`~datetime.date`
+        Same date as in ``dt``, but as a :class:`~datetime.date` object.
     """
     if hasattr(dt, 'minute'):
         return dt.date()
@@ -48,12 +53,17 @@ def toDatetime(dt, end=False):
     If a time is provided, passed through; otherwise set to start/end
     of day.
 
-    :param dt: input to convert
-    :type dt: datetime.datetime, datetime.date, or str
-    :param bool end: If input has no time, set to end of day
-                     (default to start of day)
-    :return: datetime.date
-    :rtype: datetime.date
+    Parameters
+    ----------
+    dt : :class:`~datetime.datetime`, :class:`~datetime.date`, or :class:`str`
+        input to convert
+    end : :class:`bool`, default False
+        If input has no time, set to end of day (default to start of day)
+
+    Returns
+    -------
+    :class:`~datetime.datetime`
+        Input converted to :class:`~datetime.datetime`
     """
     if hasattr(dt, 'hour'): # Already datetime
         return dt # Already datetime
@@ -69,20 +79,24 @@ def dateForPrinting(dt=None, microseconds=False, brackets='[]'):
     """
     Return a string of the date format for printing on the screen
 
-    If dt is None return now.
+    If dt is ``None`` return :meth:`~datetime.datetime.now`.
 
-    :param dt: The datetime object to format, defaults to now()
-    :type dt: datetime.datetime
-    :param microseconds: Should the microseconds be included, default False
-    :type microseconds: bool
-    :param brackets: Which brackets to encase the time in, default ('[', ']')
-    :type brackets: str
+    Parameters
+    ----------
+    dt : :class:`~datetime.datetime`, default :meth:`~datetime.datetime.now`
+        object to format
+    microseconds : :class:`bool`, default False
+        Include microseconds
+    brackets : :class:`str`, optional
+        Which brackets to encase the time in, default ``('[', ']')``
 
-    :return: Iso formatted string
-    :rtype: str
+    Returns
+    -------
+    str
+        Iso formatted string
 
-    :example:
-
+    Examples
+    --------
     >>> from dbprocessing.Utils import dateForPrinting
     >>> print("{0} Something occurred".format(dateForPrinting()))
     [2016-03-22T10:51:45]  Something occurred
@@ -100,17 +114,19 @@ def progressbar(count, blocksize, totalsize, text='Download Progress'):
 
     Taken from spacepy
 
-    :param count: The current count of the progressbar
-    :type count: float
-    :param blocksize: The size of each block (mostly useful for file downloads)
-    :type blocksize: float
-    :param totalsize: The total size of the job, progress is count*blocksize*100/totalsize
-    :type totalsize: float
-    :param text: The text to print in the progressbar, optional
-    :type text: str
+    Parameters
+    ----------
+    count : :class:`float`
+        The current count of the progressbar
+    blocksize : :class:`float`
+        The size of each block (mostly useful for file downloads)
+    totalsize : :class:`float`
+        The total size of the job, progress is ``count*blocksize*100/totalsize``
+    text : :class:`str`, optional
+        The text to print in the progressbar
 
-    :example:
-
+    Examples
+    --------
     >>> import spacepy.toolbox as tb
     >>> import urllib
     >>> urllib.urlretrieve(config['psddata_url'], PSDdata_fname, reporthook=tb.progressbar)
@@ -128,13 +144,19 @@ def chunker(seq, size):
 
     Taken from https://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
 
-    :param seq: Iterable to split up
-    :type seq: iterable
-    :param size: Size of each split in the output, last one has the remaining elements of `seq`
-    :type size: int
+    Parameters
+    ----------
+    seq : :class:`~collections.abc.Iterable`
+        Iterable to split up
+    size : :class:`int`
+        Size of each split in the output, last one has the remaining elements
+        of ``seq``
 
-    :return: A tuple of lists of the iterable `seq` split into len(seq)/`size` segments
-    :rtype: tuple
+    Returns
+    -------
+    :class:`tuple`
+        tuple of lists of the iterable ``seq`` split into ``len(seq)/size``
+        segments
     """
 
     return (seq[pos:pos + size] for pos in range(0, len(seq), size))
@@ -144,11 +166,15 @@ def unique(seq):
     """
     Take a list and return only the unique elements in the same order
 
-    :param seq: List to return the unique elements of
-    :type seq: list
+    Parameters
+    ----------
+    seq : :class:`list`
+        List to return the unique elements of
 
-    :return: List with only the unique elements
-    :rtype: list
+    Returns
+    -------
+    :class:`list`
+        List with only the unique elements
     """
 
     seen = set()
@@ -162,13 +188,17 @@ def expandDates(start_time, stop_time):
 
     Inclusive on the ends
 
-    :param start_time: Date to start the list
-    :type start_time: datetime.datetime
-    :param stop_time: Date to end the list, inclusive
-    :type stop_time: datetime.datetime
+    Parameters
+    ----------
+    start_time : :class:`~datetime.datetime`
+        Date to start the list
+    stop_time : :class:`~datetime.datetime`
+        Date to end the list, inclusive
 
-    :return: All the dates between start_time and stop_time
-    :rtype: list
+    Returns
+    -------
+    :class:`list` of :class:`~datetime.datetime`
+        All the dates between start_time and stop_time
     """
 
     return dateutil.rrule.rrule(dateutil.rrule.DAILY, dtstart=start_time, until=stop_time)
@@ -178,11 +208,15 @@ def daterange_to_dates(daterange):
     """
     Given a daterange return the date objects for all days in the range
 
-    :param seq: Start and stop dates
-    :type seq: iterable of datetime.datetime
+    Parameters
+    ----------
+    daterange : :class:`~collections.abc.Sequence` of :class:`~datetime.datetime`
+        Start and stop dates
 
-    :return: All the dates between daterange[0] and daterange[1]
-    :rype: list
+    Returns
+    -------
+    :class:`list`
+        All the dates between ``daterange[0]`` and ``daterange[1]``
     """
 
     return [daterange[0] + datetime.timedelta(days=val) for val in
@@ -193,14 +227,18 @@ def parseDate(inval):
     """
     Given a date of the for yyyy-mm-dd parse to a datetime.
 
-    This is just a wrapper around datetime.datetime.strptime
+    This is just a wrapper around :meth:`~datetime.datetime.strptime`
     If the format is wrong ValueError is raised. 
 
-    :param inval: String date representation of the form YYYY-MM-DD
-    :type inval: str
+    Parameters
+    ----------
+    inval : :class:`str`
+        String date representation of the form YYYY-MM-DD
 
-    :return: datetime object parsed from the string
-    :rtype: datetime.datetime
+    Returns
+    -------
+    :class:`~datetime.datetime`
+        datetime object parsed from the string
     """
     return datetime.datetime.strptime(inval, '%Y-%m-%d')
 
@@ -209,14 +247,17 @@ def parseVersion(inval):
     """
     Given a format of the form x.y.z parse to a Version
 
-    This is a wrapperaround Version.Version.fromString()
+    This is a wrapper around :meth:`~dbprocessing.Version.Version.fromString`.
 
-    :param inval: String Version representation of the form xx.yy.zz
-    :type inval: str
+    Parameters
+    ----------
+    inval : :class:`str`
+        String Version representation of the form xx.yy.zz
 
-    :returns: Version object parsed form the string
-    :rtype: Version.Version
-
+    Returns
+    -------
+    :class:`~dbprocessing.Version.Version`
+        Version object parsed from the string
     """
     return Version.Version.fromString(inval)
 
@@ -227,11 +268,15 @@ def flatten(l):
 
     Taken from https://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists
 
-    :param l: Nested list of lists to flatten
-    :type l: list
+    Parameters
+    ----------
+    l : :class:`list`
+        Nested list of lists to flatten
 
-    :return: Flattened list
-    :rtype: list
+    Returns
+    -------
+    :class:`list`
+        Flattened list
     """
     for el in l:
         if isinstance(el, collections.Iterable) and not isinstance(el, str_classes):
@@ -245,22 +290,31 @@ def toBool(value):
     """
     Returns true if passed 'True', 'true', True, 1, 'Yes', 'yes', 'Y', or 'y'
 
-    :param value: Value to evaluate if true
-    :type value: any
+    Parameters
+    ----------
+    value
+        Value to evaluate if true
 
-    :rtype: bool
+    Returns
+    -------
+    :class:`bool`
     """
     return value in ['True', 'true', True, 1, 'Yes', 'yes', 'Y', 'y']
 
 
 def toNone(value):
     """
-    Returns None if passed '', 'None', 'none', or 'NONE
+    Returns None if passed '', 'None', 'none', or 'NONE'
 
-    :param value: Value to evaluate if none
-    :type value: any
+    Parameters
+    ----------
+    value
+        Value to evaluate if none
     
-    :rtype: None or same type as value
+    Returns
+    -------
+    any
+        :data:`None` or same input value
     """
     if value in [None, '', 'None', 'none', 'NONE']:
         return None
@@ -272,11 +326,15 @@ def strargs_to_args(strargs):
     """
     Read in the arguments string from the db and change to a dict
 
-    :param strargs: A string of arguments("foo=bar baz=qux")
-    :type strargs: str
+    Parameters
+    ----------
+    strargs : :class:`str`
+        A string of arguments("foo=bar baz=qux")
 
-    :return: A dictionary of the arugments are their values
-    :rtype: dict
+    Returns
+    -------
+    :class:`dict`
+        A dictionary of the arguments are their values
     """
 
     if strargs is None:
@@ -305,11 +363,31 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
     """
     Do any substitutions that are needed to put thing in the right place
 
-    Honored substitutions used as {Y}{PRODUCT}{DATE}
-
     .. todo:: This may be useless/could be made more useful
 
-    .. note::
+    Honored substitutions used as {Y}{PRODUCT}{DATE}
+
+    Parameters
+    ----------
+    path : str
+        Path to the file
+    filename : str
+        Name of the time
+    utc_file_date : :class:`~datetime.datetime`
+        File's date
+    utc_start_time : :class:`~datetime.datetime`
+        File's start time
+    version : :class:`~.Version`
+        Version to substitute
+    dbu : :class:`~.DButils.DButils`, optional
+        Current database connection. If not specified, creates a new connection.
+
+    Returns
+    -------
+    :class:`str`
+
+    Notes
+    -----
         Valid subsitutions are:
             * Y: 4 digit year   
             * m: 2 digit month  
@@ -326,23 +404,6 @@ def dirSubs(path, filename, utc_file_date, utc_start_time, version, dbu=None):
             * SPACECRAFT: the spacecraft name from the db
             * PRODUCT: the product name from the db
     
-    :param path: Path to the file
-    :type path: str
-
-    :param filename: Name of the time
-    :type filename: str
-
-    :param utc_file_date: File's date
-    :type utc_file_date: datetime.datetime
-
-    :param utc_start_time: File's start time
-    :type utc_start_time: datetime.datetime
-
-    :param version:
-    :type version: :class:`.Version`
-
-    :param dbu: Pass in the current :class:`.DButils` session so that a new connection is not made
-    :type dbu: :class:`.DButils`
     """
     if '{INSTRUMENT}' in path or '{SATELLITE}' in path or '{SPACECRAFT}' in path or '{MISSION}' in path or '{PRODUCT}' in path:
         ftb = dbu.getTraceback('File', filename)
@@ -392,12 +453,23 @@ def split_code_args(args):
 
     As needed by Popen
 
-    This is different thatn just split() since we have to keep options
-    together with the flags
+    This is different than just split() since we have to keep options
+    together with the flags.
     
-    
-    :example:
+    Parameters
+    ----------
+    args : :class:`str`
 
+    Returns
+    -------
+    :class:`list` of :class:`str`
+
+    See Also
+    --------
+    :mod:`shlex`
+
+    Examples
+    --------
     >>> split_code_args("code -n hello outfile")
     [code, -n hello, outfile]
     """
@@ -418,11 +490,15 @@ def processRunning(pid):
 
     Taken from from https://stackoverflow.com/questions/568271/how-to-check-if-there-exists-a-process-with-a-given-pid-in-python
 
-    :param pid: a pid
-    :type pid: long
+    Parameters
+    ----------
+    pid : :class:`int`
+        Process ID
 
-    :return: True if pid is running, False otherwise
-    :rtype: bool
+    Returns
+    -------
+    :class:`bool`
+        True if ``pid`` is running, False otherwise
     """
     try:
         os.kill(pid, 0)
@@ -434,12 +510,22 @@ def processRunning(pid):
 
 def readconfig(config_filepath):
     """
-    Create a ConfigParser object, to read the config file
+    Read a database definition config file.
 
-    :param config_filepath: full path to the config file
-    :type config_filepath: str
-    :return: Dictionary of key value pairs from config files
-    :rtype: dict
+    Parameters
+    ----------
+    config_filepath : :class:`str`
+        full path to the config file
+
+    Returns
+    -------
+    :class:`dict`
+        Dictionary of key value pairs from config files
+
+    See Also
+    --------
+    :ref:`configurationfiles_addFromConfig`
+    :ref:`scripts_addFromConfig_py`
     """
     # "Safe" deprecated in 3.2, but still present, so version is only way
     #  to avoid stepping on the deprecation. "Safe" preferred before 3.2
