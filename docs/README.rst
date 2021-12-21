@@ -28,8 +28,8 @@ The SpacePy developers are not, as a whole, responsible for ``dbprocessing``.
 SpacePy is generally useful in processing Heliophysics data, e.g. in the
 codes that ``dbprocessing`` manages.
 
-Funding and development
------------------------
+Development
+-----------
 Development of ``dbprocessing`` is primarily supported by the projects
 which make use of it to deliver data. Development is performed in the public
 github repository at <https://github.com/spacepy/dbprocessing/>.
