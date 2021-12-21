@@ -1,9 +1,8 @@
 Copyright
 =========
+Copyright 2014-2021, dbprocessing contributors.
 
 Copyright 2019, Triad National Security, LLC. All rights reserved.
-
-Copyright 2014-2020, contributors.
 
 This program was produced under U.S. Government contract
 89233218CNA000001 for Los Alamos National Laboratory (LANL), which is

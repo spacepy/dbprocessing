@@ -92,8 +92,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'dbprocessing'
-copyright = u'2016, Brian Larsen, Jonathan Niehof'
-author = u'Brian Larsen, Jonathan Niehof'
+copyright = u'2014-2021, dbprocessing contributors'
+author = u'dbprocessing contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
