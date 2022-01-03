@@ -4,7 +4,8 @@ Repository organization
 
 top-level
 =========
-There should be(but there totally are) no committed files at the top level besides ``setup.py``, and ``.gitignore`` (not normally visible).
+There should be (but currently are) no committed files at the top level
+besides ``setup.py``, and ``.gitignore`` (not normally visible).
 
 build
 =====
@@ -14,17 +15,27 @@ dbprocessing
 ============
 Source tree for the main ``dbprocessing`` module. If it's in this directory, it's meant to be installed.
 
-Documents
+developer
 =========
-?
+Miscellaneous bits for sharing between developers. Included in the source
+tarball but not in binary distributions.
+
+docs
+====
+Source for :doc:`documentation`.
+
+examples
+========
+Examples of how to set up dbprocessing for a project, including
+configuration and scripts that are specific to missions.
+
+functional_test
+===============
+Full dbprocessing setup for end-to-end functional test (:ref:`functional`).
 
 gui
 ===
-?
-
-OneOffs
-=======
-?
+Initial work on a Qt-based GUI; not complete.
 
 scripts
 =======
@@ -32,25 +43,9 @@ Scripts meant to be called from the command line that should be installed with t
 
 sphinx
 ======
-See :doc:`documentation`.
+Built :doc:`documentation`.
 
-test_codes
+
+unit_tests
 ==========
-?
-
-testDB
-======
-See :ref:`functional`.
-
-Testing_Utils
-=============
-?
-
-tests
-=====
 See :ref:`unit`.
-
-tests_scripts
-=============
-?
-

@@ -336,6 +336,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/', None),
     'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
     'sqlalchemy': ('https://docs.sqlalchemy.org/en/stable/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
 }
 
 import sphinx.ext.autosummary.generate

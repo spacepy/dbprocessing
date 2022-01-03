@@ -2,15 +2,24 @@
 Documentation
 *************
 
-`Sphinx <http://www.sphinx-doc.org/>`_ documentation is stored in the ``sphinx`` directory.
+`Sphinx <http://www.sphinx-doc.org/>`_ documentation sources are stored in the
+``docs`` directory; the build system and output are in the ``sphinx`` directory.
 
 ``Makefile`` is used to build the documentation.
 
 Run ``make html`` in the ``sphinx`` directory to build the html documentation, output is in ``build/html``.
 
-``build`` contains the built documentation (and intermediate files); it can safely be deleted.
+``sphinx/build`` contains the built documentation (and intermediate files);
+it can safely be deleted.
 
-``source`` contains the ReStructuredText source files; note that a large quantity of the documentation is not built from here but from the Python source files. ``source/autosummary`` contains the docs extracted from those source files; it can safely be deleted. If anything's weird about the docs generated from the Python source, try deleting ``autosummary`` first and then rebuilding. The ``autosummary`` docs are extracted from the version of the module in top-level ``build``, i.e., run ``python setup.py build`` before generating the documentation.
+``docs`` contains the ReStructuredText source files; note that a large
+quantity of the documentation is not built from here but from the Python
+source files. ``docs/developer/autosummary`` contains the docs extracted
+from those source files; it can safely be deleted. If anything's weird
+about the docs generated from the Python source, try deleting ``autosummary``
+first and then rebuilding. The ``autosummary`` docs are extracted from the
+version of the module in top-level ``build``, i.e., run
+``python setup.py build`` before generating the documentation.
 
 .. contents::
    :local:
@@ -34,8 +43,7 @@ outputs. Cross-referencing of documentation should be generous.
 
 If a directive spans multiple lines, proper indentation is essential
 for readability and Sphinx parsing. Subsequent lines must align with
-the start of the description of the parameter, i.e. the second column
-after the closing ``:`` of the directive.
+the start of the description of the parameter.
 
 Documentation must build in Sphinx without warnings and the output
 be checked for proper formatting.
@@ -50,11 +58,6 @@ they can be found later. Consider opening an issue instead.  Raising a
 ``NotImplementedError`` may be appropriate in the meantime. Avoid
 commenting-out code rather than deleting it, except for short-term
 testing; it can always be retrieved from version control later.
-
-More information will be provided here regarding the use of
-autodoc/autosummary, particularly its interaction with numpydoc and
-the fully-automatic build of the API documentation, but that is
-pending a full setup of that documentation structure.
 
 Sphinx rst standards
 ====================
@@ -82,9 +85,6 @@ documentation in docstrings, and to documentation of other projects (where
 relevant.) Use :mod:`~sphinx.ext.intersphinx` to link to other projects that
 use Sphinx for documentation. ``make linkcheck`` in the ``sphinx`` directory
 will verify links (both intersphinx and HTTP).
-
-More information will be provided here on the proper separation
-of API documentation from user/design documentation.
 
 The documentation is not, at this time, completely up to these standards
 (or completely consistent.)
