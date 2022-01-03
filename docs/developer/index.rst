@@ -6,7 +6,6 @@ Developer Information
    :maxdepth: 1
 
    api
-   build
    tests
    code_standards
    documentation
@@ -14,8 +13,6 @@ Developer Information
    pull_requests
    repository
    release
-   notes
    tables
-   todo
    inspector_examples
    ../CONTRIBUTING

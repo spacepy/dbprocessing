@@ -71,7 +71,9 @@ in which case ``closes`` is preferred.
 The template includes a checklist;
 consider every item on the list and check it if completed. If an item
 is not relevant, check it, add "(N/A)" to the start of the line, and
-include an explanation below the checklist. E.g.::
+include an explanation below the checklist. E.g.:
+
+.. code-block:: none
 
    - [X] ...
    - [X] (N/A) Major new functionality has appropriate Sphinx documentation

@@ -4,7 +4,7 @@ Inspector examples
 
 These are some examples of :ref:`concepts_inspectors`.
 
-Example 2
+Example 1
 =========
 
 .. code-block:: python
@@ -43,7 +43,7 @@ Example 2
         self.diskfile.params['version'] = inspector.extract_Version(self.basename)
         return "That is not my dog." # anything that is not None is good
 
-Example 3
+Example 2
 =========
 .. code-block:: python
 

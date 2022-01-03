@@ -259,6 +259,24 @@ link deleted. The file pointed to by the link should already be in its
 final location according to its product: the file is not moved if it is
 in the "wrong" location, and this can cause problems finding it later!
 
+Implementation
+--------------
+:meth:`~.ProcessQueue.checkIncoming` checks for all files in the incoming
+directory and adds their names to a queue of files to ingest, removing
+any duplicate files.
+
+:meth:`~.ProcessQueue.importFromIncoming` iterates over these filenames.
+For each, checks if it is already in the database (:meth:`.getFileID`).
+If not, calls :meth:`~.ProcessQueue.figureProduct`, which runs each
+:ref:`inspector <concepts_inspectors>` to determine the product. If
+there is a match, :meth:`~.ProcessQueue.figureProduct`:
+
+   1. uses :meth:`~.ProcessQueue.diskfileToDB` to take the :class:`.Diskfile`
+      populated by the inspector and create the :sql:table:`file` record,
+   2. moves the file to the appropriate final place based on the product,
+   3. and adds the file to the :ref:`process queue <concepts_process_queue>`
+      (:meth:`~.ProcessqueuePush`) for further processing.
+
 .. _concepts_process_queue:
 
 Process Queue
@@ -311,6 +329,22 @@ the console output from that code is placed in the
 :sql:column:`error directory <mission.errordir>`, along with the output
 file if it has been created (this may, of course, be only a partial file,
 given the error).
+
+Implementation
+--------------
+For each file on the :ref:`process queue <concepts_process_queue>`, calls
+:meth:`~.ProcessQueue.buildChildren`, which calculates all possible output
+products and makes a :class:`~.runMe.runMe` object for every possible command
+to run.
+
+Once these are created (and the process queue empty), all :class:`~.runMe.runMe` objects are passed to :func:`~.runMe.runner` at once. :func:`~.runMe.runner`
+calculates the command line for every object, then begins starting processes
+to actually run the data processing commands.
+
+Processes are started up to the maximum count, and polled for completion.
+Outputs of successful runs are moved to incoming and then ingested; failures
+are handled as described above. New processes are then started back to the
+maximum.
 
 .. _concepts_missions:
 

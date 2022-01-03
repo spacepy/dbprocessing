@@ -119,7 +119,9 @@ first-line summary. See also :doc:`pull_requests`.
 Lines must not exceed 76 characters (``git log`` adds a
 four-space indent to the commit message on display).
 
-An example::
+An example:
+
+.. code-block:: none
 
     Add code of conduct
 
@@ -131,18 +133,18 @@ An example::
 
 Testing
 =======
-All code should be tested in the ``unittest``-based test suite of
+All code should be tested in the :mod:`unittest`-based test suite
 in the ``unit_tests`` directory.
 
 Testing should cover a reasonable fraction of the lines of code: at
 least 80%, with 90+% preferred. They should also cover a reasonable
 range of possible inputs and input types.
 
-Unit tests using the ``assertEquals`` or similar methods should
-specify the expected value as the first argument and the actual output
+Unit tests using the :meth:`~unittest.TestCase.assertEqual` or similar methods
+should specify the expected value as the first argument and the actual output
 from the tested method as the second; this makes the displayed diff
-rational.  ``assert_array_equal`` and other ``numpy`` based methods
-should be the other way around (actual, then expected) to make the
+rational.  :func:`~numpy.testing.assert_array_equal` and other :mod:`numpy`
+based methods should be the other way around (actual, then expected) to make the
 diff easy to read.
 
 Checklist
