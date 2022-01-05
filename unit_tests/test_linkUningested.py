@@ -14,6 +14,7 @@ dbp_testing.add_scripts_to_path()
 
 import linkUningested
 import dbprocessing.dbprocessing
+import dbprocessing.DButils
 
 
 class LinkUningestedTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
@@ -38,9 +39,7 @@ class LinkUningestedTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         td = tempfile.mkdtemp()
         try:
             testdb = os.path.join(td, 'emptyDB.sqlite')
-            shutil.copy2(os.path.join(dbp_testing.testsdir,
-                                      'emptyDB.sqlite'),
-                         testdb)
+            dbprocessing.DButils.create_tables(testdb)
             self.dbu = dbprocessing.DButils.DButils(testdb)
             mis = self.dbu.addMission('mission', td, td)
             sat = self.dbu.addSatellite('sat', mis)

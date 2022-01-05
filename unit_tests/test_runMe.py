@@ -363,12 +363,10 @@ class RunMeVersioningTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Make a copy of db and open it so have something to work with"""
         super(RunMeVersioningTests, self).setUp()
         self.td = tempfile.mkdtemp()
-        shutil.copy2(
-            os.path.join(os.path.dirname(__file__), 'emptyDB.sqlite'),
-            self.td)
+        testdb = os.path.join(self.td, 'emptyDB.sqlite')
+        dbprocessing.DButils.create_tables(testdb)
         self.addSkeletonMission()
-        self.dbu = dbprocessing.DButils.DButils(os.path.join(
-            self.td, 'emptyDB.sqlite'))
+        self.dbu = dbprocessing.DButils.DButils(testdb)
 
     def tearDown(self):
         """Remove the copy of db"""
