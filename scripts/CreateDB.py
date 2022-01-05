@@ -16,53 +16,31 @@ import os
 from sqlalchemy import schema, types
 from sqlalchemy.engine import create_engine
 
-from dbprocessing import DButils
+import dbprocessing.DButils
 import dbprocessing.tables
 
 
-class dbprocessing_db(object):
+def create_tables(filename='dbprocessing_default.db', dialect='sqlite'):
     """
-    Main workhorse class for the CreateDB module
+    Step through and create the DB structure, relationships and constraints
+
     """
+    # TODO move this out so that the user chooses the db type
+    if dialect == 'sqlite':
+        url = 'sqlite:///' + filename
+    elif dialect == 'postgresql':
+        url = dbprocessing.DButils.postgresql_url(filename)
+    else:
+        raise ValueError('Unknown dialect {}'.format(dialect))
 
-    def __init__(self, filename='dbprocessing_default.db', overwrite=False,
-                 create=True, dialect='sqlite'):
-        self.filename = filename
-        self.overwrite = overwrite
-        self.dialect = dialect
-        self.dbIsOpen = False
-        if create:
-            if os.path.isfile(filename) != True:
-                self.createDB()
-
-    def createDB(self):
-        """
-        Step through and create the DB structure, relationships and constraints
-
-        """
-        if self.overwrite:
-            raise NotImplementedError('overwrite is not yet implemented')
-
-        # TODO move this out so that the user chooses the db type
-        if self.dialect == 'sqlite':
-            url = 'sqlite:///' + self.filename
-        elif self.dialect == 'postgresql':
-            url = dbprocessing.DButils.postgresql_url(self.filename)
-        else:
-            raise ValueError('Unknown dialect {}'.format(self.dialect))
-
-        metadata = schema.MetaData()
-
-        for name in dbprocessing.tables.names:
-            data_table = schema.Table(
-                name, metadata, *dbprocessing.tables.definition(name))
-
-        engine = create_engine(url, echo=False)
-        metadata.bind = engine
-
-        metadata.create_all(checkfirst=True)
-        self.engine = engine
-        self.metadata = metadata
+    metadata = schema.MetaData()
+    for name in dbprocessing.tables.names:
+        data_table = schema.Table(
+            name, metadata, *dbprocessing.tables.definition(name))
+    engine = create_engine(url, echo=False)
+    metadata.bind = engine
+    metadata.create_all(checkfirst=True)
+    engine.dispose()
 
 
 if __name__ == "__main__":
@@ -81,4 +59,4 @@ if __name__ == "__main__":
         if os.path.isfile(filename):
             parser.error("file: {0} exists will not overwrite".format(filename))
 
-    db = dbprocessing_db(filename=filename, dialect=options.dialect)
+    db = create_tables(filename=filename, dialect=options.dialect)
