@@ -29,19 +29,6 @@ def remove_tmpfile(fname):
     os.remove(fname)
 
 
-class TestCreateTables(unittest.TestCase):
-    """Create the tables in a new DB"""
-
-    def test_create_tables(self):
-        td = tempfile.mkdtemp()
-        try:
-            working = os.path.join(td, 'emptyDB.sqlite')
-            DButils.create_tables(working)
-            dbu = DButils.DButils(working)
-            self.assertTrue(hasattr(dbu, 'File'))
-        finally:
-            shutil.rmtree(td)
-
 class TestSetupNoOpen(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """
     master class for the setup and teardown, without opening db
@@ -68,9 +55,25 @@ class TestSetup(TestSetupNoOpen):
         self.dbu = DButils.DButils(self.sqlworking)
 
 
-class DBUtilsEmptyTests(TestSetup):
+class DBUtilsEmptyTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """Tests on an empty database"""
-    dbfile = 'emptyDB.sqlite'
+
+    def setUp(self):
+        super(DBUtilsEmptyTests, self).setUp()
+        self.td = tempfile.mkdtemp()
+        self.sqlworking = os.path.join(self.td, 'working.sqlite')
+        DButils.create_tables(self.sqlworking)
+        self.dbu = DButils.DButils(self.sqlworking)
+
+    def tearDown(self):
+        super(DBUtilsEmptyTests, self).tearDown()
+        self.dbu.closeDB()
+        del self.dbu
+        shutil.rmtree(self.td)
+
+    def test_create_tables(self):
+        """Chunk check that table creation in setUp works."""
+        self.assertTrue(hasattr(self.dbu, 'File'))
 
     def test_empty_mission_dir(self):
         self.assertIsNone(self.dbu.getMissionDirectory())

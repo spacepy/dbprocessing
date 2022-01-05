@@ -29,10 +29,8 @@ class ProcessQueueTestsBase(unittest.TestCase, dbp_testing.AddtoDBMixin):
         if 'PGDATABASE' in os.environ:
             dbname = os.environ['PGDATABASE']
         else:
-            shutil.copy2(
-                os.path.join(os.path.dirname(__file__), 'emptyDB.sqlite'),
-                self.td)
             dbname = os.path.join(self.td, 'emptyDB.sqlite')
+            dbprocessing.DButils.create_tables(dbname)
 
         # Set up the baseline mission environment, BEFORE making processqueue
         self.addSkeletonMission()
