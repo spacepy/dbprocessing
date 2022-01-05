@@ -32,6 +32,8 @@ except NameError:
     str_classes = (str,)
 
 import sqlalchemy
+import sqlalchemy.engine
+import sqlalchemy.schema
 import sqlalchemy.sql.expression
 from sqlalchemy import Table
 from sqlalchemy.orm import mapper
@@ -2788,3 +2790,25 @@ class DButils(object):
                               .total_seconds())
             self.session.add(r)
         self.commitDB()
+
+
+def create_tables(filename='dbprocessing_default.db', dialect='sqlite'):
+    """
+    Step through and create the DB structure, relationships and constraints
+
+    """
+    if dialect == 'sqlite':
+        url = 'sqlite:///' + filename
+    elif dialect == 'postgresql':
+        url = postgresql_url(filename)
+    else:
+        raise ValueError('Unknown dialect {}'.format(dialect))
+
+    metadata = sqlalchemy.schema.MetaData()
+    for name in tables.names:
+        data_table = sqlalchemy.schema.Table(
+            name, metadata, *tables.definition(name))
+    engine = sqlalchemy.engine.create_engine(url, echo=False)
+    metadata.bind = engine
+    metadata.create_all(checkfirst=True)
+    engine.dispose()
