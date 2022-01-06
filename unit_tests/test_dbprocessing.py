@@ -26,11 +26,11 @@ class ProcessQueueTestsBase(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Make a db and open it so have something to work with"""
         super(ProcessQueueTestsBase, self).setUp()
         self.td = tempfile.mkdtemp()
-        if 'PGDATABASE' in os.environ:
-            dbname = os.environ['PGDATABASE']
-        else:
-            dbname = os.path.join(self.td, 'emptyDB.sqlite')
-            dbprocessing.DButils.create_tables(dbname)
+        self.pg = 'PGDATABASE' in os.environ
+        dbname = os.environ['PGDATABASE'] if self.pg\
+                 else os.path.join(self.td, 'emptyDB.sqlite')
+        dbprocessing.DButils.create_tables(
+            dbname, dialect = 'postgresql' if self.pg else 'sqlite')
 
         # Set up the baseline mission environment, BEFORE making processqueue
         self.addSkeletonMission()
@@ -41,11 +41,9 @@ class ProcessQueueTestsBase(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Remove the db and working tree"""
         # Unfortunately all the cleanup is in the destructor
         del self.pq
-        if 'PGDATABASE' in os.environ:
-            # Postgres database, remove all data from tables
-            for table in reversed(self.dbu.metadata.sorted_tables):
-                self.dbu.session.execute(table.delete())
-            self.dbu.session.commit() 
+        if self.pg:
+            self.dbu.session.close()
+            self.dbu.metadata.drop_all()
         self.dbu.closeDB() # Before the database is removed...
         del self.dbu
         shutil.rmtree(self.td)
