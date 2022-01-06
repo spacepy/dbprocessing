@@ -55,7 +55,7 @@ jobs:
        - run:
            command: |
              python3 unit_tests/test_all.py -v
-  createpostgres:
+  testpostgres:
     docker:
       - image: circleci/python:2.7
         auth:
@@ -68,12 +68,9 @@ jobs:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
     environment:
-      POSTGRES_USER: root
-      POSTGRES_DB: circle_test
-      POSTGRES_PASSWORD: ""
       PGPORT: 5432
       PGUSER: root
-      PGDATABASE: unhtesting
+      PGDATABASE: dbp_unittest
       PGPASSWORD: ""
       PGHOST: localhost
     steps:
@@ -84,11 +81,10 @@ jobs:
            command: |
              sudo apt update
              sudo apt install -y postgresql-client
-             createdb -h localhost unhtesting -O root
+             createdb -h localhost dbp_unittest -O root
              pip install --user psycopg2
-             python scripts/CreateDB.py --dialect postgresql unhtesting
-             python unit_tests/test_all.py
-  createpostgres3:
+             python unit_tests/test_all.py -v
+  testpostgres3:
     docker:
       - image: circleci/python:3.7
         auth:
@@ -101,12 +97,9 @@ jobs:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
     environment:
-      POSTGRES_USER: root
-      POSTGRES_DB: circle_test
-      POSTGRES_PASSWORD: ""
       PGPORT: 5432
       PGUSER: root
-      PGDATABASE: unhtesting
+      PGDATABASE: dbp_unittest
       PGPASSWORD: ""
       PGHOST: localhost
     steps:
@@ -117,9 +110,9 @@ jobs:
            command: |
              sudo apt update
              sudo apt install -y postgresql-client python3-pip
-             createdb -h localhost unhtesting -O root
+             createdb -h localhost dbp_unittest -O root
              pip3 install --user psycopg2
-             python3 scripts/CreateDBsabrs.py
+             python3 unit_tests/test_all.py -v
   docs:
     docker:
       - image: circleci/python:2.7
@@ -149,13 +142,13 @@ workflows:
      - unittest:
          requires:
            - build
-     - createpostgres:
+     - testpostgres:
          requires:
            - build
      - unittest3:
          requires:
            - build
-     - createpostgres3:
+     - testpostgres3:
          requires:
            - build
      - docs:
@@ -178,13 +171,13 @@ workflows:
      - unittest:
          requires:
            - build
-     - createpostgres:
+     - testpostgres:
          requires:
            - build
      - unittest3:
          requires:
            - build
-     - createpostgres3:
+     - testpostgres3:
          requires:
            - build
      - docs:
