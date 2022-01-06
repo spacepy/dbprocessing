@@ -38,8 +38,11 @@ class LinkUningestedTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """List files for product"""
         td = tempfile.mkdtemp()
         try:
-            testdb = os.path.join(td, 'emptyDB.sqlite')
-            dbprocessing.DButils.create_tables(testdb)
+            pg = 'PGDATABASE' in os.environ
+            testdb = os.environ['PGDATABASE'] if pg\
+                     else os.path.join(td, 'emptyDB.sqlite')
+            dbprocessing.DButils.create_tables(
+                testdb, dialect = 'postgresql' if pg else 'sqlite')
             self.dbu = dbprocessing.DButils.DButils(testdb)
             mis = self.dbu.addMission('mission', td, td)
             sat = self.dbu.addSatellite('sat', mis)
@@ -63,6 +66,9 @@ class LinkUningestedTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
             res2 = linkUningested.list_files(self.dbu, p2)
         finally:
             try:
+                if pg:
+                    self.dbu.session.close()
+                    self.dbu.metadata.drop_all()
                 self.dbu.closeDB()
                 del self.dbu
             except:

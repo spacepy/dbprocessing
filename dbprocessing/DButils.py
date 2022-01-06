@@ -3664,7 +3664,7 @@ class DButils(object):
             ("Entered updateCodeNewestVersion: code_id={0}, is_newest={1}"\
              .format(code_id, is_newest))
         code = self.getEntry('Code', code_id)
-        code.newest_version = code.active_code = int(bool(is_newest))
+        code.newest_version = code.active_code = bool(is_newest)
         self.commitDB()
 
     def editTable(self, table, my_id, column, my_str=None, after_flag=None,
