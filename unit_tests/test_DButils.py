@@ -61,12 +61,18 @@ class DBUtilsEmptyTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     def setUp(self):
         super(DBUtilsEmptyTests, self).setUp()
         self.td = tempfile.mkdtemp()
-        self.sqlworking = os.path.join(self.td, 'working.sqlite')
-        DButils.create_tables(self.sqlworking)
-        self.dbu = DButils.DButils(self.sqlworking)
+        self.pg = 'PGDATABASE' in os.environ
+        self.dbname = os.environ.get(
+            'PGDATABASE',  os.path.join(self.td, 'working.sqlite'))
+        DButils.create_tables(self.dbname,
+                              dialect = 'postgresql' if self.pg else 'sqlite')
+        self.dbu = DButils.DButils(self.dbname)
 
     def tearDown(self):
         super(DBUtilsEmptyTests, self).tearDown()
+        if self.pg:
+            self.dbu.session.close()
+            self.dbu.metadata.drop_all()
         self.dbu.closeDB()
         del self.dbu
         shutil.rmtree(self.td)
@@ -94,7 +100,7 @@ class DBUtilsEmptyTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         # differently with this different add.
         # Reload the mission
         self.dbu.closeDB()
-        self.dbu = DButils.DButils(self.sqlworking)
+        self.dbu = DButils.DButils(self.dbname)
         self.assertEqual('/rootdir', self.dbu.getCodeDirectory())
         self.assertEqual('/rootdir/errors', self.dbu.getErrorPath())
         self.assertEqual('/rootdir', self.dbu.getInspectorDirectory())
@@ -108,6 +114,20 @@ class DBUtilsEmptyTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         pid = self.dbu.addProcess('no_output2', None, 'RUN')
         self.assertIsNone(self.dbu.getEntry('Process', pid).output_product)
         # Verify product ID of zero isn't smashed
+        # Need to create explicit product ID 0, since auto-inc starts at 1
+        mission = self.dbu.addMission('mission', '/', '/incoming')
+        sat = self.dbu.addSatellite('sat', mission)
+        inst = self.dbu.addInstrument('inst', sat)
+        prod = self.dbu.Product()
+        prod.product_id = 0
+        prod.instrument_id = inst
+        prod.product_name = 'product0'
+        prod.relative_path = 'data'
+        prod.format = 'foo.txt'
+        prod.level = 1.
+        prod.description = 'product zero'
+        self.dbu.session.add(prod)
+        self.dbu.commitDB()
         pid = self.dbu.addProcess('output_pid_zero', 0, 'DAILY')
         self.assertEqual(0, self.dbu.getEntry('Process', pid).output_product)
 

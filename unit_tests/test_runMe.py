@@ -363,13 +363,19 @@ class RunMeVersioningTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Make a copy of db and open it so have something to work with"""
         super(RunMeVersioningTests, self).setUp()
         self.td = tempfile.mkdtemp()
-        testdb = os.path.join(self.td, 'emptyDB.sqlite')
-        dbprocessing.DButils.create_tables(testdb)
+        self.pg = 'PGDATABASE' in os.environ
+        testdb = os.environ['PGDATABASE'] if self.pg\
+                 else os.path.join(self.td, 'emptyDB.sqlite')
+        dbprocessing.DButils.create_tables(
+            testdb, dialect = 'postgresql' if self.pg else 'sqlite')
         self.addSkeletonMission()
         self.dbu = dbprocessing.DButils.DButils(testdb)
 
     def tearDown(self):
         """Remove the copy of db"""
+        if self.pg:
+            self.dbu.session.close()
+            self.dbu.metadata.drop_all()
         self.dbu.closeDB()
         del self.dbu
         shutil.rmtree(self.td)
