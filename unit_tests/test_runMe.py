@@ -364,12 +364,12 @@ class RunMeVersioningTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         super(RunMeVersioningTests, self).setUp()
         self.td = tempfile.mkdtemp()
         self.pg = 'PGDATABASE' in os.environ
-        testdb = os.environ['PGDATABASE'] if self.pg\
-                 else os.path.join(self.td, 'emptyDB.sqlite')
+        self.dbname = os.environ['PGDATABASE'] if self.pg\
+            else os.path.join(self.td, 'emptyDB.sqlite')
         dbprocessing.DButils.create_tables(
-            testdb, dialect = 'postgresql' if self.pg else 'sqlite')
+            self.dbname, dialect = 'postgresql' if self.pg else 'sqlite')
         self.addSkeletonMission()
-        self.dbu = dbprocessing.DButils.DButils(testdb)
+        self.dbu = dbprocessing.DButils.DButils(self.dbname)
 
     def tearDown(self):
         """Remove the copy of db"""

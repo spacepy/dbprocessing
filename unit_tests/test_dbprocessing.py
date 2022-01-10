@@ -27,14 +27,14 @@ class ProcessQueueTestsBase(unittest.TestCase, dbp_testing.AddtoDBMixin):
         super(ProcessQueueTestsBase, self).setUp()
         self.td = tempfile.mkdtemp()
         self.pg = 'PGDATABASE' in os.environ
-        dbname = os.environ['PGDATABASE'] if self.pg\
-                 else os.path.join(self.td, 'emptyDB.sqlite')
+        self.dbname = os.environ['PGDATABASE'] if self.pg\
+            else os.path.join(self.td, 'emptyDB.sqlite')
         dbprocessing.DButils.create_tables(
-            dbname, dialect = 'postgresql' if self.pg else 'sqlite')
+            self.dbname, dialect = 'postgresql' if self.pg else 'sqlite')
 
         # Set up the baseline mission environment, BEFORE making processqueue
         self.addSkeletonMission()
-        self.pq = dbprocessing.dbprocessing.ProcessQueue(dbname)
+        self.pq = dbprocessing.dbprocessing.ProcessQueue(self.dbname)
         self.dbu = self.pq.dbu
 
     def tearDown(self):

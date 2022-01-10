@@ -140,13 +140,11 @@ class AddtoDBMixin(object):
         Makes one mission, one satellite, and two instruments
 
         Assumes self.td has the test/temp directory path (str),
-        will populate self.instrument_ids for a list of instruments.
+        and self.dbname has the name of the database (including full
+        path if sqlite).
+        Will populate self.instrument_ids for a list of instruments.
         """
-        if os.path.exists(os.path.join(self.td, 'emptyDB.sqlite')):
-            dbu = dbprocessing.DButils.DButils(os.path.join(
-                self.td, 'emptyDB.sqlite'))
-        else:  # No sqlite database, must be using postgres
-            dbu = dbprocessing.DButils.DButils(os.environ['PGDATABASE'])
+        dbu = dbprocessing.DButils.DButils(self.dbname)
         if dbu.session.query(sqlalchemy.func.count(
                 dbu.Mission.mission_id)).scalar():
             raise RuntimeError('Unit test database is not empty!')
