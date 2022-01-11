@@ -3,8 +3,8 @@ from __future__ import print_function
 
 import unittest
 
+import dbp_testing
 from dbprocessing import DBqueue
-
 
 
 class DBqueueTests(unittest.TestCase):

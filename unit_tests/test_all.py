@@ -5,10 +5,7 @@
 import os
 import os.path
 
-#The log is opened on import, so need to quarantine the log directory
-#right away
-os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
-                                                  'unittestlogs')
+
 from test_addFromConfig import *
 from test_CreateDB import *
 from test_dbprocessing import *
