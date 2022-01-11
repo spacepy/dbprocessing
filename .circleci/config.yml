@@ -2,7 +2,7 @@ version: 2.1
 
 
 jobs:
-  build:
+  deps:
     docker:
       - image: circleci/python:2.7
         auth:
@@ -18,17 +18,14 @@ jobs:
            command: |
              pip install --user sqlalchemy
              pip install --user python-dateutil
-             python setup.py install --user
              sudo apt update
              sudo apt install python3-pip
              pip3 install --user sqlalchemy
              pip3 install --user python-dateutil
-             rm -rf build/
-             python3 setup.py install --user
        - persist_to_workspace:
            root: ~/.local
            paths:
-             - lib # Save installed Python libraries (including dbp itself)
+             - lib # Save installed Python libraries
   unittest:
     docker:
       - image: circleci/python:2.7
@@ -41,6 +38,7 @@ jobs:
            at: ~/.local
        - run:
            command: |
+             python setup.py build
              python unit_tests/test_all.py -v
   unittest3:
     docker:
@@ -54,6 +52,7 @@ jobs:
            at: ~/.local
        - run:
            command: |
+             python3 setup.py build
              python3 unit_tests/test_all.py -v
   testpostgres:
     docker:
@@ -83,6 +82,7 @@ jobs:
              sudo apt install -y postgresql-client
              createdb -h localhost dbp_unittest -O root
              pip install --user psycopg2
+             python setup.py build
              python unit_tests/test_all.py -v
   testpostgres3:
     docker:
@@ -112,6 +112,7 @@ jobs:
              sudo apt install -y postgresql-client python3-pip
              createdb -h localhost dbp_unittest -O root
              pip3 install --user psycopg2
+             python3 setup.py build
              python3 unit_tests/test_all.py -v
   docs:
     docker:
@@ -131,6 +132,7 @@ jobs:
              pip install --user "docutils<0.16"
              pip install --user sphinx numpy
              pip install --user numpydoc
+             python setup.py build
              make -C sphinx html | tee doc_output.txt
              # Fail (return nonzero) if there are warnings in output.
              ! grep -e "^build succeeded.*warning.*$" < doc_output.txt
@@ -138,22 +140,22 @@ jobs:
 workflows:
   main:
     jobs:
-     - build
+     - deps
      - unittest:
          requires:
-           - build
+           - deps
      - testpostgres:
          requires:
-           - build
+           - deps
      - unittest3:
          requires:
-           - build
+           - deps
      - testpostgres3:
          requires:
-           - build
+           - deps
      - docs:
          requires:
-           - build
+           - deps
 
 # Schedule disables other triggers; nightly identical to main except
 # triggers and branch restriction
@@ -167,19 +169,19 @@ workflows:
                 - master
                 - main
     jobs:
-     - build
+     - deps
      - unittest:
          requires:
-           - build
+           - deps
      - testpostgres:
          requires:
-           - build
+           - deps
      - unittest3:
          requires:
-           - build
+           - deps
      - testpostgres3:
          requires:
-           - build
+           - deps
      - docs:
          requires:
-           - build
+           - deps
