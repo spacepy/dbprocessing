@@ -8,6 +8,7 @@ import shutil
 import stat
 import unittest
 
+import dbp_testing
 from dbprocessing import DButils
 from dbprocessing import Diskfile
 from dbprocessing.Diskfile import FilenameError

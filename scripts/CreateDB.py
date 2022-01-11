@@ -7,14 +7,23 @@ import os
 import dbprocessing.DButils
 
 
-if __name__ == "__main__":
+def main(argv=None):
+    """Parse arguments and create tables
+
+    Parameters
+    ----------
+    argv : :class:`list`, optional
+        Command line arguments passed to
+        :meth:`~argparse.ArgumentParser.parse_args`. Default ``None``,
+        i.e. use :data:`sys.argv`.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--dialect", dest="dialect", default='sqlite',
                         help="sqlalchemy dialect (sqlite or postgresql)")
     parser.add_argument('dbname', action='store', type=str,
                         help='Name of database (or sqlite file) to create.')
 
-    options = parser.parse_args()
+    options = parser.parse_args(argv)
 
     filename = options.dbname
     if options.dialect == 'sqlite':
@@ -24,3 +33,7 @@ if __name__ == "__main__":
 
     db = dbprocessing.DButils.create_tables(
         filename=filename, dialect=options.dialect)
+
+
+if __name__ == "__main__":
+    main()

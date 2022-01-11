@@ -22,7 +22,9 @@ scripts = ('scripts/addFromConfig.py', 'scripts/missingFilesByProduct.py',
            'scripts/htmlCoverage.py', 'scripts/updateSHAsum.py',
            'scripts/makeLatestSymlinks.py', 'scripts/testInspector.py',
            'scripts/replaceArgsWithRootdir.py', 'scripts/printRequired.py',
-           'scripts/changeProductDir.py', 'scripts/compareDB.py')
+           'scripts/changeProductDir.py', 'scripts/compareDB.py',
+           'scripts/linkUningested.py'
+)
 
 setup(name='dbprocessing',
       version='0.0',

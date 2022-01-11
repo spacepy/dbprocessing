@@ -2,14 +2,15 @@
 
 """Helper functions for dbprocessing unit tests
 
-Simply importing this will redirect the logs, so import before importing
-any dbprocessing modules.
+Simply importing this will redirect the logs and change pathing, so import
+before importing any dbprocessing modules.
 """
 
 import datetime
 import os
 import os.path
 import sys
+import sysconfig
 
 import sqlalchemy
 
@@ -18,13 +19,42 @@ import sqlalchemy
 os.environ['DBPROCESSING_LOG_DIR'] = os.path.join(os.path.dirname(__file__),
                                                   'unittestlogs')
 
+
+testsdir = os.path.dirname(__file__)  # Used by add_build_to_path
+
+
+# Define this before using it for importing dbprocessing modules...
+def add_build_to_path():
+    """Adds the python build directory to the search path.
+
+    Locates the build directory in the same repository as this test module
+    and adds the (version-specific) library directories to the Python
+    module search path, so the unit tests can be run against the built
+    instead of installed version.
+
+    This is run on import of this module.
+    """
+    # Prioritize version-specific path; py2 tends to be version-specific
+    # and py3 tends to use just "lib". But only use first-matching.
+    for pth in ('lib',  # Prepending, so add low-priority paths first.
+                'lib.{0}-{1}.{2}'.format(sysconfig.get_platform(),
+                                         *sys.version_info[:2]),
+                ):
+        buildpath = os.path.abspath(os.path.join(testsdir, '..', 'build', pth))
+        if os.path.isdir(buildpath):
+            if not buildpath in sys.path:
+                sys.path.insert(0, buildpath)
+            break
+
+
+# Get the "build" version of dbp for definitions in this module.
+add_build_to_path()
 import dbprocessing.DButils
 import dbprocessing.Version
 
-__all__ = ['AddtoDBMixin', 'add_scripts_to_path', 'testsdir']
 
-
-testsdir = os.path.dirname(__file__)
+__all__ = ['AddtoDBMixin', 'add_build_to_path', 'add_scripts_to_path',
+           'testsdir']
 
 
 class AddtoDBMixin(object):
@@ -165,11 +195,11 @@ class AddtoDBMixin(object):
 
 
 def add_scripts_to_path():
-    """Add the script source directory to Python path
+    """Add the script build directory to Python path
 
     This allows unit testing of scripts.
     """
     scriptpath = os.path.abspath(os.path.join(
-        testsdir, '..', 'scripts'))
+        testsdir, '..', 'build', 'scripts-{}.{}'.format(*sys.version_info[:2])))
     if not scriptpath in sys.path and os.path.isdir(scriptpath):
         sys.path.insert(0, scriptpath)

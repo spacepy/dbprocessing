@@ -19,6 +19,9 @@ To check test coverage (i.e., how many lines of code are actually hit by the tes
 
 Of course, instead of ``test_all.py``, you can specify the name of the module you want to test.
 
+Unit tests use the version of dbprocessing modules in the ``build`` directory,
+i.e. run ``python setup.py build`` before running the unit tests.
+
 .. _functional:
 
 Functional Tests
@@ -33,3 +36,4 @@ Level 2 files are rot13’d versions of the level 1 files, and are stored in tes
 
 ``testDB/scripts/runThisThing.sh`` will execute the needed scripts to run the entire dbprocessing chain.
 
+The functional test uses the installed version of dbprocessing.
