@@ -9,8 +9,10 @@ before importing any dbprocessing modules.
 import datetime
 import os
 import os.path
+import shutil
 import sys
 import sysconfig
+import tempfile
 
 import sqlalchemy
 
@@ -192,6 +194,36 @@ class AddtoDBMixin(object):
                               satellite_id=satellite_id)
             for i in range(1, 3)]
         del dbu
+
+    def makeTestDB(self):
+        """Create a test database and working directory
+
+        Creates two attributes:
+            * self.td: a temporary directory
+            * self.pg: is the database postgres (if False, sqlite)
+            * self.dbname: name of database (sqlite path or postgresql db)
+
+        Does not open the database
+        """
+        self.td = tempfile.mkdtemp()
+        self.pg = 'PGDATABASE' in os.environ
+        self.dbname = os.environ['PGDATABASE'] if self.pg\
+            else os.path.join(self.td, 'emptyDB.sqlite')
+        dbprocessing.DButils.create_tables(
+            self.dbname, dialect = 'postgresql' if self.pg else 'sqlite')
+
+    def removeTestDB(self):
+        """Remove test database and working directory
+
+        Assumes has a working (open) DBUtils instance in self.dbu, which
+        will be closed.
+        """
+        if self.pg:
+            self.dbu.session.close()
+            self.dbu.metadata.drop_all()
+        self.dbu.closeDB() # Before the database is removed...
+        del self.dbu
+        shutil.rmtree(self.td)
 
 
 def add_scripts_to_path():

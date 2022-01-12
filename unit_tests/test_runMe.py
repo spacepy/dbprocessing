@@ -360,25 +360,15 @@ class RunMeVersioningTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """Tests calculation of data versions"""
 
     def setUp(self):
-        """Make a copy of db and open it so have something to work with"""
+        """Make a db and open it so have something to work with"""
         super(RunMeVersioningTests, self).setUp()
-        self.td = tempfile.mkdtemp()
-        self.pg = 'PGDATABASE' in os.environ
-        self.dbname = os.environ['PGDATABASE'] if self.pg\
-            else os.path.join(self.td, 'emptyDB.sqlite')
-        dbprocessing.DButils.create_tables(
-            self.dbname, dialect = 'postgresql' if self.pg else 'sqlite')
+        self.makeTestDB()
         self.addSkeletonMission()
         self.dbu = dbprocessing.DButils.DButils(self.dbname)
 
     def tearDown(self):
-        """Remove the copy of db"""
-        if self.pg:
-            self.dbu.session.close()
-            self.dbu.metadata.drop_all()
-        self.dbu.closeDB()
-        del self.dbu
-        shutil.rmtree(self.td)
+        """Remove the db"""
+        self.removeTestDB()
         super(RunMeVersioningTests, self).tearDown()
 
     def testCodeInterfaceBump(self):
