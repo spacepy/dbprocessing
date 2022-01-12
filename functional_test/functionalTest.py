@@ -64,16 +64,17 @@ class FunctionalTest(object):
                         os.path.join(self.tmpdir, d))
         shutil.copytree(os.path.join(self.checkout, 'functional_test', 'L0'),
                         os.path.join(self.tmpdir, 'incoming'))
-        self.execute('CreateDB.py', 'testDB.sqlite')
-        self.execute('addFromConfig.py', '-m', 'testDB.sqlite',
+        self.dbname = os.path.join(self.tmpdir, 'testDB.sqlite')
+        self.execute('CreateDB.py', self.dbname)
+        self.execute('addFromConfig.py', '-m', self.dbname,
                      os.path.join(self.checkout, 'functional_test', 'config',
                                   'testDB.conf'))
 
     def ingest_and_process(self):
         """Run ProcessQueue -i and -p"""
-        self.execute('ProcessQueue.py', '-i', '-m', 'testDB.sqlite')
+        self.execute('ProcessQueue.py', '-i', '-m', self.dbname)
         self.execute('ProcessQueue.py', '-p', '--num-proc', '1',
-                     '-m', 'testDB.sqlite')
+                     '-m', self.dbname)
 
     def error_check(self):
         """Check for errors in the logs"""
