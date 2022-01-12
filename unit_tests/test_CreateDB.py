@@ -18,9 +18,15 @@ class CreateDBTests(unittest.TestCase):
     def test1(self):
         td = tempfile.mkdtemp()
         try:
-            testfile = os.path.join(td, 'test.sqlite')
-            CreateDB.main([testfile])
-            dbu = DButils.DButils(testfile)
+            pg = 'PGDATABASE' in os.environ
+            testdb = os.environ['PGDATABASE'] if pg\
+                else os.path.join(td, 'emptyDB.sqlite')
+            argv = (['--dialect', 'postgresql'] if pg else []) + [testdb]
+            CreateDB.main(argv)
+            dbu = DButils.DButils(testdb)
+            if pg:
+                dbu.session.close()
+                dbu.metadata.drop_all()
             del dbu
         finally:
             shutil.rmtree(td)
