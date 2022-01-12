@@ -36,44 +36,32 @@ class LinkUningestedTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
 
     def test_list_files(self):
         """List files for product"""
-        td = tempfile.mkdtemp()
+        self.makeTestDB()
         try:
-            pg = 'PGDATABASE' in os.environ
-            testdb = os.environ['PGDATABASE'] if pg\
-                     else os.path.join(td, 'emptyDB.sqlite')
-            dbprocessing.DButils.create_tables(
-                testdb, dialect = 'postgresql' if pg else 'sqlite')
-            self.dbu = dbprocessing.DButils.DButils(testdb)
-            mis = self.dbu.addMission('mission', td, td)
+            self.dbu = dbprocessing.DButils.DButils(self.dbname)
+            mis = self.dbu.addMission('mission', self.td, self.td)
             sat = self.dbu.addSatellite('sat', mis)
             self.dbu.addInstrument('inst', sat)
             p1 = self.addProduct('product1',
                                  format='{PRODUCT}/{Y}/prod1{Y}{m}{d}.txt')
             p2 = self.addProduct('product2', format='prod2{Y}{m}{d}.txt')
-            os.makedirs(os.path.join(td, 'junk', 'product1', '2000'))
+            os.makedirs(os.path.join(self.td, 'junk', 'product1', '2000'))
             open(os.path.join(
-                td, 'junk', 'product1', '2000', 'prod120000101.txt'), 'w')\
-                .close()
+                self.td, 'junk', 'product1', '2000', 'prod120000101.txt'),
+                 'w').close()
             open(os.path.join(
-                td, 'junk', 'product1', '2000', 'prod120000102.txt'), 'w')\
-                .close()
+                self.td, 'junk', 'product1', '2000', 'prod120000102.txt'),
+                 'w').close()
             open(os.path.join(
-                td, 'junk', 'product1', '2000', 'somethingelse.txt'), 'w')\
-                .close()
-            open(os.path.join(td, 'junk', 'prod219990501.txt'), 'w').close()
-            open(os.path.join(td, 'junk', 'another.txt'), 'w').close()
+                self.td, 'junk', 'product1', '2000', 'somethingelse.txt'),
+                 'w').close()
+            open(os.path.join(self.td, 'junk', 'prod219990501.txt'),
+                 'w').close()
+            open(os.path.join(self.td, 'junk', 'another.txt'), 'w').close()
             res1 = linkUningested.list_files(self.dbu, p1)
             res2 = linkUningested.list_files(self.dbu, p2)
         finally:
-            try:
-                if pg:
-                    self.dbu.session.close()
-                    self.dbu.metadata.drop_all()
-                self.dbu.closeDB()
-                del self.dbu
-            except:
-                pass
-            shutil.rmtree(td)
+            self.removeTestDB()
         self.assertEqual(
             [os.path.join('junk', 'product1', '2000', 'prod12000010{}.txt'
                           .format(i))
