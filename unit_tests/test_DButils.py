@@ -1351,20 +1351,21 @@ class TestWithtestDB(unittest.TestCase):
 
     def setUp(self):
         super(TestWithtestDB, self).setUp()
-        self.tempD = tempfile.mkdtemp()
+        self.td = tempfile.mkdtemp()
         self.path = os.path.dirname(os.path.realpath(__file__))
 
-        copy_tree(self.path + '/../functional_test/', self.tempD)
-        self.dbu = DButils.DButils(self.tempD + '/testDB.sqlite')
-        self.dbu.getEntry('Mission', 1).rootdir = self.tempD  # Set the mission's dir to the tmp so we can work with it
+        copy_tree(self.path + '/../functional_test/', self.td)
+        self.dbname = os.path.join(self.td, 'testDB.sqlite')
+        self.dbu = DButils.DButils(self.dbname)
+        self.dbu.getEntry('Mission', 1).rootdir = self.td  # Set the mission's dir to the tmp so we can work with it
         self.dbu.commitDB()
-        self.dbu.MissionDirectory = self.tempD
+        self.dbu.MissionDirectory = self.td
 
     def tearDown(self):
         super(TestWithtestDB, self).tearDown()
         self.dbu.closeDB()
-        # print(self.tempD)
-        remove_tree(self.tempD)
+        # print(self.td)
+        remove_tree(self.td)
 
     def test_checkDiskForFile_DBTrue_FileTrue(self):
         """Check file in database exists on disk"""
@@ -1372,12 +1373,12 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_checkDiskForFile_DBTrue_FileFalse_FixTrue(self):
         """Check consistency between FS and DB, correct DB"""
-        os.remove(self.tempD + '/L0/testDB_001_001.raw')
+        os.remove(self.td + '/L0/testDB_001_001.raw')
         self.assertTrue(self.dbu.checkDiskForFile(1, True))
 
     def test_checkDiskForFile_DBTrue_FileFalse(self):
         """checkDiskForFile returns false if the file in DB does not exist"""
-        os.remove(self.tempD + '/L0/testDB_001_001.raw')
+        os.remove(self.td + '/L0/testDB_001_001.raw')
         self.assertFalse(self.dbu.checkDiskForFile(1))
 
     def test_checkDiskForFile_DBFalse_FileTrue(self):
@@ -1390,15 +1391,15 @@ class TestWithtestDB(unittest.TestCase):
         file_id = self.dbu.getFileID("testDB_001_001.raw")
         self.assertTrue(self.dbu.checkFileSHA(file_id))
 
-        with open(self.tempD + '/L0/testDB_001_001.raw', 'w') as fp:
+        with open(self.td + '/L0/testDB_001_001.raw', 'w') as fp:
             fp.write('I am some text that will change the SHA\n')
         self.assertFalse(self.dbu.checkFileSHA(file_id))
 
     def test_checkFiles(self):
         """Checks if checkFiles will detect both missing files and bad checksums"""
-        with open(self.tempD + '/L0/testDB_001_000.raw', 'w') as fp:
+        with open(self.td + '/L0/testDB_001_000.raw', 'w') as fp:
             fp.write('I am some text that will change the SHA\n')
-        os.remove(self.tempD + '/L0/testDB_000_000.raw')
+        os.remove(self.td + '/L0/testDB_000_000.raw')
 
         ans = [('testDB_001_000.raw', 1), ('testDB_000_000.raw', 2)]
         self.assertEqual(ans, self.dbu.checkFiles())
@@ -1794,7 +1795,7 @@ class TestWithtestDB(unittest.TestCase):
         self.assertEqual(ans, set(self.dbu.list_release(1, fullpath=False)))
         # Test additional release options
         self.dbu.addRelease('testDB_2016-01-01.cat', 2, commit=True)
-        self.assertEqual([self.tempD + '/L1/testDB_2016-01-01.cat'], self.dbu.list_release(2, fullpath=True))
+        self.assertEqual([self.td + '/L1/testDB_2016-01-01.cat'], self.dbu.list_release(2, fullpath=True))
 
     def test_getAllFilenames_all(self):
         """getAllFilenames should return all files in the db when passed no filters"""
@@ -1900,7 +1901,7 @@ class TestWithtestDB(unittest.TestCase):
         """getAllFilenames should return the fullPath"""
         out = self.dbu.getAllFilenames()
 
-        self.assertTrue(all([self.tempD in v for v in out]))
+        self.assertTrue(all([self.td in v for v in out]))
 
     def test_getChildTreeNoOutput(self):
         """getChildTree for processes w/o output"""

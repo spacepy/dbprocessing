@@ -31,15 +31,16 @@ class UtilsTests(unittest.TestCase):
         # Not changing the DB now but use a copy anyway
         # Would need to at least update DB path if we wanted to
         # do more than vanilla dirSubs
-        self.tempD = tempfile.mkdtemp()
-        copy_tree(os.path.join(os.path.dirname(__file__), '..', 'functional_test'), self.tempD)
+        self.td = tempfile.mkdtemp()
+        copy_tree(os.path.join(os.path.dirname(__file__), '..', 'functional_test'), self.td)
 
-        self.dbu = DButils.DButils(os.path.join(self.tempD, 'testDB.sqlite'))
+        self.dbname = os.path.join(self.td, 'testDB.sqlite')
+        self.dbu = DButils.DButils(self.dbname)
 
     def tearDown(self):
         super(UtilsTests, self).tearDown()
         self.dbu.closeDB()
-        remove_tree(self.tempD)
+        remove_tree(self.td)
 
     def test_dirSubs(self):
         """dirSubs substitutions should work"""
