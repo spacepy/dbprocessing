@@ -60,18 +60,18 @@ class InspectorClass(unittest.TestCase):
         # These tests shouldn't change the DB but use a copy anyway
         # Would need to at least update DB path if we wanted to
         # use DB
-        self.tempD = tempfile.mkdtemp()
+        self.td = tempfile.mkdtemp()
         copy_tree(os.path.join(
-            dbp_testing.testsdir, '..', 'functional_test'), self.tempD)
-
-        self.dbu = DButils.DButils(os.path.join(self.tempD, 'testDB.sqlite'))
+            dbp_testing.testsdir, '..', 'functional_test'), self.td)
+        self.dbname = os.path.join(self.td, 'testDB.sqlite')
+        self.dbu = DButils.DButils(self.dbname)
         self.inspect = imp.load_source('inspect', os.path.join(
             dbp_testing.testsdir, 'inspector', 'rot13_L1.py'))
 
     def tearDown(self):
         super(InspectorClass, self).tearDown()
         self.dbu.closeDB()
-        remove_tree(self.tempD)
+        remove_tree(self.td)
 
     def test_inspector(self):
         """Test inspector class"""
@@ -119,7 +119,7 @@ class InspectorClass(unittest.TestCase):
                 last['kwargs'] = kwargs
                 type(self).last = last
                 return None
-        fspec = os.path.join(self.tempD, 'testDB_2016-01-01.cat')
+        fspec = os.path.join(self.td, 'testDB_2016-01-01.cat')
         open(fspec, 'w').close()
         testi(fspec, self.dbu, 1)
         last = testi.last
