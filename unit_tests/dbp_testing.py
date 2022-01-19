@@ -213,7 +213,7 @@ class AddtoDBMixin(object):
         self.td = tempfile.mkdtemp()
         self.pg = 'PGDATABASE' in os.environ
         self.dbname = os.environ['PGDATABASE'] if self.pg\
-            else os.path.join(self.td, 'emptyDB.sqlite')
+            else os.path.join(self.td, 'testDB.sqlite')
         dbprocessing.DButils.create_tables(
             self.dbname, dialect = 'postgresql' if self.pg else 'sqlite')
 
