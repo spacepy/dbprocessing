@@ -3,9 +3,9 @@ from __future__ import print_function
 
 import datetime
 import unittest
-from distutils.dir_util import copy_tree, remove_tree
 import os
 import os.path
+import shutil
 import tempfile
 
 import dbp_testing
@@ -20,8 +20,14 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     def setUp(self):
         super(DBfileTests, self).setUp()
         self.makeTestDB()
-        copy_tree(os.path.join(dbp_testing.testsdir, '..', 'functional_test'), self.td)
-        copy_tree(os.path.join(dbp_testing.testsdir, 'tars'), self.td)
+        sourcepath = os.path.join(dbp_testing.testsdir, '..', 'functional_test')
+        for f in os.listdir(sourcepath):
+            sourcedir = os.path.join(sourcepath, f)
+            if os.path.isdir(sourcedir):
+                shutil.copytree(sourcedir, os.path.join(self.td, f))
+        sourcepath = os.path.join(dbp_testing.testsdir, 'tars')
+        for f in os.listdir(sourcepath):
+            shutil.copy2(os.path.join(sourcepath, f), os.path.join(self.td, f))
         self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
                                    'testDB_dump.json'))
         #Update the mission path to the tmp dir
@@ -95,7 +101,7 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
             fp.write('I am some test data\n')
         dbf = self.createDummyDBF('/file.file')
 
-        remove_tree(self.td+'/L1')
+        shutil.rmtree(os.path.join(self.td, 'L1'))
 
         real_ans = (self.td + '/file.file', self.td + '/L1/file.file')
         self.assertFalse(os.path.isdir(self.td + '/L1'))
@@ -106,7 +112,7 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Test moving a valid .tgz file"""
         dbf = self.createDummyDBF('/goodtar.tgz')
 
-        remove_tree(self.td + '/L1')
+        shutil.rmtree(os.path.join(self.td, 'L1'))
         real_ans = (self.td + '/goodtar.tgz', self.td + '/L1/goodtar.tgz')
         self.assertFalse(os.path.isdir(os.path.join(self.td, 'L1')))
         self.assertEqual(real_ans, dbf.move())
@@ -119,7 +125,7 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Test moving a corrupted .tgz file"""
         dbf = self.createDummyDBF('/badtar.tgz')
 
-        remove_tree(self.td + '/L1')
+        shutil.rmtree(os.path.join(self.td, 'L1'))
         real_ans = (self.td + '/badtar.tgz', self.td + '/L1/badtar.tgz')
         self.assertFalse(os.path.isdir(os.path.join(self.td, 'L1')))
         # Method return may not be helpful but this is it for now
@@ -130,7 +136,7 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Test moving an empty .tgz file"""
         dbf = self.createDummyDBF('/emptytar.tgz')
 
-        remove_tree(self.td + '/L1')
+        shutil.rmtree(os.path.join(self.td, 'L1'))
         real_ans = (self.td + '/emptytar.tgz', self.td + '/L1/emptytar.tgz')
         self.assertFalse(os.path.isdir(os.path.join(self.td, 'L1')))
         # Method return may not be helpful but this is it for now

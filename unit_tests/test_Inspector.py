@@ -3,7 +3,6 @@ from __future__ import print_function
 
 import datetime
 import unittest
-from distutils.dir_util import copy_tree
 import tempfile
 import imp
 import warnings
@@ -58,8 +57,6 @@ class InspectorClass(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Makes a copy of the DB to run tests on without altering the original."""
         super(InspectorClass, self).setUp()
         self.makeTestDB()
-        copy_tree(os.path.join(
-            dbp_testing.testsdir, '..', 'functional_test'), self.td)
         self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
                                    'testDB_dump.json'))
         self.inspect = imp.load_source('inspect', os.path.join(
