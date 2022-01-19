@@ -9,7 +9,6 @@ import sqlite3
 import stat
 import tempfile
 import unittest
-from distutils.dir_util import copy_tree, remove_tree
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -1352,8 +1351,11 @@ class TestWithtestDB(unittest.TestCase, dbp_testing.AddtoDBMixin):
     def setUp(self):
         super(TestWithtestDB, self).setUp()
         self.makeTestDB()
-        copy_tree(os.path.join(dbp_testing.testsdir, '..', 'functional_test'),
-                  self.td)
+        sourcepath = os.path.join(dbp_testing.testsdir, '..', 'functional_test')
+        for f in os.listdir(sourcepath):
+            sourcedir = os.path.join(sourcepath, f)
+            if os.path.isdir(sourcedir):
+                shutil.copytree(sourcedir, os.path.join(self.td, f))
         self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
                                    'testDB_dump.json'))
         self.dbu.getEntry('Mission', 1).rootdir = self.td  # Set the mission's dir to the tmp so we can work with it

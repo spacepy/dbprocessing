@@ -2,7 +2,6 @@
 from __future__ import print_function
 
 import datetime
-from distutils.dir_util import copy_tree
 import os
 import os.path
 import sys
@@ -29,8 +28,6 @@ class UtilsTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     def setUp(self):
         super(UtilsTests, self).setUp()
         self.makeTestDB()
-        copy_tree(os.path.join(dbp_testing.testsdir, '..', 'functional_test'),
-                  self.td)
         self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
                                    'testDB_dump.json'))
 
