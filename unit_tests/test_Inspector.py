@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import datetime
 import unittest
-from distutils.dir_util import copy_tree, remove_tree
+from distutils.dir_util import copy_tree
 import tempfile
 import imp
 import warnings
@@ -51,27 +51,23 @@ class InspectorFunctions(unittest.TestCase):
         self.assertEqual(None, inspector.extract_Version('rbspa_pre_ect-hope-L1_20130202_v1.0.cdf', basename=True))
 
 
-class InspectorClass(unittest.TestCase):
+class InspectorClass(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """Tests of the inspector class"""
 
     def setUp(self):
         """Makes a copy of the DB to run tests on without altering the original."""
         super(InspectorClass, self).setUp()
-        # These tests shouldn't change the DB but use a copy anyway
-        # Would need to at least update DB path if we wanted to
-        # use DB
-        self.td = tempfile.mkdtemp()
+        self.makeTestDB()
         copy_tree(os.path.join(
             dbp_testing.testsdir, '..', 'functional_test'), self.td)
-        self.dbname = os.path.join(self.td, 'testDB.sqlite')
-        self.dbu = DButils.DButils(self.dbname)
+        self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
+                                   'testDB_dump.json'))
         self.inspect = imp.load_source('inspect', os.path.join(
             dbp_testing.testsdir, 'inspector', 'rot13_L1.py'))
 
     def tearDown(self):
         super(InspectorClass, self).tearDown()
-        self.dbu.closeDB()
-        remove_tree(self.td)
+        self.removeTestDB()
 
     def test_inspector(self):
         """Test inspector class"""
