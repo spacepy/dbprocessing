@@ -725,7 +725,7 @@ class DBUtilsGetTests(TestSetup):
             'data_level': 1.0,
             'version': Version.Version(1, 0, 0),
             'file_create_date': datetime.date(2010, 1, 1),
-            'exists_on_disk': 1,
+            'exists_on_disk': True,
             'utc_file_date': datetime.date(2010, 1, 1),
             'utc_start_time': datetime.datetime(2010, 1, 1),
             # Weird stop time to trigger rounding errors
@@ -1346,26 +1346,23 @@ class ProcessqueueTests(TestSetup):
         self.assertRaises(DButils.DBNoData, self.dbu.getFileID, pq)
 
 
-class TestWithtestDB(unittest.TestCase):
+class TestWithtestDB(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """Tests that require the new testDB (or were written after it was made)"""
 
     def setUp(self):
         super(TestWithtestDB, self).setUp()
-        self.td = tempfile.mkdtemp()
-        self.path = os.path.dirname(os.path.realpath(__file__))
-
-        copy_tree(self.path + '/../functional_test/', self.td)
-        self.dbname = os.path.join(self.td, 'testDB.sqlite')
-        self.dbu = DButils.DButils(self.dbname)
+        self.makeTestDB()
+        copy_tree(os.path.join(dbp_testing.testsdir, '..', 'functional_test'),
+                  self.td)
+        self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
+                                   'testDB_dump.json'))
         self.dbu.getEntry('Mission', 1).rootdir = self.td  # Set the mission's dir to the tmp so we can work with it
         self.dbu.commitDB()
         self.dbu.MissionDirectory = self.td
 
     def tearDown(self):
         super(TestWithtestDB, self).tearDown()
-        self.dbu.closeDB()
-        # print(self.td)
-        remove_tree(self.td)
+        self.removeTestDB()
 
     def test_checkDiskForFile_DBTrue_FileTrue(self):
         """Check file in database exists on disk"""
@@ -1453,7 +1450,7 @@ class TestWithtestDB(unittest.TestCase):
                                data_level=0,
                                version=version,
                                file_create_date=datetime.date(2010, 1, 1),
-                               exists_on_disk=1,
+                               exists_on_disk=True,
                                utc_file_date=datetime.date(2010, 1, 1),
                                utc_start_time=datetime.datetime(2010, 1, 1, 0, 0, 0),
                                utc_stop_time=datetime.datetime(2010, 1, 2, 0, 0, 0),
@@ -1547,7 +1544,7 @@ class TestWithtestDB(unittest.TestCase):
             'data_level': 0,
             'version': v,
             'file_create_date': datetime.date(2010, 1, 1),
-            'exists_on_disk': 1,
+            'exists_on_disk': True,
             'utc_file_date': datetime.date(2010, 1, 1),
             'utc_start_time': datetime.date(2010, 1, 1),
             'utc_stop_time': datetime.datetime(2010, 1, 2, 0, 0, 0),
@@ -1585,7 +1582,7 @@ class TestWithtestDB(unittest.TestCase):
             'data_level': 0,
             'version': Version.Version(1, 0, 0),
             'file_create_date': datetime.date(2010, 1, 1),
-            'exists_on_disk': 1,
+            'exists_on_disk': True,
             'utc_file_date': datetime.date(2010, 1, 1),
             'utc_start_time': datetime.datetime(2010, 1, 1),
             'utc_stop_time': datetime.datetime(2010, 1, 1, 23, 59, 59, 600000),
@@ -1601,12 +1598,12 @@ class TestWithtestDB(unittest.TestCase):
 
     def test_addInstrument(self):
         """Tests if addInstrument is succesful"""
-        iID = self.dbu.addInstrument(instrument_name="testing_{MISSION}_{SPACECRAFT}_Instrument",
+        iID = self.dbu.addInstrument(instrument_name="t_{MISSION}_{SPACECRAFT}_In",
                                      satellite_id=1
                                      )
 
         i = self.dbu.getEntry('Instrument', iID)
-        self.assertEqual('testing_testDB_testDB-a_Instrument', i.instrument_name)
+        self.assertEqual('t_testDB_testDB-a_In', i.instrument_name)
 
     def test_addProduct(self):
         """Tests if addProduct is succesful"""
@@ -1638,7 +1635,7 @@ class TestWithtestDB(unittest.TestCase):
         self.addGenericInspector(pID)
         ID = self.dbu.addproductprocesslink(input_product_id=pID,
                                             process_id=1,
-                                            optional=0
+                                            optional=False
                                             )
 
         i = self.dbu.session.query(self.dbu.Productprocesslink).filter_by(input_product_id=pID).first()
@@ -1761,13 +1758,13 @@ class TestWithtestDB(unittest.TestCase):
         self.dbu.addInstrumentproductlink(instrument_id=1,
                                           product_id=pID
                                           )
-        prID = self.dbu.addProcess(process_name="testing_process_{PRODUCT}_{INSTRUMENT}_{SATELLITE}_{MISSION}",
+        prID = self.dbu.addProcess(process_name="test_{PRODUCT}_{INSTRUMENT}_{SATELLITE}_{MISSION}",
                                    output_product=pID,
                                    output_timebase="FILE")
         cID = self.addGenericCode(prID)
         self.dbu.addproductprocesslink(input_product_id=1,
                                        process_id=prID,
-                                       optional=0
+                                       optional=False
                                        )
         #Make sure the code was appropriately associated with the process
         #(test of the test before we rely on it)
@@ -1778,11 +1775,11 @@ class TestWithtestDB(unittest.TestCase):
             self.dbu.getCodeFromProcess(prID, datetime.date.today()))
         self.dbu.updateProcessSubs(prID)
         p = self.dbu.getEntry('Process', prID)
-        self.assertEqual('testing_process_testDB_rot13_L1_rot13_testDB-a_testDB', p.process_name)
+        self.assertEqual('test_testDB_rot13_L1_rot13_testDB-a_testDB', p.process_name)
 
     def test_list_release(self):
         """Tests all of the release stuff, it's all intertwined anyway"""
-        self.dbu.tag_release(1)
+        self.dbu.tag_release('1')
 
         ans = set(['testDB_001_001.raw', 'testDB_000_001.raw', 
                    'testDB_001_000.raw', 'testDB_000_000.raw',
@@ -1792,10 +1789,10 @@ class TestWithtestDB(unittest.TestCase):
                    'testDB_2016-01-05.rot', 'testDB_2016-01-02.rot', 
                    'testDB_2016-01-01.rot', 'testDB_2016-01-03.rot', 
                    'testDB_000_002.raw', 'testDB_000_003.raw'])
-        self.assertEqual(ans, set(self.dbu.list_release(1, fullpath=False)))
+        self.assertEqual(ans, set(self.dbu.list_release('1', fullpath=False)))
         # Test additional release options
-        self.dbu.addRelease('testDB_2016-01-01.cat', 2, commit=True)
-        self.assertEqual([self.td + '/L1/testDB_2016-01-01.cat'], self.dbu.list_release(2, fullpath=True))
+        self.dbu.addRelease('testDB_2016-01-01.cat', '2', commit=True)
+        self.assertEqual([self.td + '/L1/testDB_2016-01-01.cat'], self.dbu.list_release('2', fullpath=True))
 
     def test_getAllFilenames_all(self):
         """getAllFilenames should return all files in the db when passed no filters"""
@@ -1874,13 +1871,10 @@ class TestWithtestDB(unittest.TestCase):
         ans = ['testDB_2016-01-01.cat', 'testDB_2016-01-02.cat',
                'testDB_2016-01-03.cat', 'testDB_2016-01-04.cat',
                'testDB_2016-01-05.cat']
-
-        self.assertEqual(ans, self.dbu.getAllFilenames(fullPath = False,
-                                                       level = 1,
-                                                       product = 1,
-                                                       code = 1,
-                                                       instrument = 1,
-                                                       exists = True))
+        actual = self.dbu.getAllFilenames(
+            fullPath=False, level=1, product=1, code=1, instrument=1,
+            exists=True)
+        self.assertEqual(ans, sorted(actual))
 
     def test_getAllFilenames_limit(self):
         """getAllFilenames should only return 4 items with limit=4"""

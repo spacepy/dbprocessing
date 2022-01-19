@@ -7,6 +7,7 @@ before importing any dbprocessing modules.
 """
 
 import datetime
+import json
 import os
 import os.path
 import shutil
@@ -15,6 +16,9 @@ import sysconfig
 import tempfile
 
 import sqlalchemy
+import sqlalchemy.engine
+import sqlalchemy.schema
+
 
 #The log is opened on import, so need to quarantine the log directory
 #right away (before other dbp imports)
@@ -52,6 +56,7 @@ def add_build_to_path():
 # Get the "build" version of dbp for definitions in this module.
 add_build_to_path()
 import dbprocessing.DButils
+import dbprocessing.tables
 import dbprocessing.Version
 
 
@@ -198,7 +203,7 @@ class AddtoDBMixin(object):
     def makeTestDB(self):
         """Create a test database and working directory
 
-        Creates two attributes:
+        Creates three attributes:
             * self.td: a temporary directory
             * self.pg: is the database postgres (if False, sqlite)
             * self.dbname: name of database (sqlite path or postgresql db)
@@ -224,6 +229,71 @@ class AddtoDBMixin(object):
         self.dbu.closeDB() # Before the database is removed...
         del self.dbu
         shutil.rmtree(self.td)
+
+    def loadData(self, filename):
+        """Load data into db from a JSON file
+
+        Assumes existence of:
+            * self.dbname: name of database (sqlite path or postgresql db)
+              Must exist, with tables.
+            * self.pg: if database is postgresql
+
+        Creates:
+            * self.dbu: open DButils instance
+
+        Parameters
+        ----------
+        filename : :class:`str`
+            Full path to the JSON file
+        """
+        with open(filename, 'rt') as f:
+            data = json.load(f)
+        self.dbu = dbprocessing.DButils.DButils(self.dbname)
+        for k, v in data.items():
+            for row in v:
+                for column in row:
+                    if column in ('code_start_date',
+                                  'code_stop_date',
+                                  'date_written',
+                                  'utc_file_date',
+                    ):
+                        row[column] \
+                            = None if row[column] is None\
+                            else datetime.datetime.strptime(
+                                    row[column], '%Y-%m-%dT%H:%M:%S.%f').date()
+                    elif column in ('utc_start_time',
+                                    'utc_stop_time',
+                                    'check_date',
+                                    'file_create_date',
+                                    'processing_start_time',
+                                    'processing_end_time',
+                    ):
+                        row[column] \
+                            = None if row[column] is None\
+                            else datetime.datetime.strptime(
+                                    row[column], '%Y-%m-%dT%H:%M:%S.%f')
+        if 'unixtime' not in data:
+            # Dump from old database w/o the Unixtime table
+            tbl = sqlalchemy.inspect(self.dbu.Unixtime).mapped_table
+            tbl.drop()
+            self.dbu.metadata.remove(tbl)
+            del self.dbu.Unixtime
+        for t in dbprocessing.tables.names:
+            if t not in data or not data[t]:
+                # Data not in dump, nothing to insert
+                continue
+            table = sqlalchemy.inspect(getattr(self.dbu, t.title()))\
+                              .mapped_table
+            ins = table.insert()
+            self.dbu.session.execute(ins, data[t])
+            idcolumn = '{}_id'.format(t)
+            if self.pg and idcolumn in data[t][0]:
+                maxid = max(row[idcolumn] for row in data[t])
+                sel = "SELECT pg_catalog.setval(pg_get_serial_sequence("\
+                      "'{table}', '{column}'), {maxid})".format(
+                          table=t, column=idcolumn, maxid=maxid)
+                self.dbu.session.execute(sel)
+        self.dbu.commitDB()
 
 
 def add_scripts_to_path():

@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 import datetime
-from distutils.dir_util import copy_tree, remove_tree
+from distutils.dir_util import copy_tree
 import os
 import os.path
 import sys
@@ -20,7 +20,7 @@ from dbprocessing import DButils
 from dbprocessing import Version
 
 
-class UtilsTests(unittest.TestCase):
+class UtilsTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """Tests for DBfile class"""
 
     longMessage = True
@@ -28,19 +28,15 @@ class UtilsTests(unittest.TestCase):
 
     def setUp(self):
         super(UtilsTests, self).setUp()
-        # Not changing the DB now but use a copy anyway
-        # Would need to at least update DB path if we wanted to
-        # do more than vanilla dirSubs
-        self.td = tempfile.mkdtemp()
-        copy_tree(os.path.join(os.path.dirname(__file__), '..', 'functional_test'), self.td)
-
-        self.dbname = os.path.join(self.td, 'testDB.sqlite')
-        self.dbu = DButils.DButils(self.dbname)
+        self.makeTestDB()
+        copy_tree(os.path.join(dbp_testing.testsdir, '..', 'functional_test'),
+                  self.td)
+        self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
+                                   'testDB_dump.json'))
 
     def tearDown(self):
         super(UtilsTests, self).tearDown()
-        self.dbu.closeDB()
-        remove_tree(self.td)
+        self.removeTestDB()
 
     def test_dirSubs(self):
         """dirSubs substitutions should work"""

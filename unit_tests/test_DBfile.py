@@ -5,6 +5,7 @@ import datetime
 import unittest
 from distutils.dir_util import copy_tree, remove_tree
 import os
+import os.path
 import tempfile
 
 import dbp_testing
@@ -13,17 +14,16 @@ from dbprocessing import DButils
 from dbprocessing import Diskfile
 from dbprocessing import Version
 
-class DBfileTests(unittest.TestCase):
+class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """Tests for DBfile class"""
     
     def setUp(self):
         super(DBfileTests, self).setUp()
-        self.td = tempfile.mkdtemp()
+        self.makeTestDB()
         copy_tree(os.path.join(dbp_testing.testsdir, '..', 'functional_test'), self.td)
         copy_tree(os.path.join(dbp_testing.testsdir, 'tars'), self.td)
-
-        self.dbname = os.path.join(self.td, 'testDB.sqlite')
-        self.dbu = DButils.DButils(self.dbname)
+        self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
+                                   'testDB_dump.json'))
         #Update the mission path to the tmp dir
         self.dbu.getEntry('Mission', 1).rootdir = self.td
         self.dbu.commitDB()
@@ -31,7 +31,7 @@ class DBfileTests(unittest.TestCase):
 
     def tearDown(self):
         super(DBfileTests, self).tearDown()
-        remove_tree(self.td)
+        self.removeTestDB()
 
     def createDummyDBF(self, fname):
         dbf = DBfile.DBfile(self.td + fname, self.dbu, makeDiskFile=True)
@@ -40,7 +40,7 @@ class DBfileTests(unittest.TestCase):
         dbf.diskfile.params['utc_stop_time'] = datetime.date.today() + datetime.timedelta(days=1)
         dbf.diskfile.params['data_level'] = 0
         dbf.diskfile.params['file_create_date'] = datetime.date.today()
-        dbf.diskfile.params['exists_on_disk'] = 1
+        dbf.diskfile.params['exists_on_disk'] = True
         dbf.diskfile.params['product_id'] = 1
         dbf.diskfile.params['shasum'] = Diskfile.calcDigest(self.td + fname)
         dbf.diskfile.params['version'] = Version.Version(1, 2, 3)
