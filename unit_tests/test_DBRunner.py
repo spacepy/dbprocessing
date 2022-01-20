@@ -97,13 +97,10 @@ class DBRunnerCalcRunmeTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         """Make temp dir, redirect stdout"""
         self.pq = None # Define the symbol so the del later doesn't fail
         self.newstdout = self.oldstdout = None # Similar
-        self.td = tempfile.mkdtemp()
-        self.testdb = os.path.join(self.td, 'RBSP_MAGEIS.sqlite')
-        shutil.copy2(os.path.join(dbp_testing.testsdir,
-                                  'RBSP_MAGEIS.sqlite'),
-                     self.testdb)
-        self.pq = dbprocessing.dbprocessing.ProcessQueue(self.testdb)
-        self.dbu = self.pq.dbu # Mixin methods looking for direct dbu access.
+        self.makeTestDB()
+        self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
+                                   'RBSP_MAGEIS_dump.json'))
+        self.pq = dbprocessing.dbprocessing.ProcessQueue(self.dbu)
         # There's a bunch of print statements to smash...
         self.oldstdout = sys.stdout
         self.newstdout = (io.BytesIO if str is bytes else io.StringIO)()
@@ -116,7 +113,7 @@ class DBRunnerCalcRunmeTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         if self.newstdout is not None:
             self.newstdout.close()
         del self.pq # Cleaned up by its destructor only
-        shutil.rmtree(self.td)
+        self.removeTestDB()
 
     def test_runme_list(self):
         """Get a list of processes to run"""

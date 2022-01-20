@@ -2726,7 +2726,7 @@ class DButils(object):
             if res:
                 return res[0]
             # no file_id found
-                raise DBNoData("No product_name %s found in the DB" % (product_name))
+            raise DBNoData("No product_name %s found in the DB" % (product_name))
         # Numerical product ID, make sure it exists
         sq = self.session.query(self.Product).get(product_name)
         if sq is not None:

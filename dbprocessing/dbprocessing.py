@@ -45,7 +45,8 @@ class ProcessQueue(object):
         Parameters
         ----------
         mission : str
-            Mission database, as in :class:`.DButils`.
+            Mission database, as in :class:`.DButils`. May also be
+            an existing instance of :class:`.DButils`.
         dryrun : bool, default False
             Treat all functionality as "dry run", make no changes.
         echo : bool, default False
@@ -55,9 +56,13 @@ class ProcessQueue(object):
         self.dryrun = dryrun
         self.filename = None
         """Full path to file currently being processed (:class:`str`)"""
-        self.mission = mission
+        if isinstance(mission, DButils.DButils):
+            dbu = mission
+            self.mission = dbu.mission
+        else:
+            self.mission = mission
+            dbu = DButils.DButils(self.mission, echo=echo)
         self.tempdir = None
-        dbu = DButils.DButils(self.mission, echo=echo)
         self.runme_list = []
         self.dbu = dbu
         self.childrenQueue = DBqueue.DBqueue()

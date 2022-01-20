@@ -16,23 +16,20 @@ from dbprocessing.Diskfile import InputError
 from dbprocessing import Version
 
 
-class TestSetup(unittest.TestCase):
+class TestSetup(unittest.TestCase, dbp_testing.AddtoDBMixin):
     """
     master class for the setup and teardown
     """
     def setUp(self):
         super(TestSetup, self).setUp()
-        sqpath = os.path.join(os.path.dirname(__file__), 'RBSP_MAGEIS.sqlite')
-        self.sqlworking = sqpath.replace('RBSP_MAGEIS.sqlite', 'working.sqlite')
-        shutil.copy(sqpath, self.sqlworking)
-        os.chmod(self.sqlworking, stat.S_IRUSR|stat.S_IWUSR)
-        self.dbu = DButils.DButils(self.sqlworking)
+        super(TestSetup, self).setUp()
+        self.makeTestDB()
+        self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
+                                   'RBSP_MAGEIS_dump.json'))
 
     def tearDown(self):
         super(TestSetup, self).tearDown()
-        self.dbu.closeDB()
-        del self.dbu
-        os.remove(self.sqlworking)
+        self.removeTestDB()
 
 
 class DiskfileStaticTests(unittest.TestCase):
