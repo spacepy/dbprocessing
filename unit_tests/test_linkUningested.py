@@ -70,27 +70,26 @@ class LinkUningestedTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         self.assertEqual(
             [os.path.join('junk', 'prod219990501.txt')], sorted(res2))
 
+class LinkUningestedTestsWithDB(unittest.TestCase, dbp_testing.AddtoDBMixin):
+    """
+    Tests that use the magEIS database
+    """
+    def setUp(self):
+        super(LinkUningestedTestsWithDB, self).setUp()
+        self.makeTestDB()
+        self.loadData(os.path.join(dbp_testing.testsdir, 'data', 'db_dumps',
+                                   'RBSP_MAGEIS_dump.json'))
+
+    def tearDown(self):
+        super(LinkUningestedTestsWithDB, self).tearDown()
+        self.removeTestDB()
+
     def test_indb(self):
         """See if files are in database"""
-        td = tempfile.mkdtemp()
-        try:
-            testdb = os.path.join(td, 'RBSP_MAGEIS.sqlite')
-            shutil.copy2(os.path.join(dbp_testing.testsdir,
-                                      'RBSP_MAGEIS.sqlite'),
-                         testdb)
-            dbu = dbprocessing.DButils.DButils(testdb)
-            self.assertTrue(linkUningested.indb(
-                dbu, 'rbspb_pre_MagEphem_OP77Q_20130906_v1.0.0.txt', 138))
-            self.assertFalse(linkUningested.indb(
-                dbu, 'rbspb_pre_MagEphem_OP77Q_20130906_v1.0.0.txt', 43))
-        finally:
-            try:
-                dbu.closeDB()
-                del dbu
-            except:
-                pass
-            shutil.rmtree(td)
-        
+        self.assertTrue(linkUningested.indb(
+            self.dbu, 'rbspb_pre_MagEphem_OP77Q_20130906_v1.0.0.txt', 138))
+        self.assertFalse(linkUningested.indb(
+            self.dbu, 'rbspb_pre_MagEphem_OP77Q_20130906_v1.0.0.txt', 43))
 
 
 if __name__ == "__main__":

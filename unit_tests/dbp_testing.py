@@ -278,6 +278,12 @@ class AddtoDBMixin(object):
             tbl.drop()
             self.dbu.metadata.remove(tbl)
             del self.dbu.Unixtime
+        if data['productprocesslink']\
+           and 'yesterday' not in data['productprocesslink'][0]:
+            # Dump from old database w/o yesterday/tomorrow,
+            # set defaults.
+            for row in data['productprocesslink']:
+                row['yesterday'] = row['tomorrow'] = 0
         for t in dbprocessing.tables.names:
             if t not in data or not data[t]:
                 # Data not in dump, nothing to insert
@@ -294,6 +300,10 @@ class AddtoDBMixin(object):
                           table=t, column=idcolumn, maxid=maxid)
                 self.dbu.session.execute(sel)
         self.dbu.commitDB()
+        # Re-reference directories since new data loaded
+        self.dbu.MissionDirectory = self.dbu.getMissionDirectory()
+        self.dbu.CodeDirectory = self.dbu.getCodeDirectory()
+        self.dbu.InspectorDirectory = self.dbu.getInspectorDirectory()
 
 
 def add_scripts_to_path():
