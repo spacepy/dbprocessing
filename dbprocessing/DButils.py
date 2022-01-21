@@ -139,7 +139,10 @@ class DButils(object):
         Parameters
         ----------
         mission : :class:`str`
-            Name of the mission
+            Name of the mission. This may be the name of a .sqlite file
+            or the name of a Postgresql database; see
+            :ref:`scripts_specifying_database` for Postgresql support
+            (implemented by :func:`postgresql_url`).
         echo : :class:`bool`, default False
             if True, the Engine will log all statements as well as a
             repr() of their parameter lists to the logger

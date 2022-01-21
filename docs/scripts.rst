@@ -6,6 +6,45 @@ Scripts
    :depth: 1
    :local:
 
+.. _scripts_specifying_database:
+
+Specifying a database
+=====================
+Most scripts require a mission database to be specified. If this is an
+existing file, this is usually interpreted as an sqlite database. Otherwise
+it is assumed to be the name of a Postgresql database, and the following
+environment variables are used. Unless otherwise specified, these are
+optional and the Postgresql default is used if not specified (i.e.,
+there is no special dbprocessing-based handling.)
+
+.. note::
+
+   This can result in unusual behavior when a filename that doesn't exist
+   is specified as a mission database, as the "fall through" assumes
+   Postgresql and might raise unexpected errors if these environment
+   variables are not defined.
+
+.. envvar:: PGUSER
+
+   Username to use to connect to the database. This is required when using
+   Postgresql databases.
+
+.. envvar:: PGHOST
+
+   Hostname of the database. If not specified, will use ``''``, which is
+   usually treated as a domain socket connection on ``localhost``.
+
+.. envvar:: PGPORT
+
+   Port to connect to.
+
+.. envvar:: PGPASSWORD
+
+   User's database password. If not specified, no password provided.
+
+Postgresql support is not as heavily tested and argument handling is not
+yet normalized across all scripts.
+
 Maintained scripts
 ==================
 These scripts are of general use in dbprocessing and either are fully

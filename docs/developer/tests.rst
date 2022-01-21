@@ -22,6 +22,17 @@ Of course, instead of ``test_all.py``, you can specify the name of the module yo
 Unit tests use the version of dbprocessing modules in the ``build`` directory,
 i.e. run ``python setup.py build`` before running the unit tests.
 
+Some unit tests access databases of sample information. These are built
+on the fly. Sqlite databases are used unless :envvar:`PGDATABASE` is defined.
+In that case, it is the name of a Postgresql database to use instead.
+
+.. envvar:: PGDATABASE
+
+   Name of a Postgresql database to use for unit testing. Must exist but
+   be empty (i.e., no tables). See :ref:`scripts_specifying_database` for
+   other environment variables controlling this connection. All tables
+   will be removed from this database at the end of unit testing!
+
 .. _functional:
 
 Functional Tests
