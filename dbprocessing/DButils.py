@@ -10,12 +10,12 @@ from __future__ import print_function
 
 import collections
 import datetime
+import getpass
 import pdb
 import glob
 import itertools
 import os
 import os.path
-import pwd
 import socket  # to get the local hostname
 import sys
 from collections import namedtuple
@@ -356,7 +356,7 @@ class DButils(object):
                                     ## for now there is one mission only per DB
                                     # self.getMissionID(self.mission),
                                     self.session.query(self.Mission.mission_id).first()[0],
-                                    pwd.getpwuid(os.getuid())[0],
+                                    getpass.getuser(),
                                     socket.gethostname(),
                                     pid=os.getpid())
         DBlogging.dblogger.info("Logging started: %d: %s, PID: %s, M_id: %s, user: %s, hostname: %s" %
