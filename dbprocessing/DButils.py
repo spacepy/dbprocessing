@@ -16,6 +16,7 @@ import glob
 import itertools
 import os
 import os.path
+import posixpath
 import socket  # to get the local hostname
 import sys
 from collections import namedtuple
@@ -1994,7 +1995,8 @@ class DButils(object):
             filename = self.getFileID(filename)
         sq = self.session.query(self.File.filename, self.Product.relative_path).filter(
             self.File.file_id == filename).join((self.Product, self.File.product_id == self.Product.product_id)).one()
-        path = os.path.join(self.MissionDirectory, *sq[::-1])
+        path = os.path.join(self.MissionDirectory,
+                            *(sq[1].split(posixpath.sep) + [sq[0]]))
         if '{' in path:
             file_entry = self.getEntry('File', filename)
             path = Utils.dirSubs(path, file_entry.filename, file_entry.utc_file_date, file_entry.utc_start_time,
@@ -2673,8 +2675,11 @@ class DButils(object):
         """
         activeInspector = namedtuple('activeInspector', 'path description arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
-        return [activeInspector(os.path.join(self.InspectorDirectory, ans.relative_path, ans.filename), ans.description,
-                                ans.arguments, ans.product) for ans in sq]
+        return [activeInspector(
+            os.path.join(
+                self.InspectorDirectory,
+                *(ans.relative_path.split(posixpath.sep) + [ans.filename])),
+            ans.description, ans.arguments, ans.product) for ans in sq]
 
     def getChildrenProcesses(self, file_id):
         """

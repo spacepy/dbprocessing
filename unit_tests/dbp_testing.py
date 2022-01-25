@@ -61,8 +61,12 @@ import dbprocessing.Version
 
 
 __all__ = ['AddtoDBMixin', 'add_build_to_path', 'add_scripts_to_path',
-           'testsdir']
+           'driveroot', 'testsdir']
 
+
+driveroot = os.path.join(os.path.splitdrive(os.getcwd())[0], os.path.sep)\
+            if sys.platform == 'win32' else os.path.sep
+"""Root of the current drive (or filesystem)"""
 
 class AddtoDBMixin(object):
     """Mixin class providing helper functions for adding to database
