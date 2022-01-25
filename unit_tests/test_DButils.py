@@ -484,15 +484,25 @@ class DBUtilsGetTests(TestSetup):
 
     def test_getFileFullPath(self):
         """getFileFullPath"""
-        self.assertEqual('/n/space_data/cda/rbsp/MagEphem/predicted/b/rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt',
-                         self.dbu.getFileFullPath(1))
-        self.assertEqual('/n/space_data/cda/rbsp/MagEphem/predicted/b/rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt',
-                         self.dbu.getFileFullPath('rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt'))
-
-        self.assertEqual('/n/space_data/cda/rbsp/rbspb/mageis_vc/level0/ect_rbspb_0377_381_05.ptp.gz',
-                         self.dbu.getFileFullPath(17))
-        self.assertEqual('/n/space_data/cda/rbsp/rbspb/mageis_vc/level0/ect_rbspb_0377_381_05.ptp.gz',
-                         self.dbu.getFileFullPath('ect_rbspb_0377_381_05.ptp.gz'))
+        rootdir = os.path.join(
+            dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp')
+        self.assertEqual(
+            os.path.join(rootdir, 'MagEphem', 'predicted', 'b',
+                         'rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt'),
+            self.dbu.getFileFullPath(1))
+        self.assertEqual(
+            os.path.join(rootdir, 'MagEphem', 'predicted', 'b',
+                         'rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt'),
+            self.dbu.getFileFullPath(
+                'rbspb_pre_MagEphem_OP77Q_20130909_v1.0.0.txt'))
+        self.assertEqual(
+            os.path.join(rootdir, 'rbspb', 'mageis_vc', 'level0',
+                         'ect_rbspb_0377_381_05.ptp.gz'),
+            self.dbu.getFileFullPath(17))
+        self.assertEqual(
+            os.path.join(rootdir, 'rbspb', 'mageis_vc', 'level0',
+                         'ect_rbspb_0377_381_05.ptp.gz'),
+            self.dbu.getFileFullPath('ect_rbspb_0377_381_05.ptp.gz'))
 
     def test_getProcessFromInputProduct(self):
         """getProcessFromInputProduct"""
@@ -801,12 +811,12 @@ class DBUtilsGetTests(TestSetup):
         val = self.dbu.getActiveInspectors()
         self.assertEqual(57, len(val))
         v2 = set([v[0] for v in val])
-        ans = set(['/n/space_data/cda/rbsp/codes/inspectors/ect_L05_V1.0.0.py',
-                   '/n/space_data/cda/rbsp/codes/inspectors/ect_L0_V1.0.0.py',
-                   '/n/space_data/cda/rbsp/codes/inspectors/ect_L1_V1.0.0.py',
-                   '/n/space_data/cda/rbsp/codes/inspectors/ect_L2_V1.0.0.py',
-                   '/n/space_data/cda/rbsp/codes/inspectors/emfisis_V1.0.0.py',
-                   '/n/space_data/cda/rbsp/codes/inspectors/rbsp_pre_MagEphem_insp.py'])
+        ans = set([
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp', 'codes', 'inspectors', o)
+            for o in ('ect_L05_V1.0.0.py', 'ect_L0_V1.0.0.py',
+                      'ect_L1_V1.0.0.py', 'ect_L2_V1.0.0.py',
+                      'emfisis_V1.0.0.py', 'rbsp_pre_MagEphem_insp.py')])
         self.assertEqual(ans, v2)
         v3 = set([v[-1] for v in val])
         self.assertIn(1, v3)
@@ -847,8 +857,10 @@ class DBUtilsGetTests(TestSetup):
 
     def test_getCodePath(self):
         """getCodePath"""
-        self.assertEqual('/n/space_data/cda/rbsp/codes/l05_to_l1.py',
-                         self.dbu.getCodePath(1))
+        self.assertEqual(
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp', 'codes', 'l05_to_l1.py'),
+            self.dbu.getCodePath(1))
         self.assertRaises(DButils.DBNoData, self.dbu.getCodePath, 'badval')
 
     def test_getCodePath2(self):
@@ -879,30 +891,49 @@ class DBUtilsGetTests(TestSetup):
 
     def test_getMissionDirectory(self):
         """getMissionDirectory"""
-        self.assertEqual('/n/space_data/cda/rbsp', self.dbu.getMissionDirectory())
+        self.assertEqual(
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp'),
+            self.dbu.getMissionDirectory())
 
     def test_getCodeDirectory(self):
         """getCodeDirectory"""
-        self.assertEqual(self.dbu.getCodeDirectory(), '/n/space_data/cda/rbsp')
+        self.assertEqual(
+            self.dbu.getCodeDirectory(),
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp'))
         
     def test_getInspectorDirectory(self):
         """getInspectorDirectory"""
-        self.assertEqual(self.dbu.getInspectorDirectory(),
-                         '/n/space_data/cda/rbsp')
+        self.assertEqual(
+            self.dbu.getInspectorDirectory(),
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp'))
 
     def test_getDirectory(self):
         self.assertEqual(self.dbu.getDirectory('codedir'), None)
         self.assertEqual(self.dbu.getDirectory('inspector_dir'), None)
-        self.assertEqual(self.dbu.getDirectory('incoming_dir'), '/n/space_data/cda/rbsp/mageis_incoming') 
+        self.assertEqual(
+            self.dbu.getDirectory('incoming_dir'),
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp',
+                'mageis_incoming'))
         
     def test_getIncomingPath(self):
         """getIncomingPath"""
-        self.assertEqual(self.dbu.getIncomingPath(), '/n/space_data/cda/rbsp/mageis_incoming')
+        self.assertEqual(
+            self.dbu.getIncomingPath(),
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp',
+                'mageis_incoming'))
 
     def test_getErrorPath(self):
         """getErrorPath"""
-        self.assertEqual(self.dbu.getErrorPath(),
-                         '/n/space_data/cda/rbsp/errors')
+        self.assertEqual(
+            self.dbu.getErrorPath(),
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp',
+                'errors'))
 
     def test_getFilecodelink_byfile(self):
         """getFilecodelink_byfile"""
@@ -1054,59 +1085,89 @@ class DBUtilsGetTests(TestSetup):
         m = self.dbu.getEntry('Mission', 1)
         m.codedir = '/n/space_data/cda/rbsp/codedir'
         self.dbu.commitDB()
-        self.assertEqual(self.dbu.getCodeDirectory(),
-                         '/n/space_data/cda/rbsp/codedir')
+        self.assertEqual(
+            self.dbu.getCodeDirectory(),
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp',
+                'codedir'))
         
     def test_getCodeDirectoryRelSpecified(self):
         m = self.dbu.getEntry('Mission', 1)
         m.codedir = 'codedir'
         self.dbu.commitDB()
-        self.assertEqual(self.dbu.getCodeDirectory(),
-                         '/n/space_data/cda/rbsp/codedir')
+        self.assertEqual(
+            self.dbu.getCodeDirectory(),
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda', 'rbsp',
+                'codedir'))
      
     def test_getCodeDirectorySpecifiedBlank(self):
-        self.assertEqual(self.dbu.getCodeDirectory(), '/n/space_data/cda/rbsp')
+        self.assertEqual(self.dbu.getCodeDirectory(),
+            os.path.join(
+                dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                'rbsp'))
 
     def test_getInspectorDirectoryAbsSpecified(self):
         m = self.dbu.getEntry('Mission', 1)
         m.inspectordir = '/n/space_data/cda/rbsp/inspector_dir'
         self.dbu.commitDB()
-        self.assertEqual(self.dbu.getInspectorDirectory(),
-                         '/n/space_data/cda/rbsp/inspector_dir')
+        self.assertEqual(
+            self.dbu.getInspectorDirectory(),
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp', 'inspector_dir'))
 
     def test_getInspectorDirectoryRelSpecified(self):
         m = self.dbu.getEntry('Mission', 1)
         m.inspectordir = 'inspector_dir'
         self.dbu.commitDB()
-        self.assertEqual(self.dbu.getInspectorDirectory(),
-                         '/n/space_data/cda/rbsp/inspector_dir')
+        self.assertEqual(
+            self.dbu.getInspectorDirectory(),
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp', 'inspector_dir'))
 
     def test_getInspectorDirectorySpecifiedBlank(self):
-        self.assertEqual(self.dbu.getInspectorDirectory(), '/n/space_data/cda/rbsp')
+        self.assertEqual(
+            self.dbu.getInspectorDirectory(),
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp'))
 
     def test_getErrorDirectoryAbsSpecified(self):
         m = self.dbu.getEntry('Mission', 1)
         m.errordir = '/n/space_data/cda/rbsp/errors'
         self.dbu.commitDB()
-        self.assertEqual(self.dbu.getErrorPath(), '/n/space_data/cda/rbsp/errors')
+        self.assertEqual(
+            self.dbu.getErrorPath(),
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp', 'errors'))
 
     def test_getErrorDirectoryRelSpecified(self):
         m = self.dbu.getEntry('Mission', 1)
         m.errordir = 'errors'
         self.dbu.commitDB()
-        self.assertEqual(self.dbu.getErrorPath(),
-                         '/n/space_data/cda/rbsp/errors')
+        self.assertEqual(
+            self.dbu.getErrorPath(),
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp', 'errors'))
 
     def test_getErrorDirectorySpecifiedBlank(self):
-        self.assertEqual(self.dbu.getInspectorDirectory(), '/n/space_data/cda/rbsp')
+        self.assertEqual(
+            self.dbu.getInspectorDirectory(),
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp'))
 
     def test_getDirectorySpecified(self):
         m = self.dbu.getEntry('Mission', 1)
         m.inspector_dir = 'inspector_dir'
         m.errordir = '/n/space_data/cda/rbsp/errors'
         self.dbu.commitDB()
-        self.assertEqual(self.dbu.getDirectory('errordir'),'/n/space_data/cda/rbsp/errors')
-        self.assertEqual(self.dbu.getDirectory('inspector_dir'), '/n/space_data/cda/rbsp/inspector_dir')
+        self.assertEqual(
+            self.dbu.getDirectory('errordir'),
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp', 'errors'))
+        self.assertEqual(
+            self.dbu.getDirectory('inspector_dir'),
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data', 'cda',
+                         'rbsp', 'inspector_dir'))
         self.assertEqual(self.dbu.getDirectory('codedir'), None)
 
 
@@ -1702,7 +1763,9 @@ class TestWithtestDB(unittest.TestCase, dbp_testing.AddtoDBMixin):
         self.assertEqual(ans, set(self.dbu.list_release('1', fullpath=False)))
         # Test additional release options
         self.dbu.addRelease('testDB_2016-01-01.cat', '2', commit=True)
-        self.assertEqual([self.td + '/L1/testDB_2016-01-01.cat'], self.dbu.list_release('2', fullpath=True))
+        self.assertEqual(
+            [os.path.join(self.td , 'L1', 'testDB_2016-01-01.cat')],
+            self.dbu.list_release('2', fullpath=True))
 
     def test_getAllFilenames_all(self):
         """getAllFilenames should return all files in the db when passed no filters"""
