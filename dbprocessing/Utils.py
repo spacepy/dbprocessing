@@ -12,8 +12,10 @@ except ImportError: # Py2
     import ConfigParser as configparser
 import collections
 import datetime
+import errno
 import os
 import re
+import subprocess
 import sys
 
 import dateutil.rrule  # do this long so where it is from is remembered
@@ -500,10 +502,19 @@ def processRunning(pid):
     :class:`bool`
         True if ``pid`` is running, False otherwise
     """
+    if sys.platform == 'win32':
+        out = subprocess.check_output([
+            'tasklist', '/fi', 'PID eq {}'.format(pid)])
+        return not out.startswith(b'INFO: No tasks are running')
     try:
         os.kill(pid, 0)
-    except OSError:
-        return False
+    except OSError as err:
+        if err.errno == errno.ESRCH:
+            return False
+        elif err.errno == errno.EPERM:
+            return True
+        else:
+            raise
     else:
         return True
 
