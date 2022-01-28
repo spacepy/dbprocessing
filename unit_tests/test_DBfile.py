@@ -38,7 +38,8 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         self.removeTestDB()
 
     def createDummyDBF(self, fname):
-        dbf = DBfile.DBfile(self.td + fname, self.dbu, makeDiskFile=True)
+        fullpath = os.path.join(self.td, fname)
+        dbf = DBfile.DBfile(fullpath, self.dbu, makeDiskFile=True)
         dbf.diskfile.params['utc_file_date'] = datetime.date.today()
         dbf.diskfile.params['utc_start_time'] = datetime.date.today()
         dbf.diskfile.params['utc_stop_time'] = datetime.date.today() + datetime.timedelta(days=1)
@@ -46,7 +47,7 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         dbf.diskfile.params['file_create_date'] = datetime.date.today()
         dbf.diskfile.params['exists_on_disk'] = True
         dbf.diskfile.params['product_id'] = 1
-        dbf.diskfile.params['shasum'] = Diskfile.calcDigest(self.td + fname)
+        dbf.diskfile.params['shasum'] = Diskfile.calcDigest(fullpath)
         dbf.diskfile.params['version'] = Version.Version(1, 2, 3)
 
         return dbf
@@ -65,50 +66,57 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         self.assertRaises(DBfile.DBfileError, dbf.getDirectory )
 
         dbf.diskfile.params['product_id'] = 4
-        self.assertEqual( self.td + '/L0', dbf.getDirectory() )
+        self.assertEqual(os.path.join(self.td, 'L0'), dbf.getDirectory())
 
     def test_addFileToDB(self):
-        with open(self.td + '/file.file', 'w') as fp:
+        with open(os.path.join(self.td, 'file.file'), 'w') as fp:
             fp.write('I am some test data\n')
-        dbf = self.createDummyDBF('/file.file')
+        dbf = self.createDummyDBF('file.file')
 
         self.assertTrue(dbf.addFileToDB())
 
     def test_move_NormalFile(self):
-        with open(self.td + '/file.file', 'w') as fp:
+        with open(os.path.join(self.td, 'file.file'), 'w') as fp:
             fp.write('I am some test data\n')
-        dbf = self.createDummyDBF('/file.file')
+        dbf = self.createDummyDBF('file.file')
 
-        real_ans = (self.td + '/file.file', self.td + '/L1/file.file')
+        real_ans = (os.path.join(self.td, 'file.file'),
+                    os.path.join(self.td, 'L1', 'file.file'))
         self.assertEqual(real_ans, dbf.move())
 
     def test_move_SymLink(self):
-        with open(self.td + '/file.file', 'w') as fp:
+        targetpath = os.path.join(self.td, 'file.file')
+        linkpath = os.path.join(self.td, 'sym.file')
+        with open(targetpath, 'w') as fp:
             fp.write('I am some test data\n')
-        os.symlink(self.td + '/file.file', self.td + '/sym.file')
-        dbf = self.createDummyDBF('/sym.file')
+        os.symlink(targetpath, linkpath)
+        dbf = self.createDummyDBF('sym.file')
 
-        real_ans = (self.td + '/sym.file', self.td + '/L1/sym.file')
-        self.assertTrue(os.path.isfile(self.td + '/sym.file'))
+        real_ans = (linkpath,
+                    os.path.join(self.td, 'L1', 'sym.file'))
+        self.assertTrue(os.path.isfile(linkpath))
         self.assertEqual(real_ans, dbf.move())
-        self.assertFalse(os.path.isfile(self.td + '/sym.file'))
-        self.assertFalse(os.path.isfile(self.td + '/L1/sym.file'))
+        self.assertFalse(os.path.isfile(linkpath))
+        self.assertFalse(os.path.isfile(os.path.join(
+            self.td, 'L1', 'sym.file')))
 
     def test_move_NormalFileTargetDoesntExist(self):
-        with open(self.td + '/file.file', 'w') as fp:
+        with open(os.path.join(self.td, 'file.file'), 'w') as fp:
             fp.write('I am some test data\n')
-        dbf = self.createDummyDBF('/file.file')
+        dbf = self.createDummyDBF('file.file')
 
-        real_ans = (self.td + '/file.file', self.td + '/L1/file.file')
-        self.assertFalse(os.path.isdir(self.td + '/L1'))
+        real_ans = (os.path.join(self.td, 'file.file'),
+                    os.path.join(self.td, 'L1', 'file.file'))
+        self.assertFalse(os.path.isdir(os.path.join(self.td, 'L1')))
         self.assertEqual(real_ans, dbf.move())
-        self.assertTrue(os.path.isdir(self.td + '/L1'))
+        self.assertTrue(os.path.isdir(os.path.join(self.td, 'L1')))
 
     def test_move_goodtgzfile(self):
         """Test moving a valid .tgz file"""
-        dbf = self.createDummyDBF('/goodtar.tgz')
+        dbf = self.createDummyDBF('goodtar.tgz')
 
-        real_ans = (self.td + '/goodtar.tgz', self.td + '/L1/goodtar.tgz')
+        real_ans = (os.path.join(self.td, 'goodtar.tgz'),
+                    os.path.join(self.td, 'L1', 'goodtar.tgz'))
         self.assertFalse(os.path.isdir(os.path.join(self.td, 'L1')))
         self.assertEqual(real_ans, dbf.move())
         self.assertTrue(os.path.isdir(os.path.join(self.td, 'L1')))
@@ -118,9 +126,10 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
 
     def test_move_badtgzfile(self):
         """Test moving a corrupted .tgz file"""
-        dbf = self.createDummyDBF('/badtar.tgz')
+        dbf = self.createDummyDBF('badtar.tgz')
 
-        real_ans = (self.td + '/badtar.tgz', self.td + '/L1/badtar.tgz')
+        real_ans = (os.path.join(self.td, 'badtar.tgz'),
+                    os.path.join(self.td, 'L1', 'badtar.tgz'))
         self.assertFalse(os.path.isdir(os.path.join(self.td, 'L1')))
         # Method return may not be helpful but this is it for now
         self.assertEqual(real_ans, dbf.move())
@@ -128,9 +137,10 @@ class DBfileTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
 
     def test_move_nulltgzfile(self):
         """Test moving an empty .tgz file"""
-        dbf = self.createDummyDBF('/emptytar.tgz')
+        dbf = self.createDummyDBF('emptytar.tgz')
 
-        real_ans = (self.td + '/emptytar.tgz', self.td + '/L1/emptytar.tgz')
+        real_ans = (os.path.join(self.td, 'emptytar.tgz'),
+                    os.path.join(self.td, 'L1', 'emptytar.tgz'))
         self.assertFalse(os.path.isdir(os.path.join(self.td, 'L1')))
         # Method return may not be helpful but this is it for now
         self.assertEqual(real_ans, dbf.move())
