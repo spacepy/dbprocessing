@@ -89,9 +89,11 @@ class DBUtilsEmptyTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         # Reload the mission
         self.dbu.closeDB()
         self.dbu = DButils.DButils(self.dbname)
-        self.assertEqual('/rootdir', self.dbu.getCodeDirectory())
-        self.assertEqual('/rootdir/errors', self.dbu.getErrorPath())
-        self.assertEqual('/rootdir', self.dbu.getInspectorDirectory())
+        rootdir = os.path.join(dbp_testing.driveroot, 'rootdir')
+        self.assertEqual(rootdir, self.dbu.getCodeDirectory())
+        self.assertEqual(os.path.join(rootdir, 'errors'),
+                         self.dbu.getErrorPath())
+        self.assertEqual(rootdir, self.dbu.getInspectorDirectory())
 
     def test_addProcessNoOutput(self):
         """Add a process with no output product"""
