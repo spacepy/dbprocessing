@@ -123,8 +123,10 @@ class DBRunnerCalcRunmeTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         for r in runme:
             self.assertEqual(38, r.process_id)
             self.assertEqual(
-                '/n/space_data/cda/rbsp/codes/mageis/'
-                'run_mageis_L2combined_v3.0.0.py', r.codepath)
+                os.path.join(dbp_testing.driveroot, 'n', 'space_data',
+                             'cda', 'rbsp', 'codes', 'mageis',
+                             'run_mageis_L2combined_v3.0.0.py'),
+                r.codepath)
         self.assertEqual(
             [datetime.date(2013, 9, i) for i in range(6, 10)],
             sorted([r.utc_file_date for r in runme]))
@@ -149,7 +151,10 @@ class DBRunnerCalcRunmeTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         self.assertEqual(5, len(runme))
         # Quick checks; test_runMe has extensive tests with no input products.
         rm = runme[0]
-        self.assertEqual('/n/space_data/cda/rbsp/scripts/junk.py', rm.codepath)
+        self.assertEqual(
+            os.path.join(dbp_testing.driveroot, 'n', 'space_data',
+                         'cda', 'rbsp', 'scripts', 'junk.py'),
+            rm.codepath)
         self.assertEqual('trigger_20100101_v1.0.0.out', rm.filename)
 
     def test_runme_list_options(self):
