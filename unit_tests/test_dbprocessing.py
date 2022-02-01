@@ -7,6 +7,7 @@ __author__ = 'Jonathan Niehof <Jonathan.Niehof@unh.edu>'
 
 
 import datetime
+import os.path
 import unittest
 
 import dbp_testing
@@ -64,8 +65,9 @@ class BuildChildrenTests(ProcessQueueTestsBase):
             # Sort the input files, identified by having 'data'
             # in there (so not argument or output); the order
             # of input files doesn't matter. (Don't change function inputs.)
-            idx_exp = [j for j in range(len(e)) if '/data/' in e[j]]
-            idx_act = [j for j in range(len(a)) if '/data/' in a[j]]
+            datapart = os.path.join('x', 'data', 'x')[1:-1]
+            idx_exp = [j for j in range(len(e)) if datapart in e[j]]
+            idx_act = [j for j in range(len(a)) if datapart in a[j]]
             e = e[:idx_exp[0]] + sorted(e[idx_exp[0]:idx_exp[-1]+1]) \
                 + e[idx_exp[-1]+1:]
             a = a[:idx_act[0]] + sorted(a[idx_act[0]:idx_act[-1]+1]) \
@@ -80,9 +82,9 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         self.addProductProcessLink(l0pid, l01process)
         fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
         expected = [[
-            '{}/codes/scripts/junk.py'.format(self.td),
+            os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-            '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+            os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
             'level_1_20120101_v1.0.0']]
         self.checkCommandLines(fid, expected)
 
@@ -101,9 +103,9 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         #Updated version of L0
         fid = self.addFile('level_0_20120101_v1.1.0', l0pid)
         expected = [[
-            '{}/codes/scripts/junk.py'.format(self.td),
+            os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-            '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+            os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.1.0'),
             'level_1_20120101_v1.1.0']]
 
     def testYesterdayNewFile(self):
@@ -117,15 +119,15 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         self.addProductProcessLink(l0pid, l01process, yesterday=1)
         l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
-             'level_1_20120101_v1.0.0'
+            os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
+            'level_1_20120101_v1.0.0'
             ],
 # Yesterday-only is not made
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),,
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
 #             'level_1_20120102_v1.0.0'
 #            ],
         ]
@@ -144,31 +146,31 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         l0fid2 = self.addFile('level_0_20120102_v1.0.0', l0pid)
         # Precondition: two subsequent L0 days, L1 not made yet.
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120101_v1.0.0'
             ],
 # 2012-01-02 not triggered on "yesterday" even though it has "today"
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
 #             'level_1_20120102_v1.0.0'
 #            ],
         ]
         self.checkCommandLines(l0fid1, expected)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
              # Yesterday is included in the command build
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120102_v1.0.0'
             ],
 # 2012-01-03 yesterday-only, not triggered
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
 #             'level_1_20120103_v1.0.0'
 #            ],
         ]
@@ -188,15 +190,15 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         self.dbu.addFilefilelink(l1fid, l0fid)
         newfid = self.addFile('level_0_20120101_v1.1.0', l0pid)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.1.0'),
              'level_1_20120101_v1.1.0'
             ],
 # Yesterday-only is not made
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.1.0'),
 #             'level_1_20120102_v1.0.0'
 #            ],
         ]
@@ -223,16 +225,16 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         # Perturbation: Add new "yesterday"
         newfid = self.addFile('level_0_20120101_v1.1.0', l0pid)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.1.0'),
              'level_1_20120101_v1.1.0'
             ],
 # Date with only yesterday changed is not updated.
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
-#             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.1.0'),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
 #             'level_1_20120102_v1.1.0'
 #            ],
         ]
@@ -249,15 +251,15 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         self.addProductProcessLink(l0pid, l01process, tomorrow=1)
         l0fid = self.addFile('level_0_20120101_v1.0.0', l0pid)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120101_v1.0.0'
             ],
 # Tomorrow-only is not made
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
 #             'level_1_20111231_v1.0.0'
 #            ],
         ]
@@ -276,32 +278,32 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         l0fid2 = self.addFile('level_0_20120102_v1.0.0', l0pid)
         # Precondition: two subsequent L0 days, L1 not made yet.
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
              # Tomorrow is included in the command build
-             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120101_v1.0.0'
             ],
 # 2011-12-31 tomorrow-only, not triggered
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
 #             'level_1_20111231_v1.0.0'
 #            ],
         ]
         self.checkCommandLines(l0fid1, expected)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
              'level_1_20120102_v1.0.0'
             ],
 # 2012-01-01 not triggered by "tomorrow" even though have "today"
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
-#             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
 #             'level_1_20120101_v1.0.0'
 #            ],
         ]
@@ -321,15 +323,15 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         self.dbu.addFilefilelink(l1fid, l0fid)
         newfid = self.addFile('level_0_20120101_v1.1.0', l0pid)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.1.0'),
              'level_1_20120101_v1.1.0'
             ],
 # Tomorrow-only is not made
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.1.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.1.0'),
 #             'level_1_20111231_v1.0.0'
 #            ],
         ]
@@ -356,16 +358,16 @@ class BuildChildrenTests(ProcessQueueTestsBase):
         # Perturbation: Add new "tomorrow"
         newfid = self.addFile('level_0_20120102_v1.1.0', l0pid)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
             'level_0-1_args',
-             '{}/data/junk/level_0_20120102_v1.1.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.1.0'),
              'level_1_20120102_v1.1.0'
             ],
 # Date with only tomorrow changed is not updated.
-#            ['{}/codes/scripts/junk.py'.format(self.td),
+#            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
 #            'level_0-1_args',
-#             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
-#             '{}/data/junk/level_0_20120102_v1.1.0'.format(self.td),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
+#             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.1.0'),
 #             'level_1_20120101_v1.1.0'
 #            ],
         ]
@@ -384,14 +386,14 @@ class BuildChildrenTests(ProcessQueueTestsBase):
             [datetime.date(2012, 1, 1), datetime.date(2012, 1, 2)],
             self.dbu.getFileDates(fid))
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
              'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120101_v1.0.0'],
 # l1 "tomorrow" built because l0 "today" includes data for it
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
              'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120102_v1.0.0']
         ]
         self.checkCommandLines(fid, expected)
@@ -415,29 +417,29 @@ class BuildChildrenTests(ProcessQueueTestsBase):
             [datetime.date(2012, 1, 2), datetime.date(2012, 1, 3)],
             self.dbu.getFileDates(fid2))
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
              'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120101_v1.0.0'],
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
              'level_0-1_args',
-             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
 # l0 "previous day" with data for l1 "today" is included
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120102_v1.0.0']
         ]
         self.checkCommandLines(fid1, expected)
         expected = [
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
              'level_0-1_args',
-             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
 # l0 "next day" with data for l1 "today" is included
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120102_v1.0.0'],
 # l1 "tomorrow" built because l0 "today" includes data for it
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
              'level_0-1_args',
-             '{}/data/junk/level_0_20120102_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120102_v1.0.0'),
              'level_1_20120103_v1.0.0']
         ]
         self.checkCommandLines(fid2, expected)
@@ -456,13 +458,13 @@ class BuildChildrenTests(ProcessQueueTestsBase):
             self.dbu.getFileDates(fid))
         expected = [
 # l1 "yesterday" built because l0 "today" includes data for it
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
              'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20111231_v1.0.0'],
-            ['{}/codes/scripts/junk.py'.format(self.td),
+            [os.path.join(self.td, 'codes', 'scripts', 'junk.py'),
              'level_0-1_args',
-             '{}/data/junk/level_0_20120101_v1.0.0'.format(self.td),
+             os.path.join(self.td, 'data', 'junk', 'level_0_20120101_v1.0.0'),
              'level_1_20120101_v1.0.0'],
         ]
         self.checkCommandLines(fid, expected)
