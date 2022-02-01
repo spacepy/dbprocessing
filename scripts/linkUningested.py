@@ -4,6 +4,7 @@
 
 import argparse
 import os.path
+import posixpath
 import re
 import sys
 
@@ -66,7 +67,10 @@ def list_files(dbu, product):
     # we have to go through everything. It would be a nice improvement
     # to find the static parts of the relative path and only hit that...
     # spacepy.datamanager would do that for us.
-    pat = os.path.join(os.path.normpath(proddir), os.path.normpath(pat))
+    pat = posixpath.normpath(posixpath.join(proddir, pat))
+    if os.path.sep == '\\':  # Path-separator and regex escape are ambiguous.
+        # This path is well-formatted (from normpath); can be handled naively.
+        pat = '\\\\'.join(pat.split(posixpath.sep))
     flist = (os.path.join(dn, f)[len(md) + 1:]
              for dn, _, fnames in os.walk(md) for f in fnames)
     flist = [f for f in flist if re.match(pat, f)]
