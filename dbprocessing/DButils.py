@@ -2790,7 +2790,8 @@ class DButils(object):
         code = self.getEntry('Code', code_id)
         if not code.active_code:  # not an active code
             return None
-        return os.path.join(self.CodeDirectory, code.relative_path, code.filename)
+        return os.path.normpath(posixpath.join(
+            self.CodeDirectory, code.relative_path, code.filename))
 
     def getCodeVersion(self, code_id):
         """
