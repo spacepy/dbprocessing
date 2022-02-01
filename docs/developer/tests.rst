@@ -33,6 +33,9 @@ In that case, it is the name of a Postgresql database to use instead.
    other environment variables controlling this connection. All tables
    will be removed from this database at the end of unit testing!
 
+On Windows, certain tests (``test_move_SymLink`` in ``test_DBfile``)
+require elevated privileges to pass.
+
 .. _functional:
 
 Functional Tests
