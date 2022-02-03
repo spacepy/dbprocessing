@@ -14,6 +14,7 @@ import tempfile
 import unittest
 
 import sqlalchemy
+import sqlalchemy.inspection
 
 import dbp_testing
 
@@ -54,8 +55,9 @@ class TableDefnTests(unittest.TestCase):
                 name, self.metadata, *dbprocessing.tables.definition(name))
             for name in tables}
         self.metadata.create_all()
-        self.assertEqual(
-            sorted(tables), sorted(self.engine.table_names()))
+        actual = sqlalchemy.inspection.inspect(self.engine)\
+                 .get_table_names()
+        self.assertEqual(sorted(tables), sorted(actual))
         return created
 
     def testFile(self):

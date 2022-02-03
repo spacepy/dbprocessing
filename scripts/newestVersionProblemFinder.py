@@ -84,7 +84,9 @@ def _makeVersionnumSubquery(dbu, prod_id=None):
     version = _makeVersionnumTable(dbu=dbu, prod_id=prod_id)
 
     subq = (dbu.session.query(func.max(version.c.versionnum))
-            .group_by(version.c.utc_file_date)).subquery()
+            .group_by(version.c.utc_file_date))
+    subq = subq.scalar_subquery() if hasattr(subq, 'scalar_subquery')\
+           else subq.subquery().as_scalar() # Deprecated 1.4
     return subq
 
 def oldGetFilesByProduct(dbu, prod_id, newest_version=False):
