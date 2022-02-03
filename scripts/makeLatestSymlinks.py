@@ -8,6 +8,10 @@ from __future__ import print_function
 
 import argparse
 import collections
+try:
+    import collections.abc
+except ImportError:  # Python 2
+    collections.abc = collections
 import datetime
 import glob
 from pprint import pprint
@@ -115,10 +119,10 @@ def make_symlinks(files, files_out, outdir, linkdirs, mode, options):
     for all the files make symlinks into outdir
     """
     if isinstance(files, dbprocessing.DButils.str_classes) \
-           or not isinstance(files, collections.Iterable):
+           or not isinstance(files, collections.abc.Iterable):
         files = [files]
     if isinstance(files_out, dbprocessing.DButils.str_classes) \
-           or not isinstance(files_out, collections.Iterable):
+           or not isinstance(files_out, collections.abc.Iterable):
         files_out = [files_out]
     # if files_out then cull the files to get rid of the ones
     for f in files:

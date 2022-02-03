@@ -153,16 +153,16 @@ def _start_a_run(runme):
     files2poke = _extract_files(runme.cmdline)
     for f in files2poke:
         ans = _pokeFile(f)
-        if ans is 'NOFILE':
+        if ans == 'NOFILE':
             DBlogging.dblogger.error("Command line referenced a file that did not exist {0}.  {1}"
                                      .format(f, runme.cmdline))
-        elif ans is 'OTHER':
+        elif ans == 'OTHER':
             DBlogging.dblogger.error("Command line referenced a file that did 'other' {0}.  {1}"
                                      .format(f, runme.cmdline))
-        elif ans is 'ERROR':
+        elif ans == 'ERROR':
             DBlogging.dblogger.error("Command line referenced a file that did not open {0}.  {1}"
                                      .format(f, runme.cmdline))
-        elif ans is 'FILE':
+        elif ans == 'FILE':
             DBlogging.dblogger.debug("Command line referenced a file opened fine {0}.  {1}"
                                      .format(f, runme.cmdline))
         else:
