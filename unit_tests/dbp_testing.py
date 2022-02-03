@@ -278,7 +278,10 @@ class AddtoDBMixin(object):
                                     row[column], '%Y-%m-%dT%H:%M:%S.%f')
         if 'unixtime' not in data:
             # Dump from old database w/o the Unixtime table
-            tbl = sqlalchemy.inspect(self.dbu.Unixtime).mapped_table
+            insp = sqlalchemy.inspect(self.dbu.Unixtime)
+            # persist_selectable added 1.3 (mapped_table deprecated)
+            tbl = insp.persist_selectable\
+                  if hasattr(insp, 'persist_selectable') else insp.mapped_table
             tbl.drop()
             self.dbu.metadata.remove(tbl)
             del self.dbu.Unixtime
@@ -292,8 +295,9 @@ class AddtoDBMixin(object):
             if t not in data or not data[t]:
                 # Data not in dump, nothing to insert
                 continue
-            table = sqlalchemy.inspect(getattr(self.dbu, t.title()))\
-                              .mapped_table
+            insp = sqlalchemy.inspect(getattr(self.dbu, t.title()))
+            table = insp.persist_selectable\
+                  if hasattr(insp, 'persist_selectable') else insp.mapped_table
             ins = table.insert()
             self.dbu.session.execute(ins, data[t])
             idcolumn = '{}_id'.format(t)

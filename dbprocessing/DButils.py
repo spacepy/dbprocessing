@@ -565,7 +565,7 @@ class DButils(object):
 
         fileid = (self.session.query(self.File.file_id)
                   .filter(self.File.file_id.in_(fileid))
-                  .filter(~self.File.file_id.in_(subq))).all()
+                  .filter(~self.File.file_id.in_(subq.select()))).all()
 
         fileid = list(map(itemgetter(0), fileid))  # nested tuples to list
 
