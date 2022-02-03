@@ -9,9 +9,12 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import collections
+try:
+    import collections.abc
+except ImportError:  # Python 2
+    collections.abc = collections
 import datetime
 import getpass
-import pdb
 import glob
 import itertools
 import os
@@ -19,7 +22,6 @@ import os.path
 import posixpath
 import socket  # to get the local hostname
 import sys
-from collections import namedtuple
 from operator import itemgetter, attrgetter
 try:
     import urllib.parse  # python 3
@@ -496,7 +498,7 @@ class DButils(object):
         """
         # if the input is a file name need to handle that
         if isinstance(item, str_classes) \
-           or not isinstance(item, collections.Iterable):
+           or not isinstance(item, collections.abc.Iterable):
             item = [item]
         for ii, v in enumerate(item):
             item[ii] = self.getFileID(v)
@@ -818,7 +820,7 @@ class DButils(object):
         """
         # if not an iterable make it a iterable
         if isinstance(filename, str_classes) \
-           or not isinstance(filename, collections.Iterable):
+           or not isinstance(filename, collections.abc.Iterable):
             filename = [filename]
 
         for ii, f in enumerate(filename):
@@ -2673,7 +2675,8 @@ class DButils(object):
             :sql:column:`~inspector.arguments`, and
             :sql:column:`~inspector.product`.
         """
-        activeInspector = namedtuple('activeInspector', 'path description arguments product_id')
+        activeInspector = collections.namedtuple(
+            'activeInspector', 'path description arguments product_id')
         sq = self.session.query(self.Inspector).filter(self.Inspector.active_code == True).all()
         return [activeInspector(
             os.path.join(
@@ -3536,7 +3539,7 @@ class DButils(object):
             (but not if name lookup is not available).
         """
         retval = None
-        if isinstance(args, (int, collections.Iterable)) \
+        if isinstance(args, (int, collections.abc.Iterable)) \
            and not isinstance(args, str_classes):  # PK: int, non-str sequence
             retval = self.session.query(getattr(self, table)).get(args)
         if retval is None:  # Not valid PK type, or PK not found

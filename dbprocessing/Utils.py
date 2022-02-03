@@ -11,6 +11,10 @@ try:
 except ImportError: # Py2
     import ConfigParser as configparser
 import collections
+try:
+    import collections.abc
+except ImportError:  # Python 2
+    collections.abc = collections
 import datetime
 import errno
 import os
@@ -281,7 +285,8 @@ def flatten(l):
         Flattened list
     """
     for el in l:
-        if isinstance(el, collections.Iterable) and not isinstance(el, str_classes):
+        if isinstance(el, collections.abc.Iterable)\
+           and not isinstance(el, str_classes):
             for sub in flatten(el):
                 yield sub
         else:
