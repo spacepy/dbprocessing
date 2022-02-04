@@ -11,8 +11,19 @@
 {%- endblock %}
 
 {% block rootrellink %}
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="{{ pathto('SUPPORT') }}">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="{{ pathto('search') }}">search</a>|&nbsp;</li>
-       <li><a href="{{ pathto('index') }}">top</a> &raquo;</li>
+        <li><a href="{{ pathto('index') }}">docs</a> &raquo;</li>
+{% endblock %}
+
+{% block relbar1 %}
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="{{ pathto('index') }}"><h1>dbprocessing</h1></a>
+</div>
+{{ super() }}
 {% endblock %}
 
 {# put the sidebar before the body #}
