@@ -117,6 +117,10 @@ These documentation files are "magic" to github:
      (:doc:`../LICENSE`)
    * README
      (:doc:`../README`)
+   * `SUPPORT <https://docs.github.com/en/communities/
+     setting-up-your-project-for-healthy-contributions/
+     adding-support-resources-to-your-project>`_
+     (:doc:`../SUPPORT`)
 
 The github documentation on `community profiles
 <https://docs.github.com/en/communities/
