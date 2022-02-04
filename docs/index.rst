@@ -1,6 +1,6 @@
-############
-dbprocessing
-############
+##########################
+dbprocessing documentation
+##########################
 .. toctree::
    :maxdepth: 1
 
