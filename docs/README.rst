@@ -13,6 +13,16 @@ to process data files to derived products, and input files themselves,
 ``dbprocessing`` iteratively runs the appropriate codes to make all
 possible output files.
 
+``dbprocessing`` delegates the details of producing files to
+mission-specific processing codes.  A processing code must have a
+command-line interface and produce a single output file from one or
+more inputs. There are no language restrictions; dbprocessing has been
+used with C, Interactive Data Language (IDL), Java, and Python.
+
+Support for a file format requires about 30 lines of Python to
+identify the product and extract required metadata, which can support
+many different products
+
 When new versions of codes or input files are provided, codes are re-run
 to ensure all outputs are up to date.
 
