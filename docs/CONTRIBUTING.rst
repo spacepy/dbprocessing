@@ -7,10 +7,16 @@ requests, and other feedback are welcome via
 issue, a template is provided to assist in capturing all the
 information needed.
 
+If you are unsure whether something is a bug, would like support with
+your use case, or just for general less-structured help, open a
+conversation at
+<https://github.com/spacepy/dbprocessing/discussions>. From these
+discussions the dbprocessing team can assist in formalizing issues.
+
 To submit changes to code or documentation, open a pull request at
 <https://github.com/spacepy/dbprocessing/pulls>. Pull requests also
 have templates to help with the structure. If you are planning a
-particularly major change, please first open an issue for discussion
+particularly major change, please first open an issue for scoping and design
 at <https://github.com/spacepy/dbprocessing/issues>. Label with
 ``enhancement`` and, if you have questions about implementation, also
 with ``question``.

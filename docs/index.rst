@@ -5,6 +5,7 @@ dbprocessing
    :maxdepth: 1
 
    README
+   SUPPORT
    getting_started
    concepts
    release_notes
