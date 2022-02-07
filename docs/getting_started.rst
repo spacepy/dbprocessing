@@ -55,9 +55,10 @@ But it can also be installed by downloading the distribution and running:
 
 ``--user`` is recommended to install for a particular user.
 
-By default the scripts needed to run dbprocessing are installed in the
-``dbUtils`` directory in the user's home directory. Specify a different
-location (e.g. a directory on the path) with ``--install-scripts=DIRECTORY``.
+Scripts needed to run dbprocessing are installed into a default
+location which is usually on the path. Specify a different location
+(e.g. a directory devoted just to dbprocessing scripts) with
+``--install-scripts=DIRECTORY``.
 
 
 Directory layout
