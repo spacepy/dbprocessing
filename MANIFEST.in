@@ -1,0 +1,11 @@
+graft developer
+graft docs
+graft examples
+graft functional_test
+graft gui
+graft scripts
+graft unit_tests
+prune unit_tests/unittestlogs
+graft sphinx/build/html
+include sphinx/Makefile
+recursive-exclude * *.pyc *~ *.bak __pycache__

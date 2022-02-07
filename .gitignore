@@ -17,4 +17,5 @@ sphinx/build/
 docs/autosummary/
 docs/developer/autosummary/
 .DS_Store
-
+MANIFEST
+dist/
