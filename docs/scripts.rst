@@ -740,6 +740,26 @@ potential inputs for processing.
    Default is to output by the order in the process queue, i.e., the order
    in which files are considered for processing.
 
+.. _scripts_printRequired_py:
+
+printRequired.py
+----------------
+.. program:: printRequired.py
+
+Print all required input products for one or more processes. For each
+process, will print the product ID and product name of all required
+input files; ends with a summary of all unique product IDs on one
+line. Handy for use with :ref:`scripts_reprocessByProduct_py`.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   The database to read.
+
+.. option:: process
+
+   Process names or IDs for which to print inputs.
+
+
 .. _scripts_ProcessQueue_py:
 
 ProcessQueue.py
@@ -994,6 +1014,8 @@ queue so that the next :option:`ProcessQueue.py -p` will run them.
 
    Force the reprocessing. Specify which version number to increment (0,1,2)
 
+.. _scripts_reprocessByProduct_py:
+
 reprocessByProduct.py
 ---------------------
 .. program:: reprocessByProduct.py
@@ -1028,6 +1050,38 @@ individual processing.
 .. option:: --force {0,1,2}
 
    Force the reprocessing. Specify which version number to increment (0,1,2)
+
+.. _scripts_testInspector_py:
+
+testInspector.py
+----------------
+.. program:: testInspector.py
+
+Run an :ref:`inspector <concepts_inspectors>` against a specific
+product in a database and file. Prints contents of :class:`.Diskfile`
+if it is a match.
+
+.. option:: -m <dbname>, --mission <dbname>
+
+   Selected mission database.
+
+.. option:: -f <file>, --file <file>
+
+   Path to data file to test inspector on.
+
+.. option:: -i <inspector>, --inspector <inspector>
+
+   Path to inspector source file.
+
+.. option:: -p <product>, --product <product>
+
+   Product ID of the product the file belongs to, i.e. test if inspector
+   considers the file to be a match to this product.
+
+.. option:: -a <args>, --args <args>
+
+   Keyword arguments to pass to inspector (optional), space-separated list
+   of ``key=value`` pairs, as in :sql:column:`inspector.arguments`.
 
 scrubber.py
 -----------
@@ -1104,6 +1158,14 @@ Either put out to the same file or a different file
 
    Edit the existing CDF file in place instead of making a new output file.
 
+CreateDBsabrs.py
+----------------
+.. program:: CreateDBsabrs.py
+
+Variant of :ref:`scripts_CreateDB_py` that was used for a project with
+PostgresSQL before that functionality was integrated, but also used
+slightly different table definitions.
+
 dataToIncoming.py
 -----------------
 Concept, never actually used. Intended as a single script which would be
@@ -1135,6 +1197,11 @@ magephem-pre-CoverageHTML.py
 Produce a table with days that had coverage of predictive magnetic
 ephemeris data. See :ref:`scripts_coveragePlot_py` and
 :ref:`scripts_htmlCoverage_py` for more generic implementation.
+
+newestVersionProblemFinder.py
+-----------------------------
+Untested script to check for cases where the newest version of a file
+is not consistent with version numbering and creation dates.
 
 updateCode.py
 -------------
