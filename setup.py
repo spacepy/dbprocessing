@@ -1,15 +1,22 @@
 #!/usr/bin/env python
 """Setup script for dbprocessing"""
 
-import distutils.core
-import distutils.command.sdist
+use_setuptools = False
+try:
+    import setuptools
+    import setuptools.command.sdist
+    use_setuptools = True
+except ImportError:
+    import distutils.core
+    import distutils.command.sdist
 import glob
 import os
 import os.path
 import subprocess
 
 
-class sdist(distutils.command.sdist.sdist):
+class sdist((setuptools.command.sdist if use_setuptools
+            else distutils.command.sdist).sdist):
     """Rebuild docs before making a source distribution"""
 
     def run(self):
@@ -22,7 +29,8 @@ class sdist(distutils.command.sdist.sdist):
         cmd = [os.environ.get('SPHINXBUILD', 'sphinx-build'),
                '-b', 'html', '-d', builddir, indir, outdir]
         subprocess.check_call(cmd)
-        distutils.command.sdist.sdist.run(self)
+        (setuptools.command.sdist if use_setuptools
+         else distutils.command.sdist).sdist.run(self)
 
 scripts = glob.glob(os.path.join('scripts', '*.py'))
 
@@ -53,8 +61,13 @@ setup_kwargs = {
     'requires': ['python (>=2.7, !=3.0)', 'python_dateutil', 'sqlalchemy'],
     'scripts': scripts,
     'url': 'https://spacepy.github.io/dbprocessing/',
-    'version': '0.1.0pre',
+    'version': '0.1.0rc0',
 }
 
+if use_setuptools:
+    setup_kwargs['install_requires'] = [
+        'python_dateutil',
+        'sqlalchemy',
+    ]
 
-distutils.core.setup(**setup_kwargs)
+(setuptools if use_setuptools else distutils.core).setup(**setup_kwargs)

@@ -19,3 +19,4 @@ docs/developer/autosummary/
 .DS_Store
 MANIFEST
 dist/
+dbprocessing.egg-info/

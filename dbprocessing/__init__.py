@@ -31,4 +31,4 @@ __all__ = ['DBfile', 'DBlogging', 'dbprocessing',
            'reports', 'runMe', 'tables',
            'Utils', 'Version']
 
-__version__ = '0.1pre'
+__version__ = '0.1rc0'
