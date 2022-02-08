@@ -5,7 +5,7 @@ Getting Started
 This is a brief guide to setting up dbprocessing to support a new project.
 
 .. contents::
-   :depth: 1
+   :depth: 2
    :local:
 
 Dependencies
@@ -17,6 +17,12 @@ Python is required, either 2.7 or 3.2+.
 If you wish to use a PostgreSQL database, PostgreSQL is required, with
 appropriate permissions set up (but you can use an sqlite database
 with no database manager setup.)
+
+Other dependencies are automatically installed if you install
+``dbprocessing`` using ``pip``; these include SQLAlchemy and dateutil.
+
+Manual dependency installation
+------------------------------
 
 `SQLAlchemy <https://www.sqlalchemy.org/>`_ is required. This is available
 in most distributions; in Ubuntu, you can usually install it with:
@@ -37,15 +43,35 @@ It is also usually available via pip:
 
    pip install sqlalchemy
 
+Finally, `dateutil <https://dateutil.readthedocs.io/en/stable/>`_ is required. In Ubuntu this can be installed with:
+
+.. code-block:: sh
+
+   sudo apt-get install python-dateutil
+
+or
+
+.. code-block:: sh
+
+   sudo apt-get install python3-dateutil
+
+or via pip:
+
+.. code-block:: sh
+
+   pip install python-dateutil
+
 Installation
 ============
 dbprocessing itself is a Python package and must be installed.
 
-Once the first release is made, this can usually be done with:
+This can usually be done with:
 
 .. code-block:: sh
 
    pip install dbprocessing
+
+which will also install necessary dependencies.
 
 But it can also be installed by downloading the distribution and running:
 
