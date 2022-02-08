@@ -1,0 +1,300 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.inspector &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.inspector.DefaultFields" href="dbprocessing.inspector.DefaultFields.html" />
+    <link rel="prev" title="dbprocessing.Diskfile.Diskfile" href="dbprocessing.Diskfile.Diskfile.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.inspector.DefaultFields.html" title="dbprocessing.inspector.DefaultFields"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Diskfile.Diskfile.html" title="dbprocessing.Diskfile.Diskfile"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" accesskey="U">API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.inspector</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-dbprocessing.inspector">
+<span id="dbprocessing-inspector"></span><h1>dbprocessing.inspector<a class="headerlink" href="#module-dbprocessing.inspector" title="Permalink to this headline">¶</a></h1>
+<p>Support for inspectors, which determine product type for a given file.</p>
+<p>To write an inspector, create a Python module (i.e. a .py file).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>This file will need to import <a class="reference internal" href="#module-dbprocessing.inspector" title="dbprocessing.inspector"><code class="xref py py-mod docutils literal notranslate"><span class="pre">inspector</span></code></a> and
+<a class="reference internal" href="dbprocessing.Version.html#module-dbprocessing.Version" title="dbprocessing.Version"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Version</span></code></a> (since it must create a
+<a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><code class="xref py py-class docutils literal notranslate"><span class="pre">Version</span></code></a>).</p></li>
+<li><p>This file may import <a class="reference internal" href="dbprocessing.DBlogging.html#module-dbprocessing.DBlogging" title="dbprocessing.DBlogging"><code class="xref py py-mod docutils literal notranslate"><span class="pre">DBlogging</span></code></a> to permit logging
+of its work.</p></li>
+<li><p>This file must contain a single class</p></li>
+<li><p>The class must be named <code class="docutils literal notranslate"><span class="pre">Inspector</span></code> and inherit from
+<a class="reference internal" href="dbprocessing.inspector.inspector.html#dbprocessing.inspector.inspector" title="dbprocessing.inspector.inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">inspector</span></code></a>.</p></li>
+<li><p>The class must have a class member <code class="docutils literal notranslate"><span class="pre">code_name</span></code> with the name of the
+inspector file</p></li>
+<li><p>The class must implement the <a class="reference internal" href="dbprocessing.inspector.inspector.html#dbprocessing.inspector.inspector.inspect" title="dbprocessing.inspector.inspector.inspect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">inspect()</span></code></a> method (see that
+documentation for details).</p></li>
+</ul>
+</div></blockquote>
+<p>A <a class="reference internal" href="../tables.html#table-inspector"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">inspector</span></code></a> record must also then be created referencing the
+inspector file and with any necessary keywords.</p>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../inspector_examples.html"><span class="doc">Inspector examples</span></a></p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.extract_Version" title="dbprocessing.inspector.extract_Version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_Version</span></code></a>(filename[, basename])</p></td>
+<td><p>Go through the filename and pull out the first valid vX.Y.Z</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.inspector.extract_YYYYMM" title="dbprocessing.inspector.extract_YYYYMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_YYYYMM</span></code></a>(filename)</p></td>
+<td><p>Go through the filename and extract the first valid YYYYMM as a datetime</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.extract_YYYYMMDD" title="dbprocessing.inspector.extract_YYYYMMDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_YYYYMMDD</span></code></a>(filename)</p></td>
+<td><p>Go through the filename and extract the first valid YYYYMMDD as a datetime</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.inspector.valid_YYYYMMDD" title="dbprocessing.inspector.valid_YYYYMMDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">valid_YYYYMMDD</span></code></a>(inval)</p></td>
+<td><p>Checks if input is valid YYYYMMDD</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="dbprocessing.inspector.DefaultFields.html#dbprocessing.inspector.DefaultFields" title="dbprocessing.inspector.DefaultFields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DefaultFields</span></code></a></p></td>
+<td><p>Dict-like with defaults for the special fields used by DBformatter</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dbprocessing.inspector.DefaultFormatter.html#dbprocessing.inspector.DefaultFormatter" title="dbprocessing.inspector.DefaultFormatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DefaultFormatter</span></code></a>()</p></td>
+<td><p>Formatter that passes through any missing fields</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dbprocessing.inspector.inspector.html#dbprocessing.inspector.inspector" title="dbprocessing.inspector.inspector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspector</span></code></a>(filename, dbu, product, **kwargs)</p></td>
+<td><p>ABC for inspectors to be sure the user has implemented what is required</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.inspector.extract_Version">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.inspector.</span></span><span class="sig-name descname"><span class="pre">extract_Version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#extract_Version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.extract_Version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go through the filename and pull out the first valid vX.Y.Z</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Filename to check for version</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><code class="xref py py-class docutils literal notranslate"><span class="pre">Version</span></code></a></dt><dd><p>First valid version found in filename. If <code class="docutils literal notranslate"><span class="pre">basename</span></code>,
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of version (<a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><code class="xref py py-class docutils literal notranslate"><span class="pre">Version</span></code></a>) and
+basename (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Other Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>basename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default False</span></dt><dd><p>Include the basename after the version as well.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.inspector.extract_YYYYMM">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.inspector.</span></span><span class="sig-name descname"><span class="pre">extract_YYYYMM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#extract_YYYYMM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.extract_YYYYMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go through the filename and extract the first valid YYYYMM as a datetime</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Filename to parse for a YYYYMMDD format</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></dt><dd><p>First day of first month found in <code class="docutils literal notranslate"><span class="pre">filename</span></code>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.inspector.extract_YYYYMMDD">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.inspector.</span></span><span class="sig-name descname"><span class="pre">extract_YYYYMMDD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#extract_YYYYMMDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.extract_YYYYMMDD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go through the filename and extract the first valid YYYYMMDD as a datetime</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Filename to parse for a YYYYMMDD format</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></dt><dd><p>First date found in <code class="docutils literal notranslate"><span class="pre">filename</span></code>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.inspector.valid_YYYYMMDD">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.inspector.</span></span><span class="sig-name descname"><span class="pre">valid_YYYYMMDD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#valid_YYYYMMDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.valid_YYYYMMDD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if input is valid YYYYMMDD</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>inval</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>String to evaluate as possible YYYYMMDD</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if valid YYYYMMDD.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">dbprocessing.inspector</a><ul>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.Diskfile.Diskfile.html"
+                          title="previous chapter">dbprocessing.Diskfile.Diskfile</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.inspector.DefaultFields.html"
+                          title="next chapter">dbprocessing.inspector.DefaultFields</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.inspector.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.inspector.DefaultFields.html" title="dbprocessing.inspector.DefaultFields"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Diskfile.Diskfile.html" title="dbprocessing.Diskfile.Diskfile"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.inspector</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

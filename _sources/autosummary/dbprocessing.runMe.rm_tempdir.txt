@@ -1,6 +1,0 @@
-dbprocessing.runMe.rm_tempdir
-=============================
-
-.. currentmodule:: dbprocessing.runMe
-
-.. autofunction:: rm_tempdir

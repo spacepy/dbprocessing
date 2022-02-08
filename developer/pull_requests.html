@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Working With Pull Requests &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Repository organization" href="repository.html" />
+    <link rel="prev" title="Github integration" href="github.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="repository.html" title="Repository organization"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="github.html" title="Github integration"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Working With Pull Requests</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="working-with-pull-requests">
+<h1>Working With Pull Requests<a class="headerlink" href="#working-with-pull-requests" title="Permalink to this headline">¶</a></h1>
+<p>Documented here is the procedure for working with pull requests (PRs)
+in the <code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> project. It does not include details on working
+with git and github in general; relevant docs are linked.</p>
+<p>If you can’t figure it out, please do your best and ask for help in the PR
+(use the <code class="docutils literal notranslate"><span class="pre">question</span></code> tag).</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#creating-a-pr" id="id1">Creating a PR</a></p></li>
+<li><p><a class="reference internal" href="#reviews-and-updating" id="id2">Reviews and updating</a></p></li>
+<li><p><a class="reference internal" href="#conditions-for-merging" id="id3">Conditions for merging</a></p></li>
+<li><p><a class="reference internal" href="#post-merge-cleanup" id="id4">Post-merge cleanup</a></p></li>
+</ul>
+</div>
+<section id="creating-a-pr">
+<h2><a class="toc-backref" href="#id1">Creating a PR</a><a class="headerlink" href="#creating-a-pr" title="Permalink to this headline">¶</a></h2>
+<p>It is strongly recommended to create a pull request from a <em>topic
+branch</em> (not <code class="docutils literal notranslate"><span class="pre">master</span></code>) in a <em>fork</em> of <a class="reference external" href="https://github.com/spacepy/dbprocessing/">the spacepy/dbprocessing
+repository</a>. This allows a
+clean separation of code that’s in-progress vs. ready-to-go, and also
+a distinction between different pull requests. Submitting a pull
+request from master, even of your fork, makes it difficult to have two
+open PRs, and make cleanup after a PR is merged very difficult.</p>
+<p>Before working on an issue, then, <a class="reference external" href="https://docs.github.com/en/get-started/quickstart/fork-a-repo">fork</a> the <a class="reference external" href="https://github.com/spacepy/dbprocessing/">spacepy/dbprocessing
+repository</a>. Make a <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches">branch</a>. Work on the branch locally and, when complete, <a class="reference external" href="https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository">push
+the branch</a> to your fork. Then <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">open a pull
+request</a>
+against <code class="docutils literal notranslate"><span class="pre">spacepy/dbprocessing</span> <span class="pre">master</span></code>.</p>
+<p>If you use CircleCI, <a class="reference external" href="https://support.circleci.com/hc/en-us/articles/360008097173-Why-aren-t-pull-requests-triggering-jobs-on-my-organization-">unfollow your fork before submitting a PR</a>.</p>
+<p>The preferred flow of code is summarized:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Code is created on a <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches">branch</a> of a
+fork, not directly on <cite>master</cite>.</p></li>
+<li><p>Code enters the <code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> repository via pull requests.
+This applies to contributors and developers alike; developers do
+not push directly. (Usually PRs are relative to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch
+but in some cases a topic branch may be created.)</p></li>
+<li><p>Code enters the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch of a fork by <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork">syncing upstream
+to the fork</a> after the pull request has been merged.</p></li>
+</ol>
+</div></blockquote>
+<p>When creating the PR, following the provided template as closely as
+possible will facilitate its review.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">closes</span> <span class="pre">#x</span></code> in the description of the PR if merging the PR will
+close that issue. (<code class="docutils literal notranslate"><span class="pre">Closes</span></code> is preferred to <code class="docutils literal notranslate"><span class="pre">fixes</span></code> because e.g
+closing an enhancement issue is not exactly a fix.) Referencing
+other related issues or PRs is also encouraged, e.g. <code class="docutils literal notranslate"><span class="pre">see</span> <span class="pre">#x</span></code>.
+Avoid the <a class="reference external" href="https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue">issue-closing magic words</a> unless closing the issue,
+in which case <code class="docutils literal notranslate"><span class="pre">closes</span></code> is preferred.</p>
+<p>The template includes a checklist;
+consider every item on the list and check it if completed. If an item
+is not relevant, check it, add “(N/A)” to the start of the line, and
+include an explanation below the checklist. E.g.:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>- [X] ...
+- [X] (N/A) Major new functionality has appropriate Sphinx documentation
+- [X] ...
+
+This is a pure bugfix, no new functionality or documentation.
+</pre></div>
+</div>
+<p>If working in a draft PR, adding more checklists to the description is
+fine. A PR will be reviewed when:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>All checklists are checked (this shows in the pull request list
+as e.g. “8 of 8”).</p></li>
+<li><p>The PR is marked ready for review, i.e. not draft.</p></li>
+<li><p>All CI checks pass.</p></li>
+</ol>
+</div></blockquote>
+<p>Feel free to request help before this point (tag the PR with <code class="docutils literal notranslate"><span class="pre">question</span></code>
+to make it stand out).</p>
+</section>
+<section id="reviews-and-updating">
+<h2><a class="toc-backref" href="#id2">Reviews and updating</a><a class="headerlink" href="#reviews-and-updating" title="Permalink to this headline">¶</a></h2>
+<p>Developers will <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/reviewing-proposed-changes-in-a-pull-request">review</a> PRs for inclusion, but
+reviews and comments are welcome from all.
+Our experience has been that using the github interface to suggest
+line-by-line diffs doesn’t work very well; line-by-line comments are fine
+(and helpful!)</p>
+<p>You can request a specific reviewer, but are not required to.</p>
+<p>The review will mostly evaluate whether the PR checklist has been met,
+all tests pass, and the contribution meets requirements in the <a class="reference internal" href="index.html"><span class="doc">Developer Information</span></a>.</p>
+<p>If changes are requested, they can usually be addressed by making additional
+commits on your branch and pushing to your fork. The PR will be automatically
+updated.</p>
+<p>In some cases the master branch of the repository may have changed in a
+way that’s incompatible with the changes in the pull request. The solution
+is to <a class="reference external" href="https://docs.github.com/en/get-started/using-git/about-git-rebase">rebase</a>
+the topic branch against the new master. (The easiest way to do this is to
+update the fork master from the upstream master, then rebase the branch.)
+In the case of a conflict rebase, this can get messy…feel free to ask
+for help. A developer may be able to perform the rebase if <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork">maintainer
+edits are enabled</a>.
+After the rebase, the updated branch will have to be <a class="reference external" href="https://stackoverflow.com/questions/5509543/how-do-i-properly-force-a-git-push">force-pushed</a> to the fork on github.</p>
+</section>
+<section id="conditions-for-merging">
+<h2><a class="toc-backref" href="#id3">Conditions for merging</a><a class="headerlink" href="#conditions-for-merging" title="Permalink to this headline">¶</a></h2>
+<p>In order to be merged, a pull request must:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Have an approving review from a developer who is not the author
+of the PR. (Usually PR authors are barred from reviewing their own
+work.)</p></li>
+<li><p>Have no outstanding requests for changes from developers. Change
+requests can be addressed either by updating the code or
+convincing the developer through the discussion that the requested
+change is not desirable. Outstanding change requests from
+contributors who are not developers should also be seriously
+considered; it is preferred to have them resolved.</p></li>
+<li><p>Be open for at least 72 hours, so all developers have a chance to
+review. A <em>major</em> change (by discretion of developers commenting)
+should remain open for 168 hours (i.e. one week) if at all possible;
+<em>urgent</em> changes (again, by discretion of developers) may be merged
+24 hours from submission.</p></li>
+<li><p>Pass all continuous integration checks, unless there is a
+documented failure in CI and the PR is part of fixing that failure.</p></li>
+<li><p>Be merged by someone who is not the author of the PR. Developers
+may not merge their own PR, even with an approving review.</p></li>
+<li><p>Be merged by someone who has made an approving review.</p></li>
+<li><p>Be merged by someone who has <em>not contributed any code to the PR</em>.
+There are two exceptions, provided all other requirements are met:</p>
+<ol class="loweralpha simple">
+<li><p>A PR may be merged by a developer whose only contribution is to
+rebase the code to account for changes in master.</p></li>
+<li><p>A PR authored by a developer may be merged by a different
+developer who has authored commits that make relatively minor
+changes to the PR; again, at the discretion of the developers
+involved.</p></li>
+</ol>
+</li>
+</ol>
+</div></blockquote>
+<p>Developers pledge to make an effort to review pull requests within one week.</p>
+<p>Pull requests are merged via the <a class="reference external" href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github">rebase and merge method</a>. This maintains a linear history and
+also makes it clear both who authored the commit and who approved it
+for the repository.</p>
+<p>Once all conditions are met, a developer can <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request">perform the merge</a>.</p>
+</section>
+<section id="post-merge-cleanup">
+<h2><a class="toc-backref" href="#id4">Post-merge cleanup</a><a class="headerlink" href="#post-merge-cleanup" title="Permalink to this headline">¶</a></h2>
+<p>After merge, the contents of the pull request are in two separate sets
+of commits: the original commits on the topic branch, and new commits on
+master. To finish cleanup, the <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork">fork should be synchronized to the
+updated master</a> and the
+<a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-and-deleting-branches-within-your-repository">topic branch deleted</a>.</p>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Working With Pull Requests</a><ul>
+<li><a class="reference internal" href="#creating-a-pr">Creating a PR</a></li>
+<li><a class="reference internal" href="#reviews-and-updating">Reviews and updating</a></li>
+<li><a class="reference internal" href="#conditions-for-merging">Conditions for merging</a></li>
+<li><a class="reference internal" href="#post-merge-cleanup">Post-merge cleanup</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="github.html"
+                          title="previous chapter">Github integration</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="repository.html"
+                          title="next chapter">Repository organization</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/developer/pull_requests.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="repository.html" title="Repository organization"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="github.html" title="Github integration"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Working With Pull Requests</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

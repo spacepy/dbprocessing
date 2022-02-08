@@ -1,0 +1,1688 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Tables &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Inspector examples" href="inspector_examples.html" />
+    <link rel="prev" title="Building a release" href="release.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="inspector_examples.html" title="Inspector examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="release.html" title="Building a release"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tables</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="tables">
+<h1>Tables<a class="headerlink" href="#tables" title="Permalink to this headline">¶</a></h1>
+<p>The SQL database tables used in dbprocessing, and their columns, are
+summarized here. <a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.getEntry" title="dbprocessing.DButils.DButils.getEntry"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getEntry()</span></code></a> will,
+in most cases, return a record from any table.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 57%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-code"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">code</span></code></a></p></td>
+<td><p>Executable data-producing codes</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#table-file"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">file</span></code></a></p></td>
+<td><p>A single data file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-filecodelink"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">filecodelink</span></code></a></p></td>
+<td><p>Code used to create an output file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#table-filefilelink"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">filefilelink</span></code></a></p></td>
+<td><p>Input files used to create an output file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-inspector"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">inspector</span></code></a></p></td>
+<td><p>Codes that link files to products</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#table-instrument"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">instrument</span></code></a></p></td>
+<td><p>Instrument (for grouping related products)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-instrumentproductlink"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">instrumentproductlink</span></code></a></p></td>
+<td><p>Connect instruments to products</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#table-logging"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">logging</span></code></a></p></td>
+<td><p>Log of <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> runs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-logging_file"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">logging_file</span></code></a></p></td>
+<td><p>Unused</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#table-mission"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">mission</span></code></a></p></td>
+<td><p>Directories for mission codes, files, etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-process"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">process</span></code></a></p></td>
+<td><p>Process that converts inputs to output</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#table-processqueue"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">processqueue</span></code></a></p></td>
+<td><p>Files to be processed</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-product"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">product</span></code></a></p></td>
+<td><p>Generalization of file types</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#table-productprocesslink"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">productprocesslink</span></code></a></p></td>
+<td><p>Relates processes to their input products</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-release"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">release</span></code></a></p></td>
+<td><p>Record of files in a release</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#table-satellite"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">satellite</span></code></a></p></td>
+<td><p>Satellite (for grouping related products)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#table-unixtime"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">unixtime</span></code></a></p></td>
+<td><p>Unix start/stop time for files</p></td>
+</tr>
+</tbody>
+</table>
+<div class="graphviz"><img src="../_images/graphviz-9e51bce7e491519bc9f7540e559aef8fea7fb3ae.png" alt="digraph g { graph [ rankdir = &quot;LR&quot; ];
+splines=compound;
+
+&quot;code&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;code&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;code_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;code_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;code_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;filename_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;filename&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;filename_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;relative_path_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;relative_path&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;relative_path_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;code_start_date_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;code_start_date&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;code_start_date_out&quot;&gt;Date&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;code_stop_date_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;code_stop_date&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;code_stop_date_out&quot;&gt;Date&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;code_description_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;code_description&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;code_description_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;process_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;process_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;process_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;interface_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;interface_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;interface_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;quality_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;quality_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;quality_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;revision_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;revision_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;revision_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;output_interface_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;output_interface_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;output_interface_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;active_code_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;active_code&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;active_code_out&quot;&gt;Boolean&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;date_written_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;date_written&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;date_written_out&quot;&gt;Date&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;shasum_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;shasum&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;shasum_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;newest_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;newest_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;newest_version_out&quot;&gt;Boolean&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;arguments_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;arguments&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;arguments_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;ram_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;ram&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;ram_out&quot;&gt;Float&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;cpu_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;cpu&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;cpu_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;file&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;file&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;file_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;file_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;file_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;filename_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;filename&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;filename_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;utc_file_date_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;utc_file_date&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;utc_file_date_out&quot;&gt;Date&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;utc_start_time_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;utc_start_time&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;utc_start_time_out&quot;&gt;DateTime&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;utc_stop_time_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;utc_stop_time&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;utc_stop_time_out&quot;&gt;DateTime&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;data_level_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;data_level&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;data_level_out&quot;&gt;Float&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;interface_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;interface_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;interface_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;quality_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;quality_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;quality_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;revision_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;revision_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;revision_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;verbose_provenance_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;verbose_provenance&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;verbose_provenance_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;check_date_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;check_date&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;check_date_out&quot;&gt;DateTime&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;quality_comment_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;quality_comment&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;quality_comment_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;caveats_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;caveats&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;caveats_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;file_create_date_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;file_create_date&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;file_create_date_out&quot;&gt;DateTime&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;met_start_time_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;met_start_time&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;met_start_time_out&quot;&gt;Float&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;met_stop_time_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;met_stop_time&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;met_stop_time_out&quot;&gt;Float&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;exists_on_disk_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;exists_on_disk&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;exists_on_disk_out&quot;&gt;Boolean&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;quality_checked_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;quality_checked&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;quality_checked_out&quot;&gt;Boolean&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;product_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;product_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;product_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;shasum_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;shasum&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;shasum_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;process_keywords_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;process_keywords&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;process_keywords_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;filecodelink&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;filecodelink&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;resulting_file_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;resulting_file&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;resulting_file_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;source_code_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;source_code&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;source_code_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;filefilelink&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;filefilelink&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;source_file_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;source_file&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;source_file_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;resulting_file_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;resulting_file&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;resulting_file_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;inspector&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;inspector&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;inspector_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;inspector_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;inspector_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;filename_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;filename&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;filename_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;relative_path_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;relative_path&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;relative_path_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;description_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;description&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;description_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;interface_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;interface_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;interface_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;quality_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;quality_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;quality_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;revision_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;revision_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;revision_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;output_interface_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;output_interface_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;output_interface_version_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;active_code_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;active_code&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;active_code_out&quot;&gt;Boolean&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;date_written_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;date_written&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;date_written_out&quot;&gt;Date&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;shasum_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;shasum&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;shasum_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;newest_version_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;newest_version&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;newest_version_out&quot;&gt;Boolean&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;arguments_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;arguments&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;arguments_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;product_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;product&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;product_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;instrument&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;instrument&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;instrument_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;instrument_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;instrument_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;instrument_name_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;instrument_name&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;instrument_name_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;satellite_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;satellite_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;satellite_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;instrumentproductlink&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;instrumentproductlink&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;instrument_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;instrument_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;instrument_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;product_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;product_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;product_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;logging&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;logging&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;logging_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;logging_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;logging_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;currently_processing_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;currently_processing&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;currently_processing_out&quot;&gt;Boolean&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;pid_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;pid&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;pid_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;processing_start_time_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;processing_start_time&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;processing_start_time_out&quot;&gt;DateTime&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;processing_end_time_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;processing_end_time&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;processing_end_time_out&quot;&gt;DateTime&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;comment_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;comment&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;comment_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;mission_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;mission_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;mission_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;user_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;user&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;user_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;hostname_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;hostname&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;hostname_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;logging_file&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;logging_file&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;logging_file_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;logging_file_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;logging_file_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;logging_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;logging_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;logging_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;file_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;file_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;file_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;code_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;code_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;code_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;comments_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;comments&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;comments_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;mission&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;mission&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;mission_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;mission_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;mission_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;mission_name_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;mission_name&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;mission_name_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;rootdir_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;rootdir&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;rootdir_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;incoming_dir_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;incoming_dir&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;incoming_dir_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;codedir_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;codedir&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;codedir_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;inspectordir_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;inspectordir&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;inspectordir_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;errordir_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;errordir&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;errordir_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;process&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;process&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;process_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;process_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;process_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;process_name_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;process_name&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;process_name_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;output_product_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;output_product&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;output_product_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;output_timebase_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;output_timebase&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;output_timebase_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;extra_params_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;extra_params&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;extra_params_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;processqueue&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;processqueue&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;file_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;file_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;file_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;version_bump_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;version_bump&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;version_bump_out&quot;&gt;SmallInteger&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;product&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;product&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;product_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;product_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;product_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;product_name_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;product_name&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;product_name_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;instrument_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;instrument_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;instrument_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;relative_path_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;relative_path&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;relative_path_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;level_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;level&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;level_out&quot;&gt;Float&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;format_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;format&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;format_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;product_description_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;product_description&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;product_description_out&quot;&gt;Text&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;productprocesslink&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;productprocesslink&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;process_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;process_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;process_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;input_product_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;input_product_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;input_product_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;optional_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;optional&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;optional_out&quot;&gt;Boolean&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;yesterday_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;yesterday&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;yesterday_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;tomorrow_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;tomorrow&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;tomorrow_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;release&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;release&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;file_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;file_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;file_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;release_num_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;release_num&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;release_num_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;satellite&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;satellite&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;satellite_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;satellite_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;satellite_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;satellite_name_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;satellite_name&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;satellite_name_out&quot;&gt;String&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;mission_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;mission_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;mission_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+
+&quot;unixtime&quot; [
+    shape=none
+    label=&lt;
+        &lt;table border=&quot;0&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; cellborder=&quot;1&quot;&gt;
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; bgcolor=&quot;#E0B010&quot; valign=&quot;BOTTOM&quot;&gt;&lt;font point-size=&quot;18&quot; face=&quot;bold&quot;&gt;unixtime&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;file_id_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&amp;#9919;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;file_id&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;file_id_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;unix_start_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;unix_start&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;unix_start_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td align=&quot;center&quot; port=&quot;unix_stop_in&quot; sides=&quot;ltb&quot;  bgcolor=&quot;#FFF0B0&quot;&gt;&lt;/td&gt;&lt;td align=&quot;left&quot; sides=&quot;rtb&quot; bgcolor=&quot;#FFF0B0&quot;&gt;&lt;b&gt;unix_stop&lt;/b&gt;&lt;/td&gt;&lt;td bgcolor=&quot;#FFE080&quot; align=&quot;left&quot; port=&quot;unix_stop_out&quot;&gt;Integer&lt;/td&gt;&lt;/tr&gt;
+
+        &lt;/table&gt;
+&gt;];
+code:process_id_out:e -&gt; process:process_id_in:w
+file:product_id_out:e -&gt; product:product_id_in:w
+filecodelink:resulting_file_out:e -&gt; file:file_id_in:w
+filecodelink:source_code_out:e -&gt; code:code_id_in:w
+filefilelink:resulting_file_out:e -&gt; file:file_id_in:w
+filefilelink:source_file_out:e -&gt; file:file_id_in:w
+inspector:product_out:e -&gt; product:product_id_in:w
+instrument:satellite_id_out:e -&gt; satellite:satellite_id_in:w
+instrumentproductlink:instrument_id_out:e -&gt; instrument:instrument_id_in:w
+instrumentproductlink:product_id_out:e -&gt; product:product_id_in:w
+logging:mission_id_out:e -&gt; mission:mission_id_in:w
+logging_file:code_id_out:e -&gt; code:code_id_in:w
+logging_file:file_id_out:e -&gt; file:file_id_in:w
+logging_file:logging_id_out:e -&gt; logging:logging_id_in:w
+process:output_product_out:e -&gt; product:product_id_in:w
+processqueue:file_id_out:e -&gt; file:file_id_in:w
+product:instrument_id_out:e -&gt; instrument:instrument_id_in:w
+productprocesslink:input_product_id_out:e -&gt; product:product_id_in:w
+productprocesslink:process_id_out:e -&gt; process:process_id_in:w
+release:file_id_out:e -&gt; file:file_id_in:w
+satellite:mission_id_out:e -&gt; mission:mission_id_in:w
+unixtime:file_id_out:e -&gt; file:file_id_in:w
+}" class="graphviz" /></div>
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-code">
+<span class="sig-name descname"><span class="pre">code</span></span><a class="headerlink" href="#table-code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table describing a single executable script, used for creating
+output files from input files (see <a class="reference internal" href="../concepts.html#concepts-codes"><span class="std std-ref">Codes</span></a>). Note each
+version of a code has its own entry (with no explicit connection between
+them), and a given script may be referred to/used by more than one code
+entry.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-code_id">
+<span class="pre">code_id</span><a class="headerlink" href="#column-code-code_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for this code, mostly for cross-referencing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-filename">
+<span class="pre">filename</span><a class="headerlink" href="#column-code-filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filename (only) of executable; this is passed as part of the command
+line. May include substitution strings.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-relative_path">
+<span class="pre">relative_path</span><a class="headerlink" href="#column-code-relative_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory containing <a class="reference internal" href="#column-code-filename"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">filename</span></code></a>, relative to
+<a class="reference internal" href="#column-mission-codedir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission.codedir</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-code_start_date">
+<span class="pre">code_start_date</span><a class="headerlink" href="#column-code-code_start_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Code is valid for files dated on or after this date; matching is by
+<a class="reference internal" href="#column-file-utc_file_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_file_date</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Date" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Date</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-code_stop_date">
+<span class="pre">code_stop_date</span><a class="headerlink" href="#column-code-code_stop_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Code is valid for files dated on or after before date; matching is by
+<a class="reference internal" href="#column-file-utc_file_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_file_date</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Date" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Date</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-code_description">
+<span class="pre">code_description</span><a class="headerlink" href="#column-code-code_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable description of a code. May be considered a name but
+usually longer than a name and usually not used for lookup.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-process_id">
+<span class="pre">process_id</span><a class="headerlink" href="#column-code-process_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The process implemented by this code.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-process-process_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">process.process_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-interface_version">
+<span class="pre">interface_version</span><a class="headerlink" href="#column-code-interface_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>code</em>. Full version is <code class="docutils literal notranslate"><span class="pre">interface.quality.revision</span></code>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-quality_version">
+<span class="pre">quality_version</span><a class="headerlink" href="#column-code-quality_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>code</em>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-revision_version">
+<span class="pre">revision_version</span><a class="headerlink" href="#column-code-revision_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>code</em>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-output_interface_version">
+<span class="pre">output_interface_version</span><a class="headerlink" href="#column-code-output_interface_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface (i.e. major) version of the <em>output product</em> of this code.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-active_code">
+<span class="pre">active_code</span><a class="headerlink" href="#column-code-active_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the code is active; inactive codes are not used for processing
+files.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Boolean" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Boolean</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-date_written">
+<span class="pre">date_written</span><a class="headerlink" href="#column-code-date_written" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date code was written; meant for human information only.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Date" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Date</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-shasum">
+<span class="pre">shasum</span><a class="headerlink" href="#column-code-shasum" title="Permalink to this definition">¶</a></dt>
+<dd><p>SHA-1 checksum of the code; meant for validation but not currently used.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-newest_version">
+<span class="pre">newest_version</span><a class="headerlink" href="#column-code-newest_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether this is the newest version of a particular code. This may somewhat
+conflict with having multiple versions of a code that are selected based
+on <a class="reference internal" href="#column-code-code_start_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code_start_date</span></code></a> and <a class="reference internal" href="#column-code-code_stop_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code_stop_date</span></code></a>; in
+practice, to date only one version of a code has been marked
+<code class="docutils literal notranslate"><span class="pre">newest_version</span></code> and it is also usually the only one marked
+<a class="reference internal" href="#column-code-active_code"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">active_code</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Boolean" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Boolean</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-arguments">
+<span class="pre">arguments</span><a class="headerlink" href="#column-code-arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Command line arguments for building the code. The full command line is
+built from <a class="reference internal" href="#column-mission-codedir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission.codedir</span></code></a>, <a class="reference internal" href="#column-code-relative_path"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">relative_path</span></code></a>,
+<a class="reference internal" href="#column-code-filename"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">filename</span></code></a>, <a class="reference internal" href="#column-process-extra_params"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">process.extra_params</span></code></a>, <code class="docutils literal notranslate"><span class="pre">arguments</span></code>,
+the input files, and then output files (in that order).
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-ram">
+<span class="pre">ram</span><a class="headerlink" href="#column-code-ram" title="Permalink to this definition">¶</a></dt>
+<dd><p>A relative measure of how much memory this code consumes. Purely
+relative and used in calculating how many codes are currently
+running for purposes of <a class="reference internal" href="../scripts.html#cmdoption-ProcessQueue.py-n"><code class="xref std std-option docutils literal notranslate"><span class="pre">ProcessQueue.py</span> <span class="pre">-n</span></code></a>. Nominally
+1, so e.g. making 2 indicates a process that takes up twice as much
+RAM as “typical”, and 0.5 indicates half as much as typical.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Float" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Float</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-code-cpu">
+<span class="pre">cpu</span><a class="headerlink" href="#column-code-cpu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analagous to <a class="reference internal" href="#column-code-ram"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">ram</span></code></a>, a relative measure of how much processor
+power it takes to run this code. More concretely, this should usually be
+set to the number of threads a code uses (thus being integral); a
+long-running single-threaded process should still be set to <code class="docutils literal notranslate"><span class="pre">1</span></code>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-file">
+<span class="sig-name descname"><span class="pre">file</span></span><a class="headerlink" href="#table-file" title="Permalink to this definition">¶</a></dt>
+<dd><p>A single data <a class="reference internal" href="../concepts.html#concepts-files"><span class="std std-ref">file</span></a>; conceptually maps to a single
+file on disk. Related, but not identical, to
+<a class="reference internal" href="autosummary/dbprocessing.Diskfile.Diskfile.html#dbprocessing.Diskfile.Diskfile" title="dbprocessing.Diskfile.Diskfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diskfile</span></code></a> and
+<a class="reference internal" href="autosummary/dbprocessing.DBfile.DBfile.html#dbprocessing.DBfile.DBfile" title="dbprocessing.DBfile.DBfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DBfile</span></code></a>. Much of this information is
+populated by the <a class="reference internal" href="autosummary/dbprocessing.inspector.inspector.html#dbprocessing.inspector.inspector" title="dbprocessing.inspector.inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">inspector</span></code></a>. See
+also <a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.addFile" title="dbprocessing.DButils.DButils.addFile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addFile()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-file_id">
+<span class="pre">file_id</span><a class="headerlink" href="#column-file-file_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for this file, mostly for cross-referencing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-filename">
+<span class="pre">filename</span><a class="headerlink" href="#column-file-filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the file, without path. The pathing is determined from
+<a class="reference internal" href="#column-product-relative_path"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product.relative_path</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-utc_file_date">
+<span class="pre">utc_file_date</span><a class="headerlink" href="#column-file-utc_file_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single data “characterizing” the data within the file. For a file
+of a product on a <code class="docutils literal notranslate"><span class="pre">DAILY</span></code> timebase, this usually maps to the date
+of every timestamp within the file. However, a daily file may, due
+to conversions, include a small amount of data from the previous and
+following date, thus this is distinct from <a class="reference internal" href="#column-file-utc_start_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_start_time</span></code></a>
+and <a class="reference internal" href="#column-file-utc_stop_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_stop_time</span></code></a>. Semantics on other timebases are not
+yet defined.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Date" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Date</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-utc_start_time">
+<span class="pre">utc_start_time</span><a class="headerlink" href="#column-file-utc_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timestamp of the first record in this file. The interpretation of this
+timestamp is not defined by dbprocessing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.DateTime" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTime</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-utc_stop_time">
+<span class="pre">utc_stop_time</span><a class="headerlink" href="#column-file-utc_stop_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timestamp of the last record in this file. The interpretation of this
+timestamp is not defined by dbprocessing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.DateTime" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTime</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-data_level">
+<span class="pre">data_level</span><a class="headerlink" href="#column-file-data_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Numerical level of this file; somewhat redundant with
+<a class="reference internal" href="#column-product-level"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product.level</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Float" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Float</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-interface_version">
+<span class="pre">interface_version</span><a class="headerlink" href="#column-file-interface_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>file</em>. Full version is <code class="docutils literal notranslate"><span class="pre">interface.quality.revision</span></code>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-quality_version">
+<span class="pre">quality_version</span><a class="headerlink" href="#column-file-quality_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>file</em>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-revision_version">
+<span class="pre">revision_version</span><a class="headerlink" href="#column-file-revision_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>file</em>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-verbose_provenance">
+<span class="pre">verbose_provenance</span><a class="headerlink" href="#column-file-verbose_provenance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full command line which was used to build this file; in theory if the
+same codes and input files are in place, executing this command line
+will recreate the file.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-check_date">
+<span class="pre">check_date</span><a class="headerlink" href="#column-file-check_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date the file was quality checked; unused. (Was meant to support the QA
+loop).
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.DateTime" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTime</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-quality_comment">
+<span class="pre">quality_comment</span><a class="headerlink" href="#column-file-quality_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Comment from the quality check; unused.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-caveats">
+<span class="pre">caveats</span><a class="headerlink" href="#column-file-caveats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Caveats on use of the file; unused.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-file_create_date">
+<span class="pre">file_create_date</span><a class="headerlink" href="#column-file-file_create_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date/time the file was created.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.DateTime" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTime</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-met_start_time">
+<span class="pre">met_start_time</span><a class="headerlink" href="#column-file-met_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mission Elapsed Time (MET) of first record in file, meant to correspond
+to <a class="reference internal" href="#column-file-utc_start_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_start_time</span></code></a>. Not used by dbprocessing logic and
+interpretation is not defined by dbprocessing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Float" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Float</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-met_stop_time">
+<span class="pre">met_stop_time</span><a class="headerlink" href="#column-file-met_stop_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>MET of last record in file, corresponding to <a class="reference internal" href="#column-file-utc_stop_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_stop_time</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Float" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Float</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-exists_on_disk">
+<span class="pre">exists_on_disk</span><a class="headerlink" href="#column-file-exists_on_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the file is believed to exist on disk, or is a historical
+record of a deleted file.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Boolean" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Boolean</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-quality_checked">
+<span class="pre">quality_checked</span><a class="headerlink" href="#column-file-quality_checked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether quality has been checked; part of the unused QA loop.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Boolean" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Boolean</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-product_id">
+<span class="pre">product_id</span><a class="headerlink" href="#column-file-product_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>This file is considered an instance of this product.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-product-product_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product.product_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-shasum">
+<span class="pre">shasum</span><a class="headerlink" href="#column-file-shasum" title="Permalink to this definition">¶</a></dt>
+<dd><p>SHA-1 checksum of the file, calculated when ingested.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-file-process_keywords">
+<span class="pre">process_keywords</span><a class="headerlink" href="#column-file-process_keywords" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This explanation may not be completely correct; this is not
+commonly used.</p>
+</div>
+<p>When a product has keyword substitutions in the filename
+<a class="reference internal" href="#column-product-format"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">format</span></code></a> that are not directly calculatable by
+dbprocessing (not, e.g. date or version), the values of those
+keywords for this file are stored, allowing calculation of the
+filename.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-filecodelink">
+<span class="sig-name descname"><span class="pre">filecodelink</span></span><a class="headerlink" href="#table-filecodelink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects a single data file to the (single) code used to create it.
+A many-to-one relationship: many files are made from a single code.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-filecodelink-resulting_file">
+<span class="pre">resulting_file</span><a class="headerlink" href="#column-filecodelink-resulting_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the file created.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-file-file_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.file_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-filecodelink-source_code">
+<span class="pre">source_code</span><a class="headerlink" href="#column-filecodelink-source_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the code used to create <a class="reference internal" href="#column-filecodelink-resulting_file"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">resulting_file</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-code-code_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code.code_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-filefilelink">
+<span class="sig-name descname"><span class="pre">filefilelink</span></span><a class="headerlink" href="#table-filefilelink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects a single data file to the (potentially many) input files used
+to create it. A many-to-many relationship: each file may serve as input
+to multiple output files, and each output file may be created from
+multiple inputs. This table is expressed as pairs: each row links one
+output file to one of its input files.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-filefilelink-source_file">
+<span class="pre">source_file</span><a class="headerlink" href="#column-filefilelink-source_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the source (input) file for a particular pairing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-file-file_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.file_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-filefilelink-resulting_file">
+<span class="pre">resulting_file</span><a class="headerlink" href="#column-filefilelink-resulting_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the resulting (output) file for a particular pairing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-file-file_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.file_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-inspector">
+<span class="sig-name descname"><span class="pre">inspector</span></span><a class="headerlink" href="#table-inspector" title="Permalink to this definition">¶</a></dt>
+<dd><p>An <a class="reference internal" href="../concepts.html#concepts-inspectors"><span class="std std-ref">inspector</span></a> is a small piece of
+code which examines (inspects) a file to determine its product and
+various metadata for dbprocessing; this table describes the codes.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="autosummary/dbprocessing.inspector.inspector.html#dbprocessing.inspector.inspector" title="dbprocessing.inspector.inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">inspector</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-inspector_id">
+<span class="pre">inspector_id</span><a class="headerlink" href="#column-inspector-inspector_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for this inspector, mostly for cross-referencing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-filename">
+<span class="pre">filename</span><a class="headerlink" href="#column-inspector-filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filename (only) of inspector module.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-relative_path">
+<span class="pre">relative_path</span><a class="headerlink" href="#column-inspector-relative_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory containing <a class="reference internal" href="#column-inspector-filename"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">filename</span></code></a>, relative to
+<a class="reference internal" href="#column-mission-inspectordir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission.inspectordir</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-description">
+<span class="pre">description</span><a class="headerlink" href="#column-inspector-description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable description of an inspector. May be considered a name
+but usually longer than a name and usually not used for lookup.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-interface_version">
+<span class="pre">interface_version</span><a class="headerlink" href="#column-inspector-interface_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>inspector</em>. Full version is <code class="docutils literal notranslate"><span class="pre">interface.quality.revision</span></code>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-quality_version">
+<span class="pre">quality_version</span><a class="headerlink" href="#column-inspector-quality_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>inspector</em>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-revision_version">
+<span class="pre">revision_version</span><a class="headerlink" href="#column-inspector-revision_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of the <em>inspector</em>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-output_interface_version">
+<span class="pre">output_interface_version</span><a class="headerlink" href="#column-inspector-output_interface_version" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The purpose of this column is unclear.</p>
+</div>
+<p>Usually 1. May exist simply from copying the <a class="reference internal" href="#table-code"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">code</span></code></a> definition.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-active_code">
+<span class="pre">active_code</span><a class="headerlink" href="#column-inspector-active_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether this inspector is active, i.e. actually executed to determine
+potential matches between files and products.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Boolean" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Boolean</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-date_written">
+<span class="pre">date_written</span><a class="headerlink" href="#column-inspector-date_written" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date inspector was written; meant for human information only.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Date" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Date</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-shasum">
+<span class="pre">shasum</span><a class="headerlink" href="#column-inspector-shasum" title="Permalink to this definition">¶</a></dt>
+<dd><p>SHA-1 checksum of the inspector file; meant for validation but not
+currently used.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-newest_version">
+<span class="pre">newest_version</span><a class="headerlink" href="#column-inspector-newest_version" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This does not appear to be used, so its purpose is unclear.</p>
+</div>
+<p>Whether this is the newest version of a particular inspector.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Boolean" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Boolean</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-arguments">
+<span class="pre">arguments</span><a class="headerlink" href="#column-inspector-arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Space-separated list of <code class="docutils literal notranslate"><span class="pre">key=value</span></code> pairs, passed as keyword arguments
+to <a class="reference internal" href="autosummary/dbprocessing.inspector.inspector.html#dbprocessing.inspector.inspector.inspect" title="dbprocessing.inspector.inspector.inspect"><code class="xref py py-class docutils literal notranslate"><span class="pre">inspect</span></code></a>. This allows
+the same file to be used as an inspector for multiple products, by using
+different arguments.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-inspector-product">
+<span class="pre">product</span><a class="headerlink" href="#column-inspector-product" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the product which this inspector identifies. Every inspector can
+identify on, and only one, product.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-product-product_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product.product_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-instrument">
+<span class="sig-name descname"><span class="pre">instrument</span></span><a class="headerlink" href="#table-instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes an instrument. An instrument is primarily a means of connecting
+related products for convenience (e.g. in queries and reprocessing);
+generally speaking it corresponds to a physical instrument. The hierarchy
+of association is <a class="reference internal" href="#table-instrument"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">instrument</span></code></a>, <a class="reference internal" href="#table-satellite"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">satellite</span></code></a>,
+<a class="reference internal" href="#table-mission"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">mission</span></code></a>, where each relation is many-to-one.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-instrument-instrument_id">
+<span class="pre">instrument_id</span><a class="headerlink" href="#column-instrument-instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for this instrument, mostly for cross-referencing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-instrument-instrument_name">
+<span class="pre">instrument_name</span><a class="headerlink" href="#column-instrument-instrument_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the instrument, normally short to make it easy to use in command
+line queries.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-instrument-satellite_id">
+<span class="pre">satellite_id</span><a class="headerlink" href="#column-instrument-satellite_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the satellite of which this instrument is part.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-satellite-satellite_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">satellite.satellite_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-instrumentproductlink">
+<span class="sig-name descname"><span class="pre">instrumentproductlink</span></span><a class="headerlink" href="#table-instrumentproductlink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects each instrument to the products it is associated with. This is
+a many-to-many link: an instrument may have its data in several products,
+and a product may draw from several instruments. Most commonly a product
+is associated with only one instrument; having multiple instruments per
+product is not heavily used or tested.</p>
+<p>This table is expressed as pairs: each row links one product with one
+instrument.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The existence of <a class="reference internal" href="#column-product-instrument_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product.instrument_id</span></code></a> suggests a
+different approach than this.</p>
+</div>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-instrumentproductlink-instrument_id">
+<span class="pre">instrument_id</span><a class="headerlink" href="#column-instrumentproductlink-instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the instrument in a pairing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-instrument-instrument_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">instrument.instrument_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-instrumentproductlink-product_id">
+<span class="pre">product_id</span><a class="headerlink" href="#column-instrumentproductlink-product_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the product associated with the instrument in the same record.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-product-product_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product.product_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-logging">
+<span class="sig-name descname"><span class="pre">logging</span></span><a class="headerlink" href="#table-logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log of the state of <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> invocations. Every
+run creates a single record in this table, recording the state of
+processing and how it terminated.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-logging_id">
+<span class="pre">logging_id</span><a class="headerlink" href="#column-logging-logging_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for each log entry, to maintain unique rows.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-currently_processing">
+<span class="pre">currently_processing</span><a class="headerlink" href="#column-logging-currently_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this instance of <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> still running.
+There should only be one instance running at a time, so this is used
+as a lock (<a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.currentlyProcessing" title="dbprocessing.DButils.DButils.currentlyProcessing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">currentlyProcessing()</span></code></a>).
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Boolean" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Boolean</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-pid">
+<span class="pre">pid</span><a class="headerlink" href="#column-logging-pid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process ID of <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-processing_start_time">
+<span class="pre">processing_start_time</span><a class="headerlink" href="#column-logging-processing_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>When this instance of <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> started.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.DateTime" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTime</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-processing_end_time">
+<span class="pre">processing_end_time</span><a class="headerlink" href="#column-logging-processing_end_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>When this instance of <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> completed.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.DateTime" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTime</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-comment">
+<span class="pre">comment</span><a class="headerlink" href="#column-logging-comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>How <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> exited. In the event the processing
+flag was cleared manually with <a class="reference internal" href="../scripts.html#scripts-clearprocessingflag-py"><span class="std std-ref">clearProcessingFlag.py</span></a>,
+this includes the <a class="reference internal" href="../scripts.html#cmdoption-clearProcessingFlag.py-arg-message"><code class="xref std std-option docutils literal notranslate"><span class="pre">message</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-mission_id">
+<span class="pre">mission_id</span><a class="headerlink" href="#column-logging-mission_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the mission on which this is executing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-mission-mission_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission.mission_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-user">
+<span class="pre">user</span><a class="headerlink" href="#column-logging-user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Username running the <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> process.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging-hostname">
+<span class="pre">hostname</span><a class="headerlink" href="#column-logging-hostname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the host on which <a class="reference internal" href="../scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> is running.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-logging_file">
+<span class="sig-name descname"><span class="pre">logging_file</span></span><a class="headerlink" href="#table-logging_file" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This table appears to be unused.</p>
+</div>
+<p>Likely intended to provide some sort of dbprocessing-level support for
+logging from data processing codes, but not used.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging_file-logging_file_id">
+<span class="pre">logging_file_id</span><a class="headerlink" href="#column-logging_file-logging_file_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging_file-logging_id">
+<span class="pre">logging_id</span><a class="headerlink" href="#column-logging_file-logging_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-logging-logging_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">logging.logging_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging_file-file_id">
+<span class="pre">file_id</span><a class="headerlink" href="#column-logging_file-file_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-file-file_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.file_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging_file-code_id">
+<span class="pre">code_id</span><a class="headerlink" href="#column-logging_file-code_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-code-code_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code.code_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-logging_file-comments">
+<span class="pre">comments</span><a class="headerlink" href="#column-logging_file-comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-mission">
+<span class="sig-name descname"><span class="pre">mission</span></span><a class="headerlink" href="#table-mission" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../concepts.html#concepts-missions"><span class="std std-ref">mission</span></a> for the data held in this database.
+A mission may pertain
+to multiple satellites, e.g. the Van Allen Probes mission had RBSP-A
+and RBSP-B. The hierarchy of association is <a class="reference internal" href="#table-instrument"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">instrument</span></code></a>,
+<a class="reference internal" href="#table-satellite"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">satellite</span></code></a>, <a class="reference internal" href="#table-mission"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">mission</span></code></a>, where each relation is
+many-to-one.</p>
+<p>This is the top-level table determining where dbprocessing looks for
+files and codes.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In theory a single database can contain multiple missions; in practice,
+this has always been a one-to-one, and many parts of the codebase assume
+just one mission. In particular, most command line arguments to
+specify “mission” really specify the database.</p>
+</div>
+<p>A mission has many relevant directories; in older versions of the database,
+these were not all explicitly specified, and in newer versions they may
+often be null. In these cases a default is used; see
+<a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.getDirectory" title="dbprocessing.DButils.DButils.getDirectory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getDirectory()</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Where specified in this table, directories are assumed to be absolute.
+If relative, they are relative to current directory, not any particular
+mission directory.</p>
+</div>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-mission-mission_id">
+<span class="pre">mission_id</span><a class="headerlink" href="#column-mission-mission_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for this code, mostly for cross-referencing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-mission-mission_name">
+<span class="pre">mission_name</span><a class="headerlink" href="#column-mission-mission_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable name of this mission, should be short for easy use in
+command line queries.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-mission-rootdir">
+<span class="pre">rootdir</span><a class="headerlink" href="#column-mission-rootdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>All data paths are specified relative to this directory. Code and related
+paths are not.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.getMissionDirectory" title="dbprocessing.DButils.DButils.getMissionDirectory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getMissionDirectory()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-mission-incoming_dir">
+<span class="pre">incoming_dir</span><a class="headerlink" href="#column-mission-incoming_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory from which new files are ingested for this mission.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.getIncomingPath" title="dbprocessing.DButils.DButils.getIncomingPath"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getIncomingPath()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-mission-codedir">
+<span class="pre">codedir</span><a class="headerlink" href="#column-mission-codedir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data processing codes are specified relative to this directory.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>)</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.getCodeDirectory" title="dbprocessing.DButils.DButils.getCodeDirectory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getCodeDirectory()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-mission-inspectordir">
+<span class="pre">inspectordir</span><a class="headerlink" href="#column-mission-inspectordir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inspector module paths are specified relative to this directory.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>)</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.getInspectorDirectory" title="dbprocessing.DButils.DButils.getInspectorDirectory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getInspectorDirectory()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-mission-errordir">
+<span class="pre">errordir</span><a class="headerlink" href="#column-mission-errordir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outputs of failed data processing codes, both file outputs and stdout,
+are placed in this directory, by default <code class="docutils literal notranslate"><span class="pre">'errors'</span></code> in
+<a class="reference internal" href="#column-mission-codedir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">codedir</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>)</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.getErrorPath" title="dbprocessing.DButils.DButils.getErrorPath"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getErrorPath()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-process">
+<span class="sig-name descname"><span class="pre">process</span></span><a class="headerlink" href="#table-process" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="../concepts.html#concepts-processes"><span class="std std-ref">process</span></a>, which converts files of input
+product(s) to a file of an output product.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-process-process_id">
+<span class="pre">process_id</span><a class="headerlink" href="#column-process-process_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for this process, mostly for cross-referencing
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-process-process_name">
+<span class="pre">process_name</span><a class="headerlink" href="#column-process-process_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable name of this process, normally short to make it easy
+to use in command line queries.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-process-output_product">
+<span class="pre">output_product</span><a class="headerlink" href="#column-process-output_product" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the single output product.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-product-product_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product.product_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-process-output_timebase">
+<span class="pre">output_timebase</span><a class="headerlink" href="#column-process-output_timebase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timebase of output files.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-process-extra_params">
+<span class="pre">extra_params</span><a class="headerlink" href="#column-process-extra_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Arguments to add to the processing command line. These are added before the
+code’s <a class="reference internal" href="#column-code-arguments"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">arguments</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-processqueue">
+<span class="sig-name descname"><span class="pre">processqueue</span></span><a class="headerlink" href="#table-processqueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queue of files which are to be evaluated as potential inputs to processes
+see <a class="reference internal" href="../concepts.html#concepts-process-queue"><span class="std std-ref">Process Queue</span></a>. <a class="reference internal" href="../scripts.html#cmdoption-ProcessQueue.py-p"><code class="xref std std-option docutils literal notranslate"><span class="pre">ProcessQueue.py</span> <span class="pre">-p</span></code></a> will
+evaluate all products which can be built using these as inputs, and create
+any which are out of date.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-processqueue-file_id">
+<span class="pre">file_id</span><a class="headerlink" href="#column-processqueue-file_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of a file in the queue.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-file-file_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.file_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-processqueue-version_bump">
+<span class="pre">version_bump</span><a class="headerlink" href="#column-processqueue-version_bump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Requested approach to processing. By default, will only run processes
+if the outputs are out of date. If this is set, processes are forced
+to run, and the specified version component of the output is incremented
+(0 for interface version, 1 for quality, 2 for revision.)
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.SmallInteger" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmallInteger</span></code></a>)</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../scripts.html#cmdoption-reprocessByProduct.py-force"><code class="xref std std-option docutils literal notranslate"><span class="pre">reprocessByProduct.py</span> <span class="pre">--force</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-product">
+<span class="sig-name descname"><span class="pre">product</span></span><a class="headerlink" href="#table-product" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generalization or “type” of a file; every file is an instance of a
+<a class="reference internal" href="../concepts.html#concepts-products"><span class="std std-ref">product</span></a>.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-product-product_id">
+<span class="pre">product_id</span><a class="headerlink" href="#column-product-product_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for this product, mostly for cross-referencing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-product-product_name">
+<span class="pre">product_name</span><a class="headerlink" href="#column-product-product_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable name of the product, normally short to make it easy to
+use in command line queries.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-product-instrument_id">
+<span class="pre">instrument_id</span><a class="headerlink" href="#column-product-instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The instrument providing data for this product.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-instrument-instrument_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">instrument.instrument_id</span></code></a>)</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The existence of <a class="reference internal" href="#table-instrumentproductlink"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">instrumentproductlink</span></code></a> suggests a
+different approach than this.</p>
+</div>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-product-relative_path">
+<span class="pre">relative_path</span><a class="headerlink" href="#column-product-relative_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Location where data files of this product are stored, relative to
+<a class="reference internal" href="#column-mission-rootdir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">rootdir</span></code></a>. May contain fields to be filled
+(e.g. <code class="docutils literal notranslate"><span class="pre">{Y}</span></code> to have a by-year directory).
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-product-level">
+<span class="pre">level</span><a class="headerlink" href="#column-product-level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Numerical level of this product; somewhat redundant with
+<a class="reference internal" href="#column-file-data_level"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.data_level</span></code></a>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Float" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Float</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-product-format">
+<span class="pre">format</span><a class="headerlink" href="#column-product-format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filename template for files of this product. Normally contains fields
+to be filled (e.g. <code class="docutils literal notranslate"><span class="pre">{Y}</span></code> to include the year).
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-product-product_description">
+<span class="pre">product_description</span><a class="headerlink" href="#column-product-product_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable description of the product. Usually not used for queries.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Text" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-productprocesslink">
+<span class="sig-name descname"><span class="pre">productprocesslink</span></span><a class="headerlink" href="#table-productprocesslink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relates processes to the products that they need as inputs. Each record
+pairs a process with one of its input products and describes that
+relationship.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-productprocesslink-process_id">
+<span class="pre">process_id</span><a class="headerlink" href="#column-productprocesslink-process_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the process whose input product is described by this record.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-process-process_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">process.process_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-productprocesslink-input_product_id">
+<span class="pre">input_product_id</span><a class="headerlink" href="#column-productprocesslink-input_product_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of one input product for the process of this record.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-product-product_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product.product_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-productprocesslink-optional">
+<span class="pre">optional</span><a class="headerlink" href="#column-productprocesslink-optional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether <a class="reference internal" href="#column-productprocesslink-input_product_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">input_product_id</span></code></a> is an optional product, in which
+case the process can execute without it, or not. A product will only
+execute if all its required inputs are available. If all inputs are optional,
+it will only execute if at least one optional input is available.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Boolean" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Boolean</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-productprocesslink-yesterday">
+<span class="pre">yesterday</span><a class="headerlink" href="#column-productprocesslink-yesterday" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of days in the past of this product to include as inputs to the
+process. For instance, if this is 2, then in processing day <code class="docutils literal notranslate"><span class="pre">n</span></code>, days
+<code class="docutils literal notranslate"><span class="pre">n-1</span></code> and <code class="docutils literal notranslate"><span class="pre">n-2</span></code> are also provided as inputs. Behavior is undefined
+for timebases other than <code class="docutils literal notranslate"><span class="pre">DAILY</span></code>.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-productprocesslink-tomorrow">
+<span class="pre">tomorrow</span><a class="headerlink" href="#column-productprocesslink-tomorrow" title="Permalink to this definition">¶</a></dt>
+<dd><p>As <a class="reference internal" href="#column-productprocesslink-yesterday"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">yesterday</span></code></a>, but specifying days in the future.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-release">
+<span class="sig-name descname"><span class="pre">release</span></span><a class="headerlink" href="#table-release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tracks the files that are present in a public release. For every release,
+each file in that release has a record in this table. This is a
+many-to-many relationship: each file may be in multiple releases, which
+may contain multiple files.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-release-file_id">
+<span class="pre">file_id</span><a class="headerlink" href="#column-release-file_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the file which is included in the release.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-file-file_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.file_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-release-release_num">
+<span class="pre">release_num</span><a class="headerlink" href="#column-release-release_num" title="Permalink to this definition">¶</a></dt>
+<dd><p>Release number of which <a class="reference internal" href="#column-release-file_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file_id</span></code></a> is a part.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-satellite">
+<span class="sig-name descname"><span class="pre">satellite</span></span><a class="headerlink" href="#table-satellite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes an satellite. A satellite is primarily a means of connecting
+related products for convenience (e.g. in queries and reprocessing);
+generally speaking it corresponds to a physical instrument. The hierarchy
+of association is <a class="reference internal" href="#table-instrument"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">instrument</span></code></a>, <a class="reference internal" href="#table-satellite"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">satellite</span></code></a>,
+<a class="reference internal" href="#table-mission"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">mission</span></code></a>, where each relation is many-to-one.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-satellite-satellite_id">
+<span class="pre">satellite_id</span><a class="headerlink" href="#column-satellite-satellite_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-incremented ID for this satellite, mostly for cross-referencing.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-satellite-satellite_name">
+<span class="pre">satellite_name</span><a class="headerlink" href="#column-satellite-satellite_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the satellite, normally short to make it easy to use in command
+line queries.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.String" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">String</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-satellite-mission_id">
+<span class="pre">mission_id</span><a class="headerlink" href="#column-satellite-mission_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the mission of which this satellite is part.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-mission-mission_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission.mission_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql table">
+<dt class="sig sig-object sql" id="table-unixtime">
+<span class="sig-name descname"><span class="pre">unixtime</span></span><a class="headerlink" href="#table-unixtime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores the start and stop time for each file as a count of seconds since
+the Unix epoch. This makes certain lookups faster.</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-unixtime-file_id">
+<span class="pre">file_id</span><a class="headerlink" href="#column-unixtime-file_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the file for which this record stores the start/stop times.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.PrimaryKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PK</span></code></a>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code>,
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/constraints.html#sqlalchemy.schema.ForeignKeyConstraint" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FK</span></code></a>
+<a class="reference internal" href="#column-file-file_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.file_id</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-unixtime-unix_start">
+<span class="pre">unix_start</span><a class="headerlink" href="#column-unixtime-unix_start" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#column-file-utc_start_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_start_time</span></code></a> for this file expressed as seconds
+since Unix epoch.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>)</p>
+</dd></dl>
+
+<dl class="sql column">
+<dt class="sig sig-object sql" id="column-unixtime-unix_stop">
+<span class="pre">unix_stop</span><a class="headerlink" href="#column-unixtime-unix_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#column-file-utc_stop_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_stop_time</span></code></a> for this file expressed as seconds
+since Unix epoch.
+(<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a>)</p>
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="release.html"
+                          title="previous chapter">Building a release</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="inspector_examples.html"
+                          title="next chapter">Inspector examples</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/developer/tables.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="inspector_examples.html" title="Inspector examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="release.html" title="Building a release"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tables</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

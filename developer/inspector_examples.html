@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Inspector examples &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing" href="../CONTRIBUTING.html" />
+    <link rel="prev" title="Tables" href="tables.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../CONTRIBUTING.html" title="Contributing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tables.html" title="Tables"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Inspector examples</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="inspector-examples">
+<h1>Inspector examples<a class="headerlink" href="#inspector-examples" title="Permalink to this headline">¶</a></h1>
+<p>These are some examples of <a class="reference internal" href="../concepts.html#concepts-inspectors"><span class="std std-ref">Inspectors</span></a>.</p>
+<section id="example-1">
+<h2>Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">spacepy</span> <span class="kn">import</span> <span class="n">pycdf</span>
+<span class="kn">from</span> <span class="nn">dbprocessing</span> <span class="kn">import</span> <span class="n">DBlogging</span>
+<span class="kn">from</span> <span class="nn">dbprocessing</span> <span class="kn">import</span> <span class="n">inspector</span>
+<span class="kn">from</span> <span class="nn">dbprocessing</span> <span class="kn">import</span> <span class="n">Version</span>
+
+<span class="k">class</span> <span class="nc">Inspector</span><span class="p">(</span><span class="n">inspector</span><span class="o">.</span><span class="n">inspector</span><span class="p">):</span>
+
+    <span class="n">code_name</span> <span class="o">=</span> <span class="s1">&#39;ect_L2_V1.0.0.py&#39;</span>
+
+    <span class="k">def</span> <span class="nf">inspect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">re1</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="si">{product_name}</span><span class="s1">_\d\d\d\d\d\d\d\d.*.cdf$&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">re1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">):</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector </span><span class="si">{0}</span><span class="s2">:  re did not match </span><span class="si">{1}</span><span class="s2"> </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">,</span> <span class="n">re1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+     <span class="k">try</span><span class="p">:</span>
+         <span class="n">cdf</span> <span class="o">=</span> <span class="n">pycdf</span><span class="o">.</span><span class="n">CDF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+     <span class="k">except</span><span class="p">:</span>
+         <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector </span><span class="si">{0}</span><span class="s2">: error in pycdf.CDF()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">))</span>
+         <span class="k">return</span> <span class="kc">None</span> <span class="c1"># malformed file</span>
+
+     <span class="k">try</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_file_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_YYYYMMDD</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+     <span class="k">except</span><span class="p">:</span>
+         <span class="k">return</span> <span class="kc">None</span>
+     <span class="c1">## get the start time from the file</span>
+     <span class="n">min_time</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cdf</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="n">pycdf</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">CDF_EPOCH</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">pycdf</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">CDF_EPOCH16</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">rv</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+     <span class="n">max_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cdf</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="n">pycdf</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">CDF_EPOCH</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">pycdf</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">CDF_EPOCH16</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">rv</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_time</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_stop_time&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="n">max_time</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inspector</span><span class="o">.</span><span class="n">extract_Version</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">)</span>
+     <span class="k">return</span> <span class="s2">&quot;That is not my dog.&quot;</span> <span class="c1"># anything that is not None is good</span>
+</pre></div>
+</div>
+</section>
+<section id="example-2">
+<h2>Example 2<a class="headerlink" href="#example-2" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">dbprocessing</span> <span class="kn">import</span> <span class="n">DBlogging</span>
+<span class="kn">from</span> <span class="nn">dbprocessing</span> <span class="kn">import</span> <span class="n">inspector</span>
+<span class="kn">from</span> <span class="nn">dbprocessing</span> <span class="kn">import</span> <span class="n">Version</span>
+
+<span class="k">class</span> <span class="nc">Inspector</span><span class="p">(</span><span class="n">inspector</span><span class="o">.</span><span class="n">inspector</span><span class="p">):</span>
+
+    <span class="n">code_name</span> <span class="o">=</span> <span class="s1">&#39;ephem_0_insp.py&#39;</span>
+
+    <span class="k">def</span> <span class="nf">inspect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">re1</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;.*</span><span class="si">{product_name}</span><span class="s1">.*&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">re1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">):</span>
+            <span class="n">DBlogging</span><span class="o">.</span><span class="n">dblogger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Inspector </span><span class="si">{0}</span><span class="s2">:  re did not match </span><span class="si">{1}</span><span class="s2"> </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_name</span><span class="p">,</span> <span class="n">re1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_YYYYMMDD</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_file_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+
+        <span class="c1">## get the start time from the file</span>
+        <span class="n">min_time</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;utc_stop_time&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="n">max_time</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diskfile</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Version</span><span class="o">.</span><span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="s2">&quot;That is not my dog.&quot;</span> <span class="c1"># anything that is not None is good</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Inspector examples</a><ul>
+<li><a class="reference internal" href="#example-1">Example 1</a></li>
+<li><a class="reference internal" href="#example-2">Example 2</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="tables.html"
+                          title="previous chapter">Tables</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../CONTRIBUTING.html"
+                          title="next chapter">Contributing</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/developer/inspector_examples.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../CONTRIBUTING.html" title="Contributing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tables.html" title="Tables"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Inspector examples</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

@@ -1,33 +1,30 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dbprocessing.DBqueue &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     
-    <title>dbprocessing.DBqueue &mdash; dbprocessing NMC_1 documentation</title>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     
-    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     'NMC_1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/copybutton.js"></script>
-    <link rel="top" title="dbprocessing NMC_1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -37,29 +34,17 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="../../search.html">search</a>|&nbsp;</li>
-       <li><a href="../../index.html">top</a> &raquo;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
 
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.DBqueue</a></li> 
       </ul>
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -67,16 +52,30 @@
           <div class="body" role="main">
             
   <h1>Source code for dbprocessing.DBqueue</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;General deque implementation, used for processing queue.&quot;&quot;&quot;</span>
+
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
 
 
-<div class="viewcode-block" id="DBqueue"><a class="viewcode-back" href="../../autosummary/dbprocessing.DBqueue.DBqueue.html#dbprocessing.DBqueue.DBqueue">[docs]</a><span class="k">class</span> <span class="nc">DBqueue</span><span class="p">(</span><span class="n">deque</span><span class="p">):</span>
-<div class="viewcode-block" id="DBqueue.popleftiter"><a class="viewcode-back" href="../../autosummary/dbprocessing.DBqueue.DBqueue.html#dbprocessing.DBqueue.DBqueue.popleftiter">[docs]</a>    <span class="k">def</span> <span class="nf">popleftiter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DBqueue"><a class="viewcode-back" href="../../developer/autosummary/dbprocessing.DBqueue.DBqueue.html#dbprocessing.DBqueue.DBqueue">[docs]</a><span class="k">class</span> <span class="nc">DBqueue</span><span class="p">(</span><span class="n">deque</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;General deque</span>
+
+<span class="sd">    Extension to :class:`~collections.deque` to add methods</span>
+<span class="sd">    :meth:`popiter` and :meth:`popleftiter`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DBqueue.popleftiter"><a class="viewcode-back" href="../../developer/autosummary/dbprocessing.DBqueue.DBqueue.html#dbprocessing.DBqueue.DBqueue.popleftiter">[docs]</a>    <span class="k">def</span> <span class="nf">popleftiter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allow a for loop to iterate and pop items from the DBqueue</span>
 
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        any</span>
+<span class="sd">            Leftmost (0th) item in queue.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; a = DBqueue([1,2,3])</span>
 <span class="sd">        &gt;&gt;&gt;  for i in a.popleftiter():</span>
 <span class="sd">        ...:     print(i)</span>
@@ -87,10 +86,17 @@
         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="DBqueue.popiter"><a class="viewcode-back" href="../../autosummary/dbprocessing.DBqueue.DBqueue.html#dbprocessing.DBqueue.DBqueue.popiter">[docs]</a>    <span class="k">def</span> <span class="nf">popiter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DBqueue.popiter"><a class="viewcode-back" href="../../developer/autosummary/dbprocessing.DBqueue.DBqueue.html#dbprocessing.DBqueue.DBqueue.popiter">[docs]</a>    <span class="k">def</span> <span class="nf">popiter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allow a for loop to iterate and pop items from the DBqueue</span>
 
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        any</span>
+<span class="sd">            Rightmost (last) item in queue.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; a = DBqueue([1,2,3])</span>
 <span class="sd">        &gt;&gt;&gt;  for i in a.poptiter():</span>
 <span class="sd">        ...:     print(i)</span>
@@ -102,7 +108,22 @@
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -116,15 +137,19 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="../../search.html">search</a>|&nbsp;</li>
-       <li><a href="../../index.html">top</a> &raquo;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
 
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.DBqueue</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

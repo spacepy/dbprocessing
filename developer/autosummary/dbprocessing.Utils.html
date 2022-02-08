@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.Utils &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.Version" href="dbprocessing.Version.html" />
+    <link rel="prev" title="dbprocessing.tables" href="dbprocessing.tables.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Version.html" title="dbprocessing.Version"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.tables.html" title="dbprocessing.tables"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" accesskey="U">API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.Utils</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-dbprocessing.Utils">
+<span id="dbprocessing-utils"></span><h1>dbprocessing.Utils<a class="headerlink" href="#module-dbprocessing.Utils" title="Permalink to this headline">¶</a></h1>
+<p>Various utilities of use throughout this code.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.chunker" title="dbprocessing.Utils.chunker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chunker</span></code></a>(seq, size)</p></td>
+<td><p>Return a long iterable in a tuple of shorter lists.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.dateForPrinting" title="dbprocessing.Utils.dateForPrinting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dateForPrinting</span></code></a>([dt, microseconds, brackets])</p></td>
+<td><p>Return a string of the date format for printing on the screen</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.daterange_to_dates" title="dbprocessing.Utils.daterange_to_dates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daterange_to_dates</span></code></a>(daterange)</p></td>
+<td><p>Given a daterange return the date objects for all days in the range</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.datetimeToDate" title="dbprocessing.Utils.datetimeToDate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetimeToDate</span></code></a>(dt)</p></td>
+<td><p>Given an input datetime.datetime or datetime.date return a datetime.date</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.dirSubs" title="dbprocessing.Utils.dirSubs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dirSubs</span></code></a>(path, filename, utc_file_date, ...)</p></td>
+<td><p>Do any substitutions that are needed to put thing in the right place</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.expandDates" title="dbprocessing.Utils.expandDates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expandDates</span></code></a>(start_time, stop_time)</p></td>
+<td><p>Given a start and a stop date make all the dates in between</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.flatten" title="dbprocessing.Utils.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code></a>(l)</p></td>
+<td><p>Flatten an irregularly nested list of lists</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.parseDate" title="dbprocessing.Utils.parseDate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parseDate</span></code></a>(inval)</p></td>
+<td><p>Given a date of the for yyyy-mm-dd parse to a datetime.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.parseVersion" title="dbprocessing.Utils.parseVersion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parseVersion</span></code></a>(inval)</p></td>
+<td><p>Given a format of the form x.y.z parse to a Version</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.processRunning" title="dbprocessing.Utils.processRunning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">processRunning</span></code></a>(pid)</p></td>
+<td><p>Given a PID see if it is currently running.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.progressbar" title="dbprocessing.Utils.progressbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">progressbar</span></code></a>(count, blocksize, totalsize[, text])</p></td>
+<td><p>Print a progress bar with urllib.urlretrieve reporthook functionality</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.readconfig" title="dbprocessing.Utils.readconfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">readconfig</span></code></a>(config_filepath)</p></td>
+<td><p>Read a database definition config file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.split_code_args" title="dbprocessing.Utils.split_code_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_code_args</span></code></a>(args)</p></td>
+<td><p>Split a string with a bunch of command line arguments into a list</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.strargs_to_args" title="dbprocessing.Utils.strargs_to_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strargs_to_args</span></code></a>(strargs)</p></td>
+<td><p>Read in the arguments string from the db and change to a dict</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.toBool" title="dbprocessing.Utils.toBool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toBool</span></code></a>(value)</p></td>
+<td><p>Returns true if passed 'True', 'true', True, 1, 'Yes', 'yes', 'Y', or 'y'</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.toDatetime" title="dbprocessing.Utils.toDatetime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toDatetime</span></code></a>(dt[, end])</p></td>
+<td><p>Convert a date, date string, or datetime to a datetime</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Utils.toNone" title="dbprocessing.Utils.toNone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toNone</span></code></a>(value)</p></td>
+<td><p>Returns None if passed '', 'None', 'none', or 'NONE'</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Utils.unique" title="dbprocessing.Utils.unique"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique</span></code></a>(seq)</p></td>
+<td><p>Take a list and return only the unique elements in the same order</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.chunker">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">chunker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#chunker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.chunker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a long iterable in a tuple of shorter lists.</p>
+<p>Taken from <a class="reference external" href="https://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks">https://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks</a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>seq</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a></span></dt><dd><p>Iterable to split up</p>
+</dd>
+<dt><strong>size</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Size of each split in the output, last one has the remaining elements
+of <code class="docutils literal notranslate"><span class="pre">seq</span></code></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></dt><dd><p>tuple of lists of the iterable <code class="docutils literal notranslate"><span class="pre">seq</span></code> split into <code class="docutils literal notranslate"><span class="pre">len(seq)/size</span></code>
+segments</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.dateForPrinting">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">dateForPrinting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">microseconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brackets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'[]'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#dateForPrinting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.dateForPrinting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string of the date format for printing on the screen</p>
+<p>If dt is <code class="docutils literal notranslate"><span class="pre">None</span></code> return <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="(in Python v3.10)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">now()</span></code></a>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>dt</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, default <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime.now" title="(in Python v3.10)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">now()</span></code></a></span></dt><dd><p>object to format</p>
+</dd>
+<dt><strong>microseconds</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default False</span></dt><dd><p>Include microseconds</p>
+</dd>
+<dt><strong>brackets</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Which brackets to encase the time in, default <code class="docutils literal notranslate"><span class="pre">('[',</span> <span class="pre">']')</span></code></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd><p>Iso formatted string</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dbprocessing.Utils</span> <span class="kn">import</span> <span class="n">dateForPrinting</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> Something occurred&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dateForPrinting</span><span class="p">()))</span>
+<span class="go">[2016-03-22T10:51:45]  Something occurred</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.daterange_to_dates">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">daterange_to_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daterange</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#daterange_to_dates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.daterange_to_dates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a daterange return the date objects for all days in the range</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>daterange</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span></dt><dd><p>Start and stop dates</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></dt><dd><p>All the dates between <code class="docutils literal notranslate"><span class="pre">daterange[0]</span></code> and <code class="docutils literal notranslate"><span class="pre">daterange[1]</span></code></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.datetimeToDate">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">datetimeToDate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#datetimeToDate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.datetimeToDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an input datetime.datetime or datetime.date return a datetime.date</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>dt</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a></span></dt><dd><p>input to convert</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a></dt><dd><p>Same date as in <code class="docutils literal notranslate"><span class="pre">dt</span></code>, but as a <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a> object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.dirSubs">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">dirSubs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">utc_file_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">utc_start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#dirSubs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.dirSubs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do any substitutions that are needed to put thing in the right place</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>This may be useless/could be made more useful</p>
+</div>
+<p>Honored substitutions used as {Y}{PRODUCT}{DATE}</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>path</strong><span class="classifier">str</span></dt><dd><p>Path to the file</p>
+</dd>
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Name of the time</p>
+</dd>
+<dt><strong>utc_file_date</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span></dt><dd><p>File’s date</p>
+</dd>
+<dt><strong>utc_start_time</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span></dt><dd><p>File’s start time</p>
+</dd>
+<dt><strong>version</strong><span class="classifier"><a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><code class="xref py py-class docutils literal notranslate"><span class="pre">Version</span></code></a></span></dt><dd><p>Version to substitute</p>
+</dd>
+<dt><strong>dbu</strong><span class="classifier"><a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DButils</span></code></a>, optional</span></dt><dd><p>Current database connection. If not specified, creates a new connection.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl class="simple">
+<dt>Valid subsitutions are:</dt><dd><ul class="simple">
+<li><p>Y: 4 digit year</p></li>
+<li><p>m: 2 digit month</p></li>
+<li><p>b: 3 character month (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)</p></li>
+<li><p>d: 2 digit day</p></li>
+<li><p>y: 2 digit year</p></li>
+<li><p>j: 3 digit day of year</p></li>
+<li><p>H: 2 digit hour (24-hour time)</p></li>
+<li><p>M: 2 digit minute</p></li>
+<li><p>S: 2 digit second</p></li>
+<li><p>VERSION: version string, interface.quality.revision</p></li>
+<li><p>DATE: the UTC date from a file, same as Ymd</p></li>
+<li><p>MISSION: the mission name from the db</p></li>
+<li><p>SPACECRAFT: the spacecraft name from the db</p></li>
+<li><p>PRODUCT: the product name from the db</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.expandDates">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">expandDates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#expandDates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.expandDates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a start and a stop date make all the dates in between</p>
+<p>Inclusive on the ends</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>start_time</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span></dt><dd><p>Date to start the list</p>
+</dd>
+<dt><strong>stop_time</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span></dt><dd><p>Date to end the list, inclusive</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>:class:`list` of</strong><span class="classifier">class:<cite>~datetime.datetime</cite></span></dt><dd><p>All the dates between start_time and stop_time</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.flatten">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">flatten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#flatten"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flatten an irregularly nested list of lists</p>
+<p>Taken from <a class="reference external" href="https://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists">https://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists</a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>l</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>Nested list of lists to flatten</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></dt><dd><p>Flattened list</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.parseDate">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">parseDate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#parseDate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.parseDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a date of the for yyyy-mm-dd parse to a datetime.</p>
+<p>This is just a wrapper around <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime" title="(in Python v3.10)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">strptime()</span></code></a>
+If the format is wrong ValueError is raised.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>inval</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>String date representation of the form YYYY-MM-DD</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></dt><dd><p>datetime object parsed from the string</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.parseVersion">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">parseVersion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#parseVersion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.parseVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a format of the form x.y.z parse to a Version</p>
+<p>This is a wrapper around <a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version.fromString" title="dbprocessing.Version.Version.fromString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fromString()</span></code></a>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>inval</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>String Version representation of the form xx.yy.zz</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><code class="xref py py-class docutils literal notranslate"><span class="pre">Version</span></code></a></dt><dd><p>Version object parsed from the string</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.processRunning">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">processRunning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#processRunning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.processRunning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a PID see if it is currently running.</p>
+<p>Taken from from <a class="reference external" href="https://stackoverflow.com/questions/568271/how-to-check-if-there-exists-a-process-with-a-given-pid-in-python">https://stackoverflow.com/questions/568271/how-to-check-if-there-exists-a-process-with-a-given-pid-in-python</a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pid</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Process ID</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></dt><dd><p>True if <code class="docutils literal notranslate"><span class="pre">pid</span></code> is running, False otherwise</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.progressbar">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">progressbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">totalsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Download</span> <span class="pre">Progress'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#progressbar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.progressbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a progress bar with urllib.urlretrieve reporthook functionality</p>
+<p>Taken from spacepy</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>count</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The current count of the progressbar</p>
+</dd>
+<dt><strong>blocksize</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The size of each block (mostly useful for file downloads)</p>
+</dd>
+<dt><strong>totalsize</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>The total size of the job, progress is <code class="docutils literal notranslate"><span class="pre">count*blocksize*100/totalsize</span></code></p>
+</dd>
+<dt><strong>text</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The text to print in the progressbar</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">spacepy.toolbox</span> <span class="k">as</span> <span class="nn">tb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urllib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urllib</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;psddata_url&#39;</span><span class="p">],</span> <span class="n">PSDdata_fname</span><span class="p">,</span> <span class="n">reporthook</span><span class="o">=</span><span class="n">tb</span><span class="o">.</span><span class="n">progressbar</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.readconfig">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">readconfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#readconfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.readconfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a database definition config file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>config_filepath</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>full path to the config file</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></dt><dd><p>Dictionary of key value pairs from config files</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../../ConfigurationFiles.html#configurationfiles-addfromconfig"><span class="std std-ref">addFromConfig.py</span></a></dt><dd></dd>
+<dt><a class="reference internal" href="../../scripts.html#scripts-addfromconfig-py"><span class="std std-ref">addFromConfig.py</span></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.split_code_args">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">split_code_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#split_code_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.split_code_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split a string with a bunch of command line arguments into a list</p>
+<p>As needed by Popen</p>
+<p>This is different than just split() since we have to keep options
+together with the flags.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>args</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>:class:`list` of</strong><span class="classifier">class:<cite>str</cite></span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/shlex.html#module-shlex" title="(in Python v3.10)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">shlex</span></code></a></dt><dd></dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_code_args</span><span class="p">(</span><span class="s2">&quot;code -n hello outfile&quot;</span><span class="p">)</span>
+<span class="go">[code, -n hello, outfile]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.strargs_to_args">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">strargs_to_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#strargs_to_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.strargs_to_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in the arguments string from the db and change to a dict</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>strargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>A string of arguments(“foo=bar baz=qux”)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></dt><dd><p>A dictionary of the arguments are their values</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.toBool">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">toBool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#toBool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.toBool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true if passed ‘True’, ‘true’, True, 1, ‘Yes’, ‘yes’, ‘Y’, or ‘y’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>value</strong></dt><dd><p>Value to evaluate if true</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.toDatetime">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">toDatetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#toDatetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.toDatetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a date, date string, or datetime to a datetime</p>
+<p>If a time is provided, passed through; otherwise set to start/end
+of day.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>dt</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>input to convert</p>
+</dd>
+<dt><strong>end</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default False</span></dt><dd><p>If input has no time, set to end of day (default to start of day)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></dt><dd><p>Input converted to <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.toNone">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">toNone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#toNone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.toNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns None if passed ‘’, ‘None’, ‘none’, or ‘NONE’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>value</strong></dt><dd><p>Value to evaluate if none</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>any</dt><dd><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a> or same input value</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Utils.unique">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Utils.</span></span><span class="sig-name descname"><span class="pre">unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Utils.html#unique"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Utils.unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a list and return only the unique elements in the same order</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>seq</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>List to return the unique elements of</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></dt><dd><p>List with only the unique elements</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.tables.html"
+                          title="previous chapter">dbprocessing.tables</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.Version.html"
+                          title="next chapter">dbprocessing.Version</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.Utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Version.html" title="dbprocessing.Version"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.tables.html" title="dbprocessing.tables"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.Utils</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

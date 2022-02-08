@@ -1,33 +1,32 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing documentation &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     
-    <title>dbprocessing &mdash; dbprocessing NMC_1 documentation</title>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+        <script type="text/javascript" src="_static/copybutton.js"></script>
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'NMC_1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/copybutton.js"></script>
-    <link rel="top" title="dbprocessing NMC_1 documentation" href="#" />
-    <link rel="next" title="Developer Information" href="developer/index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dbprocessing README" href="README.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="#"><h1>dbprocessing</h1></a>
+</div>
+
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,88 +37,83 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="developer/index.html" title="Developer Information"
+          <a href="README.html" title="dbprocessing README"
              accesskey="N">next</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="search.html">search</a>|&nbsp;</li>
-       <li><a href="#">top</a> &raquo;</li>
- 
+        <li><a href="#">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">dbprocessing documentation</a></li> 
       </ul>
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">dbprocessing</a><ul>
-<li><a class="reference internal" href="#api-documentation">API documentation</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Next topic</h4>
-  <p class="topless"><a href="developer/index.html"
-                        title="next chapter">Developer Information</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="dbprocessing">
-<h1>dbprocessing<a class="headerlink" href="#dbprocessing" title="Permalink to this headline">¶</a></h1>
+  <section id="dbprocessing-documentation">
+<h1>dbprocessing documentation<a class="headerlink" href="#dbprocessing-documentation" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> automates the routine data processing needs arising
+in every Heliophysics mission. This Python-based, database-driven
+process controller uses the arrival of new data to automatically
+execute relevant processing codes, providing updated files for all
+possible data products.</p>
+<p>Although originally written for Heliophysics data, it is intended to
+be flexible enough to manage most forms of digital time-dependent
+data.</p>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="README.html">dbprocessing README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SUPPORT.html">Getting help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer/index.html">Developer Information</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scripts.html">dbprocessing Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConfigurationFiles.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CODE_OF_CONDUCT.html">dbprocessing Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="COPYRIGHT.html">Copyright</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTORS.html">Contributions and Acknowledgements</a></li>
 </ul>
 </div>
-<div class="section" id="api-documentation">
-<h2>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="DBfile.html">DBfile</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DBlogging.html">DBlogging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dbprocessing.html">dbprocessing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DBqueue.html">DBqueue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DBstrings.html">DBStrings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DButils.html">DButils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Diskfile.html">Diskfile</a></li>
-<li class="toctree-l1"><a class="reference internal" href="inspector.html">inspector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module.html">module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reports.html">reports</a></li>
-<li class="toctree-l1"><a class="reference internal" href="runMe.html">runMe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Utils.html">Utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Version.html">Version</a></li>
-</ul>
-</div>
-</div>
-</div>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="README.html"
+                          title="next chapter">dbprocessing README</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -134,16 +128,20 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="developer/index.html" title="Developer Information"
+          <a href="README.html" title="dbprocessing README"
              >next</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="search.html">search</a>|&nbsp;</li>
-       <li><a href="#">top</a> &raquo;</li>
- 
+        <li><a href="#">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">dbprocessing documentation</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

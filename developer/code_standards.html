@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Code standards &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Documentation" href="documentation.html" />
+    <link rel="prev" title="Tests" href="tests.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tests.html" title="Tests"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Code standards</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="code-standards">
+<h1>Code standards<a class="headerlink" href="#code-standards" title="Permalink to this headline">¶</a></h1>
+<p>Code in <code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> should follow consistent standards to maximize
+readability.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#coding-style" id="id1">Coding style</a></p></li>
+<li><p><a class="reference internal" href="#naming-conventions" id="id2">Naming conventions</a></p></li>
+<li><p><a class="reference internal" href="#updates-for-style" id="id3">Updates for style</a></p></li>
+<li><p><a class="reference internal" href="#style-checks" id="id4">Style checks</a></p></li>
+<li><p><a class="reference internal" href="#commit-messages" id="id5">Commit messages</a></p></li>
+<li><p><a class="reference internal" href="#testing" id="id6">Testing</a></p></li>
+<li><p><a class="reference internal" href="#checklist" id="id7">Checklist</a></p></li>
+</ul>
+</div>
+<section id="coding-style">
+<h2><a class="toc-backref" href="#id1">Coding style</a><a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
+<p>Several external documents form the basis of the <code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> code style.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a>.</p></li>
+<li><p><a class="reference external" href="https://www.python.org/dev/peps/pep-0020/">PEP 20</a>. Although less
+prescriptive than PEP 8, PEP 20 is still very useful for choosing
+how to write code.</p></li>
+<li><p><a class="reference external" href="https://doi.org/10.5281/zenodo.2529131">PyHC community standards</a>.</p></li>
+</ul>
+</div></blockquote>
+<p>The following specific standards supplement and, where contradictory,
+supersede the documents above.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Indentation must be with spaces, not tabs. Most editors can
+be configured to insert spaces when the tab key is presssed.</p></li>
+<li><p>Indentation must ordinarily be in increments of four spaces.</p></li>
+<li><p>If the arguments to a function call are split across lines, the
+continuation line should start at the same column that the arguments
+start on the line above (i.e., one column after the opening
+parenthesis of the call.) Multiple-line constants for dictionaries,
+lists, etc. should follow similar formatting. The exception is when
+there are no arguments on the line with the function name and
+opening parenthesis; in that case, all lines with arguments should
+be indented one more level (four spaces) than the beginning of the
+line with the open parenthesis.</p></li>
+<li><p>Lines must break before a binary operator, as suggested in PEP 8.</p></li>
+<li><p>Lines must not be longer than 80 columns unless absolutely necessary.</p></li>
+<li><p>Code must work without change on Python 2.7 and Python 3.</p>
+<ul>
+<li><p>Where possible, Python 3 should be treated as the “normal” case and
+Python 2 as the exceptional case, e.g. prefer Python 3 names
+from the standard library, try the Python 3 case and fall back
+to Python 2 syntax if it fails, etc. This may not always be
+possible (e.g. if using Python 3 syntax on Python 2 would
+result in successful execution but the wrong result.)</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">import</span></code> and <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">as</span></code> are discouraged, because they
+obscure the origin of the symbols imported, contradicting the
+“explicit is better than implicit” principle of PEP 20. The exception
+is where necessary for maintaining compatibility between Python 2 and 3.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="naming-conventions">
+<h2><a class="toc-backref" href="#id2">Naming conventions</a><a class="headerlink" href="#naming-conventions" title="Permalink to this headline">¶</a></h2>
+<p>Variable names should be short and begin with a lower-case letter.</p>
+<p>Class names should be CamelCase, with an initial capital letter.</p>
+<p>Method names and other identifiers that are multi-word should start
+with a lower-case letter, with words separated by <code class="docutils literal notranslate"><span class="pre">_</span></code>, except for
+private identifiers which should start with a single underscore <code class="docutils literal notranslate"><span class="pre">_</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">_</span></code> should be used as the identifier for a “junk” variable.</p>
+</section>
+<section id="updates-for-style">
+<h2><a class="toc-backref" href="#id3">Updates for style</a><a class="headerlink" href="#updates-for-style" title="Permalink to this headline">¶</a></h2>
+<p>Much of the <code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> code predates the adoption of these
+standards and it will take time to bring it up to standard. Code
+should be brought up to standard before being edited for other reasons
+(e.g. adding features). Making piecemeal standards-only edits around
+the codebase is discouraged; such edits should be comprehensive
+(i.e. bring a particular piece of code completely to standard) and
+focused (i.e. work on a single function, class, or module at a time,
+rather than bits and pieces here and there.)</p>
+<p>When updating code for style or standards, it is preferred to perform
+all the formatting-only (i.e., non-behavior-modifying) edits first and
+place them in one commit before preparing further commits that change
+the behavior. There are two reasons for this: first, the formatting
+changes will (hopefully) make the code easier to read and understand
+before changing it; second, diffs from formatting changes can be
+<em>very</em> difficult to read and functional changes won’t necessarily be
+apparent. It is simiarly preferred to verify unit test coverage
+before making formatting changes, to ensure that formatting changes do
+not introduce regressions.</p>
+</section>
+<section id="style-checks">
+<h2><a class="toc-backref" href="#id4">Style checks</a><a class="headerlink" href="#style-checks" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pylint</span></code> can be used to check individual files or the entire package.
+There is a <code class="docutils literal notranslate"><span class="pre">.pylintrc</span></code> in the top-level checkout which is updated to
+<code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> standards; if running <code class="docutils literal notranslate"><span class="pre">pylint</span></code> from another directory,
+specify the path to this file, e.g. from the <code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> directory:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pylint</span> <span class="pre">--rcfile=../.pylintrc</span> <span class="pre">inspector.py</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">pylint</span></code> checks will be automated in the future, once existing code is
+up to standard.</p>
+<p>When updating <code class="docutils literal notranslate"><span class="pre">.pylintrc</span></code>, leave the default value commented out, so
+it is clear where local standards differ from the default. There is no
+need to leave previous local values in place. Leave no space between
+the comment <code class="docutils literal notranslate"><span class="pre">#</span></code> and the default value, to distinguish between defaults
+and other comments.</p>
+</section>
+<section id="commit-messages">
+<h2><a class="toc-backref" href="#id5">Commit messages</a><a class="headerlink" href="#commit-messages" title="Permalink to this headline">¶</a></h2>
+<p>Commit messages should provide a very brief summary of what was done and
+why; in particular, placing the changes into context.</p>
+<p>They must consist of a single line summary, optionally followed by a
+bullet list of details. A blank link must separate the summary and the
+details. Each point in the bullet list must start with a single space,
+an asterisk, and another space; wrapped lines must be indented three
+spaces to align with the start of the line’s text.</p>
+<p>If a commit closes an issue, include <code class="docutils literal notranslate"><span class="pre">(Closes</span> <span class="pre">#x)</span></code> at the end of the
+first-line summary. See also <a class="reference internal" href="pull_requests.html"><span class="doc">Working With Pull Requests</span></a>.</p>
+<p>Lines must not exceed 76 characters (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> adds a
+four-space indent to the commit message on display).</p>
+<p>An example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Add code of conduct
+
+ * This is marked as rST but in a way that should be compatible with
+   Markdown.
+ * It&#39;s not obvious that github will note this as a &quot;real&quot; CoC but that
+   is something that can be dealt with later.
+</pre></div>
+</div>
+</section>
+<section id="testing">
+<h2><a class="toc-backref" href="#id6">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>All code should be tested in the <a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.10)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a>-based test suite
+in the <code class="docutils literal notranslate"><span class="pre">unit_tests</span></code> directory.</p>
+<p>Testing should cover a reasonable fraction of the lines of code: at
+least 80%, with 90+% preferred. They should also cover a reasonable
+range of possible inputs and input types.</p>
+<p>Unit tests using the <a class="reference external" href="https://docs.python.org/3/library/unittest.html#unittest.TestCase.assertEqual" title="(in Python v3.10)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">assertEqual()</span></code></a> or similar methods
+should specify the expected value as the first argument and the actual output
+from the tested method as the second; this makes the displayed diff
+rational.  <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_array_equal.html#numpy.testing.assert_array_equal" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">assert_array_equal()</span></code></a> and other <a class="reference external" href="https://numpy.org/doc/stable/reference/index.html#module-numpy" title="(in NumPy v1.22)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code></a>
+based methods should be the other way around (actual, then expected) to make the
+diff easy to read.</p>
+</section>
+<section id="checklist">
+<h2><a class="toc-backref" href="#id7">Checklist</a><a class="headerlink" href="#checklist" title="Permalink to this headline">¶</a></h2>
+<p>Before finalizing a commit, consider the following questions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Do the unit tests for the recently-edited code complete successfully?</p></li>
+<li><p>Are there sufficient unit tests for the new or recently-edited code?</p></li>
+<li><p>Do unit tests for other code still complete successfully, or is
+it possible they were broken by this change?</p></li>
+<li><p>Does the package install properly?</p></li>
+<li><p>Do the unit tests and installer run properly against Python 2 and 3?</p></li>
+<li><p>Does the documentation build? Does the build raise warnings? Is the
+output correct (e.g. properly formatted)?</p></li>
+<li><p>Is there sufficient documentation? Is there a docstring at all, are
+inputs/outputs described, are cross-references sufficient and properly
+linked?</p></li>
+<li><p>Is the code readable, with appropriate “how” comments, and consistent
+with standards? Are there ways (e.g. particular inputs) the code may
+fail that aren’t documented?</p></li>
+<li><p>Is there anything that would obviously make the software hard to
+deploy, such as hard-coded paths?</p></li>
+</ul>
+</div></blockquote>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Code standards</a><ul>
+<li><a class="reference internal" href="#coding-style">Coding style</a></li>
+<li><a class="reference internal" href="#naming-conventions">Naming conventions</a></li>
+<li><a class="reference internal" href="#updates-for-style">Updates for style</a></li>
+<li><a class="reference internal" href="#style-checks">Style checks</a></li>
+<li><a class="reference internal" href="#commit-messages">Commit messages</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#checklist">Checklist</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="tests.html"
+                          title="previous chapter">Tests</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="documentation.html"
+                          title="next chapter">Documentation</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/developer/code_standards.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="documentation.html" title="Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tests.html" title="Tests"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Code standards</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

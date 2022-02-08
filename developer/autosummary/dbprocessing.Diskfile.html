@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.Diskfile &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.Diskfile.Diskfile" href="dbprocessing.Diskfile.Diskfile.html" />
+    <link rel="prev" title="dbprocessing.DButils.DButils" href="dbprocessing.DButils.DButils.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Diskfile.Diskfile.html" title="dbprocessing.Diskfile.Diskfile"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DButils.DButils.html" title="dbprocessing.DButils.DButils"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" accesskey="U">API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.Diskfile</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-dbprocessing.Diskfile">
+<span id="dbprocessing-diskfile"></span><h1>dbprocessing.Diskfile<a class="headerlink" href="#module-dbprocessing.Diskfile" title="Permalink to this headline">¶</a></h1>
+<p>Information regarding a file as stored on disk.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Diskfile.calcDigest" title="dbprocessing.Diskfile.calcDigest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calcDigest</span></code></a>(infile)</p></td>
+<td><p>Calculate the SHA1 digest from a file.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="dbprocessing.Diskfile.Diskfile.html#dbprocessing.Diskfile.Diskfile" title="dbprocessing.Diskfile.Diskfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Diskfile</span></code></a>(infile, dbu)</p></td>
+<td><p>Diskfile class contains methods for dealing with files on disk</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Diskfile.DigestError" title="dbprocessing.Diskfile.DigestError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DigestError</span></code></a>(*params)</p></td>
+<td><p>Exception that is thrown by calcDigest.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Diskfile.FilenameError" title="dbprocessing.Diskfile.FilenameError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FilenameError</span></code></a>(*params)</p></td>
+<td><p>Exception especially for created filenames showing that they are wrong</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Diskfile.InputError" title="dbprocessing.Diskfile.InputError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InputError</span></code></a>(*params)</p></td>
+<td><p>Exception that input is bad to the DiskFile class</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.Diskfile.ReadError" title="dbprocessing.Diskfile.ReadError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReadError</span></code></a>(*params)</p></td>
+<td><p>Exception that a file is not readable by the script, probably doesn't exist</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.Diskfile.WriteError" title="dbprocessing.Diskfile.WriteError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WriteError</span></code></a>(*params)</p></td>
+<td><p>Exception that a file is not write able by the script</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.Diskfile.calcDigest">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.Diskfile.</span></span><span class="sig-name descname"><span class="pre">calcDigest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Diskfile.html#calcDigest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Diskfile.calcDigest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the SHA1 digest from a file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>infile</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Path to the file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>hash</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Hex digits of the file’s SHA1 hash (40 bytes).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.Diskfile.DigestError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.Diskfile.</span></span><span class="sig-name descname"><span class="pre">DigestError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Diskfile.html#DigestError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Diskfile.DigestError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception that is thrown by calcDigest.</p>
+<p class="rubric">Notes</p>
+<p>Maybe just combine this with ReadError for the current purpose</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.Diskfile.FilenameError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.Diskfile.</span></span><span class="sig-name descname"><span class="pre">FilenameError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Diskfile.html#FilenameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Diskfile.FilenameError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception especially for created filenames showing that they are wrong</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.Diskfile.InputError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.Diskfile.</span></span><span class="sig-name descname"><span class="pre">InputError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Diskfile.html#InputError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Diskfile.InputError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception that input is bad to the DiskFile class</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.Diskfile.ReadError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.Diskfile.</span></span><span class="sig-name descname"><span class="pre">ReadError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Diskfile.html#ReadError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Diskfile.ReadError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception that a file is not readable by the script, probably doesn’t exist</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.Diskfile.WriteError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.Diskfile.</span></span><span class="sig-name descname"><span class="pre">WriteError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/Diskfile.html#WriteError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.Diskfile.WriteError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception that a file is not write able by the script</p>
+<p>probably doesn’t exist or in a ro directory</p>
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.DButils.DButils.html"
+                          title="previous chapter">dbprocessing.DButils.DButils</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.Diskfile.Diskfile.html"
+                          title="next chapter">dbprocessing.Diskfile.Diskfile</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.Diskfile.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.Diskfile.Diskfile.html" title="dbprocessing.Diskfile.Diskfile"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DButils.DButils.html" title="dbprocessing.DButils.DButils"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.Diskfile</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

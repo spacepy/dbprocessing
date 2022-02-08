@@ -1,6 +1,0 @@
-dbprocessing.inspector.EphemeralCallable
-========================================
-
-.. currentmodule:: dbprocessing.inspector
-
-.. autofunction:: EphemeralCallable

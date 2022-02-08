@@ -1,6 +1,0 @@
-dbprocessing.Utils.unique
-=========================
-
-.. currentmodule:: dbprocessing.Utils
-
-.. autofunction:: unique

@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.inspector.inspector &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.module" href="dbprocessing.module.html" />
+    <link rel="prev" title="dbprocessing.inspector.DefaultFormatter" href="dbprocessing.inspector.DefaultFormatter.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.module.html" title="dbprocessing.module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.inspector.DefaultFormatter.html" title="dbprocessing.inspector.DefaultFormatter"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="dbprocessing.inspector.html" accesskey="U">dbprocessing.inspector</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.inspector.inspector</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="dbprocessing-inspector-inspector">
+<h1>dbprocessing.inspector.inspector<a class="headerlink" href="#dbprocessing-inspector-inspector" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.inspector.</span></span><span class="sig-name descname"><span class="pre">inspector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#inspector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.inspector" title="Permalink to this definition">¶</a></dt>
+<dd><p>ABC for inspectors to be sure the user has implemented what is required</p>
+<p>Provides utility routines common to many inspectors</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#inspector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.inspector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Path to file to inspect.</p>
+</dd>
+<dt><strong>dbu</strong><span class="classifier"><a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DButils</span></code></a></span></dt><dd><p>Open database connection.</p>
+</dd>
+<dt><strong>product</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Product ID; verify if passed-in file is instance of this product.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>Keyword arguments passed through to <a class="reference internal" href="#dbprocessing.inspector.inspector.inspect" title="dbprocessing.inspector.inspector.inspect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">inspect()</span></code></a> (as a dict).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.inspector.extract_YYYYMMDD" title="dbprocessing.inspector.inspector.extract_YYYYMMDD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_YYYYMMDD</span></code></a>()</p></td>
+<td><p>go through the filename, extract first valid YYYYMMDD as a datetime</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.inspector.inspector.inspect" title="dbprocessing.inspector.inspector.inspect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inspect</span></code></a>(filename, kwargs)</p></td>
+<td><p>Override this method to implement an inspector</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.code_name" title="dbprocessing.inspector.inspector.code_name"><code class="xref py py-data docutils literal notranslate"><span class="pre">code_name</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.dbu" title="dbprocessing.inspector.inspector.dbu"><code class="xref py py-data docutils literal notranslate"><span class="pre">dbu</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.filename" title="dbprocessing.inspector.inspector.filename"><code class="xref py py-data docutils literal notranslate"><span class="pre">filename</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.basename" title="dbprocessing.inspector.inspector.basename"><code class="xref py py-data docutils literal notranslate"><span class="pre">basename</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.dirname" title="dbprocessing.inspector.inspector.dirname"><code class="xref py py-data docutils literal notranslate"><span class="pre">dirname</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.product" title="dbprocessing.inspector.inspector.product"><code class="xref py py-data docutils literal notranslate"><span class="pre">product</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.filenameformat" title="dbprocessing.inspector.inspector.filenameformat"><code class="xref py py-data docutils literal notranslate"><span class="pre">filenameformat</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.filenameregex" title="dbprocessing.inspector.inspector.filenameregex"><code class="xref py py-data docutils literal notranslate"><span class="pre">filenameregex</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.inspector.inspector.diskfile" title="dbprocessing.inspector.inspector.diskfile"><code class="xref py py-data docutils literal notranslate"><span class="pre">diskfile</span></code></a></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.extract_YYYYMMDD">
+<span class="sig-name descname"><span class="pre">extract_YYYYMMDD</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#inspector.extract_YYYYMMDD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.inspector.extract_YYYYMMDD" title="Permalink to this definition">¶</a></dt>
+<dd><p>go through the filename, extract first valid YYYYMMDD as a datetime</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></dt><dd><p>First date found in <a class="reference internal" href="#dbprocessing.inspector.inspector.filename" title="dbprocessing.inspector.inspector.filename"><code class="xref py py-data docutils literal notranslate"><span class="pre">filename</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.inspect">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inspect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#inspector.inspect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.inspector.inspect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this method to implement an inspector</p>
+<p>If the input file is not a match for this product, nothing else
+should be updated.</p>
+<p>If the input file is a match for the product, must update
+<a class="reference internal" href="dbprocessing.Diskfile.Diskfile.html#dbprocessing.Diskfile.Diskfile.params" title="dbprocessing.Diskfile.Diskfile.params"><code class="xref py py-data docutils literal notranslate"><span class="pre">params</span></code></a> dict of
+<a class="reference internal" href="#dbprocessing.inspector.inspector.diskfile" title="dbprocessing.inspector.inspector.diskfile"><code class="xref py py-data docutils literal notranslate"><span class="pre">diskfile</span></code></a> with the following keys, which map directly
+to columns of the <a class="reference internal" href="../tables.html#table-file"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">file</span></code></a> table in the database:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>utc_file_date (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a>)</dt><dd><p>Characteristic date of the file.
+(<a class="reference internal" href="../tables.html#column-file-utc_file_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_file_date</span></code></a>)</p>
+</dd>
+<dt>utc_start time (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>)</dt><dd><p>Timestamp of first record in the file.
+(<a class="reference internal" href="../tables.html#column-file-utc_start_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_start_time</span></code></a>)</p>
+</dd>
+<dt>utc_stop time (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>)</dt><dd><p>Timestamp of last record in the file.
+(<a class="reference internal" href="../tables.html#column-file-utc_stop_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_stop_time</span></code></a>)</p>
+</dd>
+<dt>version (<a class="reference internal" href="dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><code class="xref py py-class docutils literal notranslate"><span class="pre">Version</span></code></a>)</dt><dd><p>Version of the file.
+(<a class="reference internal" href="../tables.html#column-file-interface_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">interface_version</span></code></a>,
+<a class="reference internal" href="../tables.html#column-file-quality_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">quality_version</span></code></a>,
+<a class="reference internal" href="../tables.html#column-file-revision_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">revision_version</span></code></a>)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The following keys may be updated, but are optional:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>check_date (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>)</dt><dd><p><a class="reference internal" href="../tables.html#column-file-check_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">check_date</span></code></a></p>
+</dd>
+<dt>verbose_provenance (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</dt><dd><p><a class="reference internal" href="../tables.html#column-file-verbose_provenance"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">verbose_provenance</span></code></a></p>
+</dd>
+<dt>quality_comment (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</dt><dd><p><a class="reference internal" href="../tables.html#column-file-quality_comment"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">quality_comment</span></code></a></p>
+</dd>
+<dt>caveats (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</dt><dd><p><a class="reference internal" href="../tables.html#column-file-caveats"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">caveats</span></code></a></p>
+</dd>
+<dt>met_start_time (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>)</dt><dd><p><a class="reference internal" href="../tables.html#column-file-met_start_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">met_start_time</span></code></a></p>
+</dd>
+<dt>met_stop_time (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>)</dt><dd><p><a class="reference internal" href="../tables.html#column-file-met_stop_time"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">met_stop_time</span></code></a></p>
+</dd>
+<dt>quality_checked (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>)</dt><dd><p><a class="reference internal" href="../tables.html#column-file-quality_checked"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">quality_checked</span></code></a></p>
+</dd>
+<dt>process_keywords (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</dt><dd><p><a class="reference internal" href="../tables.html#column-file-process_keywords"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">process_keywords</span></code></a></p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The inspector may use the non-private instance attributes of
+<a class="reference internal" href="#dbprocessing.inspector.inspector" title="dbprocessing.inspector.inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">this</span> <span class="pre">class</span></code></a>, including
+access to the database (although this should be done with care,
+as the inspector is called during active phases of processing).
+It is also expected that the inspector will open the file for reading;
+writing to the data file is highly discouraged at this point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Not used; use <a class="reference internal" href="#dbprocessing.inspector.inspector.filename" title="dbprocessing.inspector.inspector.filename"><code class="xref py py-data docutils literal notranslate"><span class="pre">filename</span></code></a> attribute instead.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keyword arguments provided in <a class="reference internal" href="../tables.html#column-inspector-arguments"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">inspector.arguments</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>any</dt><dd><p><code class="docutils literal notranslate"><span class="pre">None</span></code> if the file passed in is not a match for the product,
+and anything else if it is.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.code_name">
+<span class="sig-name descname"><span class="pre">code_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#dbprocessing.inspector.inspector.code_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this in child class, with the name of the inspector file
+(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.dbu">
+<span class="sig-name descname"><span class="pre">dbu</span></span><a class="headerlink" href="#dbprocessing.inspector.inspector.dbu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open database. (<a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DButils</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#dbprocessing.inspector.inspector.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full path to the file being inspected. (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.basename">
+<span class="sig-name descname"><span class="pre">basename</span></span><a class="headerlink" href="#dbprocessing.inspector.inspector.basename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filename (only, no directory) of the file being inspected.
+(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.dirname">
+<span class="sig-name descname"><span class="pre">dirname</span></span><a class="headerlink" href="#dbprocessing.inspector.inspector.dirname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full path to the directory containing the file. (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.product">
+<span class="sig-name descname"><span class="pre">product</span></span><a class="headerlink" href="#dbprocessing.inspector.inspector.product" title="Permalink to this definition">¶</a></dt>
+<dd><p>Product ID for which this inspector is being called.
+(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.filenameformat">
+<span class="sig-name descname"><span class="pre">filenameformat</span></span><a class="headerlink" href="#dbprocessing.inspector.inspector.filenameformat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format to match the filename. (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.filenameregex">
+<span class="sig-name descname"><span class="pre">filenameregex</span></span><a class="headerlink" href="#dbprocessing.inspector.inspector.filenameregex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression that will match a valid filename, derived from
+<a class="reference internal" href="#dbprocessing.inspector.inspector.filenameformat" title="dbprocessing.inspector.inspector.filenameformat"><code class="xref py py-data docutils literal notranslate"><span class="pre">filenameformat</span></code></a>. (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.inspector.inspector.diskfile">
+<span class="sig-name descname"><span class="pre">diskfile</span></span><a class="headerlink" href="#dbprocessing.inspector.inspector.diskfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>File metadata to populate. (<a class="reference internal" href="dbprocessing.Diskfile.Diskfile.html#dbprocessing.Diskfile.Diskfile" title="dbprocessing.Diskfile.Diskfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diskfile.Diskfile</span></code></a>)</p>
+</dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.inspector.DefaultFormatter.html"
+                          title="previous chapter">dbprocessing.inspector.DefaultFormatter</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.module.html"
+                          title="next chapter">dbprocessing.module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.inspector.inspector.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.module.html" title="dbprocessing.module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.inspector.DefaultFormatter.html" title="dbprocessing.inspector.DefaultFormatter"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="dbprocessing.inspector.html" >dbprocessing.inspector</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.inspector.inspector</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

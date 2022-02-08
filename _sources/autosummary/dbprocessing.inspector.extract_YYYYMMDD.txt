@@ -1,6 +1,0 @@
-dbprocessing.inspector.extract_YYYYMMDD
-=======================================
-
-.. currentmodule:: dbprocessing.inspector
-
-.. autofunction:: extract_YYYYMMDD

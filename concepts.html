@@ -1,0 +1,728 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Concepts &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release Notes" href="release_notes.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="release_notes.html" title="Release Notes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+        <li><a href="index.html">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Concepts</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="concepts">
+<h1>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h1>
+<p>Understanding some key concepts about how dbprocessing views the world
+makes it easier to deploy on a project. The treatment here is fairly
+abstract but links to the concrete representations in Python code and
+SQL objects.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#files" id="id2">Files</a></p></li>
+<li><p><a class="reference internal" href="#codes" id="id3">Codes</a></p></li>
+<li><p><a class="reference internal" href="#products" id="id4">Products</a></p></li>
+<li><p><a class="reference internal" href="#processes" id="id5">Processes</a></p></li>
+<li><p><a class="reference internal" href="#versions" id="id6">Versions</a></p></li>
+<li><p><a class="reference internal" href="#inspectors" id="id7">Inspectors</a></p></li>
+<li><p><a class="reference internal" href="#ingestion" id="id8">Ingestion</a></p></li>
+<li><p><a class="reference internal" href="#process-queue" id="id9">Process Queue</a></p></li>
+<li><p><a class="reference internal" href="#processing" id="id10">Processing</a></p></li>
+<li><p><a class="reference internal" href="#missions" id="id11">Missions</a></p></li>
+<li><p><a class="reference internal" href="#substitutions" id="id12">Substitutions</a></p></li>
+<li><p><a class="reference internal" href="#qa-loop" id="id13">QA Loop</a></p></li>
+<li><p><a class="reference internal" href="#logs" id="id14">Logs</a></p></li>
+<li><p><a class="reference internal" href="#releases" id="id15">Releases</a></p></li>
+</ul>
+</div>
+<section id="files">
+<span id="concepts-files"></span><h2><a class="toc-backref" href="#id2">Files</a><a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h2>
+<p>dbprocessing exists to manage the production of files from other
+files. Conceptually, the treatment of a “file” in dbprocessing maps
+directly to a single file on disk. Data are stored entirely in files;
+the database contains metadata only.</p>
+<p>Metadata about a file can be represented in several different ways:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>As a record in the <a class="reference internal" href="developer/tables.html#table-file"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">file</span></code></a> table.</p></li>
+<li><p>As an instance of <a class="reference internal" href="developer/autosummary/dbprocessing.Diskfile.Diskfile.html#dbprocessing.Diskfile.Diskfile" title="dbprocessing.Diskfile.Diskfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diskfile</span></code></a>, containing
+solely information about the file on disk, or of
+<a class="reference internal" href="developer/autosummary/dbprocessing.DBfile.DBfile.html#dbprocessing.DBfile.DBfile" title="dbprocessing.DBfile.DBfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DBfile</span></code></a>, which interacts with the database
+representation.</p></li>
+</ul>
+</div></blockquote>
+<p>A file has certain properties:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>file date</dt><dd><p>The “characteristic date” of the data contained within the file.
+For a daily file, the expectation is that most of the data in
+the file are timestamped with times within that day. But the
+file date is treated distinctly from the actual first and last
+timestamp, because a “daily” file might include a small amount
+of data timestamped on the previous or next day, depending on
+the needs of the mission. Thus dbprocessing needs to be aware
+both of “the date” of the file and the actual timestamps, so it
+can gather all data timestamped on a particular date. Usually
+the file date is reflected in the filename in some way.</p>
+</dd>
+<dt>version</dt><dd><p>The version of the file itself. Each file has a unique version
+that relates to its production history, but different files
+(e.g. for different days of data) with identical versions are
+not guaranteed to have had the same history. Version treatments
+are consistent across dbprocessing; see <a class="reference internal" href="#concepts-versions"><span class="std std-ref">Versions</span></a>.</p>
+</dd>
+<dt>data_level</dt><dd><p>The “level” of the data, following the convention that level 0
+is processed into level 1, level 1 into 2, etc. This is only used
+to sort processing: all level 0 files are evaluated for possible
+new output products before level 1, etc., so that a newly-created
+level 1 file is available as input to level 2 before attempting
+to process level 2 files with old level 1 files as inputs. The
+level may be fractional to extend this concept.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Files that have the same structure and are considered part of the same
+data set; they are described as having the same <a class="reference internal" href="#concepts-products"><span class="std std-ref">product</span></a>. Again this is frequently reflected in the filename.</p>
+<p>The combination of file date, product, and version is considered to be
+unique: only one file of a particular date, product, and version can
+exist within the database.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is important to distinguish between the “date” of a file in the
+sense of the timestamps on the data it contains, and the “date” in
+the sense of the timestamp on the file itself in the filesystem.
+Unless qualified, a file’s “date” in dbprocessing always refers to
+the former, which is more important in processing data.</p>
+</div>
+<p>Files are largely treated the same whether they are created by
+processes controlled by dbprocessing, or if they are created by other
+means and then brought into the dbprocessing environment. Regardless
+of where files are created, metadata are populated by a process called
+<a class="reference internal" href="#concepts-ingest"><span class="std std-ref">ingestion</span></a>.</p>
+<p>dbprocessing itself does not create data files; that is the
+responsibility of data processing codes.</p>
+</section>
+<section id="codes">
+<span id="concepts-codes"></span><h2><a class="toc-backref" href="#id3">Codes</a><a class="headerlink" href="#codes" title="Permalink to this headline">¶</a></h2>
+<p>A data processing code, or simply “code”, produces an output data file
+from one ore more inputs. There are several requirements on a code:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>It must be callable from the command line.</p></li>
+<li><p>It must accept one or more input files and produce a single
+output file.</p></li>
+<li><p>It can accept any combination of arguments, as long as the
+arguments are followed by the list of all input files, and
+finally the path of the output file.</p></li>
+</ul>
+</div></blockquote>
+<p>Codes are represented in the <a class="reference internal" href="developer/tables.html#table-code"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">code</span></code></a> table.</p>
+<p>Given a set of files and codes, dbprocessing’s task is to call the
+appropriate codes to generate all possible derived files. The
+relationships that allow this are described at a higher level, through
+<a class="reference internal" href="#concepts-products"><span class="std std-ref">products</span></a> and
+<a class="reference internal" href="#concepts-processes"><span class="std std-ref">processes</span></a>.</p>
+<p>There are two exceptions to the many-in, one-out concept:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="scripts.html#scripts-dbrunner"><span class="std std-ref">DBRunner.py</span></a> allows for the execution of codes with no
+inputs.</p></li>
+<li><p><a class="reference internal" href="#concepts-processes"><span class="std std-ref">Processes</span></a> with a <code class="docutils literal notranslate"><span class="pre">RUN</span></code> timebase do not produce outputs.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="products">
+<span id="concepts-products"></span><h2><a class="toc-backref" href="#id4">Products</a><a class="headerlink" href="#products" title="Permalink to this headline">¶</a></h2>
+<p>A product is a <em>generalization of a file</em>. For instance, “HOPE-A level
+3 pitch angle-resolved” is an example of a product.
+<code class="docutils literal notranslate"><span class="pre">rbspa_rel04_ect-hope-PA-L3_20150102_v7.1.0.cdf</span></code> is a file which is
+an instance of this product, specifically with version 7.1.0 and containing
+data for 2015-01-02.</p>
+<p>Two properties of a product are of particular relevance:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>format</dt><dd><p>The product’s format describes how to build and parse the filename
+for files of that product. It includes the filename only, no directory,
+and may include wildcards to be filled by metadata. See
+<a class="reference internal" href="#concepts-substitutions"><span class="std std-ref">substitutions</span></a>.</p>
+</dd>
+<dt>relative_path</dt><dd><p>Path to the directory containing files of this product, relative to
+the mission’s <a class="reference internal" href="developer/tables.html#column-mission-rootdir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">rootdir</span></code></a>.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Determining the product of a file, among other metadata, is a task for
+an <a class="reference internal" href="#concepts-inspectors"><span class="std std-ref">inspector</span></a>.</p>
+<p>Products are represented in the <a class="reference internal" href="developer/tables.html#table-product"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">product</span></code></a> table.</p>
+</section>
+<section id="processes">
+<span id="concepts-processes"></span><h2><a class="toc-backref" href="#id5">Processes</a><a class="headerlink" href="#processes" title="Permalink to this headline">¶</a></h2>
+<p>As <a class="reference internal" href="#concepts-products"><span class="std std-ref">products</span></a> generalize files, so a process is
+<em>a generalization of a code</em>. Processes describe the relationship between
+any number (usually one or more) of input products, and usually one output
+product (but sometimes zero).</p>
+<p>Input products to a process may be optional, in which case a process
+can execute without them. The input specification may also include a
+request to include multiple days of input.</p>
+<p>There are two other major properties of a process:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>output_product</dt><dd><p>The product produced by this process (i.e., the type of file
+created by codes which implement this process.) This is optional
+for processes which produce no output.</p>
+</dd>
+<dt>output_timebase</dt><dd><p>The amount of data included in each file produced by this process.
+Currently the implemented timebases are <code class="docutils literal notranslate"><span class="pre">DAILY</span></code>, to produce files
+with one day worth of data, <code class="docutils literal notranslate"><span class="pre">RUN</span></code>, for processes that produce
+no output, and <code class="docutils literal notranslate"><span class="pre">FILE</span></code>, for processes that map the time period of
+their input directly to the output. The timebase specification
+allows dbprocessing to find the appropriate set of inputs; <code class="docutils literal notranslate"><span class="pre">DAILY</span></code>
+is almost always the correct choice. (<code class="docutils literal notranslate"><span class="pre">FILE</span></code> rarely is, even for
+processes that take single-day input and produce single-day output).</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Processes are represented in the <a class="reference internal" href="developer/tables.html#table-process"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">process</span></code></a> table; the
+connection to input products is in <a class="reference internal" href="developer/tables.html#table-productprocesslink"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">productprocesslink</span></code></a>.</p>
+</section>
+<section id="versions">
+<span id="concepts-versions"></span><h2><a class="toc-backref" href="#id6">Versions</a><a class="headerlink" href="#versions" title="Permalink to this headline">¶</a></h2>
+<p>dbprocessing treats versions as a triplet of major.minor.subminor. These are
+called, respectively, the interface, quality, and revision versions. The
+versions are dot-separated numbers, not decimals: 1.1.0 and 1.10.0 are
+different versions.</p>
+<p>The <em>interface</em> version indicates compatibility. Changes in a file’s
+interface suggest a change to file structure; changes in a code’s
+interface usually suggests a change in the input or output files. For this
+reason, it is recommnded that the interface version of a code be incremented
+whenever the interface version of its output or any inputs is incremented.</p>
+<p>A change to the <em>quality</em> version suggests a change where a user of the data
+would generally care. This might be an improvement in processing or merely
+the incorporation of additional data. Quality changes are the most common.</p>
+<p>Changes to the <em>revision</em> version indicate very minor changes that a data
+user may not find important. This may mean, for instance, small metadata
+changes.</p>
+<dl class="simple">
+<dt>The enforced rules are:</dt><dd><ul class="simple">
+<li><p>The version of a <em>code</em> is set directly in the database.</p></li>
+<li><p>The <em>interface</em> version of a file is usually determined by the
+<a class="reference internal" href="developer/tables.html#column-code-output_interface_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code.output_interface_version</span></code></a> of the code that makes it.</p></li>
+<li><p>The first time a file of a given product, date, and interface version
+is created, it has version X.0.0 (where X is the interface version.)</p></li>
+<li><p>If a new version of a file for a given product and date is created,
+its quality version is incremented if the quality <em>or</em> interface version
+of any of its inputs (any input files or code) are incremented.</p></li>
+<li><p>A file’s revision version is incremented if its quality version has not
+been incremented and the revision version of any of its inputs are
+incremented.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="developer/autosummary/dbprocessing.Version.Version.html#dbprocessing.Version.Version" title="dbprocessing.Version.Version"><code class="xref py py-class docutils literal notranslate"><span class="pre">Version</span></code></a></p>
+</div>
+</section>
+<section id="inspectors">
+<span id="concepts-inspectors"></span><h2><a class="toc-backref" href="#id7">Inspectors</a><a class="headerlink" href="#inspectors" title="Permalink to this headline">¶</a></h2>
+<p>dbprocessing does not interpret the contents of any data files. The bridge
+between the generic handling of dbprocessing and the specific file format
+is a small piece of code called an <em>inspector</em>. Every
+<a class="reference internal" href="#concepts-products"><span class="std std-ref">product</span></a> has an associated inspector, which has
+two tasks:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Verifying a file is an instance of the product associated with this
+inspector.</p></li>
+<li><p>Extracting certain metadata from the file for use in dbprocessing.</p></li>
+</ol>
+</div></blockquote>
+<p>The product match is a yes/no question: an inspector does not <em>choose</em> a
+product, but verifies if a file matches the product. Keyword arguments can
+be used to specify the product if the same piece of inspector code is used
+for multiple products.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="developer/tables.html#table-inspector"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">inspector</span></code></a> table, <a class="reference internal" href="developer/autosummary/dbprocessing.inspector.html#module-dbprocessing.inspector" title="dbprocessing.inspector"><code class="xref py py-mod docutils literal notranslate"><span class="pre">inspector</span></code></a> module</p>
+</div>
+</section>
+<section id="ingestion">
+<span id="concepts-ingest"></span><span id="index-0"></span><h2><a class="toc-backref" href="#id8">Ingestion</a><a class="headerlink" href="#ingestion" title="Permalink to this headline">¶</a></h2>
+<p>Bringing new files into the database is called “ingesting.” New files are
+searched for in the “incoming directory” (<a class="reference internal" href="developer/tables.html#column-mission-incoming_dir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission.incoming_dir</span></code></a>)
+and:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The product is identified by calling
+<a class="reference internal" href="#concepts-inspectors"><span class="std std-ref">inspectors</span></a>.</p></li>
+<li><p>A <a class="reference internal" href="developer/tables.html#table-file"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">file</span></code></a> record is created, including metadata from the
+inspector.</p></li>
+<li><p>The file is moved to the appropriate directory based on its product.</p></li>
+<li><p>The file is added to the <a class="reference internal" href="#concepts-process-queue"><span class="std std-ref">Process Queue</span></a> for
+consideration in future processing.</p></li>
+</ol>
+</div></blockquote>
+<p>The ingestion process is run via <a class="reference internal" href="scripts.html#cmdoption-ProcessQueue.py-i"><code class="xref std std-option docutils literal notranslate"><span class="pre">ProcessQueue.py</span> <span class="pre">-i</span></code></a>.</p>
+<p>One subtle feature is the ability to put files directly in their final
+location and ingest them later. This is useful if, e.g., keeping a directory
+in sync with a remote server. If a symbolic link to a file is placed in
+the incoming directory, steps 1, 2, and 4 above are performed, and the
+link deleted. The file pointed to by the link should already be in its
+final location according to its product: the file is not moved if it is
+in the “wrong” location, and this can cause problems finding it later!</p>
+<section id="implementation">
+<h3>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.checkIncoming" title="dbprocessing.dbprocessing.ProcessQueue.checkIncoming"><code class="xref py py-meth docutils literal notranslate"><span class="pre">checkIncoming()</span></code></a> checks for all files in the incoming
+directory and adds their names to a queue of files to ingest, removing
+any duplicate files.</p>
+<p><a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.importFromIncoming" title="dbprocessing.dbprocessing.ProcessQueue.importFromIncoming"><code class="xref py py-meth docutils literal notranslate"><span class="pre">importFromIncoming()</span></code></a> iterates over these filenames.
+For each, checks if it is already in the database (<a class="reference internal" href="developer/autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.getFileID" title="dbprocessing.DButils.DButils.getFileID"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getFileID()</span></code></a>).
+If not, calls <a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.figureProduct" title="dbprocessing.dbprocessing.ProcessQueue.figureProduct"><code class="xref py py-meth docutils literal notranslate"><span class="pre">figureProduct()</span></code></a>, which runs each
+<a class="reference internal" href="#concepts-inspectors"><span class="std std-ref">inspector</span></a> to determine the product. If
+there is a match, <a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.figureProduct" title="dbprocessing.dbprocessing.ProcessQueue.figureProduct"><code class="xref py py-meth docutils literal notranslate"><span class="pre">figureProduct()</span></code></a>:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>uses <a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.diskfileToDB" title="dbprocessing.dbprocessing.ProcessQueue.diskfileToDB"><code class="xref py py-meth docutils literal notranslate"><span class="pre">diskfileToDB()</span></code></a> to take the <a class="reference internal" href="developer/autosummary/dbprocessing.Diskfile.Diskfile.html#dbprocessing.Diskfile.Diskfile" title="dbprocessing.Diskfile.Diskfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diskfile</span></code></a>
+populated by the inspector and create the <a class="reference internal" href="developer/tables.html#table-file"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">file</span></code></a> record,</p></li>
+<li><p>moves the file to the appropriate final place based on the product,</p></li>
+<li><p>and adds the file to the <a class="reference internal" href="#concepts-process-queue"><span class="std std-ref">process queue</span></a>
+(<a class="reference internal" href="developer/autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.ProcessqueuePush" title="dbprocessing.DButils.DButils.ProcessqueuePush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ProcessqueuePush()</span></code></a>) for further processing.</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+<section id="process-queue">
+<span id="concepts-process-queue"></span><h2><a class="toc-backref" href="#id9">Process Queue</a><a class="headerlink" href="#process-queue" title="Permalink to this headline">¶</a></h2>
+<p>The process queue is a list of files to evaluate as potential <em>inputs</em> to
+new processing. It is implemented as table <a class="reference internal" href="developer/tables.html#table-processqueue"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">processqueue</span></code></a>.</p>
+<p>This is not the same as the <a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue" title="dbprocessing.dbprocessing.ProcessQueue"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessQueue</span></code></a>
+class, which implements most of the logic of handing the processing queue
+(and ingestion), or the <a class="reference internal" href="scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> script, which is
+the front-end for this processing.</p>
+</section>
+<section id="processing">
+<span id="concepts-processing"></span><h2><a class="toc-backref" href="#id10">Processing</a><a class="headerlink" href="#processing" title="Permalink to this headline">¶</a></h2>
+<p>“Processing” is the consideration of every file in the process queue as
+a potential input for processing. For every file in the queue, this
+procedure:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Considers the file’s product and date.</p></li>
+<li><p>Finds all processes which can be run with that product as input</p></li>
+<li><p>For each process:</p>
+<ol class="loweralpha simple">
+<li><p>Consider all possible output files that can be made with the file’s
+date of input.</p></li>
+<li><p>Consider all inputs (not just the relevant file’s) resulting in those
+files.</p></li>
+<li><p>Compare the inputs against all existing outputs</p></li>
+<li><p>If <em>any</em> input (not just the file from the process queue) is newer
+than the output under consideration, execute a code associated with
+that process, with all the newest inputs, to make a new ouput.</p></li>
+<li><p>Ingest the new outputs into the database.</p>
+<ol class="lowerroman simple">
+<li><p>The product is known, so the inspector is only used to verify it.</p></li>
+<li><p>Verbose provenance is known and populated.</p></li>
+<li><p>The newly created file is appended to the process queue.</p></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</div></blockquote>
+<p>This may sometimes result in counterintuitive effects. For instance,
+if version 1.1.0 of a file is on the process queue but 1.2.0 exists,
+new files will be made with 1.2.0, not 1.1.0. In practice there is
+filtering to, for instance, avoid adding 1.1.0 and 1.2.0 to the queue
+at the same time.</p>
+<p>Processing is executed via <a class="reference internal" href="scripts.html#cmdoption-ProcessQueue.py-p"><code class="xref std std-option docutils literal notranslate"><span class="pre">ProcessQueue.py</span> <span class="pre">-p</span></code></a>.</p>
+<p>Output files are created in a temporary directory and then moved to their
+final location. If a processing code exits with non-zero (i.e. error) status,
+the console output from that code is placed in the
+<a class="reference internal" href="developer/tables.html#column-mission-errordir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">error</span> <span class="pre">directory</span></code></a>, along with the output
+file if it has been created (this may, of course, be only a partial file,
+given the error).</p>
+<section id="id1">
+<h3>Implementation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>For each file on the <a class="reference internal" href="#concepts-process-queue"><span class="std std-ref">process queue</span></a>, calls
+<a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.buildChildren" title="dbprocessing.dbprocessing.ProcessQueue.buildChildren"><code class="xref py py-meth docutils literal notranslate"><span class="pre">buildChildren()</span></code></a>, which calculates all possible output
+products and makes a <a class="reference internal" href="developer/autosummary/dbprocessing.runMe.runMe.html#dbprocessing.runMe.runMe" title="dbprocessing.runMe.runMe"><code class="xref py py-class docutils literal notranslate"><span class="pre">runMe</span></code></a> object for every possible command
+to run.</p>
+<p>Once these are created (and the process queue empty), all <a class="reference internal" href="developer/autosummary/dbprocessing.runMe.runMe.html#dbprocessing.runMe.runMe" title="dbprocessing.runMe.runMe"><code class="xref py py-class docutils literal notranslate"><span class="pre">runMe</span></code></a> objects are passed to <a class="reference internal" href="developer/autosummary/dbprocessing.runMe.html#dbprocessing.runMe.runner" title="dbprocessing.runMe.runner"><code class="xref py py-func docutils literal notranslate"><span class="pre">runner()</span></code></a> at once. <a class="reference internal" href="developer/autosummary/dbprocessing.runMe.html#dbprocessing.runMe.runner" title="dbprocessing.runMe.runner"><code class="xref py py-func docutils literal notranslate"><span class="pre">runner()</span></code></a>
+calculates the command line for every object, then begins starting processes
+to actually run the data processing commands.</p>
+<p>Processes are started up to the maximum count, and polled for completion.
+Outputs of successful runs are moved to incoming and then ingested; failures
+are handled as described above. New processes are then started back to the
+maximum.</p>
+</section>
+</section>
+<section id="missions">
+<span id="concepts-missions"></span><h2><a class="toc-backref" href="#id11">Missions</a><a class="headerlink" href="#missions" title="Permalink to this headline">¶</a></h2>
+<p>Most of the automation in dbprocessing happens at the level of
+products and processes (with their associated files and
+codes). However, it is convenient (e.g. in considering reprocessing)
+to group products together. Products may be associated with
+instruments, instruments with satellites, and satellites with
+missions. There is some support for interacting with database
+components (e.g. adding files to reprocess, or displaying product
+information) by instrument, for convenience.</p>
+<p>The mission has one other major function: all filesystem structure
+(including data product locations but also incoming directory,
+processing codes, etc.) is determined by mission.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>root directory</dt><dd><p>All data paths are specified relative to the root. This does
+not mean dbprocessing controls all directories under this;
+it will only touch directories which are specified as the
+appropriate directory for a <a class="reference internal" href="#concepts-products"><span class="std std-ref">product</span></a>.
+Other filesystems, symlinks, etc. can be mounted under this;
+dbprocessing simply builds a named path from this root. This can
+simply be the root directory of the filesystem tree <code class="docutils literal notranslate"><span class="pre">/</span></code>, but
+that is not recommended.</p>
+</dd>
+<dt>incoming directory</dt><dd><p>This is the directory into which all new files are placed for
+ingestion into the database (and subsequent use as inputs). There
+is no restriction on this, although it helps to be on the same
+filesystem as the root directory to avoid copying files.</p>
+</dd>
+<dt>code directory</dt><dd><p>Code paths are specified relative to this directory. This can be
+the same as the root directory, but that is not recommended. In
+practice it is often helpful to have two subdirectories of the
+code directory, one for <a class="reference internal" href="#concepts-inspectors"><span class="std std-ref">inspectors</span></a>
+and one for <a class="reference internal" href="#concepts-codes"><span class="std std-ref">processing scripts</span></a>.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>In practice, there is one mission per database.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="developer/tables.html#table-mission"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">mission</span></code></a> table</p>
+</div>
+</section>
+<section id="substitutions">
+<span id="concepts-substitutions"></span><h2><a class="toc-backref" href="#id12">Substitutions</a><a class="headerlink" href="#substitutions" title="Permalink to this headline">¶</a></h2>
+<p>dbprocessing supports Python format-style substitutions in most database
+fields that refer to files and directories. These substitutions are also
+applied to command line arguments. Where a value is known (such as in
+calculating the filename for a new file), the value is directly substituted;
+where it is not, a matching regular expression may be used.</p>
+<p>Fields are wrapped in <code class="docutils literal notranslate"><span class="pre">{}</span></code>. A double-brace can be used to avoid expansion,
+although avoiding braces is preferred. For instance, <code class="docutils literal notranslate"><span class="pre">{Y}</span></code> in the
+<a class="reference internal" href="developer/tables.html#column-product-format"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">format</span></code></a> of a product will correspond to the year
+of a file in its filename, but the <a class="reference internal" href="developer/tables.html#column-product-relative_path"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">relative_path</span></code></a> may
+also contain <code class="docutils literal notranslate"><span class="pre">{Y}</span></code> to allow files of a product to be separated by year.</p>
+<p>The following fields are based on the <a class="reference internal" href="developer/tables.html#column-file-utc_file_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">utc_file_date</span></code></a> of
+a file. All numbers are zero-padded.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Y</dt><dd><p>Four-digit year</p>
+</dd>
+<dt>m</dt><dd><p>Two-digit month</p>
+</dd>
+<dt>b</dt><dd><p>Three-character month abbreviation, English (e.g. “Jan”)</p>
+</dd>
+<dt>d</dt><dd><p>Two-digit day</p>
+</dd>
+<dt>y</dt><dd><p>Two-digit year (not recommended)</p>
+</dd>
+<dt>j</dt><dd><p>Three-digit day of year</p>
+</dd>
+<dt>H</dt><dd><p>Two-digit hour (24-hour)</p>
+</dd>
+<dt>M</dt><dd><p>Two-digit minute</p>
+</dd>
+<dt>S</dt><dd><p>Two-digit second</p>
+</dd>
+<dt>MILLI</dt><dd><p>Three-digit millisecond</p>
+</dd>
+<dt>MICRO</dt><dd><p>Three-digit microsecond</p>
+</dd>
+<dt>DATE</dt><dd><p>Full date as YYYYMMDD</p>
+</dd>
+<dt>datetime</dt><dd><p>Full date as YYYYMMDD</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The following fields are based on other characteristics of a <a class="reference internal" href="developer/tables.html#table-file"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">file</span></code></a>:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>VERSION</dt><dd><p>Version, x.y.z</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The following fields are supported but must be carried through by an
+inspector; see <a class="reference internal" href="developer/tables.html#column-file-process_keywords"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">file.process_keywords</span></code></a>.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>QACODE</dt><dd><p>QA code, from the QA loop, <code class="docutils literal notranslate"><span class="pre">ok</span></code>, <code class="docutils literal notranslate"><span class="pre">ignore</span></code>, <code class="docutils literal notranslate"><span class="pre">problem</span></code>.</p>
+</dd>
+<dt>mday</dt><dd><p>Mission day, decimal number</p>
+</dd>
+<dt>APID</dt><dd><p>Application ID, hex number</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>??</dt><dd><p>Any two-character string</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>???</dt><dd><p>Any three-character string</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">????</span></code></dt><dd><p>Any four-character string</p>
+</dd>
+<dt>nn</dt><dd><p>Any two-digit decimal number, in practice sometimes used for a version
+on files that do not follow the dbprocessing
+<a class="reference internal" href="#concepts-versions"><span class="std std-ref">versioning</span></a> scheme.</p>
+</dd>
+<dt>nnn</dt><dd><p>Any three-digit decimal number.</p>
+</dd>
+<dt>nnnn</dt><dd><p>Any four-digit decimal number.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The following fields are based primarily on the properties of a code or
+mission; they are handled somewhat differently from the above.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>CODEDIR</dt><dd><p>Directory containing a code; mostly used if a command line argument
+to a code needs its full path. This is assembled from the component
+parts (<a class="reference internal" href="developer/tables.html#column-mission-codedir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission.codedir</span></code></a> and
+<a class="reference internal" href="developer/tables.html#column-code-relative_path"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code.relative_path</span></code></a>).</p>
+</dd>
+<dt>CODEVERSION</dt><dd><p>Version of a code as x.y.z from <a class="reference internal" href="developer/tables.html#table-code"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">code</span></code></a>; mostly used in
+specifying the path to a code if the version is desired to be in
+the path without having to update it with new versions.</p>
+</dd>
+<dt>ROOTDIR</dt><dd><p>Root data directory of a mission, i.e. <a class="reference internal" href="developer/tables.html#column-mission-rootdir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission.rootdir</span></code></a>.
+Because most paths specified in the database are relative, this is
+primarily useful if specifying additional command line arguments.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The following are used in the
+<a class="reference internal" href="ConfigurationFiles.html#configurationfiles-addfromconfig"><span class="std std-ref">config file</span></a> and are expanded
+when added to the database, unlike the above which are stored as-is in
+the database and expanded when used.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>MISSION</dt><dd><p>Mission name</p>
+</dd>
+<dt>SPACECRAFT</dt><dd><p>Satellite name</p>
+</dd>
+<dt>INSTRUMENT</dt><dd><p>Instrument name</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Since each configuration file can only have a single mission, spacecraft,
+and instrument, the above are unique within the config file.</p>
+<p>Examples of using substitutions to define <a class="reference internal" href="#concepts-products"><span class="std std-ref">product</span></a>
+<a class="reference internal" href="developer/tables.html#column-product-format"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">format</span></code></a>:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">rbspa_ect_hope_L2_20130212_v1.2.3.cdf</span></code></dt><dd><p>described as <code class="docutils literal notranslate"><span class="pre">{SPACECRAFT}_{PRODUCT}_{DATE}_v{VERSION}.cdf</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">{SPACECRAFT}</span></code> and <code class="docutils literal notranslate"><span class="pre">{PRODUCT}</span></code> would be expanded when
+the config file is parsed, and <code class="docutils literal notranslate"><span class="pre">{DATE}</span></code>, <code class="docutils literal notranslate"><span class="pre">{VERSION}</span></code> when a
+filename is parsed or generated. The product section in this case
+may be called <code class="docutils literal notranslate"><span class="pre">product_ect_hope_L2</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">20131034_ns41_L1.cdf</span></code></dt><dd><p>described as <code class="docutils literal notranslate"><span class="pre">{DATE}_{SPACECRAFT}_{PRODUCT}.cdf</span></code>.</p>
+</dd>
+</dl>
+</div></blockquote>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="developer/autosummary/dbprocessing.DBstrings.DBformatter.html#dbprocessing.DBstrings.DBformatter" title="dbprocessing.DBstrings.DBformatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">DBformatter</span></code></a></p>
+</div>
+</section>
+<section id="qa-loop">
+<span id="concepts-qa-loop"></span><h2><a class="toc-backref" href="#id13">QA Loop</a><a class="headerlink" href="#qa-loop" title="Permalink to this headline">¶</a></h2>
+<p>The QA loop was designed for RBSP-ECT to permit e.g. the validation of
+level 1 files before generating level 2. It was not used in production,
+but may eventually be documented and tested for other use.</p>
+</section>
+<section id="logs">
+<span id="concepts-logs"></span><h2><a class="toc-backref" href="#id14">Logs</a><a class="headerlink" href="#logs" title="Permalink to this headline">¶</a></h2>
+<p>All actions are logged to files in a designated directory, by default
+<code class="docutils literal notranslate"><span class="pre">dbprocessing_logs</span></code> in the user’s home directory.</p>
+<p>Logs are daily files with names in the form
+<code class="docutils literal notranslate"><span class="pre">dbprocessing_DATABASE.log.YYYY-MM-DD</span></code>. <code class="docutils literal notranslate"><span class="pre">DATABASE</span></code> is the name of the
+mission database being processed. Initially dbprocessing logs to a file
+<code class="docutils literal notranslate"><span class="pre">dbprocessing_log.log.YYYY-MM-DD</span></code> until the database is fully opened,
+and then switches to the database-specific file. Some small utilities may
+not perform this switch.</p>
+<p>Log files are rotated (and named) according to the UTC day. Timestamps
+within the log files are also in UTC.</p>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DBPROCESSING_LOG_DIR">
+<span class="sig-name descname"><span class="pre">DBPROCESSING_LOG_DIR</span></span><a class="headerlink" href="#envvar-DBPROCESSING_LOG_DIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory to contain log files. Can use <code class="docutils literal notranslate"><span class="pre">~</span></code> and similar to specify
+directories relative a user’s home directory.</p>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="developer/autosummary/dbprocessing.DBlogging.html#module-dbprocessing.DBlogging" title="dbprocessing.DBlogging"><code class="xref py py-mod docutils literal notranslate"><span class="pre">DBlogging</span></code></a></p>
+</div>
+</section>
+<section id="releases">
+<span id="concepts-releases"></span><h2><a class="toc-backref" href="#id15">Releases</a><a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h2>
+<p>dbprocessing supports the concept of regular public releases of data. Any
+file may be included in any number of releases (including zero), and a release
+may contain any number of files. A release is described by a single number
+and the list of files in it.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="developer/tables.html#table-release"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">release</span></code></a>
+<a class="reference internal" href="developer/autosummary/dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils.addRelease" title="dbprocessing.DButils.DButils.addRelease"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addRelease()</span></code></a></p>
+</div>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Concepts</a><ul>
+<li><a class="reference internal" href="#files">Files</a></li>
+<li><a class="reference internal" href="#codes">Codes</a></li>
+<li><a class="reference internal" href="#products">Products</a></li>
+<li><a class="reference internal" href="#processes">Processes</a></li>
+<li><a class="reference internal" href="#versions">Versions</a></li>
+<li><a class="reference internal" href="#inspectors">Inspectors</a></li>
+<li><a class="reference internal" href="#ingestion">Ingestion</a><ul>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#process-queue">Process Queue</a></li>
+<li><a class="reference internal" href="#processing">Processing</a><ul>
+<li><a class="reference internal" href="#id1">Implementation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#missions">Missions</a></li>
+<li><a class="reference internal" href="#substitutions">Substitutions</a></li>
+<li><a class="reference internal" href="#qa-loop">QA Loop</a></li>
+<li><a class="reference internal" href="#logs">Logs</a></li>
+<li><a class="reference internal" href="#releases">Releases</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="getting_started.html"
+                          title="previous chapter">Getting Started</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="release_notes.html"
+                          title="next chapter">Release Notes</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/concepts.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="release_notes.html" title="Release Notes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+        <li><a href="index.html">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Concepts</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

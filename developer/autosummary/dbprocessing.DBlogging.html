@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.DBlogging &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.dbprocessing" href="dbprocessing.dbprocessing.html" />
+    <link rel="prev" title="dbprocessing.DBfile.DBfile" href="dbprocessing.DBfile.DBfile.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.dbprocessing.html" title="dbprocessing.dbprocessing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBfile.DBfile.html" title="dbprocessing.DBfile.DBfile"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" accesskey="U">API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.DBlogging</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-dbprocessing.DBlogging">
+<span id="dbprocessing-dblogging"></span><h1>dbprocessing.DBlogging<a class="headerlink" href="#module-dbprocessing.DBlogging" title="Permalink to this headline">¶</a></h1>
+<p>Support for logging information from the dbprocessing chain.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBlogging.change_logfile" title="dbprocessing.DBlogging.change_logfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_logfile</span></code></a>([logname])</p></td>
+<td><p>Switch to a new log file</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="#dbprocessing.DBlogging.utctoday" title="dbprocessing.DBlogging.utctoday"><code class="xref py py-data docutils literal notranslate"><span class="pre">utctoday</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.DBlogging.log_dir" title="dbprocessing.DBlogging.log_dir"><code class="xref py py-data docutils literal notranslate"><span class="pre">log_dir</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.DBlogging.basename" title="dbprocessing.DBlogging.basename"><code class="xref py py-data docutils literal notranslate"><span class="pre">basename</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.DBlogging.LOG_FILENAME" title="dbprocessing.DBlogging.LOG_FILENAME"><code class="xref py py-data docutils literal notranslate"><span class="pre">LOG_FILENAME</span></code></a></div>
+<div class="line"><a class="reference internal" href="#dbprocessing.DBlogging.LEVELS" title="dbprocessing.DBlogging.LEVELS"><code class="xref py py-data docutils literal notranslate"><span class="pre">LEVELS</span></code></a></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.DBlogging.change_logfile">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.DBlogging.</span></span><span class="sig-name descname"><span class="pre">change_logfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/DBlogging.html#change_logfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DBlogging.change_logfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch to a new log file</p>
+<p>This implements switching default logging from one filename to another,
+usually used to indicate the mission being processed.
+The filename will always start with <code class="docutils literal notranslate"><span class="pre">dbprocessing_</span></code> and include
+a date string for the day.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>logname</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, default “log”</span></dt><dd><p>Name to include in full log filename.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dbprocessing.DBlogging.utctoday">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.DBlogging.</span></span><span class="sig-name descname"><span class="pre">utctoday</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'2022-02-10'</span></em><a class="headerlink" href="#dbprocessing.DBlogging.utctoday" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current UTC date as YYYY-MM-DD (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dbprocessing.DBlogging.log_dir">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.DBlogging.</span></span><span class="sig-name descname"><span class="pre">log_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/home/jtniehof/dbprocessing_logs'</span></em><a class="headerlink" href="#dbprocessing.DBlogging.log_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory to contain all dbprocessing log files (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dbprocessing.DBlogging.basename">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.DBlogging.</span></span><span class="sig-name descname"><span class="pre">basename</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dbprocessing_log'</span></em><a class="headerlink" href="#dbprocessing.DBlogging.basename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of log file without date (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dbprocessing.DBlogging.LOG_FILENAME">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.DBlogging.</span></span><span class="sig-name descname"><span class="pre">LOG_FILENAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/home/jtniehof/dbprocessing_logs/dbprocessing_log.log.2022-02-10'</span></em><a class="headerlink" href="#dbprocessing.DBlogging.LOG_FILENAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full name of the log file (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dbprocessing.DBlogging.LEVELS">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.DBlogging.</span></span><span class="sig-name descname"><span class="pre">LEVELS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'critical':</span> <span class="pre">50,</span> <span class="pre">'debug':</span> <span class="pre">10,</span> <span class="pre">'error':</span> <span class="pre">40,</span> <span class="pre">'info':</span> <span class="pre">20,</span> <span class="pre">'warning':</span> <span class="pre">30}</span></em><a class="headerlink" href="#dbprocessing.DBlogging.LEVELS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map name of logging level names to numbers (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>)</p>
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.DBfile.DBfile.html"
+                          title="previous chapter">dbprocessing.DBfile.DBfile</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.dbprocessing.html"
+                          title="next chapter">dbprocessing.dbprocessing</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.DBlogging.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.dbprocessing.html" title="dbprocessing.dbprocessing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBfile.DBfile.html" title="dbprocessing.DBfile.DBfile"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.DBlogging</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

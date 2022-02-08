@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.DButils &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.DButils.DButils" href="dbprocessing.DButils.DButils.html" />
+    <link rel="prev" title="dbprocessing.DBstrings.DBformatter" href="dbprocessing.DBstrings.DBformatter.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DButils.DButils.html" title="dbprocessing.DButils.DButils"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBstrings.DBformatter.html" title="dbprocessing.DBstrings.DBformatter"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" accesskey="U">API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.DButils</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-dbprocessing.DButils">
+<span id="dbprocessing-dbutils"></span><h1>dbprocessing.DButils<a class="headerlink" href="#module-dbprocessing.DButils" title="Permalink to this headline">¶</a></h1>
+<p>Direct interfacing to dbprocessing databases.</p>
+<p>Provides interface specific to dbprocessing databases (not general SQL
+databases) and performs most functionality for retrieving, changing, etc.
+of records.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DButils.create_tables" title="dbprocessing.DButils.create_tables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_tables</span></code></a>([filename, dialect])</p></td>
+<td><p>Step through and create the DB structure, relationships and constraints</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DButils.postgresql_url" title="dbprocessing.DButils.postgresql_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">postgresql_url</span></code></a>(databasename)</p></td>
+<td><p>Build postgresl database URL</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DButils</span></code></a>([mission, db_var, echo, engine])</p></td>
+<td><p>Utility routines for DBProcessing class</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DButils.DBError" title="dbprocessing.DButils.DBError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DBError</span></code></a></p></td>
+<td><p>Error in accessing the database</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DButils.DBNoData" title="dbprocessing.DButils.DBNoData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DBNoData</span></code></a></p></td>
+<td><p>Expected data not found in the database</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DButils.DBProcessingError" title="dbprocessing.DButils.DBProcessingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DBProcessingError</span></code></a></p></td>
+<td><p>Higher-level error (used only for failures in logging)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DButils.FilenameParse" title="dbprocessing.DButils.FilenameParse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FilenameParse</span></code></a></p></td>
+<td><p>Not used</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.DButils.create_tables">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.DButils.</span></span><span class="sig-name descname"><span class="pre">create_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dbprocessing_default.db'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sqlite'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/DButils.html#create_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DButils.create_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Step through and create the DB structure, relationships and constraints</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.DButils.postgresql_url">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.DButils.</span></span><span class="sig-name descname"><span class="pre">postgresql_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">databasename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/DButils.html#postgresql_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DButils.postgresql_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build postgresl database URL</p>
+<p>Environment variable <code class="docutils literal notranslate"><span class="pre">PGUSER</span></code> is required. Will also use <code class="docutils literal notranslate"><span class="pre">PGHOST</span></code>,
+<code class="docutils literal notranslate"><span class="pre">PGPORT</span></code> (requires <code class="docutils literal notranslate"><span class="pre">PGHOST</span></code>), <code class="docutils literal notranslate"><span class="pre">PGPASSWORD</span></code> to define database
+server to connect to. Anything unspecified is postgresql default.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>databasename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Name of the database</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></dt><dd><p>Full postgresql URL, suitable for use in
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/engines.html#sqlalchemy.create_engine" title="(in SQLAlchemy v1.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_engine()</span></code></a></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.DButils.DBError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.DButils.</span></span><span class="sig-name descname"><span class="pre">DBError</span></span><a class="reference internal" href="../../_modules/dbprocessing/DButils.html#DBError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DButils.DBError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error in accessing the database</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.DButils.DBNoData">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.DButils.</span></span><span class="sig-name descname"><span class="pre">DBNoData</span></span><a class="reference internal" href="../../_modules/dbprocessing/DButils.html#DBNoData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DButils.DBNoData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expected data not found in the database</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.DButils.DBProcessingError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.DButils.</span></span><span class="sig-name descname"><span class="pre">DBProcessingError</span></span><a class="reference internal" href="../../_modules/dbprocessing/DButils.html#DBProcessingError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DButils.DBProcessingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Higher-level error (used only for failures in logging)</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.DButils.FilenameParse">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.DButils.</span></span><span class="sig-name descname"><span class="pre">FilenameParse</span></span><a class="reference internal" href="../../_modules/dbprocessing/DButils.html#FilenameParse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DButils.FilenameParse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not used</p>
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.DBstrings.DBformatter.html"
+                          title="previous chapter">dbprocessing.DBstrings.DBformatter</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.DButils.DButils.html"
+                          title="next chapter">dbprocessing.DButils.DButils</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.DButils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DButils.DButils.html" title="dbprocessing.DButils.DButils"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBstrings.DBformatter.html" title="dbprocessing.DBstrings.DBformatter"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.DButils</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>
