@@ -1,6 +1,0 @@
-dbprocessing.Diskfile.calcDigest
-================================
-
-.. currentmodule:: dbprocessing.Diskfile
-
-.. autofunction:: calcDigest

@@ -1,6 +1,0 @@
-dbprocessing.Utils.flatten
-==========================
-
-.. currentmodule:: dbprocessing.Utils
-
-.. autofunction:: flatten

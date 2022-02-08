@@ -1,34 +1,33 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Configuration Files &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     
-    <title>Configuration Files &mdash; dbprocessing NMC_1 documentation</title>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+        <script type="text/javascript" src="_static/copybutton.js"></script>
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'NMC_1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/copybutton.js"></script>
-    <link rel="top" title="dbprocessing NMC_1 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="dbprocessing Code of Conduct" href="CODE_OF_CONDUCT.html" />
-    <link rel="prev" title="dbprocessing Scripts" href="scripts.html" /> 
-  </head>
-  <body role="document">
+    <link rel="prev" title="Scripts" href="scripts.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1>dbprocessing</h1></a>
+</div>
+
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -42,356 +41,561 @@
           <a href="CODE_OF_CONDUCT.html" title="dbprocessing Code of Conduct"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="scripts.html" title="dbprocessing Scripts"
+          <a href="scripts.html" title="Scripts"
              accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="search.html">search</a>|&nbsp;</li>
-       <li><a href="index.html">top</a> &raquo;</li>
- 
+        <li><a href="index.html">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Configuration Files</a></li> 
       </ul>
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Configuration Files</a><ul>
-<li><a class="reference internal" href="#basics">Basics</a></li>
-<li><a class="reference internal" href="#coverageplot-py">coveragePlot.py</a></li>
-<li><a class="reference internal" href="#addfromconfig-py">addFromConfig.py</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="scripts.html"
-                        title="previous chapter">dbprocessing Scripts</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="CODE_OF_CONDUCT.html"
-                        title="next chapter">dbprocessing Code of Conduct</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/ConfigurationFiles.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="configuration-files">
+  <section id="configuration-files">
 <h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="basics">
+<section id="basics">
 <h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
-<p>Configuration files in this project are INI files. The configuration file consists of sections,
-led by a [section] header and followed by name=value properties.</p>
-<p>Note that leading whitespace is removed from values.
-The optional values can contain format strings which refer to other values in the same section,
-or values in a special DEFAULT section. Additional defaults can be provided on initialization
-and retrieval.</p>
-<p>Note that leading whitespace is removed from values. Configuration files may include comments,
-prefixed by &#8216;#&#8217; or &#8216;;&#8217;. Comments may appear on their own in an otherwise empty line, or may be
-entered in lines holding values or section names. In the latter case, they need to be preceded
-by a whitespace character to be recognized as a comment. (For backwards compatibility, only ;
-starts an inline comment, while # does not.)</p>
-</div>
-<div class="section" id="coverageplot-py">
-<h2>coveragePlot.py<a class="headerlink" href="#coverageplot-py" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-ini"><div class="highlight"><pre><span class="c1">#############################</span>
-<span class="c1"># sample config file</span>
-<span class="c1">#############################</span>
-<span class="c1">## ##################</span>
-<span class="c1">## # Substitutions</span>
-<span class="c1">## # {TODAY}</span>
-<span class="c1">## # {N DAYS}  -&gt; add N days to the previous where N is an int</span>
+<p>Configuration files in this project are INI files as supported by the
+<a class="reference external" href="https://docs.python.org/3/library/configparser.html#module-configparser" title="(in Python v3.10)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">configparser</span></code></a> Python module. Refer to that documentation for
+all the detailed features of the format.</p>
+<p>The files consist of sections, delimited by a <code class="docutils literal notranslate"><span class="pre">[section]</span></code> header and
+containing <code class="docutils literal notranslate"><span class="pre">name=value</span></code> properties. Leading whitespace is removed
+from values. Lines starting with <code class="docutils literal notranslate"><span class="pre">#</span></code> or <code class="docutils literal notranslate"><span class="pre">;</span></code> are treated as
+comments.</p>
+</section>
+<section id="addfromconfig-py">
+<span id="configurationfiles-addfromconfig"></span><h2>addFromConfig.py<a class="headerlink" href="#addfromconfig-py" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># Honored database substitutions used as {Y}{MILLI}{PRODUCT}</span><span class="w"></span>
+<span class="c1">#       Y: 4 digit year</span><span class="w"></span>
+<span class="c1">#       m: 2 digit month</span><span class="w"></span>
+<span class="c1">#       b: 3 character month (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)</span><span class="w"></span>
+<span class="c1">#       d: 2 digit day</span><span class="w"></span>
+<span class="c1">#       y: 2 digit year</span><span class="w"></span>
+<span class="c1">#       j: 3 digit day of year</span><span class="w"></span>
+<span class="c1">#       H: 2 digit hour (24-hour time)</span><span class="w"></span>
+<span class="c1">#       M: 2 digit minute</span><span class="w"></span>
+<span class="c1">#       S: 2 digit second</span><span class="w"></span>
+<span class="c1">#       MILLI: 3 digit millisecond</span><span class="w"></span>
+<span class="c1">#       MICRO: 3 digit microsecond</span><span class="w"></span>
+<span class="c1">#       QACODE: the QA code (ok|ignore|problem)</span><span class="w"></span>
+<span class="c1">#       VERSION: version string, interface.quality.revision</span><span class="w"></span>
+<span class="c1">#       DATE: the UTC date from a file, same as Ymd</span><span class="w"></span>
+<span class="c1">#       MISSION: the mission name from the db</span><span class="w"></span>
+<span class="c1">#       SPACECRAFT: the spacecraft name from the db</span><span class="w"></span>
+<span class="c1">#       PRODUCT: the product name from the db</span><span class="w"></span>
 
 
-<span class="c1">## ##################</span>
-<span class="c1">## # Required elements</span>
-
-<span class="k">[settings]</span>
-<span class="na">mission</span> <span class="o">=</span> <span class="s">~/RBSP_MAGEIS.sqlite</span>
-<span class="na">outformat</span> <span class="o">=</span> <span class="s">pdf</span>
-<span class="na">filename_format</span> <span class="o">=</span> <span class="s">MagEIS_L3_Coverage_{TODAY}</span>
-<span class="na">startdate</span> <span class="o">=</span> <span class="s">20120901</span>
-<span class="na">enddate</span> <span class="o">=</span> <span class="s">{TODAY} + {7 DAYS}</span>
-
-
-<span class="c1">## ###############################################</span>
-<span class="c1">## # Plots</span>
-<span class="c1">## ###############################################</span>
-<span class="k">[panel]</span>
-<span class="c1">## # in the panel section we define what will be plotted</span>
-<span class="c1">## # N keys pf plotN define subplots</span>
-<span class="c1">## # daysperplot gives the days per plot that will be on each page</span>
-<span class="na">plot1</span> <span class="o">=</span> <span class="s">plot1</span>
-<span class="na">plot2</span> <span class="o">=</span> <span class="s">plot2</span>
-<span class="na">daysperplot</span> <span class="o">=</span> <span class="s">60</span>
-<span class="na">title</span> <span class="o">=</span> <span class="s">MagEIS L3 Coverage</span>
-<span class="na">preset</span> <span class="o">=</span> <span class="s">green</span>
-<span class="na">missing</span> <span class="o">=</span> <span class="s">red</span>
-<span class="na">expected</span> <span class="o">=</span> <span class="s">grey</span>
-
-<span class="c1">## [plot1]</span>
-<span class="c1">## # in the plot section rows are defined bottom up</span>
-<span class="c1">## # ylabel is what to put on the plot ylabel</span>
-<span class="c1">## # productN is the product to plot</span>
-<span class="c1">## # yticklabelN is what to call each product</span>
-<span class="c1">## # productN_glob is a glob that a file has to match in order to be valid</span>
-<span class="c1">## # productN_version is a minimum version allowed for files (e.g. 4.0.0)</span>
-<span class="na">ylabel</span> <span class="o">=</span> <span class="s">RBSP-A</span>
-<span class="na">product1</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageisLOW-L3</span>
-<span class="na">product2</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageisM35-L3</span>
-<span class="na">product3</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageisM75-L3</span>
-<span class="na">product4</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageisHIGH-L3</span>
-<span class="na">product5</span> <span class="o">=</span> <span class="s">rbspa_int_ect-mageis-L3</span>
-<span class="na">yticklabel1</span> <span class="o">=</span> <span class="s">LOW</span>
-<span class="na">yticklabel2</span> <span class="o">=</span> <span class="s">M35</span>
-<span class="na">yticklabel3</span> <span class="o">=</span> <span class="s">M75</span>
-<span class="na">yticklabel4</span> <span class="o">=</span> <span class="s">HIGH</span>
-<span class="na">yticklabel5</span> <span class="o">=</span> <span class="s">FULL</span>
+<span class="c1">##########################</span><span class="w"></span>
+<span class="c1"># MANUAL</span><span class="w"></span>
+<span class="c1">#</span><span class="w"></span>
+<span class="c1"># Loops over the configuration file and if the DB does not have the mission,</span><span class="w"></span>
+<span class="c1"># satellite, instrument entries present they are added, skipped otherwise.</span><span class="w"></span>
+<span class="c1"># The product and process entries must be unique and not present.</span><span class="w"></span>
+<span class="c1">#</span><span class="w"></span>
+<span class="c1"># THERE IS CURRENTLY NO UPDATE IN THE DB BASED ON THIS CONFIG SCRIPT</span><span class="w"></span>
 
 
-<span class="c1">## [plot2]</span>
-<span class="na">ylabel</span> <span class="o">=</span> <span class="s">RBSP-B</span>
-<span class="na">product1</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageisLOW-L3</span>
-<span class="na">product2</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageisM35-L3</span>
-<span class="na">product3</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageisM75-L3</span>
-<span class="na">product4</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageisHIGH-L3</span>
-<span class="na">product5</span> <span class="o">=</span> <span class="s">rbspb_int_ect-mageis-L3</span>
-<span class="na">yticklabel1</span> <span class="o">=</span> <span class="s">LOW</span>
-<span class="na">yticklabel2</span> <span class="o">=</span> <span class="s">M35</span>
-<span class="na">yticklabel3</span> <span class="o">=</span> <span class="s">M75</span>
-<span class="na">yticklabel4</span> <span class="o">=</span> <span class="s">HIGH</span>
-<span class="na">yticklabel5</span> <span class="o">=</span> <span class="s">FULL</span>
+<span class="c1">##################</span><span class="w"></span>
+<span class="c1"># Required elements</span><span class="w"></span>
+<span class="c1">#</span><span class="w"></span>
+<span class="c1"># [mission]  &lt;- once and only once with</span><span class="w"></span>
+<span class="c1">#   rootdir  (string)</span><span class="w"></span>
+<span class="c1">#   mission_name  (string)</span><span class="w"></span>
+<span class="c1">#   incoming_dir  (string)</span><span class="w"></span>
+<span class="c1"># [satellite] &lt;- once and only once with</span><span class="w"></span>
+<span class="c1">#   satellite_name  (string)</span><span class="w"></span>
+<span class="c1"># [instrument] &lt;- once and only once with</span><span class="w"></span>
+<span class="c1">#   instrument_name  (string)</span><span class="w"></span>
+<span class="c1">##### products and inspector are defined together since they are a one-to-one</span><span class="w"></span>
+<span class="c1"># [product] &lt;- multiple entries each starting with &quot;product&quot; then a unique identifer</span><span class="w"></span>
+<span class="c1">#   product_name  (string)</span><span class="w"></span>
+<span class="c1">#   relative_path  (string)</span><span class="w"></span>
+<span class="c1">#   level  (float)</span><span class="w"></span>
+<span class="c1">#   format  (string)</span><span class="w"></span>
+<span class="c1">#   product_description (string)</span><span class="w"></span>
+<span class="c1">#   inspector_filename (string)</span><span class="w"></span>
+<span class="c1">#   inspector_relative_path (string)</span><span class="w"></span>
+<span class="c1">#   inspector_description (string)</span><span class="w"></span>
+<span class="c1">#   inspector_version (version e.g. 1.0.0)</span><span class="w"></span>
+<span class="c1">#   inspector_output_interface (integer)</span><span class="w"></span>
+<span class="c1">#   inspector_active (Boolean e.g. True or 1 or False or 0)</span><span class="w"></span>
+<span class="c1">#   inspector_date_written (date e.g. 2013-07-12)</span><span class="w"></span>
+<span class="c1">#   inspector_newest_version  (Boolean e.g. True or 1 or False or 0)</span><span class="w"></span>
+<span class="c1">#   inspector_arguments (string)</span><span class="w"></span>
+<span class="c1">#### processes and codes operate on the names of the products, they can be in</span><span class="w"></span>
+<span class="c1">#### this config file or already in the db codes are one-to-one with processes</span><span class="w"></span>
+<span class="c1"># [process] &lt;- multiple entries each starting with &quot;process&quot; then a unique identifer</span><span class="w"></span>
+<span class="c1">#   process_name (string)</span><span class="w"></span>
+<span class="c1">#   output_product (string)  - identifer from section heading</span><span class="w"></span>
+<span class="c1">#   output_timebase  (string, FILE/DAILY/WEEKLY/MONTHLY/YEARLY)</span><span class="w"></span>
+<span class="c1">#   extra_params (string)</span><span class="w"></span>
+<span class="c1">## A collection of input names entered as such</span><span class="w"></span>
+<span class="c1">## the required portion is &quot;optional_input&quot; or &quot;required_input&quot; then some</span><span class="w"></span>
+<span class="c1">## unique identifer on the end</span><span class="w"></span>
+<span class="c1">#   optional_input1  (string) name of product - identifer from section heading</span><span class="w"></span>
+<span class="c1">#   optional_input2  (string) name of product - identifer from section heading</span><span class="w"></span>
+<span class="c1">#   optional_input3  (string) name of product - identifer from section heading</span><span class="w"></span>
+<span class="c1">#   required_input1  (string) name of product - identifer from section heading</span><span class="w"></span>
+<span class="c1">#   required_input2  (string) name of product - identifer from section heading</span><span class="w"></span>
+<span class="c1">#   required_input3  (string) name of product - identifer from section heading</span><span class="w"></span>
+<span class="c1">## code is entered as part of process</span><span class="w"></span>
+<span class="c1">#   code_filename (string)</span><span class="w"></span>
+<span class="c1">#   code_relative_path (string)</span><span class="w"></span>
+<span class="c1">#   code_start_date (date, 2000-01-01)</span><span class="w"></span>
+<span class="c1">#   code_stop_date  (date, 2050-12-31)</span><span class="w"></span>
+<span class="c1">#   code_description (string)</span><span class="w"></span>
+<span class="c1">#   code_version  (version e.g. 1.0.0)</span><span class="w"></span>
+<span class="c1">#   code_output_interface  (integer)</span><span class="w"></span>
+<span class="c1">#   code_active (Boolean e.g. True or 1 or False or 0)</span><span class="w"></span>
+<span class="c1">#   code_date_written   (date, 2050-12-31)</span><span class="w"></span>
+<span class="c1">#   code_newest_version (Boolean e.g. True or 1 or False or 0)</span><span class="w"></span>
+<span class="c1">#   code_arguments (string)</span><span class="w"></span>
+<span class="k">[mission]</span><span class="w"></span>
+<span class="na">mission_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">testDB</span><span class="w"></span>
+<span class="na">rootdir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/myles/dbprocessing/test_DB</span><span class="w"></span>
+<span class="na">incoming_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">L0</span><span class="w"></span>
+
+<span class="k">[satellite]</span><span class="w"></span>
+<span class="na">satellite_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{MISSION}-a</span><span class="w"></span>
+
+<span class="k">[instrument]</span><span class="w"></span>
+<span class="na">instrument_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rot13</span><span class="w"></span>
+
+<span class="k">[product_input_first]</span><span class="w"></span>
+<span class="na">product_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{MISSION}_rot13_L0_first</span><span class="w"></span>
+<span class="na">relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">L0</span><span class="w"></span>
+<span class="na">level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">0.0</span><span class="w"></span>
+<span class="na">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">testDB_{nnn}_first.raw</span><span class="w"></span>
+<span class="na">product_description</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="na">inspector_filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rot13_L0_first.py</span><span class="w"></span>
+<span class="na">inspector_relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">codes/inspectors</span><span class="w"></span>
+<span class="na">inspector_description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Level 0</span><span class="w"></span>
+<span class="na">inspector_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0.0</span><span class="w"></span>
+<span class="na">inspector_output_interface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">inspector_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">inspector_date_written</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2016-05-31</span><span class="w"></span>
+<span class="na">inspector_newest_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">inspector_arguments</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+
+<span class="k">[product_input_second]</span><span class="w"></span>
+<span class="na">product_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{MISSION}_rot13_L0_second</span><span class="w"></span>
+<span class="na">relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">L0</span><span class="w"></span>
+<span class="na">level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">0.0</span><span class="w"></span>
+<span class="na">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">testDB_{nnn}_sec.raw</span><span class="w"></span>
+<span class="na">product_description</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="na">inspector_filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rot13_L0_second.py</span><span class="w"></span>
+<span class="na">inspector_relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">codes/inspectors</span><span class="w"></span>
+<span class="na">inspector_description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Level 0</span><span class="w"></span>
+<span class="na">inspector_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0.0</span><span class="w"></span>
+<span class="na">inspector_output_interface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">inspector_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">inspector_date_written</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2016-05-31</span><span class="w"></span>
+<span class="na">inspector_newest_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">inspector_arguments</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+
+<span class="k">[product_concat]</span><span class="w"></span>
+<span class="na">product_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{MISSION}_rot13_L1</span><span class="w"></span>
+<span class="na">relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">L1</span><span class="w"></span>
+<span class="na">level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0</span><span class="w"></span>
+<span class="na">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">testDB_{nnn}.cat</span><span class="w"></span>
+<span class="na">product_description</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="na">inspector_filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rot13_L1.py</span><span class="w"></span>
+<span class="na">inspector_relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">codes/inspectors</span><span class="w"></span>
+<span class="na">inspector_description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Level 1</span><span class="w"></span>
+<span class="na">inspector_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0.0</span><span class="w"></span>
+<span class="na">inspector_output_interface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">inspector_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">inspector_date_written</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2016-05-31</span><span class="w"></span>
+<span class="na">inspector_newest_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">inspector_arguments</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+
+<span class="k">[product_rot13]</span><span class="w"></span>
+<span class="na">product_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{MISSION}_rot13_L2</span><span class="w"></span>
+<span class="na">relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">L2</span><span class="w"></span>
+<span class="na">level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2.0</span><span class="w"></span>
+<span class="na">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">testDB_{nnn}.rot</span><span class="w"></span>
+<span class="na">product_description</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="na">inspector_filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rot13_L2.py</span><span class="w"></span>
+<span class="na">inspector_relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">codes/inspectors</span><span class="w"></span>
+<span class="na">inspector_description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Level 2</span><span class="w"></span>
+<span class="na">inspector_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0.0</span><span class="w"></span>
+<span class="na">inspector_output_interface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">inspector_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">inspector_date_written</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2016-05-31</span><span class="w"></span>
+<span class="na">inspector_newest_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">inspector_arguments</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+
+<span class="k">[process_rot13_L0-L1]</span><span class="w"></span>
+<span class="na">process_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rot_L0toL1</span><span class="w"></span>
+<span class="na">output_product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">product_concat</span><span class="w"></span>
+<span class="na">output_timebase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">FILE</span><span class="w"></span>
+<span class="na">extra_params</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="na">required_input1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">product_input_first</span><span class="w"></span>
+<span class="na">required_input2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">product_input_second</span><span class="w"></span>
+<span class="na">code_filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">run_rot13_L0toL1.py</span><span class="w"></span>
+<span class="na">code_relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">scripts</span><span class="w"></span>
+<span class="na">code_start_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2010-09-01</span><span class="w"></span>
+<span class="na">code_stop_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2020-01-01</span><span class="w"></span>
+<span class="na">code_description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Python L0-&gt;L1</span><span class="w"></span>
+<span class="na">code_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0.0</span><span class="w"></span>
+<span class="na">code_output_interface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">code_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">code_date_written</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2016-05-31</span><span class="w"></span>
+<span class="na">code_newest_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">code_arguments</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="na">code_cpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">code_ram</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+
+<span class="k">[process_rot13_L1-L2]</span><span class="w"></span>
+<span class="na">process_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rot_L1toL2</span><span class="w"></span>
+<span class="na">output_product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">product_rot13</span><span class="w"></span>
+<span class="na">output_timebase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">FILE</span><span class="w"></span>
+<span class="na">extra_params</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="na">required_input1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">product_concat</span><span class="w"></span>
+<span class="na">code_filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">run_rot13_L1toL2.py</span><span class="w"></span>
+<span class="na">code_relative_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">scripts</span><span class="w"></span>
+<span class="na">code_start_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2010-09-01</span><span class="w"></span>
+<span class="na">code_stop_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2020-01-01</span><span class="w"></span>
+<span class="na">code_description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Python L1-&gt;L2</span><span class="w"></span>
+<span class="na">code_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0.0</span><span class="w"></span>
+<span class="na">code_output_interface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">code_active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">code_date_written</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2016-05-31</span><span class="w"></span>
+<span class="na">code_newest_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="na">code_arguments</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="na">code_cpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">code_ram</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="addfromconfig-py">
-<h2>addFromConfig.py<a class="headerlink" href="#addfromconfig-py" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># Honored database substitutions used as {Y}{MILLI}{PRODUCT}</span>
-<span class="c1">#       Y: 4 digit year</span>
-<span class="c1">#       m: 2 digit month</span>
-<span class="c1">#       b: 3 character month (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)</span>
-<span class="c1">#       d: 2 digit day</span>
-<span class="c1">#       y: 2 digit year</span>
-<span class="c1">#       j: 3 digit day of year</span>
-<span class="c1">#       H: 2 digit hour (24-hour time)</span>
-<span class="c1">#       M: 2 digit minute</span>
-<span class="c1">#       S: 2 digit second</span>
-<span class="c1">#       MILLI: 3 digit millisecond</span>
-<span class="c1">#       MICRO: 3 digit microsecond</span>
-<span class="c1">#       QACODE: the QA code (ok|ignore|problem)</span>
-<span class="c1">#       VERSION: version string, interface.quality.revision</span>
-<span class="c1">#       DATE: the UTC date from a file, same as Ymd</span>
-<span class="c1">#       MISSION: the mission name from the db</span>
-<span class="c1">#       SPACECRAFT: the spacecraft name from the db</span>
-<span class="c1">#       PRODUCT: the product name from the db</span>
-
-
-<span class="c1">##########################</span>
-<span class="c1"># MANUAL</span>
-<span class="c1">#</span>
-<span class="c1"># Loops over the configuration file and if the DB does not have the mission,</span>
-<span class="c1"># satellite, instrument entries present they are added, skipped otherwise.</span>
-<span class="c1"># The product and process entries must be unique and not present.</span>
-<span class="c1">#</span>
-<span class="c1"># THERE IS CURRENTLY NO UPDATE IN THE DB BASED ON THIS CONFIG SCRIPT</span>
-
-
-<span class="c1">##################</span>
-<span class="c1"># Required elements</span>
-<span class="c1">#</span>
-<span class="c1"># [mission]  &lt;- once and only once with</span>
-<span class="c1">#   rootdir  (string)</span>
-<span class="c1">#   mission_name  (string)</span>
-<span class="c1">#   incoming_dir  (string)</span>
-<span class="c1"># [satellite] &lt;- once and only once with</span>
-<span class="c1">#   satellite_name  (string)</span>
-<span class="c1"># [instrument] &lt;- once and only once with</span>
-<span class="c1">#   instrument_name  (string)</span>
-<span class="c1">##### products and inspector are defined together since they are a one-to-one</span>
-<span class="c1"># [product] &lt;- multiple entries each starting with &quot;product&quot; then a unique identifer</span>
-<span class="c1">#   product_name  (string)</span>
-<span class="c1">#   relative_path  (string)</span>
-<span class="c1">#   level  (float)</span>
-<span class="c1">#   format  (string)</span>
-<span class="c1">#   product_description (string)</span>
-<span class="c1">#   inspector_filename (string)</span>
-<span class="c1">#   inspector_relative_path (string)</span>
-<span class="c1">#   inspector_description (string)</span>
-<span class="c1">#   inspector_version (version e.g. 1.0.0)</span>
-<span class="c1">#   inspector_output_interface (integer)</span>
-<span class="c1">#   inspector_active (Boolean e.g. True or 1 or False or 0)</span>
-<span class="c1">#   inspector_date_written (date e.g. 2013-07-12)</span>
-<span class="c1">#   inspector_newest_version  (Boolean e.g. True or 1 or False or 0)</span>
-<span class="c1">#   inspector_arguments (string)</span>
-<span class="c1">#### processes and codes operate on the names of the products, they can be in</span>
-<span class="c1">#### this config file or already in the db codes are one-to-one with processes</span>
-<span class="c1"># [process] &lt;- multiple entries each starting with &quot;process&quot; then a unique identifer</span>
-<span class="c1">#   process_name (string)</span>
-<span class="c1">#   output_product (string)  - identifer from section heading</span>
-<span class="c1">#   output_timebase  (string, FILE/DAILY/WEEKLY/MONTHLY/YEARLY)</span>
-<span class="c1">#   extra_params (string)</span>
-<span class="c1">## A collection of input names entered as such</span>
-<span class="c1">## the required portion is &quot;optional_input&quot; or &quot;required_input&quot; then some</span>
-<span class="c1">## unique identifer on the end</span>
-<span class="c1">#   optional_input1  (string) name of product - identifer from section heading</span>
-<span class="c1">#   optional_input2  (string) name of product - identifer from section heading</span>
-<span class="c1">#   optional_input3  (string) name of product - identifer from section heading</span>
-<span class="c1">#   required_input1  (string) name of product - identifer from section heading</span>
-<span class="c1">#   required_input2  (string) name of product - identifer from section heading</span>
-<span class="c1">#   required_input3  (string) name of product - identifer from section heading</span>
-<span class="c1">## code is entered as part of process</span>
-<span class="c1">#   code_filename (string)</span>
-<span class="c1">#   code_relative_path (string)</span>
-<span class="c1">#   code_start_date (date, 2000-01-01)</span>
-<span class="c1">#   code_stop_date  (date, 2050-12-31)</span>
-<span class="c1">#   code_description (string)</span>
-<span class="c1">#   code_version  (version e.g. 1.0.0)</span>
-<span class="c1">#   code_output_interface  (integer)</span>
-<span class="c1">#   code_active (Boolean e.g. True or 1 or False or 0)</span>
-<span class="c1">#   code_date_written   (date, 2050-12-31)</span>
-<span class="c1">#   code_newest_version (Boolean e.g. True or 1 or False or 0)</span>
-<span class="c1">#   code_arguments (string)</span>
-<span class="k">[mission]</span>
-<span class="na">mission_name</span> <span class="o">=</span> <span class="s">testDB</span>
-<span class="na">rootdir</span> <span class="o">=</span> <span class="s">/home/myles/dbprocessing/test_DB</span>
-<span class="na">incoming_dir</span> <span class="o">=</span> <span class="s">L0</span>
-
-<span class="k">[satellite]</span>
-<span class="na">satellite_name</span> <span class="o">=</span> <span class="s">{MISSION}-a</span>
-
-<span class="k">[instrument]</span>
-<span class="na">instrument_name</span> <span class="o">=</span> <span class="s">rot13</span>
-
-<span class="k">[product_input_first]</span>
-<span class="na">product_name</span> <span class="o">=</span> <span class="s">{MISSION}_rot13_L0_first</span>
-<span class="na">relative_path</span> <span class="o">=</span> <span class="s">L0</span>
-<span class="na">level</span> <span class="o">=</span> <span class="s">0.0</span>
-<span class="na">format</span> <span class="o">=</span> <span class="s">testDB_{nnn}_first.raw</span>
-<span class="na">product_description</span> <span class="o">=</span>
-<span class="na">inspector_filename</span> <span class="o">=</span> <span class="s">rot13_L0_first.py</span>
-<span class="na">inspector_relative_path</span> <span class="o">=</span> <span class="s">codes/inspectors</span>
-<span class="na">inspector_description</span> <span class="o">=</span> <span class="s">Level 0</span>
-<span class="na">inspector_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
-<span class="na">inspector_output_interface</span> <span class="o">=</span> <span class="s">1</span>
-<span class="na">inspector_active</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">inspector_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
-<span class="na">inspector_newest_version</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">inspector_arguments</span> <span class="o">=</span>
-
-<span class="k">[product_input_second]</span>
-<span class="na">product_name</span> <span class="o">=</span> <span class="s">{MISSION}_rot13_L0_second</span>
-<span class="na">relative_path</span> <span class="o">=</span> <span class="s">L0</span>
-<span class="na">level</span> <span class="o">=</span> <span class="s">0.0</span>
-<span class="na">format</span> <span class="o">=</span> <span class="s">testDB_{nnn}_sec.raw</span>
-<span class="na">product_description</span> <span class="o">=</span>
-<span class="na">inspector_filename</span> <span class="o">=</span> <span class="s">rot13_L0_second.py</span>
-<span class="na">inspector_relative_path</span> <span class="o">=</span> <span class="s">codes/inspectors</span>
-<span class="na">inspector_description</span> <span class="o">=</span> <span class="s">Level 0</span>
-<span class="na">inspector_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
-<span class="na">inspector_output_interface</span> <span class="o">=</span> <span class="s">1</span>
-<span class="na">inspector_active</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">inspector_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
-<span class="na">inspector_newest_version</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">inspector_arguments</span> <span class="o">=</span>
-
-<span class="k">[product_concat]</span>
-<span class="na">product_name</span> <span class="o">=</span> <span class="s">{MISSION}_rot13_L1</span>
-<span class="na">relative_path</span> <span class="o">=</span> <span class="s">L1</span>
-<span class="na">level</span> <span class="o">=</span> <span class="s">1.0</span>
-<span class="na">format</span> <span class="o">=</span> <span class="s">testDB_{nnn}.cat</span>
-<span class="na">product_description</span> <span class="o">=</span>
-<span class="na">inspector_filename</span> <span class="o">=</span> <span class="s">rot13_L1.py</span>
-<span class="na">inspector_relative_path</span> <span class="o">=</span> <span class="s">codes/inspectors</span>
-<span class="na">inspector_description</span> <span class="o">=</span> <span class="s">Level 1</span>
-<span class="na">inspector_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
-<span class="na">inspector_output_interface</span> <span class="o">=</span> <span class="s">1</span>
-<span class="na">inspector_active</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">inspector_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
-<span class="na">inspector_newest_version</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">inspector_arguments</span> <span class="o">=</span>
-
-<span class="k">[product_rot13]</span>
-<span class="na">product_name</span> <span class="o">=</span> <span class="s">{MISSION}_rot13_L2</span>
-<span class="na">relative_path</span> <span class="o">=</span> <span class="s">L2</span>
-<span class="na">level</span> <span class="o">=</span> <span class="s">2.0</span>
-<span class="na">format</span> <span class="o">=</span> <span class="s">testDB_{nnn}.rot</span>
-<span class="na">product_description</span> <span class="o">=</span>
-<span class="na">inspector_filename</span> <span class="o">=</span> <span class="s">rot13_L2.py</span>
-<span class="na">inspector_relative_path</span> <span class="o">=</span> <span class="s">codes/inspectors</span>
-<span class="na">inspector_description</span> <span class="o">=</span> <span class="s">Level 2</span>
-<span class="na">inspector_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
-<span class="na">inspector_output_interface</span> <span class="o">=</span> <span class="s">1</span>
-<span class="na">inspector_active</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">inspector_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
-<span class="na">inspector_newest_version</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">inspector_arguments</span> <span class="o">=</span>
-
-<span class="k">[process_rot13_L0-L1]</span>
-<span class="na">process_name</span> <span class="o">=</span> <span class="s">rot_L0toL1</span>
-<span class="na">output_product</span> <span class="o">=</span> <span class="s">product_concat</span>
-<span class="na">output_timebase</span> <span class="o">=</span> <span class="s">FILE</span>
-<span class="na">extra_params</span> <span class="o">=</span>
-<span class="na">required_input1</span> <span class="o">=</span> <span class="s">product_input_first</span>
-<span class="na">required_input2</span> <span class="o">=</span> <span class="s">product_input_second</span>
-<span class="na">code_filename</span> <span class="o">=</span> <span class="s">run_rot13_L0toL1.py</span>
-<span class="na">code_relative_path</span> <span class="o">=</span> <span class="s">scripts</span>
-<span class="na">code_start_date</span> <span class="o">=</span> <span class="s">2010-09-01</span>
-<span class="na">code_stop_date</span> <span class="o">=</span> <span class="s">2020-01-01</span>
-<span class="na">code_description</span> <span class="o">=</span> <span class="s">Python L0-&gt;L1</span>
-<span class="na">code_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
-<span class="na">code_output_interface</span> <span class="o">=</span> <span class="s">1</span>
-<span class="na">code_active</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">code_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
-<span class="na">code_newest_version</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">code_arguments</span> <span class="o">=</span>
-<span class="na">code_cpu</span> <span class="o">=</span> <span class="s">1</span>
-<span class="na">code_ram</span> <span class="o">=</span> <span class="s">1</span>
-
-<span class="k">[process_rot13_L1-L2]</span>
-<span class="na">process_name</span> <span class="o">=</span> <span class="s">rot_L1toL2</span>
-<span class="na">output_product</span> <span class="o">=</span> <span class="s">product_rot13</span>
-<span class="na">output_timebase</span> <span class="o">=</span> <span class="s">FILE</span>
-<span class="na">extra_params</span> <span class="o">=</span>
-<span class="na">required_input1</span> <span class="o">=</span> <span class="s">product_concat</span>
-<span class="na">code_filename</span> <span class="o">=</span> <span class="s">run_rot13_L1toL2.py</span>
-<span class="na">code_relative_path</span> <span class="o">=</span> <span class="s">scripts</span>
-<span class="na">code_start_date</span> <span class="o">=</span> <span class="s">2010-09-01</span>
-<span class="na">code_stop_date</span> <span class="o">=</span> <span class="s">2020-01-01</span>
-<span class="na">code_description</span> <span class="o">=</span> <span class="s">Python L1-&gt;L2</span>
-<span class="na">code_version</span> <span class="o">=</span> <span class="s">1.0.0</span>
-<span class="na">code_output_interface</span> <span class="o">=</span> <span class="s">1</span>
-<span class="na">code_active</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">code_date_written</span> <span class="o">=</span> <span class="s">2016-05-31</span>
-<span class="na">code_newest_version</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">code_arguments</span> <span class="o">=</span>
-<span class="na">code_cpu</span> <span class="o">=</span> <span class="s">1</span>
-<span class="na">code_ram</span> <span class="o">=</span> <span class="s">1</span>
+<section id="mission">
+<h3>mission<a class="headerlink" href="#mission" title="Permalink to this headline">¶</a></h3>
+<p>This section defines the <a class="reference internal" href="concepts.html#concepts-missions"><span class="std std-ref">mission</span></a>; this configuration
+only supports one mission per database. The keys map directly to the fields
+in the <a class="reference internal" href="developer/tables.html#table-mission"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">mission</span></code></a> table:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="developer/tables.html#column-mission-rootdir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">rootdir</span></code></a></p></li>
+<li><p><a class="reference internal" href="developer/tables.html#column-mission-mission_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">mission_name</span></code></a></p></li>
+<li><p><a class="reference internal" href="developer/tables.html#column-mission-incoming_dir"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">incoming_dir</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="satellite">
+<h3>satellite<a class="headerlink" href="#satellite" title="Permalink to this headline">¶</a></h3>
+<p>Although a database may contain multiple satellites, products can only be
+defined within a single config file for a single satellite. (Multiple config
+files can be used to add multiple satellites.)</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">satellite_name</span></code> key specified the name of the satellite as in
+<a class="reference internal" href="developer/tables.html#column-satellite-satellite_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">satellite.satellite_name</span></code></a>; the instrument and products in
+this file will all be associated with the satellite of this name.</p>
+</section>
+<section id="instrument">
+<h3>instrument<a class="headerlink" href="#instrument" title="Permalink to this headline">¶</a></h3>
+<p>As with <code class="docutils literal notranslate"><span class="pre">satellite</span></code>, this section specifies, via <code class="docutils literal notranslate"><span class="pre">instrument_name</span></code>,
+the instrument (<a class="reference internal" href="developer/tables.html#column-instrument-instrument_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">instrument.instrument_name</span></code></a>) with which
+all the products in this file will be associated.</p>
+</section>
+<section id="product">
+<h3>product<a class="headerlink" href="#product" title="Permalink to this headline">¶</a></h3>
+<p>Each section starting with <code class="docutils literal notranslate"><span class="pre">product_</span></code> defines a
+<a class="reference internal" href="concepts.html#concepts-products"><span class="std std-ref">product</span></a>. An entry in the <a class="reference internal" href="developer/tables.html#table-product"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">product</span></code></a>
+table will be added for each section; the keys map to columns of the table.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>product_name</dt><dd><p><a class="reference internal" href="developer/tables.html#column-product-product_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product_name</span></code></a></p>
+</dd>
+<dt>relative_path</dt><dd><p><a class="reference internal" href="developer/tables.html#column-product-product_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product_name</span></code></a></p>
+</dd>
+<dt>level</dt><dd><p><a class="reference internal" href="developer/tables.html#column-product-product_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product_name</span></code></a></p>
+</dd>
+<dt>format</dt><dd><p><a class="reference internal" href="developer/tables.html#column-product-product_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product_name</span></code></a></p>
+</dd>
+<dt>product_description</dt><dd><p><a class="reference internal" href="developer/tables.html#column-product-product_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product_name</span></code></a> (may be blank)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Boolean values can be expressed in the config file in a number of
+ways, e.g. <code class="docutils literal notranslate"><span class="pre">0</span></code>/<code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>. Dates are expressed as
+<code class="docutils literal notranslate"><span class="pre">YYYY-MM-DD</span></code>.</p>
+<p>A single entry in the <a class="reference internal" href="developer/tables.html#table-inspector"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">inspector</span></code></a> table is also added,
+associated with this product (via <a class="reference internal" href="developer/tables.html#column-inspector-product"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">inspector.product</span></code></a>).</p>
+<blockquote>
+<div><dl class="simple">
+<dt>inspector_filename</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-filename"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">filename</span></code></a></p>
+</dd>
+<dt>inspector_relative_path</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-relative_path"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">relative_path</span></code></a></p>
+</dd>
+<dt>inspector_description</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-description"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">description</span></code></a></p>
+</dd>
+<dt>inspector_version</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-interface_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">interface_version</span></code></a>.
+<a class="reference internal" href="developer/tables.html#column-inspector-quality_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">quality_version</span></code></a>.
+<a class="reference internal" href="developer/tables.html#column-inspector-revision_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">revision_version</span></code></a></p>
+</dd>
+<dt>inspector_output_interface</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-output_interface_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">output_interface_version</span></code></a></p>
+</dd>
+<dt>inspector_active</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-active_code"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">active_code</span></code></a></p>
+</dd>
+<dt>inspector_date_written</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-date_written"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">date_written</span></code></a></p>
+</dd>
+<dt>inspector_newest_version</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-newest_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">newest_version</span></code></a></p>
+</dd>
+<dt>inspector_arguments</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-arguments"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">arguments</span></code></a> (may be blank)</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="process">
+<h3>process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h3>
+<p>Each section starting with <code class="docutils literal notranslate"><span class="pre">process_</span></code> defines a
+<a class="reference internal" href="concepts.html#concepts-processes"><span class="std std-ref">process</span></a>. An entry in the <a class="reference internal" href="developer/tables.html#table-process"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">process</span></code></a>
+table will be added for each section; the keys map to columns of the table:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>process_name</dt><dd><p><a class="reference internal" href="developer/tables.html#column-process-process_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">process_name</span></code></a></p>
+</dd>
+<dt>output_product</dt><dd><p><a class="reference internal" href="developer/tables.html#column-process-output_product"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">output_product</span></code></a>. This is specified in the config
+file as a name, and mapped to the <a class="reference internal" href="developer/tables.html#column-product-product_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product_id</span></code></a>.
+If the product exists in the same config file, it must be the name
+of the product section, including the <code class="docutils literal notranslate"><span class="pre">product_</span></code>. If the product
+is already in the database, it must be specified as the
+<a class="reference internal" href="developer/tables.html#column-product-product_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product_name</span></code></a>. (Making this more flexible is
+planned.)</p>
+</dd>
+<dt>output_timebase</dt><dd><p><a class="reference internal" href="developer/tables.html#column-process-output_timebase"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">output_timebase</span></code></a></p>
+</dd>
+<dt>extra_params</dt><dd><p><a class="reference internal" href="developer/tables.html#column-process-extra_params"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">extra_params</span></code></a></p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Keys starting with <code class="docutils literal notranslate"><span class="pre">optional_input</span></code> or <code class="docutils literal notranslate"><span class="pre">required_input</span></code> create
+entries in the <a class="reference internal" href="developer/tables.html#table-productprocesslink"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">productprocesslink</span></code></a> table. They must be
+named sequentially, e.g.:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">required_input1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">required_input2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optional_input1</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>etc.</p>
+<p>The <em>values</em> of each entry are ordinarily the name of a product. As
+with the output product, if the product exists in the same config
+file, it must be the name of the product section, including the
+<code class="docutils literal notranslate"><span class="pre">product_</span></code>. If the product is already in the database, it must be
+specified as the <a class="reference internal" href="developer/tables.html#column-product-product_name"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">product_name</span></code></a>.</p>
+<p>If the key starts with <code class="docutils literal notranslate"><span class="pre">optional</span></code>, the
+<a class="reference internal" href="developer/tables.html#column-productprocesslink-optional"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">optional</span></code></a> column is <code class="docutils literal notranslate"><span class="pre">True</span></code>; otherwise
+it is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>To specify the inclusion of previous or following days of input data
+(i.e. to set <a class="reference internal" href="developer/tables.html#column-productprocesslink-yesterday"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">yesterday</span></code></a> and
+<a class="reference internal" href="developer/tables.html#column-productprocesslink-tomorrow"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">tomorrow</span></code></a>, use a different format, of
+<code class="docutils literal notranslate"><span class="pre">(&quot;name&quot;,</span> <span class="pre">days_before,</span> <span class="pre">days_after)</span></code>. For example, to specify the
+product from section <code class="docutils literal notranslate"><span class="pre">product_level2</span></code> as a required input, and use
+one day prior to the current day as input and no addition days after,
+use:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">required_input1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">(&quot;product_level2&quot;, 1, 0)</span><span class="w"></span>
 </pre></div>
 </div>
-</div>
-</div>
+<p>The product name is only in quotes if using this form.</p>
+<p>Finally, an entry is created in the <a class="reference internal" href="developer/tables.html#table-code"><code class="xref sql sql-table docutils literal notranslate"><span class="pre">code</span></code></a> table, with
+<a class="reference internal" href="developer/tables.html#column-code-process_id"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">process_id</span></code></a> set to associate it with this
+process. Ini key to column mappings are:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>code_filename</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-filename"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">filename</span></code></a></p>
+</dd>
+<dt>code_relative_path</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-relative_path"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">relative_path</span></code></a></p>
+</dd>
+<dt>code_start_date</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-code_start_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code_start_date</span></code></a></p>
+</dd>
+<dt>code_stop_date</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-code_stop_date"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code_stop_date</span></code></a></p>
+</dd>
+<dt>code_description</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-code_description"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">code_description</span></code></a></p>
+</dd>
+<dt>code_version</dt><dd><p><a class="reference internal" href="developer/tables.html#column-inspector-interface_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">interface_version</span></code></a>.
+<a class="reference internal" href="developer/tables.html#column-inspector-quality_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">quality_version</span></code></a>.
+<a class="reference internal" href="developer/tables.html#column-inspector-revision_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">revision_version</span></code></a></p>
+</dd>
+<dt>code_output_interface</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-output_interface_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">output_interface_version</span></code></a></p>
+</dd>
+<dt>code_active</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-active_code"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">active_code</span></code></a></p>
+</dd>
+<dt>code_date_written</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-date_written"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">date_written</span></code></a></p>
+</dd>
+<dt>code_newest_version</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-newest_version"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">newest_version</span></code></a></p>
+</dd>
+<dt>code_arguments</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-arguments"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">arguments</span></code></a></p>
+</dd>
+<dt>code_cpu</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-cpu"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">cpu</span></code></a></p>
+</dd>
+<dt>code_ram</dt><dd><p><a class="reference internal" href="developer/tables.html#column-code-ram"><code class="xref sql sql-column docutils literal notranslate"><span class="pre">ram</span></code></a></p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</section>
+<section id="coverageplot-py">
+<span id="configurationfiles-coverageplot"></span><h2>coveragePlot.py<a class="headerlink" href="#coverageplot-py" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1">#############################</span><span class="w"></span>
+<span class="c1"># sample config file</span><span class="w"></span>
+<span class="c1">#############################</span><span class="w"></span>
+<span class="c1">##################</span><span class="w"></span>
+<span class="c1"># Substitutions</span><span class="w"></span>
+<span class="c1"># {TODAY}</span><span class="w"></span>
+<span class="c1"># {N DAYS}  -&gt; add N days to the previous where N is an int</span><span class="w"></span>
 
 
+<span class="c1">##################</span><span class="w"></span>
+<span class="c1"># Required elements</span><span class="w"></span>
+
+<span class="k">[settings]</span><span class="w"></span>
+<span class="na">mission</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">~/RBSP_MAGEIS.sqlite</span><span class="w"></span>
+<span class="na">outformat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">pdf</span><span class="w"></span>
+<span class="na">filename_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MagEIS_L3_Coverage_{TODAY}</span><span class="w"></span>
+<span class="na">startdate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">20120901</span><span class="w"></span>
+<span class="na">enddate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{TODAY} + {7 DAYS}</span><span class="w"></span>
+
+
+<span class="c1">###############################################</span><span class="w"></span>
+<span class="c1"># Plots</span><span class="w"></span>
+<span class="c1">###############################################</span><span class="w"></span>
+<span class="k">[panel]</span><span class="w"></span>
+<span class="c1"># in the panel section we define what will be plotted</span><span class="w"></span>
+<span class="c1"># N keys pf plotN define subplots</span><span class="w"></span>
+<span class="c1"># daysperplot gives the days per plot that will be on each page</span><span class="w"></span>
+<span class="na">plot1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">plot1</span><span class="w"></span>
+<span class="na">plot2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">plot2</span><span class="w"></span>
+<span class="na">daysperplot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">60</span><span class="w"></span>
+<span class="na">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MagEIS L3 Coverage</span><span class="w"></span>
+<span class="na">preset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">green</span><span class="w"></span>
+<span class="na">missing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">red</span><span class="w"></span>
+<span class="na">expected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">grey</span><span class="w"></span>
+
+<span class="k">[plot1]</span><span class="w"></span>
+<span class="c1"># in the plot section rows are defined bottom up</span><span class="w"></span>
+<span class="c1"># ylabel is what to put on the plot ylabel</span><span class="w"></span>
+<span class="c1"># productN is the product to plot</span><span class="w"></span>
+<span class="c1"># yticklabelN is what to call each product</span><span class="w"></span>
+<span class="c1"># productN_glob is a glob that a file has to match in order to be valid</span><span class="w"></span>
+<span class="c1"># productN_version is a minimum version allowed for files (e.g. 4.0.0)</span><span class="w"></span>
+<span class="na">ylabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">RBSP-A</span><span class="w"></span>
+<span class="na">product1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspa_int_ect-mageisLOW-L3</span><span class="w"></span>
+<span class="na">product2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspa_int_ect-mageisM35-L3</span><span class="w"></span>
+<span class="na">product3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspa_int_ect-mageisM75-L3</span><span class="w"></span>
+<span class="na">product4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspa_int_ect-mageisHIGH-L3</span><span class="w"></span>
+<span class="na">product5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspa_int_ect-mageis-L3</span><span class="w"></span>
+<span class="na">yticklabel1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">LOW</span><span class="w"></span>
+<span class="na">yticklabel2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">M35</span><span class="w"></span>
+<span class="na">yticklabel3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">M75</span><span class="w"></span>
+<span class="na">yticklabel4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">HIGH</span><span class="w"></span>
+<span class="na">yticklabel5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">FULL</span><span class="w"></span>
+
+
+<span class="k">[plot2]</span><span class="w"></span>
+<span class="na">ylabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">RBSP-B</span><span class="w"></span>
+<span class="na">product1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspb_int_ect-mageisLOW-L3</span><span class="w"></span>
+<span class="na">product2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspb_int_ect-mageisM35-L3</span><span class="w"></span>
+<span class="na">product3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspb_int_ect-mageisM75-L3</span><span class="w"></span>
+<span class="na">product4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspb_int_ect-mageisHIGH-L3</span><span class="w"></span>
+<span class="na">product5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rbspb_int_ect-mageis-L3</span><span class="w"></span>
+<span class="na">yticklabel1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">LOW</span><span class="w"></span>
+<span class="na">yticklabel2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">M35</span><span class="w"></span>
+<span class="na">yticklabel3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">M75</span><span class="w"></span>
+<span class="na">yticklabel4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">HIGH</span><span class="w"></span>
+<span class="na">yticklabel5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">FULL</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="makelatestsymlinks-py">
+<span id="configurationfiles-makelatestsymlinks"></span><h2>makeLatestSymlinks.py<a class="headerlink" href="#makelatestsymlinks-py" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[isois]</span><span class="w"></span>
+<span class="c1"># Directory containing the data files</span><span class="w"></span>
+<span class="na">sourcedir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">~/dbp_py3/data/ISOIS/level1/</span><span class="w"></span>
+<span class="c1"># Directory to make the symlinks in</span><span class="w"></span>
+<span class="na">destdir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">~/tmp/</span><span class="w"></span>
+<span class="c1"># First date to link</span><span class="w"></span>
+<span class="na">startdate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2010-01-01</span><span class="w"></span>
+<span class="c1"># Last date to link</span><span class="w"></span>
+<span class="na">enddate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2021-01-01</span><span class="w"></span>
+<span class="c1"># Number of days before present not to link (e.g. to keep internal-only)</span><span class="w"></span>
+<span class="na">deltadays</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">60</span><span class="w"></span>
+<span class="c1"># glob for files to match</span><span class="w"></span>
+<span class="na">filter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">psp_isois_l1-sc-hk_*.cdf</span><span class="w"></span>
+<span class="c1"># Link directories as well as files</span><span class="w"></span>
+<span class="na">linkdirs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+<span class="c1"># Mode to use when making output directory</span><span class="w"></span>
+<span class="na">outmode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">775</span><span class="w"></span>
+<span class="c1"># Do not limit based on date (i.e., ignore date options; they&#39;re still required)</span><span class="w"></span>
+<span class="na">nodate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span><span class="w"></span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Configuration Files</a><ul>
+<li><a class="reference internal" href="#basics">Basics</a></li>
+<li><a class="reference internal" href="#addfromconfig-py">addFromConfig.py</a><ul>
+<li><a class="reference internal" href="#mission">mission</a></li>
+<li><a class="reference internal" href="#satellite">satellite</a></li>
+<li><a class="reference internal" href="#instrument">instrument</a></li>
+<li><a class="reference internal" href="#product">product</a></li>
+<li><a class="reference internal" href="#process">process</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#coverageplot-py">coveragePlot.py</a></li>
+<li><a class="reference internal" href="#makelatestsymlinks-py">makeLatestSymlinks.py</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="scripts.html"
+                          title="previous chapter">Scripts</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="CODE_OF_CONDUCT.html"
+                          title="next chapter">dbprocessing Code of Conduct</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ConfigurationFiles.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -409,16 +613,20 @@ starts an inline comment, while # does not.)</p>
           <a href="CODE_OF_CONDUCT.html" title="dbprocessing Code of Conduct"
              >next</a> |</li>
         <li class="right" >
-          <a href="scripts.html" title="dbprocessing Scripts"
+          <a href="scripts.html" title="Scripts"
              >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="search.html">search</a>|&nbsp;</li>
-       <li><a href="index.html">top</a> &raquo;</li>
- 
+        <li><a href="index.html">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Configuration Files</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

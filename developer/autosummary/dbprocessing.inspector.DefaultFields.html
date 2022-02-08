@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.inspector.DefaultFields &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.inspector.DefaultFormatter" href="dbprocessing.inspector.DefaultFormatter.html" />
+    <link rel="prev" title="dbprocessing.inspector" href="dbprocessing.inspector.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.inspector.DefaultFormatter.html" title="dbprocessing.inspector.DefaultFormatter"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.inspector.html" title="dbprocessing.inspector"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="dbprocessing.inspector.html" accesskey="U">dbprocessing.inspector</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.inspector.DefaultFields</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="dbprocessing-inspector-defaultfields">
+<h1>dbprocessing.inspector.DefaultFields<a class="headerlink" href="#dbprocessing-inspector-defaultfields" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.inspector.</span></span><span class="sig-name descname"><span class="pre">DefaultFields</span></span><a class="reference internal" href="../../_modules/dbprocessing/inspector.html#DefaultFields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.inspector.DefaultFields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dict-like with defaults for the special fields used by DBformatter</p>
+<p>Any key not present returns a value that maintains the key reference
+and provides a match-all regex.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.clear" title="dbprocessing.inspector.DefaultFields.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.copy" title="dbprocessing.inspector.DefaultFields.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.fromkeys" title="dbprocessing.inspector.DefaultFields.fromkeys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromkeys</span></code></a>(iterable[, value])</p></td>
+<td><p>Create a new dictionary with keys from iterable and values set to value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.get" title="dbprocessing.inspector.DefaultFields.get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code></a>(key[, default])</p></td>
+<td><p>Return the value for key if key is in the dictionary, else default.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.items" title="dbprocessing.inspector.DefaultFields.items"><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.keys" title="dbprocessing.inspector.DefaultFields.keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.pop" title="dbprocessing.inspector.DefaultFields.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>(key[, default])</p></td>
+<td><p>If key is not found, default is returned if given, otherwise KeyError is raised</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.popitem" title="dbprocessing.inspector.DefaultFields.popitem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code></a>(/)</p></td>
+<td><p>Remove and return a (key, value) pair as a 2-tuple.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.setdefault" title="dbprocessing.inspector.DefaultFields.setdefault"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code></a>(key[, default])</p></td>
+<td><p>Insert key with a value of default if key is not in the dictionary.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.update" title="dbprocessing.inspector.DefaultFields.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>([E, ]**F)</p></td>
+<td><p>If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k] If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v In either case, this is followed by: for k in F:  D[k] = F[k]</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.inspector.DefaultFields.values" title="dbprocessing.inspector.DefaultFields.values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None.</span>&#160; <span class="pre">Remove</span> <span class="pre">all</span> <span class="pre">items</span> <span class="pre">from</span> <span class="pre">D.</span></span></span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">shallow</span> <span class="pre">copy</span> <span class="pre">of</span> <span class="pre">D</span></span></span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.fromkeys">
+<span class="sig-name descname"><span class="pre">fromkeys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.fromkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new dictionary with keys from iterable and values set to value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value for key if key is in the dictionary, else default.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.items">
+<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">set-like</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">items</span></span></span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">set-like</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">keys</span></span></span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.pop">
+<span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=&lt;unrepresentable&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>If key is not found, default is returned if given, otherwise KeyError is raised</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.popitem">
+<span class="sig-name descname"><span class="pre">popitem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.popitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove and return a (key, value) pair as a 2-tuple.</p>
+<p>Pairs are returned in LIFO (last-in, first-out) order.
+Raises KeyError if the dict is empty.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.setdefault">
+<span class="sig-name descname"><span class="pre">setdefault</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert key with a value of default if key is not in the dictionary.</p>
+<p>Return the value for key if key is in the dictionary, else default.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="optional">[</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <span class="optional">]</span><em class="sig-param"><span class="n"><span class="pre">**F</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None.</span>&#160; <span class="pre">Update</span> <span class="pre">D</span> <span class="pre">from</span> <span class="pre">dict/iterable</span> <span class="pre">E</span> <span class="pre">and</span> <span class="pre">F.</span></span></span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]
+If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v
+In either case, this is followed by: for k in F:  D[k] = F[k]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.inspector.DefaultFields.values">
+<span class="sig-name descname"><span class="pre">values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">an</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">values</span></span></span><a class="headerlink" href="#dbprocessing.inspector.DefaultFields.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.inspector.html"
+                          title="previous chapter">dbprocessing.inspector</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.inspector.DefaultFormatter.html"
+                          title="next chapter">dbprocessing.inspector.DefaultFormatter</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.inspector.DefaultFields.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.inspector.DefaultFormatter.html" title="dbprocessing.inspector.DefaultFormatter"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.inspector.html" title="dbprocessing.inspector"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="dbprocessing.inspector.html" >dbprocessing.inspector</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.inspector.DefaultFields</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

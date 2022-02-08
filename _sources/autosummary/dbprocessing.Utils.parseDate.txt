@@ -1,6 +1,0 @@
-dbprocessing.Utils.parseDate
-============================
-
-.. currentmodule:: dbprocessing.Utils
-
-.. autofunction:: parseDate

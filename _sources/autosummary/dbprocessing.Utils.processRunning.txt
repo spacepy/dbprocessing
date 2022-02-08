@@ -1,6 +1,0 @@
-dbprocessing.Utils.processRunning
-=================================
-
-.. currentmodule:: dbprocessing.Utils
-
-.. autofunction:: processRunning

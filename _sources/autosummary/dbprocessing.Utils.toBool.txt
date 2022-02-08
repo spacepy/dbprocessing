@@ -1,6 +1,0 @@
-dbprocessing.Utils.toBool
-=========================
-
-.. currentmodule:: dbprocessing.Utils
-
-.. autofunction:: toBool

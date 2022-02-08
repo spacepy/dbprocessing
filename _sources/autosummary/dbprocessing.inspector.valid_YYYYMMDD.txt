@@ -1,6 +1,0 @@
-dbprocessing.inspector.valid_YYYYMMDD
-=====================================
-
-.. currentmodule:: dbprocessing.inspector
-
-.. autofunction:: valid_YYYYMMDD

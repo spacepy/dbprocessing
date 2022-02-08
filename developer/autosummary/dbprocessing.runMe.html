@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.runMe &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.runMe.runMe" href="dbprocessing.runMe.runMe.html" />
+    <link rel="prev" title="dbprocessing.reports.movedToError" href="dbprocessing.reports.movedToError.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.runMe.runMe.html" title="dbprocessing.runMe.runMe"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.reports.movedToError.html" title="dbprocessing.reports.movedToError"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" accesskey="U">API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.runMe</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-dbprocessing.runMe">
+<span id="dbprocessing-runme"></span><h1>dbprocessing.runMe<a class="headerlink" href="#module-dbprocessing.runMe" title="Permalink to this headline">¶</a></h1>
+<p>Support for running codes to make data files, as defined in database.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.runMe.mk_tempdir" title="dbprocessing.runMe.mk_tempdir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mk_tempdir</span></code></a>([suffix])</p></td>
+<td><p>Create a secure temp directory</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.runMe.rm_tempdir" title="dbprocessing.runMe.rm_tempdir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rm_tempdir</span></code></a>(tempdir)</p></td>
+<td><p>Remove the temp directory</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.runMe.runner" title="dbprocessing.runMe.runner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runner</span></code></a>(runme_list, dbu[, MAX_PROC, rundir])</p></td>
+<td><p>Go through a list of runMe objects and run them</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="dbprocessing.runMe.runMe.html#dbprocessing.runMe.runMe" title="dbprocessing.runMe.runMe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runMe</span></code></a>(dbu, utc_file_date, process_id, ...[, ...])</p></td>
+<td><p>class holds all the info it takes to run a process</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.runMe.ProcessException" title="dbprocessing.runMe.ProcessException"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessException</span></code></a></p></td>
+<td><p>Class for errors in running processes</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.runMe.mk_tempdir">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.runMe.</span></span><span class="sig-name descname"><span class="pre">mk_tempdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_dbprocessing'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/runMe.html#mk_tempdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.runMe.mk_tempdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a secure temp directory</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></dt><dd><p>Path to resulting directory.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Other Parameters</dt>
+<dd class="field-even"><dl>
+<dt><strong>suffix</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, default <code class="docutils literal notranslate"><span class="pre">_dbprocessing</span></code></span></dt><dd><p>Suffix to include on the directory name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.runMe.rm_tempdir">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.runMe.</span></span><span class="sig-name descname"><span class="pre">rm_tempdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tempdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/runMe.html#rm_tempdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.runMe.rm_tempdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the temp directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>:class:`str`</strong></dt><dd><p>Path to directory to remove.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dbprocessing.runMe.runner">
+<span class="sig-prename descclassname"><span class="pre">dbprocessing.runMe.</span></span><span class="sig-name descname"><span class="pre">runner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runme_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MAX_PROC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rundir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/runMe.html#runner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.runMe.runner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go through a list of runMe objects and run them</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>This function can be made a smart as one wants, for now it is
+not made to be smart, but flexible</p>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>runme_list</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="dbprocessing.runMe.runMe.html#dbprocessing.runMe.runMe" title="dbprocessing.runMe.runMe"><code class="xref py py-class docutils literal notranslate"><span class="pre">runMe</span></code></a></span></dt><dd><p>List of runMe objects that need to be run.</p>
+</dd>
+<dt><strong>dbu</strong><span class="classifier"><a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DButils</span></code></a></span></dt><dd><p>Open database connection.</p>
+</dd>
+<dt><strong>MAX_PROC</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, default 2</span></dt><dd><p>Maximum number of processes to run at once.</p>
+</dd>
+<dt><strong>rundir</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Directory to run in, default use a freshly-created temp directory.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>:class:`tuple` of</strong><span class="classifier">class:<cite>int</cite></span></dt><dd><p>number of processes that successfully completed, number of processes
+that failed.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dbprocessing.runMe.ProcessException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.runMe.</span></span><span class="sig-name descname"><span class="pre">ProcessException</span></span><a class="reference internal" href="../../_modules/dbprocessing/runMe.html#ProcessException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.runMe.ProcessException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for errors in running processes</p>
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.reports.movedToError.html"
+                          title="previous chapter">dbprocessing.reports.movedToError</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.runMe.runMe.html"
+                          title="next chapter">dbprocessing.runMe.runMe</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.runMe.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.runMe.runMe.html" title="dbprocessing.runMe.runMe"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.reports.movedToError.html" title="dbprocessing.reports.movedToError"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.runMe</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

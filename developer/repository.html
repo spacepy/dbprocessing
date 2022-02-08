@@ -1,35 +1,33 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Repository organization &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     
-    <title>Repository organization &mdash; dbprocessing NMC_1 documentation</title>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     'NMC_1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/copybutton.js"></script>
-    <link rel="top" title="dbprocessing NMC_1 documentation" href="../index.html" />
-    <link rel="up" title="Developer Information" href="index.html" />
-    <link rel="next" title="Database Structure" href="structure.html" />
-    <link rel="prev" title="Documentation" href="documentation.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Building a release" href="release.html" />
+    <link rel="prev" title="Working With Pull Requests" href="pull_requests.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><h1>dbprocessing</h1></a>
+</div>
+
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -40,131 +38,135 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="structure.html" title="Database Structure"
+          <a href="release.html" title="Building a release"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="documentation.html" title="Documentation"
+          <a href="pull_requests.html" title="Working With Pull Requests"
              accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="../search.html">search</a>|&nbsp;</li>
-       <li><a href="../index.html">top</a> &raquo;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
 
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Information</a> &raquo;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Repository organization</a></li> 
       </ul>
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Repository organization</a><ul>
-<li><a class="reference internal" href="#top-level">top-level</a></li>
-<li><a class="reference internal" href="#build">build</a></li>
-<li><a class="reference internal" href="#dbprocessing">dbprocessing</a></li>
-<li><a class="reference internal" href="#documents">Documents</a></li>
-<li><a class="reference internal" href="#gui">gui</a></li>
-<li><a class="reference internal" href="#oneoffs">OneOffs</a></li>
-<li><a class="reference internal" href="#scripts">scripts</a></li>
-<li><a class="reference internal" href="#sphinx">sphinx</a></li>
-<li><a class="reference internal" href="#test-codes">test_codes</a></li>
-<li><a class="reference internal" href="#testdb">testDB</a></li>
-<li><a class="reference internal" href="#testing-utils">Testing_Utils</a></li>
-<li><a class="reference internal" href="#tests">tests</a></li>
-<li><a class="reference internal" href="#tests-scripts">tests_scripts</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="documentation.html"
-                        title="previous chapter">Documentation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="structure.html"
-                        title="next chapter">Database Structure</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/developer/repository.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="repository-organization">
+  <section id="repository-organization">
 <h1>Repository organization<a class="headerlink" href="#repository-organization" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="top-level">
+<section id="top-level">
 <h2>top-level<a class="headerlink" href="#top-level" title="Permalink to this headline">¶</a></h2>
-<p>There should be(but there totally are) no committed files at the top level besides <code class="docutils literal"><span class="pre">setup.py</span></code>, and <code class="docutils literal"><span class="pre">.gitignore</span></code> (not normally visible).</p>
-</div>
-<div class="section" id="build">
+<p>There should be (but currently are) no committed files at the top level
+besides <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>, and <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> (not normally visible).</p>
+</section>
+<section id="build">
 <h2>build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h2>
-<p>This is used by <code class="docutils literal"><span class="pre">setup.py</span></code> in the build/install process; it is ignored by git. Don&#8217;t hand-edit anything under here; can be safely deleted.</p>
-</div>
-<div class="section" id="dbprocessing">
+<p>This is used by <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> in the build/install process; it is ignored by git. Don’t hand-edit anything under here; can be safely deleted.</p>
+</section>
+<section id="dbprocessing">
 <h2>dbprocessing<a class="headerlink" href="#dbprocessing" title="Permalink to this headline">¶</a></h2>
-<p>Source tree for the main <code class="docutils literal"><span class="pre">dbprocessing</span></code> module. If it&#8217;s in this directory, it&#8217;s meant to be installed.</p>
-</div>
-<div class="section" id="documents">
-<h2>Documents<a class="headerlink" href="#documents" title="Permalink to this headline">¶</a></h2>
-<p>?</p>
-</div>
-<div class="section" id="gui">
+<p>Source tree for the main <code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> module. If it’s in this directory, it’s meant to be installed.</p>
+</section>
+<section id="developer">
+<h2>developer<a class="headerlink" href="#developer" title="Permalink to this headline">¶</a></h2>
+<p>Miscellaneous bits for sharing between developers. Included in the source
+tarball but not in binary distributions.</p>
+</section>
+<section id="docs">
+<h2>docs<a class="headerlink" href="#docs" title="Permalink to this headline">¶</a></h2>
+<p>Source for <a class="reference internal" href="documentation.html"><span class="doc">Documentation</span></a>.</p>
+</section>
+<section id="examples">
+<h2>examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Examples of how to set up dbprocessing for a project, including
+configuration and scripts that are specific to missions.</p>
+</section>
+<section id="functional-test">
+<h2>functional_test<a class="headerlink" href="#functional-test" title="Permalink to this headline">¶</a></h2>
+<p>Full dbprocessing setup for end-to-end functional test (<a class="reference internal" href="tests.html#functional"><span class="std std-ref">Functional Tests</span></a>).</p>
+</section>
+<section id="gui">
 <h2>gui<a class="headerlink" href="#gui" title="Permalink to this headline">¶</a></h2>
-<p>?</p>
-</div>
-<div class="section" id="oneoffs">
-<h2>OneOffs<a class="headerlink" href="#oneoffs" title="Permalink to this headline">¶</a></h2>
-<p>?</p>
-</div>
-<div class="section" id="scripts">
+<p>Initial work on a Qt-based GUI; not complete.</p>
+</section>
+<section id="scripts">
 <h2>scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h2>
-<p>Scripts meant to be called from the command line that should be installed with the module. They should be added to the <code class="docutils literal"><span class="pre">scripts</span></code> list in <code class="docutils literal"><span class="pre">setup.py</span></code> and documented in <a class="reference internal" href="../scripts.html"><em>dbprocessing Scripts</em></a> (source file <code class="docutils literal"><span class="pre">scripts.rst</span></code>).</p>
-</div>
-<div class="section" id="sphinx">
+<p>Scripts meant to be called from the command line that should be installed with the module. They should be added to the <code class="docutils literal notranslate"><span class="pre">scripts</span></code> list in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> and documented in <a class="reference internal" href="../scripts.html"><span class="doc">Scripts</span></a> (source file <code class="docutils literal notranslate"><span class="pre">scripts.rst</span></code>).</p>
+</section>
+<section id="sphinx">
 <h2>sphinx<a class="headerlink" href="#sphinx" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference internal" href="documentation.html"><em>Documentation</em></a>.</p>
-</div>
-<div class="section" id="test-codes">
-<h2>test_codes<a class="headerlink" href="#test-codes" title="Permalink to this headline">¶</a></h2>
-<p>?</p>
-</div>
-<div class="section" id="testdb">
-<h2>testDB<a class="headerlink" href="#testdb" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference internal" href="tests.html#functional"><span>Functional Tests</span></a>.</p>
-</div>
-<div class="section" id="testing-utils">
-<h2>Testing_Utils<a class="headerlink" href="#testing-utils" title="Permalink to this headline">¶</a></h2>
-<p>?</p>
-</div>
-<div class="section" id="tests">
-<h2>tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference internal" href="tests.html#unit"><span>Unit Tests</span></a>.</p>
-</div>
-<div class="section" id="tests-scripts">
-<h2>tests_scripts<a class="headerlink" href="#tests-scripts" title="Permalink to this headline">¶</a></h2>
-<p>?</p>
-</div>
-</div>
+<p>Built <a class="reference internal" href="documentation.html"><span class="doc">Documentation</span></a>.</p>
+</section>
+<section id="unit-tests">
+<h2>unit_tests<a class="headerlink" href="#unit-tests" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="tests.html#unit"><span class="std std-ref">Unit Tests</span></a>.</p>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Repository organization</a><ul>
+<li><a class="reference internal" href="#top-level">top-level</a></li>
+<li><a class="reference internal" href="#build">build</a></li>
+<li><a class="reference internal" href="#dbprocessing">dbprocessing</a></li>
+<li><a class="reference internal" href="#developer">developer</a></li>
+<li><a class="reference internal" href="#docs">docs</a></li>
+<li><a class="reference internal" href="#examples">examples</a></li>
+<li><a class="reference internal" href="#functional-test">functional_test</a></li>
+<li><a class="reference internal" href="#gui">gui</a></li>
+<li><a class="reference internal" href="#scripts">scripts</a></li>
+<li><a class="reference internal" href="#sphinx">sphinx</a></li>
+<li><a class="reference internal" href="#unit-tests">unit_tests</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="pull_requests.html"
+                          title="previous chapter">Working With Pull Requests</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="release.html"
+                          title="next chapter">Building a release</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/developer/repository.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -179,20 +181,24 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="structure.html" title="Database Structure"
+          <a href="release.html" title="Building a release"
              >next</a> |</li>
         <li class="right" >
-          <a href="documentation.html" title="Documentation"
+          <a href="pull_requests.html" title="Working With Pull Requests"
              >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
         <li><a href="../search.html">search</a>|&nbsp;</li>
-       <li><a href="../index.html">top</a> &raquo;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
 
-          <li class="nav-item nav-item-1"><a href="index.html" >Developer Information</a> &raquo;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Repository organization</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016, Brian Larsen, Jonathan Niehof.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

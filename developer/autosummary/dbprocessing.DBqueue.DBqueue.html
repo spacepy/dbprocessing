@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.DBqueue.DBqueue &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.DBstrings" href="dbprocessing.DBstrings.html" />
+    <link rel="prev" title="dbprocessing.DBqueue" href="dbprocessing.DBqueue.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBstrings.html" title="dbprocessing.DBstrings"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBqueue.html" title="dbprocessing.DBqueue"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="dbprocessing.DBqueue.html" accesskey="U">dbprocessing.DBqueue</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.DBqueue.DBqueue</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="dbprocessing-dbqueue-dbqueue">
+<h1>dbprocessing.DBqueue.DBqueue<a class="headerlink" href="#dbprocessing-dbqueue-dbqueue" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.DBqueue.</span></span><span class="sig-name descname"><span class="pre">DBqueue</span></span><a class="reference internal" href="../../_modules/dbprocessing/DBqueue.html#DBqueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>General deque</p>
+<p>Extension to <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.deque" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">deque</span></code></a> to add methods
+<a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.popiter" title="dbprocessing.DBqueue.DBqueue.popiter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">popiter()</span></code></a> and <a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.popleftiter" title="dbprocessing.DBqueue.DBqueue.popleftiter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">popleftiter()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.append" title="dbprocessing.DBqueue.DBqueue.append"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code></a></p></td>
+<td><p>Add an element to the right side of the deque.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.appendleft" title="dbprocessing.DBqueue.DBqueue.appendleft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">appendleft</span></code></a></p></td>
+<td><p>Add an element to the left side of the deque.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.clear" title="dbprocessing.DBqueue.DBqueue.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
+<td><p>Remove all elements from the deque.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.copy" title="dbprocessing.DBqueue.DBqueue.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
+<td><p>Return a shallow copy of a deque.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.count" title="dbprocessing.DBqueue.DBqueue.count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code></a>(value)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.extend" title="dbprocessing.DBqueue.DBqueue.extend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code></a></p></td>
+<td><p>Extend the right side of the deque with elements from the iterable</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.extendleft" title="dbprocessing.DBqueue.DBqueue.extendleft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extendleft</span></code></a></p></td>
+<td><p>Extend the left side of the deque with elements from the iterable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.index" title="dbprocessing.DBqueue.DBqueue.index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code></a>(value, [start, [stop]])</p></td>
+<td><p>Raises ValueError if the value is not present.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.insert" title="dbprocessing.DBqueue.DBqueue.insert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert</span></code></a></p></td>
+<td><p>D.insert(index, object) -- insert object before index</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.pop" title="dbprocessing.DBqueue.DBqueue.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a></p></td>
+<td><p>Remove and return the rightmost element.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.popiter" title="dbprocessing.DBqueue.DBqueue.popiter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">popiter</span></code></a>()</p></td>
+<td><p>Allow a for loop to iterate and pop items from the DBqueue</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.popleft" title="dbprocessing.DBqueue.DBqueue.popleft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">popleft</span></code></a></p></td>
+<td><p>Remove and return the leftmost element.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.popleftiter" title="dbprocessing.DBqueue.DBqueue.popleftiter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">popleftiter</span></code></a>()</p></td>
+<td><p>Allow a for loop to iterate and pop items from the DBqueue</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.remove" title="dbprocessing.DBqueue.DBqueue.remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code></a></p></td>
+<td><p>D.remove(value) -- remove first occurrence of value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.reverse" title="dbprocessing.DBqueue.DBqueue.reverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code></a></p></td>
+<td><p>D.reverse() -- reverse <em>IN PLACE</em></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.rotate" title="dbprocessing.DBqueue.DBqueue.rotate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate</span></code></a></p></td>
+<td><p>Rotate the deque n steps to the right (default n=1).</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="#dbprocessing.DBqueue.DBqueue.maxlen" title="dbprocessing.DBqueue.DBqueue.maxlen"><code class="xref py py-data docutils literal notranslate"><span class="pre">maxlen</span></code></a></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an element to the right side of the deque.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.appendleft">
+<span class="sig-name descname"><span class="pre">appendleft</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.appendleft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an element to the left side of the deque.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all elements from the deque.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a shallow copy of a deque.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.count">
+<span class="sig-name descname"><span class="pre">count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">integer</span> <span class="pre">--</span> <span class="pre">return</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">occurrences</span> <span class="pre">of</span> <span class="pre">value</span></span></span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.extend">
+<span class="sig-name descname"><span class="pre">extend</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extend the right side of the deque with elements from the iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.extendleft">
+<span class="sig-name descname"><span class="pre">extendleft</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.extendleft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extend the left side of the deque with elements from the iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">integer</span> <span class="pre">--</span> <span class="pre">return</span> <span class="pre">first</span> <span class="pre">index</span> <span class="pre">of</span> <span class="pre">value.</span></span></span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.insert">
+<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>D.insert(index, object) – insert object before index</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.pop">
+<span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove and return the rightmost element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.popiter">
+<span class="sig-name descname"><span class="pre">popiter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/DBqueue.html#DBqueue.popiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.popiter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow a for loop to iterate and pop items from the DBqueue</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>any</dt><dd><p>Rightmost (last) item in queue.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">DBqueue</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">poptiter</span><span class="p">():</span>
+<span class="go">...:     print(i)</span>
+<span class="go">3</span>
+<span class="go">2</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.popleft">
+<span class="sig-name descname"><span class="pre">popleft</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.popleft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove and return the leftmost element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.popleftiter">
+<span class="sig-name descname"><span class="pre">popleftiter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/DBqueue.html#DBqueue.popleftiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.popleftiter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow a for loop to iterate and pop items from the DBqueue</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>any</dt><dd><p>Leftmost (0th) item in queue.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">DBqueue</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">popleftiter</span><span class="p">():</span>
+<span class="go">...:     print(i)</span>
+<span class="go">1</span>
+<span class="go">2</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>D.remove(value) – remove first occurrence of value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.reverse">
+<span class="sig-name descname"><span class="pre">reverse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>D.reverse() – reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the deque n steps to the right (default n=1).  If n is negative, rotates left.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.DBqueue.DBqueue.maxlen">
+<span class="sig-name descname"><span class="pre">maxlen</span></span><a class="headerlink" href="#dbprocessing.DBqueue.DBqueue.maxlen" title="Permalink to this definition">¶</a></dt>
+<dd><p>maximum size of a deque or None if unbounded</p>
+</dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.DBqueue.html"
+                          title="previous chapter">dbprocessing.DBqueue</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.DBstrings.html"
+                          title="next chapter">dbprocessing.DBstrings</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.DBqueue.DBqueue.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBstrings.html" title="dbprocessing.DBstrings"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBqueue.html" title="dbprocessing.DBqueue"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="dbprocessing.DBqueue.html" >dbprocessing.DBqueue</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.DBqueue.DBqueue</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

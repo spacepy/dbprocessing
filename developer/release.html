@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Building a release &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tables" href="tables.html" />
+    <link rel="prev" title="Repository organization" href="repository.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tables.html" title="Tables"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="repository.html" title="Repository organization"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building a release</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="building-a-release">
+<h1>Building a release<a class="headerlink" href="#building-a-release" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#release-notes" id="id2">Release notes</a></p>
+<ul>
+<li><p><a class="reference internal" href="#release-note-subsubsections" id="id3">Release note subsubsections</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#prs-and-issues-in-release-notes" id="id4">PRs and issues in release notes</a></p></li>
+<li><p><a class="reference internal" href="#preparing-the-release-commit" id="id5">Preparing the release commit</a></p></li>
+<li><p><a class="reference internal" href="#isolated-anaconda-environment" id="id6">Isolated anaconda environment</a></p></li>
+<li><p><a class="reference internal" href="#preparing-the-distributions" id="id7">Preparing the distributions</a></p></li>
+<li><p><a class="reference internal" href="#docs" id="id8">Docs</a></p></li>
+<li><p><a class="reference internal" href="#test-pypi" id="id9">Test PyPI</a></p></li>
+<li><p><a class="reference internal" href="#release-to-pypi" id="id10">Release to PyPI</a></p></li>
+<li><p><a class="reference internal" href="#release-to-github" id="id11">Release to github</a></p></li>
+<li><p><a class="reference internal" href="#web-page-update" id="id12">Web page update</a></p></li>
+</ul>
+</div>
+<section id="release-notes">
+<h2><a class="toc-backref" href="#id2">Release notes</a><a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h2>
+<p>The release notes should be updated with the date of release and checked
+for completeness and accuracy. The release series (x.y) is formatted
+as a section, the actual release (x.y.z) as a subsection, and the possible
+subsubsections follow here.</p>
+<p>Normally release notes should be updated as functionality is added/changed,
+not only at release time.</p>
+<section id="release-note-subsubsections">
+<h3><a class="toc-backref" href="#id3">Release note subsubsections</a><a class="headerlink" href="#release-note-subsubsections" title="Permalink to this headline">¶</a></h3>
+<p>If any of these is not used for a particular release, it may be omitted.</p>
+<section id="new-features">
+<h4>New features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h4>
+<p>Brief description of any features that were added in this release. Link to
+appropriate documentation of the feature (e.g. user documentation such
+as the script, or API documentation). Link to either the Github pull request
+that introduced the feature or the enhancement request issue related to it,
+whichever has the most information.</p>
+<p>This includes added functionality in existing scripts, functions, and classes.</p>
+</section>
+<section id="deprecations-and-removals">
+<h4>Deprecations and removals<a class="headerlink" href="#deprecations-and-removals" title="Permalink to this headline">¶</a></h4>
+<p>Any functionality that has been removed or is planned to be removed
+(deprecated). This includes API deprecations. For deprecated features,
+link their documentation; for deprecated or removed, link the appropriate
+replacement.</p>
+<p>This also includes any changes in support for older database versions.</p>
+</section>
+<section id="dependency-requirements">
+<h4>Dependency requirements<a class="headerlink" href="#dependency-requirements" title="Permalink to this headline">¶</a></h4>
+<p>Any changes to dependencies (e.g. new dependencies, new minimum versions.)</p>
+</section>
+<section id="major-bugfixes">
+<h4>Major bugfixes<a class="headerlink" href="#major-bugfixes" title="Permalink to this headline">¶</a></h4>
+<p>Fixed bugs that are likely to be of interest to a substantial fraction of
+dbprocessing users. Omit very obscure bugs that are unlikely to be hit;
+they will be included in the full list of closed issues.</p>
+<p>Normally link to the relevant Github issue, although in some cases the pull
+request that closed the bug may be more appropriate.</p>
+</section>
+<section id="other-changes">
+<h4>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h4>
+<p>Any other changes that are likely to be of interest to a substantial fraction
+of users and do not fit the above categories. In particular, any changes
+in behavior or expectations that are not new features or bug fixes.</p>
+</section>
+<section id="pull-requests-merged-this-release">
+<h4>Pull requests merged this release<a class="headerlink" href="#pull-requests-merged-this-release" title="Permalink to this headline">¶</a></h4>
+<p>Should be generated and pasted into release notes at release time; see below.</p>
+</section>
+<section id="other-issues-closed-this-release">
+<h4>Other issues closed this release<a class="headerlink" href="#other-issues-closed-this-release" title="Permalink to this headline">¶</a></h4>
+<p>Also generated at release time.</p>
+</section>
+</section>
+</section>
+<section id="prs-and-issues-in-release-notes">
+<h2><a class="toc-backref" href="#id4">PRs and issues in release notes</a><a class="headerlink" href="#prs-and-issues-in-release-notes" title="Permalink to this headline">¶</a></h2>
+<p>The list of pull requests and issues closed in a release is created from the
+script <code class="docutils literal notranslate"><span class="pre">git_notes.py</span></code> in <code class="docutils literal notranslate"><span class="pre">developer/scripts</span></code>.</p>
+<p>This script requires <a class="reference external" href="https://gitpython.readthedocs.io/en/stable/">GitPython</a> and <a class="reference external" href="https://pygithub.readthedocs.io/en/latest/introduction.html">PyGithub</a>. On Ubuntu these are packaged as <code class="docutils literal notranslate"><span class="pre">python-git</span></code> and
+<code class="docutils literal notranslate"><span class="pre">python-github</span></code> (or <code class="docutils literal notranslate"><span class="pre">python3-git</span></code> and <code class="docutils literal notranslate"><span class="pre">python3-github</span></code>.)</p>
+<p>You need a <a class="reference external" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token">Github token</a>
+to avoid <a class="reference external" href="https://docs.github.com/en/rest/overview/resources-in-the-rest-api#rate-limiting">throttling</a>. No scopes are
+required.</p>
+<p>Run the script with your token and the name of the last release tag. The
+relevant rST will be sent to stdout; redirect to a file, and copy/paste into
+the release notes. Do not do this on a shared machine, as the token will be
+visible in the process table.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python ./git_notes.py -t GITHUB_TOKEN -r release-0.1
+</pre></div>
+</div>
+<p>Note that the PR including the release should also be in the list; you
+can open a draft PR to get the PR number, and manually add that to the
+list. Similarly, the commit against <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> that updates the
+website should be in the list.</p>
+</section>
+<section id="preparing-the-release-commit">
+<h2><a class="toc-backref" href="#id5">Preparing the release commit</a><a class="headerlink" href="#preparing-the-release-commit" title="Permalink to this headline">¶</a></h2>
+<p>The following changes should result in either the final release version,
+or the appropriate release candidate (i.e. add “rc1” if building rc).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Change version in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>, in setup_kwargs near bottom.</p></li>
+<li><p>Change <code class="docutils literal notranslate"><span class="pre">__version__</span></code> around line 209 of <code class="docutils literal notranslate"><span class="pre">dbprocessing/__init__.py</span></code>.</p></li>
+</ul>
+</div></blockquote>
+<p>Commit these changes.</p>
+<p>If this is the release version, make a second commit setting all the
+versions to the next version number and <code class="docutils literal notranslate"><span class="pre">rc0</span></code>. Then submit the
+PR. The tagging is done in github and will be done from the last
+commit before the <code class="docutils literal notranslate"><span class="pre">rc0</span></code> commit.</p>
+</section>
+<section id="isolated-anaconda-environment">
+<h2><a class="toc-backref" href="#id6">Isolated anaconda environment</a><a class="headerlink" href="#isolated-anaconda-environment" title="Permalink to this headline">¶</a></h2>
+<p>You may wish to perform all the steps after this within an isolated
+Anaconda environment, separate from your machine’s Python setup. In
+that case, download <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a>, install it, and
+use that environment:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>bash ./Miniconda3-latest-Linux-x86_64.sh -b -p ~/miniconda
+~/miniconda/bin/conda create -y -n dbp_build <span class="nv">python</span><span class="o">=</span><span class="m">3</span>
+<span class="nb">export</span> <span class="nv">PYTHONNOUSERSITE</span><span class="o">=</span><span class="m">1</span>
+<span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span>
+<span class="nb">source</span> ~/miniconda/bin/activate dbp_build
+conda install sqlalchemy python-dateutil sphinx numpydoc twine numpy wheel
+</pre></div>
+</div>
+<p>Note numpy is only required for the <a class="reference internal" href="autosummary/dbprocessing.reports.html#module-dbprocessing.reports" title="dbprocessing.reports"><code class="xref py py-mod docutils literal notranslate"><span class="pre">reports</span></code></a> module (and thus
+its documentation).</p>
+</section>
+<section id="preparing-the-distributions">
+<h2><a class="toc-backref" href="#id7">Preparing the distributions</a><a class="headerlink" href="#preparing-the-distributions" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py sdist --formats<span class="o">=</span>gztar,zip
+python setup.py bdist_wheel --universal
+</pre></div>
+</div>
+<p>Note this will perform a “build” and then rebuild the documentation
+(in <code class="docutils literal notranslate"><span class="pre">sphinx/build</span></code>) for the souce distribution. Tarball, zip, and
+wheel are in the dist directory.</p>
+</section>
+<section id="docs">
+<h2><a class="toc-backref" href="#id8">Docs</a><a class="headerlink" href="#docs" title="Permalink to this headline">¶</a></h2>
+<p>From the <code class="docutils literal notranslate"><span class="pre">sphinx</span></code> directory:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make latexpdf
+cp build/latex/dbprocessing.pdf dbprocessing-x.y.z-doc.pdf
+<span class="nb">cd</span> build/html
+zip -r ../../dbprocessing-x.y.z-doc.zip *
+</pre></div>
+</div>
+</section>
+<section id="test-pypi">
+<h2><a class="toc-backref" href="#id9">Test PyPI</a><a class="headerlink" href="#test-pypi" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://packaging.python.org/guides/using-testpypi/">Test PyPI</a>
+allows the upload and test of a complete build.</p>
+<p>A <a class="reference external" href="https://www.python.org/dev/peps/pep-0440/#pre-releases">release candidate</a> build
+should be uploaded first. <code class="docutils literal notranslate"><span class="pre">rc0</span></code> is used as the version number
+throughout development; actual release candidates should start with
+<code class="docutils literal notranslate"><span class="pre">rc1</span></code>.</p>
+<p>Make a <a class="reference external" href="https://packaging.python.org/en/latest/specifications/pypirc/">.pypirc file</a></p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[distutils]</span><span class="w"></span>
+<span class="na">index-servers</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">    </span><span class="na">pypi</span><span class="w"></span>
+<span class="w">    </span><span class="na">testpypi</span><span class="w"></span>
+
+<span class="k">[pypi]</span><span class="w"></span>
+<span class="na">username: &lt;username&gt;</span><span class="w"></span>
+
+<span class="k">[testpypi]</span><span class="w"></span>
+<span class="na">repository: https://test.pypi.org/legacy/</span><span class="w"></span>
+<span class="na">username: &lt;username&gt;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Put all the builds (source dists) into one
+directory and then do the upload:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>twine upload -r testpypi dbprocessing-*.zip dbprocessing-*.whl
+</pre></div>
+</div>
+<p>PyPI can only take one source distribution (zip or tar.gz), so we use zip.</p>
+<p>Test installing with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ dbprocessing
+</pre></div>
+</div>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">--pre</span></code> flag to install the RC version; in that
+case, probably want to use <code class="docutils literal notranslate"><span class="pre">--no-deps</span></code> so don’t get RC version of
+dependencies! (Or can specify the rc version,
+e.g. <code class="docutils literal notranslate"><span class="pre">dbprocessing==0.1.0rc1</span></code>).</p>
+</section>
+<section id="release-to-pypi">
+<h2><a class="toc-backref" href="#id10">Release to PyPI</a><a class="headerlink" href="#release-to-pypi" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="https://python-packaging-tutorial.readthedocs.io/en/latest/uploading_pypi.html">PyPI upload directions</a></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>twine upload dbprocessing-*.zip dbprocessing-*.whl
+</pre></div>
+</div>
+<p>Do not upload the .tar.gz since can only upload one source package per release.</p>
+<p>There’s no longer any capability to edit information on PyPI, it’s
+straight from the setup.py metadata.</p>
+</section>
+<section id="release-to-github">
+<h2><a class="toc-backref" href="#id11">Release to github</a><a class="headerlink" href="#release-to-github" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository">GitHub directions</a>.</p>
+<p>On the code tab, click on “n releases” (on the right column, below
+“about”). Click “Draft a new release.” Make the tag “release-x.y.z”
+and select the appropriate commit as the target (the one where the
+version number was updated).</p>
+<p>Use just “x.y.z” as the title. The “describe” should link the release
+notes on the website and also have a brief version of the release
+notes included.</p>
+<p>Click in the “upload binaries” area and upload all the files: source
+distributions (zip and tar), wheel, documentation PDF
+(<code class="docutils literal notranslate"><span class="pre">dbprocessing-x.y.z-doc.pdf</span></code>) and a zip
+(<code class="docutils literal notranslate"><span class="pre">dbprocessing-x.y.z-doc.zip</span></code>).</p>
+</section>
+<section id="web-page-update">
+<h2><a class="toc-backref" href="#id12">Web page update</a><a class="headerlink" href="#web-page-update" title="Permalink to this headline">¶</a></h2>
+<p>Check out the <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch. Right now the root of the branch is
+basically the root of the <code class="docutils literal notranslate"><span class="pre">sphinx/build/html</span></code> output. Copy all the
+freshly-built docs there, commit, submit PR against the <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code>
+branch.</p>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Building a release</a><ul>
+<li><a class="reference internal" href="#release-notes">Release notes</a><ul>
+<li><a class="reference internal" href="#release-note-subsubsections">Release note subsubsections</a><ul>
+<li><a class="reference internal" href="#new-features">New features</a></li>
+<li><a class="reference internal" href="#deprecations-and-removals">Deprecations and removals</a></li>
+<li><a class="reference internal" href="#dependency-requirements">Dependency requirements</a></li>
+<li><a class="reference internal" href="#major-bugfixes">Major bugfixes</a></li>
+<li><a class="reference internal" href="#other-changes">Other changes</a></li>
+<li><a class="reference internal" href="#pull-requests-merged-this-release">Pull requests merged this release</a></li>
+<li><a class="reference internal" href="#other-issues-closed-this-release">Other issues closed this release</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#prs-and-issues-in-release-notes">PRs and issues in release notes</a></li>
+<li><a class="reference internal" href="#preparing-the-release-commit">Preparing the release commit</a></li>
+<li><a class="reference internal" href="#isolated-anaconda-environment">Isolated anaconda environment</a></li>
+<li><a class="reference internal" href="#preparing-the-distributions">Preparing the distributions</a></li>
+<li><a class="reference internal" href="#docs">Docs</a></li>
+<li><a class="reference internal" href="#test-pypi">Test PyPI</a></li>
+<li><a class="reference internal" href="#release-to-pypi">Release to PyPI</a></li>
+<li><a class="reference internal" href="#release-to-github">Release to github</a></li>
+<li><a class="reference internal" href="#web-page-update">Web page update</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="repository.html"
+                          title="previous chapter">Repository organization</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="tables.html"
+                          title="next chapter">Tables</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/developer/release.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tables.html" title="Tables"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="repository.html" title="Repository organization"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <li><a href="../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Developer Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Building a release</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

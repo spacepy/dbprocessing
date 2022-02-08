@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Release Notes &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developer Information" href="developer/index.html" />
+    <link rel="prev" title="Concepts" href="concepts.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer/index.html" title="Developer Information"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+        <li><a href="index.html">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Release Notes</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="release-notes">
+<h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#series" id="id81">0.1 Series</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id1" id="id82">0.1.0 (2022-02-10)</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="series">
+<h2><a class="toc-backref" href="#id81">0.1 Series</a><a class="headerlink" href="#series" title="Permalink to this headline">¶</a></h2>
+<section id="id1">
+<h3><a class="toc-backref" href="#id82">0.1.0 (2022-02-10)</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>This is the first public packaged release of dbprocessing. For the convenience
+of those working directly from git checkouts, these release notes summarize
+changes made since the creation of the public repository on 2020-07-15.</p>
+<section id="new-features">
+<h4>New features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h4>
+<p>Support for processes that take no input was added, as part of many
+enhancements to <a class="reference internal" href="scripts.html#scripts-dbrunner"><span class="std std-ref">DBRunner.py</span></a> (<a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/26">26</a>).</p>
+<p>New script <a class="reference internal" href="scripts.html#scripts-linkuningested"><span class="std std-ref">linkUningested.py</span></a> to find files which match product
+format but are not in database, and symlink them to the incoming directory
+so they can be ingested (<a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/54">54</a>).</p>
+<p>Python 3 support was added (<a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/77">77</a>).</p>
+<p>Added options <a class="reference internal" href="scripts.html#cmdoption-printProcessQueue.py-c"><code class="xref std std-option docutils literal notranslate"><span class="pre">printProcessQueue.py</span> <span class="pre">--count</span></code></a>,
+<a class="reference internal" href="scripts.html#cmdoption-printProcessQueue.py-e"><code class="xref std std-option docutils literal notranslate"><span class="pre">printProcessQueue.py</span> <span class="pre">--exist</span></code></a>, and <a class="reference internal" href="scripts.html#cmdoption-printProcessQueue.py-q"><code class="xref std std-option docutils literal notranslate"><span class="pre">printProcessQueue.py</span>
+<span class="pre">--quiet</span></code></a> to allow flow control in shell scripts based on the process
+queue state (<a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/87">87</a>, <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/88">88</a>).</p>
+<p>Added options <a class="reference internal" href="scripts.html#cmdoption-printProcessQueue.py-p"><code class="xref std std-option docutils literal notranslate"><span class="pre">printProcessQueue.py</span> <span class="pre">--product</span></code></a> to filter output
+and <a class="reference internal" href="scripts.html#cmdoption-printProcessQueue.py-s"><code class="xref std std-option docutils literal notranslate"><span class="pre">printProcessQueue.py</span> <span class="pre">--sort</span></code></a> to sort output
+(<a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/93">93</a>).</p>
+<p>Initial PostgreSQL support was added; see
+<a class="reference internal" href="scripts.html#scripts-specifying-database"><span class="std std-ref">Specifying a database</span></a> and <a class="reference internal" href="scripts.html#cmdoption-CreateDB.py-d"><code class="xref std std-option docutils literal notranslate"><span class="pre">CreateDB.py</span> <span class="pre">--dialect</span></code></a>
+(<a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/64">64</a>,
+<a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/78">78</a>
+<a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/114">114</a>).</p>
+</section>
+<section id="deprecations-and-removals">
+<h4>Deprecations and removals<a class="headerlink" href="#deprecations-and-removals" title="Permalink to this headline">¶</a></h4>
+<p>None</p>
+</section>
+<section id="dependency-requirements">
+<h4>Dependency requirements<a class="headerlink" href="#dependency-requirements" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference external" href="https://www.sqlalchemy.org/">SQLAlchemy</a> and <a class="reference external" href="https://dateutil.readthedocs.io/en/stable/">dateutil</a> are required. No
+minimum version has been established, but <code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> is known to
+work with SQLAlchemy 1.1 and dateutil 2.6.</p>
+</section>
+<section id="major-bugfixes">
+<h4>Major bugfixes<a class="headerlink" href="#major-bugfixes" title="Permalink to this headline">¶</a></h4>
+<p>Fixed <a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.buildChildren" title="dbprocessing.dbprocessing.ProcessQueue.buildChildren"><code class="xref py py-class docutils literal notranslate"><span class="pre">buildChildren</span></code></a> on
+older databases without <code class="docutils literal notranslate"><span class="pre">yesterday</span></code> and <code class="docutils literal notranslate"><span class="pre">tomorrow</span></code> columns in the
+<code class="docutils literal notranslate"><span class="pre">Productprocesslink</span></code> table (<a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/20">20</a>).</p>
+<p>Fixed <a class="reference internal" href="developer/autosummary/dbprocessing.runMe.runMe.html#dbprocessing.runMe.runMe" title="dbprocessing.runMe.runMe"><code class="xref py py-class docutils literal notranslate"><span class="pre">runMe</span></code></a> to always maintain the
+<code class="docutils literal notranslate"><span class="pre">output_interface</span></code> version specified by the code. Updates to a code’s
+interface version will increment the quality version of its output (not
+the interface); updates to a file’s interface version will increment the
+quality version of child files (rather than assuming children were up-to-date
+and failing to reprocess them). (<a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/63">63</a>)</p>
+<p>Fixed <a class="reference internal" href="developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.html#dbprocessing.dbprocessing.ProcessQueue.buildChildren" title="dbprocessing.dbprocessing.ProcessQueue.buildChildren"><code class="xref py py-meth docutils literal notranslate"><span class="pre">buildChildren()</span></code></a>
+(specifically, helper method <code class="docutils literal notranslate"><span class="pre">_getRequiredProducts</span></code>) to only look
+for files which are recorded in the database as existing on disk. Most
+notably, this means <a class="reference internal" href="scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a>
+will not attempt to use nonexistent files as inputs to processing.</p>
+</section>
+<section id="other-changes">
+<h4>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="pull-requests-merged-this-release">
+<h4>Pull requests merged this release<a class="headerlink" href="#pull-requests-merged-this-release" title="Permalink to this headline">¶</a></h4>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/8">8</a>: Fix unit tests for scripts (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/44690a955d41544af9a10c9c316221cc4154bf14">44690a95</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/13">13</a>: Circleci project setup (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/c99ffc43961ff389ff3d8645ab92ead41af4d9e0">c99ffc43</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/18">18</a>: Fix handling of inspector regex for ECT (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/61a2215ec449ebc253dab2e98716c734dd1092e2">61a2215e</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/1">1</a>: Basic respository organization (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/362a0b72b868d5ad6019784acd6052d07b8d2a35">362a0b72</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/19">19</a>: test_checkIncoming update to guarantee directory state (Closes #17) (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/16899b2c8e83236b1687bfe50d1bea304811efc2">16899b2c</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/17">17</a>: test_checkIncoming  fails when a direction on my system is not empty</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/21">21</a>: Fix _getRequiredProducts/getInputProductID on old DB (Closes #20) (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/07f3e3a1ace8f4f72e482e2dd47b951fe00d140d">07f3e3a1</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/20">20</a>: ‘Productprocesslink’ has no attribute ‘yesterday’, old database</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/24">24</a>: Testing changes in preparation for no-input support (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/24ca0b577b0487393a333d601b59212cd086a236">24ca0b57</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/27">27</a>: Run unit tests in CircleCI (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/1fe1ef4648768c151cd895c96f725b3d3ae112e7">1fe1ef46</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/16">16</a>: Document CircleCI setup and github integration</p>
+<p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/15">15</a>: Execute unit tests in CircleCI</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/26">26</a>: DBRunner enhancements for ingest, update-only, force (Closes #9) (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/5c05a165ed0072770a34cffa3c0d7894203af6f8">5c05a165</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/9">9</a>: Support products with no input</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/31">31</a>: Speed up getFiles by start/stop time (Closes #23) (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/b5f30ef366e63fdfb846ca688f98a61ec782436e">b5f30ef3</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/23">23</a>: ProcessQueue “Command Build Progress” is slow</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/36">36</a>: addFile: fix utc_start_time/stop_time as dates with Unix time table (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/333e47dc7ef320ebd941d06e62be4414d0586e22">333e47dc</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/39">39</a>: CircleCI: update apt cache before installing packages (fix CreateDBsabrs test) (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/00922ed5404c92607849ee99334c4eddc825e2d3">00922ed5</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/38">38</a>: Fix Unix time table calculation to maintain file day (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/20afffc47c2d8d30018af953372c59fa0d82d87a">20afffc4</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/41">41</a>: remove the #! to python2.6 in favor of python, this was making my system barf that wants to use 2.7 (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/8e5d3ae432fb35227c74bc5615422cf456b39578">8e5d3ae4</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/49">49</a>: Build Sphinx docs in CI; check for warnings (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/240be3df1a4670d839e4238446f8860f313f94b8">240be3df</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/50">50</a>: More documentation of pull request processing; release notes (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/b470f43689e97d04a47b2805a597214aaee12979">b470f436</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/28">28</a>: Set up release notes</p>
+<p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/30">30</a>: Document use of checklists and draft PRs in developer docs</p>
+<p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/29">29</a>: Document github magic references for commit messages and PRs</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/51">51</a>: add docker authentication (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/af0ab929e152dabe354aa617c271ab7d000ccd89">af0ab929</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/32">32</a>: Add Docker auth to CircleCI</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/56">56</a>: Fix make clean for the autosummary docs (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/e4eb0c01ad5b8d7fd9b4ab9e52439406849fccab">e4eb0c01</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/55">55</a>: Move table definitions to separate, common module. (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/bfb806afe2f01135d88675397b3b20e677c9c6b2">bfb806af</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/54">54</a>: New linkUningested script: find files not in database and symlink for import (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/734f37b1bfb3540f5682edd6dbb2e590eb51a3ff">734f37b1</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/63">63</a>: Increment output quality versions when input/code interface version changes (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/1c15308027ad95784b4d05cfc9f77d6164a7f8aa">1c153080</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/64">64</a>: Minimal postgresql support in dbUtils (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/11a417e89ac8dd2168982e12008504c66c13f8c0">11a417e8</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/66">66</a>: Triage scripts and port to argparse (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/80d12b59b29f9e5a0b6cc795fadc3c33daaab3cd">80d12b59</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/67">67</a>: Fix test_DBfile when called by itself (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/142a4976f66d28d227e95ae6acfc73376adc660f">142a4976</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/73">73</a>: Update postgresql dialect name in CreateDBsabrs (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/b5ba751b07dd200cff73421df24eb719b5257c6c">b5ba751b</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/72">72</a>: fast_data: add option to archive files instead of delete. (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/dc3fb0be50d0293a4669a9b76daed1843ce53b9f">dc3fb0be</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/77">77</a>: Python 3 support (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/29b66787b28137bbf7fdb37310bbef0c9d659de4">29b66787</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/79">79</a>: Fix addFromConfig for processes with no output product (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/3aafa1e12180b62e771e29094bb807b2296eeaa3">3aafa1e1</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/78">78</a>: add postgresql support and unit testing (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/5c0082c9c64e0b7c0b244ee168f4e571a19109dd">5c0082c9</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/90">90</a>:  Only use products that exist on disk when figuring inputs (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/0bae771bb106e94a228b672596856d28a7ab524a">0bae771b</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/47">47</a>: _getRequiredProducts should require input files to exist on disc</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/91">91</a>: fast_data: skip deleting files that don’t exist on disk (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/b6711a74a57c25e0938f082f8eb570a98800cbad">b6711a74</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/92">92</a>: Use docutils &lt;0.16 when building docs in CI (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/d81efdfbbfe7f6cae1798e68d93bfabd4dde419f">d81efdfb</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/88">88</a>: add count/exist/quiet options to printProcessQueue (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/5e6e4132c14cac5ece34ee20aab64b76e94b661d">5e6e4132</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/87">87</a>: Use exit code of printProcessQueue to indicate if the queue is empty</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/93">93</a>: printProcessQueue: add ability to filter by product, sort (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/6469cb26a1b98d7832a58e60b318cbf44e238857">6469cb26</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/98">98</a>: Force empty output products to null (Closes #95) (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/4a8ec7ad96b44158f9d72970fa3301a0d2ac62a3">4a8ec7ad</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/95">95</a>: No output fail in postgres</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/94">94</a>: Make documentation fully automatic (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/7936301363eca49f5b5f473ca8a86805fff57909">79363013</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/99">99</a>: test_DButils: clarify no-output tests (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/34d3cb0b9f3175b29f0207cc11458dcc4dd79ab0">34d3cb0b</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/100">100</a>: Update documentation for scripts (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/fdcc7e38cde75cd7695258a231f2090e1942f1f9">fdcc7e38</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/101">101</a>: Close DBrunner db on exit; document the need to close (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/74cec351ef5cc38db1b7385ecba2b058ea42382e">74cec351</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/102">102</a>: Document tables/database structure (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/6852abd100df4b3c8a64966154ce4a40a65e2b18">6852abd1</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/112">112</a>: Documentation overhaul (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/a48f262978caa8f524fdb0f06ec9748751d00087">a48f2629</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/113">113</a>: Create “empty” test database in unit tests (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/4300d704f40e239fda7b590c87ddebb95941b2d7">4300d704</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/114">114</a>: Convert all unit tests to use Postgres (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/fb95a08ff01bf293a4a4059f331ad4860066ddb7">fb95a08f</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/34">34</a>: Create RBSP_MAGEIS.sqlite database</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/119">119</a>: Get unit tests working on Windows (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/2ca3554fb28a6846ff3d2a7201492f60e0efb2ba">2ca3554f</a>)</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/120">120</a>: Fix python 3.9 and sqlalchemy 1.4 deprecations (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/0a0a74424ddab2b927ae887e9b8949810a2129a6">0a0a7442</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/83">83</a>: deprecations: collections.abc, Engine.table_name</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/122">122</a>: Provide support documentation integrated with GitHub and other doc tweaks (<a class="reference external" href="https://github.com/spacepy/dbprocessing/commit/6b6ad6b802febe9de383455965763e0ebbae3e7b">6b6ad6b8</a>)</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/118">118</a>: Link github page in documentation</p>
+</div></blockquote>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/123">123</a>: Updates for release 0.1.0</p>
+<p>PR <a class="reference external" href="https://github.com/spacepy/dbprocessing/pull/124">124</a>: Updated docs for release 0.1.0</p>
+</section>
+<section id="other-issues-closed-this-release">
+<h4>Other issues closed this release<a class="headerlink" href="#other-issues-closed-this-release" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/2">2</a>: Website not finding CSS</p>
+<p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/42">42</a>: PR checklist calls for CHANGELOG update, yet there is no changelog</p>
+<p><a class="reference external" href="https://github.com/spacepy/dbprocessing/issues/48">48</a>: Clean up tags in repo</p>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Release Notes</a><ul>
+<li><a class="reference internal" href="#series">0.1 Series</a><ul>
+<li><a class="reference internal" href="#id1">0.1.0 (2022-02-10)</a><ul>
+<li><a class="reference internal" href="#new-features">New features</a></li>
+<li><a class="reference internal" href="#deprecations-and-removals">Deprecations and removals</a></li>
+<li><a class="reference internal" href="#dependency-requirements">Dependency requirements</a></li>
+<li><a class="reference internal" href="#major-bugfixes">Major bugfixes</a></li>
+<li><a class="reference internal" href="#other-changes">Other changes</a></li>
+<li><a class="reference internal" href="#pull-requests-merged-this-release">Pull requests merged this release</a></li>
+<li><a class="reference internal" href="#other-issues-closed-this-release">Other issues closed this release</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="concepts.html"
+                          title="previous chapter">Concepts</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="developer/index.html"
+                          title="next chapter">Developer Information</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/release_notes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer/index.html" title="Developer Information"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+        <li><a href="index.html">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Release Notes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

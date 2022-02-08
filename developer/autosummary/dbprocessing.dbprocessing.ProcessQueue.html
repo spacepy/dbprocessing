@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.dbprocessing.ProcessQueue &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.DBqueue" href="dbprocessing.DBqueue.html" />
+    <link rel="prev" title="dbprocessing.dbprocessing" href="dbprocessing.dbprocessing.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBqueue.html" title="dbprocessing.DBqueue"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.dbprocessing.html" title="dbprocessing.dbprocessing"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="dbprocessing.dbprocessing.html" accesskey="U">dbprocessing.dbprocessing</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.dbprocessing.ProcessQueue</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="dbprocessing-dbprocessing-processqueue">
+<h1>dbprocessing.dbprocessing.ProcessQueue<a class="headerlink" href="#dbprocessing-dbprocessing-processqueue" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dbprocessing.dbprocessing.</span></span><span class="sig-name descname"><span class="pre">ProcessQueue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dryrun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">echo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main code used to process the Queue.</p>
+<p>Looks in incoming and builds all possible files</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>As this object holds a reference to
+<a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DButils</span></code></a>, that database should be
+closed before the program terminates. Deleting this object will
+ordinarily suffice.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dryrun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">echo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the process queue</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mission</strong><span class="classifier">str</span></dt><dd><p>Mission database, as in <a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DButils</span></code></a>. May also be
+an existing instance of <a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DButils</span></code></a>.</p>
+</dd>
+<dt><strong>dryrun</strong><span class="classifier">bool, default False</span></dt><dd><p>Treat all functionality as “dry run”, make no changes.</p>
+</dd>
+<dt><strong>echo</strong><span class="classifier">bool, default False</span></dt><dd><p>Log all SQL statements (as in
+<a class="reference internal" href="dbprocessing.DButils.DButils.html#dbprocessing.DButils.DButils" title="dbprocessing.DButils.DButils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DButils</span></code></a>).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.buildChildren" title="dbprocessing.dbprocessing.ProcessQueue.buildChildren"><code class="xref py py-obj docutils literal notranslate"><span class="pre">buildChildren</span></code></a>(file_id[, debug, skip_run, ...])</p></td>
+<td><p>go through and all the runMe's and add to the runme_list variable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.checkIncoming" title="dbprocessing.dbprocessing.ProcessQueue.checkIncoming"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkIncoming</span></code></a>([glb])</p></td>
+<td><p>Goes out to incoming and grabs all files there adding them to self.queue</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.diskfileToDB" title="dbprocessing.dbprocessing.ProcessQueue.diskfileToDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diskfileToDB</span></code></a>(df)</p></td>
+<td><p>given a diskfile go through and do all the steps to add it into the db</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.figureProduct" title="dbprocessing.dbprocessing.ProcessQueue.figureProduct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">figureProduct</span></code></a>([filename])</p></td>
+<td><p>Imports inspectors and figures out which inspectors claim the file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.importFromIncoming" title="dbprocessing.dbprocessing.ProcessQueue.importFromIncoming"><code class="xref py py-obj docutils literal notranslate"><span class="pre">importFromIncoming</span></code></a>()</p></td>
+<td><p>Import a file from incoming into the database</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.mk_tempdir" title="dbprocessing.dbprocessing.ProcessQueue.mk_tempdir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mk_tempdir</span></code></a>([suffix])</p></td>
+<td><p>create a secure temp directory</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.moveToError" title="dbprocessing.dbprocessing.ProcessQueue.moveToError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moveToError</span></code></a>(fname)</p></td>
+<td><p>Moves a file from incoming to error</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.onStartup" title="dbprocessing.dbprocessing.ProcessQueue.onStartup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">onStartup</span></code></a>()</p></td>
+<td><p>Processes can be defined as output timebase &quot;STARTUP&quot; which means to run them each time to processing chain is run</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.reprocessByCode" title="dbprocessing.dbprocessing.ProcessQueue.reprocessByCode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reprocessByCode</span></code></a>(id_in[, startDate, endDate, ...])</p></td>
+<td><p>Add files made by a code to the queue for reprocessing.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.reprocessByDate" title="dbprocessing.dbprocessing.ProcessQueue.reprocessByDate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reprocessByDate</span></code></a>([startDate, endDate, ...])</p></td>
+<td><p>Add files to the queue for reprocessing, by file date.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.reprocessByInstrument" title="dbprocessing.dbprocessing.ProcessQueue.reprocessByInstrument"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reprocessByInstrument</span></code></a>(id_in[, level, ...])</p></td>
+<td><p>Add files for an instrument to the queue for reprocessing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.reprocessByProduct" title="dbprocessing.dbprocessing.ProcessQueue.reprocessByProduct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reprocessByProduct</span></code></a>(id_in[, startDate, ...])</p></td>
+<td><p>Add files of a particular product to the queue for reprocessing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.rm_tempdir" title="dbprocessing.dbprocessing.ProcessQueue.rm_tempdir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rm_tempdir</span></code></a>()</p></td>
+<td><p>remove the temp directory</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.set_filename" title="dbprocessing.dbprocessing.ProcessQueue.set_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_filename</span></code></a>(filename)</p></td>
+<td><p>Setter for filename, this is cleaner than just random sets</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.filename" title="dbprocessing.dbprocessing.ProcessQueue.filename"><code class="xref py py-data docutils literal notranslate"><span class="pre">filename</span></code></a></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.buildChildren">
+<span class="sig-name descname"><span class="pre">buildChildren</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_procs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.buildChildren"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.buildChildren" title="Permalink to this definition">¶</a></dt>
+<dd><p>go through and all the runMe’s and add to the runme_list variable</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>file_id</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>file ID of the file for which children will be built</p>
+</dd>
+<dt><strong>skip_run</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default False</span></dt><dd><p>Skip RUN timebase processes if True</p>
+</dd>
+<dt><strong>run_procs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>If provided, comma-separated list of process IDs
+or process names to run; other processes are
+ignored. (Default: all possible processes).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.checkIncoming">
+<span class="sig-name descname"><span class="pre">checkIncoming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">glb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.checkIncoming"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.checkIncoming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Goes out to incoming and grabs all files there adding them to self.queue</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>glb</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Glob pattern that files must match.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.diskfileToDB">
+<span class="sig-name descname"><span class="pre">diskfileToDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.diskfileToDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.diskfileToDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a diskfile go through and do all the steps to add it into the db</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>df</strong><span class="classifier"><a class="reference internal" href="dbprocessing.Diskfile.Diskfile.html#dbprocessing.Diskfile.Diskfile" title="dbprocessing.Diskfile.Diskfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diskfile</span></code></a></span></dt><dd><p>File to add to database.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.figureProduct">
+<span class="sig-name descname"><span class="pre">figureProduct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.figureProduct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.figureProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports inspectors and figures out which inspectors claim the file</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Full path to file to check, default <a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.filename" title="dbprocessing.dbprocessing.ProcessQueue.filename"><code class="xref py py-data docutils literal notranslate"><span class="pre">filename</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.importFromIncoming">
+<span class="sig-name descname"><span class="pre">importFromIncoming</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.importFromIncoming"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.importFromIncoming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import a file from incoming into the database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.mk_tempdir">
+<span class="sig-name descname"><span class="pre">mk_tempdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_dbprocessing_28973'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.mk_tempdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.mk_tempdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a secure temp directory</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.moveToError">
+<span class="sig-name descname"><span class="pre">moveToError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.moveToError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.moveToError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves a file from incoming to error</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>fname</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Full path to file to move to error.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.onStartup">
+<span class="sig-name descname"><span class="pre">onStartup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.onStartup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.onStartup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes can be defined as output timebase “STARTUP” which means to run
+them each time to processing chain is run</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.reprocessByCode">
+<span class="sig-name descname"><span class="pre">reprocessByCode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startDate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endDate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.reprocessByCode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.reprocessByCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add files made by a code to the queue for reprocessing.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>id_in</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>ID or filename of code to reprocess</p>
+</dd>
+<dt><strong>startDate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, optional</span></dt><dd><p>First date to reprocess (default all)</p>
+</dd>
+<dt><strong>endDate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, optional</span></dt><dd><p>Last date to reprocess (default all)</p>
+</dd>
+<dt><strong>incVersion</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> {0, 1, 2}, optional</span></dt><dd><p>Which version number to increment: major (0), minor (1),
+subminor (2). Forces reprocessing. (default do not force).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.reprocessByDate">
+<span class="sig-name descname"><span class="pre">reprocessByDate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">startDate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endDate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.reprocessByDate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.reprocessByDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add files to the queue for reprocessing, by file date.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>startDate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, optional</span></dt><dd><p>First date to reprocess (default all)</p>
+</dd>
+<dt><strong>endDate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, optional</span></dt><dd><p>Last date to reprocess (default all)</p>
+</dd>
+<dt><strong>incVersion</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> {0, 1, 2}, optional</span></dt><dd><p>Which version number to increment: major (0), minor (1),
+subminor (2). Forces reprocessing (default do not force).</p>
+</dd>
+<dt><strong>level</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>Only reprocess files of this level (default all)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.reprocessByInstrument">
+<span class="sig-name descname"><span class="pre">reprocessByInstrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startDate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endDate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.reprocessByInstrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.reprocessByInstrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add files for an instrument to the queue for reprocessing</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>id_in</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>ID or name of instrument to reprocess</p>
+</dd>
+<dt><strong>level</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Only reprocess files of this level (default all)</p>
+</dd>
+<dt><strong>startDate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, optional</span></dt><dd><p>First date to reprocess (default all)</p>
+</dd>
+<dt><strong>endDate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, optional</span></dt><dd><p>Last date to reprocess (default all)</p>
+</dd>
+<dt><strong>incVersion</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> {0, 1, 2}, optional</span></dt><dd><p>Which version number to increment: major (0), minor (1),
+subminor (2). Forces reprocessing (default do not force).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.reprocessByProduct">
+<span class="sig-name descname"><span class="pre">reprocessByProduct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startDate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endDate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.reprocessByProduct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.reprocessByProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add files of a particular product to the queue for reprocessing.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>id_in</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>ID or name of code to reprocess</p>
+</dd>
+<dt><strong>startDate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, optional</span></dt><dd><p>First date to reprocess (default all)</p>
+</dd>
+<dt><strong>endDate</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>, optional</span></dt><dd><p>Last date to reprocess (default all)</p>
+</dd>
+<dt><strong>incVersion</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> {0, 1, 2}, optional</span></dt><dd><p>Which version number to increment: major (0), minor (1),
+subminor (2). Forces reprocessing (default do not force).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.rm_tempdir">
+<span class="sig-name descname"><span class="pre">rm_tempdir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.rm_tempdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.rm_tempdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove the temp directory</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.set_filename">
+<span class="sig-name descname"><span class="pre">set_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dbprocessing/dbprocessing.html#ProcessQueue.set_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.set_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setter for filename, this is cleaner than just random sets</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>filename to set to <a class="reference internal" href="#dbprocessing.dbprocessing.ProcessQueue.filename" title="dbprocessing.dbprocessing.ProcessQueue.filename"><code class="xref py py-data docutils literal notranslate"><span class="pre">filename</span></code></a></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dbprocessing.dbprocessing.ProcessQueue.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#dbprocessing.dbprocessing.ProcessQueue.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Full path to file currently being processed (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
+</dd></dl>
+
+</dd></dl>
+
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.dbprocessing.html"
+                          title="previous chapter">dbprocessing.dbprocessing</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.DBqueue.html"
+                          title="next chapter">dbprocessing.DBqueue</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.dbprocessing.ProcessQueue.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.DBqueue.html" title="dbprocessing.DBqueue"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.dbprocessing.html" title="dbprocessing.dbprocessing"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="dbprocessing.dbprocessing.html" >dbprocessing.dbprocessing</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.dbprocessing.ProcessQueue</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

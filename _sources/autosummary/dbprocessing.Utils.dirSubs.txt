@@ -1,6 +1,0 @@
-dbprocessing.Utils.dirSubs
-==========================
-
-.. currentmodule:: dbprocessing.Utils
-
-.. autofunction:: dirSubs

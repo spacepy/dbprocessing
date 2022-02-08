@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dbprocessing.reports &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="dbprocessing.reports.HTMLbase" href="dbprocessing.reports.HTMLbase.html" />
+    <link rel="prev" title="dbprocessing.module.module" href="dbprocessing.module.module.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.reports.HTMLbase.html" title="dbprocessing.reports.HTMLbase"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.module.module.html" title="dbprocessing.module.module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" accesskey="U">API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.reports</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-dbprocessing.reports">
+<span id="dbprocessing-reports"></span><h1>dbprocessing.reports<a class="headerlink" href="#module-dbprocessing.reports" title="Permalink to this headline">¶</a></h1>
+<p>Support for making reports from dbprocessing logs.</p>
+<dl class="simple">
+<dt>things included are:</dt><dd><ul class="simple">
+<li><p>number and list of files ingested</p></li>
+<li><p>number and list of files requested for ingestion that failed</p></li>
+<li><p>number and list of other products created</p></li>
+<li><p>list of commands run</p></li>
+</ul>
+</dd>
+<dt>TODO include later</dt><dd><ul class="simple">
+<li><p>any errors or anomalies reported (TODO not done)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="dbprocessing.reports.HTMLbase.html#dbprocessing.reports.HTMLbase" title="dbprocessing.reports.HTMLbase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HTMLbase</span></code></a>()</p></td>
+<td><p>Support comparisons based on time stored in this object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dbprocessing.reports.commandsRun.html#dbprocessing.reports.commandsRun" title="dbprocessing.reports.commandsRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commandsRun</span></code></a>(inStr)</p></td>
+<td><p>Report on commands that have been run by the chain</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dbprocessing.reports.errors.html#dbprocessing.reports.errors" title="dbprocessing.reports.errors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code></a>(inStr)</p></td>
+<td><p>Report all ERRORs logged by dbprocessing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dbprocessing.reports.ingested.html#dbprocessing.reports.ingested" title="dbprocessing.reports.ingested"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ingested</span></code></a>(inStr)</p></td>
+<td><p>Report files that have been ingested in to the chain</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dbprocessing.reports.logfile.html#dbprocessing.reports.logfile" title="dbprocessing.reports.logfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logfile</span></code></a>(filename[, timerange])</p></td>
+<td><p>class to hold a datafile</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dbprocessing.reports.movedToError.html#dbprocessing.reports.movedToError" title="dbprocessing.reports.movedToError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">movedToError</span></code></a>(inStr)</p></td>
+<td><p>Report files that have moved to the dbprocessing error directory</p></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="dbprocessing.module.module.html"
+                          title="previous chapter">dbprocessing.module.module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="dbprocessing.reports.HTMLbase.html"
+                          title="next chapter">dbprocessing.reports.HTMLbase</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/developer/autosummary/dbprocessing.reports.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.reports.HTMLbase.html" title="dbprocessing.reports.HTMLbase"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dbprocessing.module.module.html" title="dbprocessing.module.module"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="../../SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+        <li><a href="../../index.html">docs</a> &raquo;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Developer Information</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../api.html" >API documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dbprocessing.reports</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>

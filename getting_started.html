@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Getting Started &#8212; dbprocessing v0.1.0 manual</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+        <script type="text/javascript" src="_static/copybutton.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Concepts" href="concepts.html" />
+    <link rel="prev" title="Getting help" href="SUPPORT.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1>dbprocessing</h1></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="SUPPORT.html" title="Getting help"
+             accesskey="P">previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+        <li><a href="index.html">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Getting Started</a></li> 
+      </ul>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>This is a brief guide to setting up dbprocessing to support a new project.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#dependencies" id="id1">Dependencies</a></p>
+<ul>
+<li><p><a class="reference internal" href="#manual-dependency-installation" id="id2">Manual dependency installation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#installation" id="id3">Installation</a></p></li>
+<li><p><a class="reference internal" href="#directory-layout" id="id4">Directory layout</a></p></li>
+<li><p><a class="reference internal" href="#processing-codes" id="id5">Processing Codes</a></p></li>
+<li><p><a class="reference internal" href="#inspectors" id="id6">Inspectors</a></p></li>
+<li><p><a class="reference internal" href="#configuration-file" id="id7">Configuration file</a></p></li>
+<li><p><a class="reference internal" href="#database-creation" id="id8">Database creation</a></p></li>
+<li><p><a class="reference internal" href="#initial-ingest" id="id9">Initial ingest</a></p></li>
+<li><p><a class="reference internal" href="#processing" id="id10">Processing</a></p></li>
+<li><p><a class="reference internal" href="#automation" id="id11">Automation</a></p></li>
+</ul>
+</div>
+<section id="dependencies">
+<h2><a class="toc-backref" href="#id1">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Currently dbprocessing runs on Linux systems (Mac and Windows are in testing.)</p>
+<p>Python is required, either 2.7 or 3.2+.</p>
+<p>Other dependencies are automatically installed if you install
+<code class="docutils literal notranslate"><span class="pre">dbprocessing</span></code> using <code class="docutils literal notranslate"><span class="pre">pip</span></code>; these include SQLAlchemy and dateutil.</p>
+<p>If you wish to use a PostgreSQL database, PostgreSQL is required, with
+appropriate permissions set up (but you can use an sqlite database
+with no database manager setup.) <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code> is also required for
+PostgreSQL and will not be installed automatically; <em>one</em> of the
+following lines will likely be appropriate, depending on your
+environment:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt-get install python-psycopg2
+sudo apt-get install python3-psycopg2
+conda install psycopg2
+pip install psycopg2
+</pre></div>
+</div>
+<p>It is recommended to use the same method (system package, conda, or
+pip) for psycopg2 as for SQLAlchemy.</p>
+<section id="manual-dependency-installation">
+<h3><a class="toc-backref" href="#id2">Manual dependency installation</a><a class="headerlink" href="#manual-dependency-installation" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.sqlalchemy.org/">SQLAlchemy</a> is required. This is available
+in most distributions; in Ubuntu, you can usually install it with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt-get install python-sqlalchemy
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt-get install python3-sqlalchemy
+</pre></div>
+</div>
+<p>It is also usually available via pip:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install sqlalchemy
+</pre></div>
+</div>
+<p>Finally, <a class="reference external" href="https://dateutil.readthedocs.io/en/stable/">dateutil</a> is required. In Ubuntu this can be installed with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt-get install python-dateutil
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt-get install python3-dateutil
+</pre></div>
+</div>
+<p>or via pip:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install python-dateutil
+</pre></div>
+</div>
+</section>
+</section>
+<section id="installation">
+<h2><a class="toc-backref" href="#id3">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>dbprocessing itself is a Python package and must be installed.</p>
+<p>This can usually be done with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install dbprocessing
+</pre></div>
+</div>
+<p>which will also install necessary dependencies.</p>
+<p>But it can also be installed by downloading the distribution and running:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py install --user
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--user</span></code> is recommended to install for a particular user.</p>
+<p>Scripts needed to run dbprocessing are installed into a default
+location which is usually on the path. Specify a different location
+(e.g. a directory devoted just to dbprocessing scripts) with
+<code class="docutils literal notranslate"><span class="pre">--install-scripts=DIRECTORY</span></code>.</p>
+</section>
+<section id="directory-layout">
+<h2><a class="toc-backref" href="#id4">Directory layout</a><a class="headerlink" href="#directory-layout" title="Permalink to this headline">¶</a></h2>
+<p>There are several directories that should be reserved, usually one as
+a temporary location for incoming data files, one for data files once
+they have been brought into the database, and one for processing codes.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="concepts.html#concepts-missions"><span class="std std-ref">Missions</span></a></p>
+</div>
+</section>
+<section id="processing-codes">
+<h2><a class="toc-backref" href="#id5">Processing Codes</a><a class="headerlink" href="#processing-codes" title="Permalink to this headline">¶</a></h2>
+<p>A processing code or script is specific to your project and takes
+less processed data into a more processed form. dbprocessing calls
+these codes, but they do not need to be aware of dbprocessing or
+interact with it. This is one of the interfaces between the generic
+dbprocessing and your specific project.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="concepts.html#concepts-codes"><span class="std std-ref">Codes</span></a></p>
+</div>
+</section>
+<section id="inspectors">
+<h2><a class="toc-backref" href="#id6">Inspectors</a><a class="headerlink" href="#inspectors" title="Permalink to this headline">¶</a></h2>
+<p>An inspector is a small piece of Python code which can identify certain
+metadata about your data files and provide it to dbprocessing. This is
+the second interface between dbprocessing and your project.</p>
+<p>Examples are forthcoming.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="concepts.html#concepts-inspectors"><span class="std std-ref">Inspectors</span></a></p>
+</div>
+</section>
+<section id="configuration-file">
+<h2><a class="toc-backref" href="#id7">Configuration file</a><a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
+<p>The dbprocessing configuration file is a human-readable description of
+your project’s data files, processing codes, and the interactions
+between them. This human-readable description is parsed into the database
+structure. In principle these relationships can be defined directly in
+the database; in practice it is much easier to describe with this file.</p>
+<p>This is the third and final interface between dbprocessing and your project.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="ConfigurationFiles.html#configurationfiles-addfromconfig"><span class="std std-ref">addFromConfig.py</span></a></p>
+</div>
+</section>
+<section id="database-creation">
+<h2><a class="toc-backref" href="#id8">Database creation</a><a class="headerlink" href="#database-creation" title="Permalink to this headline">¶</a></h2>
+<p>If using PostgreSQL, the database itself must first be created without
+any tables. This step is skipped for an sqlite database.</p>
+<p>Then the tables and relations are created with <a class="reference internal" href="scripts.html#scripts-createdb-py"><span class="std std-ref">CreateDB.py</span></a>.
+This creates all dbprocessing structures, with no information specific
+to a project.</p>
+<p>Finally, <a class="reference internal" href="scripts.html#scripts-addfromconfig-py"><span class="std std-ref">addFromConfig.py</span></a> adds project-specific information
+from the configuration file.</p>
+</section>
+<section id="initial-ingest">
+<h2><a class="toc-backref" href="#id9">Initial ingest</a><a class="headerlink" href="#initial-ingest" title="Permalink to this headline">¶</a></h2>
+<p>The first set of files to bring into dbprocessing should be placed in
+the incoming directory, and <a class="reference internal" href="scripts.html#cmdoption-ProcessQueue.py-i"><code class="xref std std-option docutils literal notranslate"><span class="pre">ProcessQueue.py</span> <span class="pre">-i</span></code></a> used to ingest
+them into the database.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="concepts.html#concepts-ingest"><span class="std std-ref">Ingestion</span></a></p>
+</div>
+</section>
+<section id="processing">
+<h2><a class="toc-backref" href="#id10">Processing</a><a class="headerlink" href="#processing" title="Permalink to this headline">¶</a></h2>
+<p>Run <a class="reference internal" href="scripts.html#cmdoption-ProcessQueue.py-p"><code class="xref std std-option docutils literal notranslate"><span class="pre">ProcessQueue.py</span> <span class="pre">-p</span></code></a> to produce all possible output files from
+the initial set of inputs.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="concepts.html#concepts-processing"><span class="std std-ref">Processing</span></a></p>
+</div>
+</section>
+<section id="automation">
+<h2><a class="toc-backref" href="#id11">Automation</a><a class="headerlink" href="#automation" title="Permalink to this headline">¶</a></h2>
+<p>Although dbprocessing can be run “by hand” as above, normally it is
+recommended to perform the following sequence on an automated basis
+(e.g. in cron or from a daemon that calls them regularly.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Place new files in the incoming directory (or link them).</p></li>
+<li><p>Call <a class="reference internal" href="scripts.html#cmdoption-ProcessQueue.py-i"><code class="xref std std-option docutils literal notranslate"><span class="pre">ProcessQueue.py</span> <span class="pre">-i</span></code></a>.</p></li>
+<li><p>Call <a class="reference internal" href="scripts.html#cmdoption-ProcessQueue.py-p"><code class="xref std std-option docutils literal notranslate"><span class="pre">ProcessQueue.py</span> <span class="pre">-p</span></code></a>.</p></li>
+</ol>
+</div></blockquote>
+<p>Examples are pending.</p>
+<p>A few considerations relating to automation:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><a class="reference internal" href="scripts.html#scripts-processqueue-py"><span class="std std-ref">ProcessQueue.py</span></a> should not be run
+with partially-copied files in the incoming directory; it doesn’t
+check if they are being written to. There are two ways to address
+this need:</p>
+<ol class="loweralpha simple">
+<li><p>Ensure that the code which populates incoming never runs at the
+same time as <code class="docutils literal notranslate"><span class="pre">ProcessQueue.py</span></code>.</p></li>
+<li><p>Copy files to incoming with a name starting with <code class="docutils literal notranslate"><span class="pre">.</span></code>, so they
+will be ignored on ingest. Then perform a rename once the
+copy is done. This rename is atomic.</p></li>
+</ol>
+</li>
+<li><p>Two instances of <code class="docutils literal notranslate"><span class="pre">ProcessQueue.py</span></code> cannot run on the same database
+at the same time. This means ingest must complete before processing,
+but it also means if, for instance, a processing run takes 90 minutes
+to complete, the process should not be run hourly. This suggests using
+a script that waits a predefined time between the end and the start
+of processing, rather than always starting processing at a fixed
+interval. A lock on the database ensures no data corruption if two
+instances are run at once; <code class="docutils literal notranslate"><span class="pre">ProcessQueue.py</span></code> will simply return
+with an error. Handling this error gracefully and trying later is also
+a reasonable approach.</p></li>
+</ol>
+</div></blockquote>
+<hr class="docutils" />
+<p><strong>Release</strong>: 0.1.0 <strong>Doc generation date</strong>: Feb 10, 2022</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a><ul>
+<li><a class="reference internal" href="#manual-dependency-installation">Manual dependency installation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#directory-layout">Directory layout</a></li>
+<li><a class="reference internal" href="#processing-codes">Processing Codes</a></li>
+<li><a class="reference internal" href="#inspectors">Inspectors</a></li>
+<li><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li><a class="reference internal" href="#database-creation">Database creation</a></li>
+<li><a class="reference internal" href="#initial-ingest">Initial ingest</a></li>
+<li><a class="reference internal" href="#processing">Processing</a></li>
+<li><a class="reference internal" href="#automation">Automation</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="SUPPORT.html"
+                          title="previous chapter">Getting help</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="concepts.html"
+                          title="next chapter">Concepts</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/getting_started.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="SUPPORT.html" title="Getting help"
+             >previous</a> |</li>
+        <li><a href="https://spacepy.github.io/dbprocessing/">homepage</a>|&nbsp;</li>
+        <li><a href="SUPPORT.html">help</a>|&nbsp;</li>
+        <li><a href="https://github.com/spacepy/dbprocessing">development</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+        <li><a href="index.html">docs</a> &raquo;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Getting Started</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021, dbprocessing contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    </div>
+  </body>
+</html>
