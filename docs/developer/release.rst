@@ -129,20 +129,22 @@ use that environment:
    source ~/miniconda/bin/activate dbp_build
    export PYTHONNOUSERSITE=1
    export PYTHONPATH=
-   conda install sqlalchemy python-dateutil sphinx numpydoc twine numpy
+   conda install sqlalchemy python-dateutil sphinx numpydoc twine numpy wheel
 
 Note numpy is only required for the :mod:`.reports` module (and thus
 its documentation).
 
-Preparing the source build
-==========================
+Preparing the distributions
+===========================
 
 .. code-block:: sh
 
    python setup.py sdist --formats=gztar,zip
+   python setup.py bdist_wheel --universal
 
 Note this will perform a "build" and then rebuild the documentation
-(in ``sphinx/build``). Tarball and zip are in the dist directory.
+(in ``sphinx/build``) for the souce distribution. Tarball, zip, and
+wheel are in the dist directory.
 
 Docs
 ====
@@ -189,9 +191,9 @@ directory and then do the upload:
 
 .. code-block:: sh
 
-   twine upload -r testpypi dbprocessing-*.zip
+   twine upload -r testpypi dbprocessing-*.zip dbprocessing-*.whl
 
-PyPI can only take one source distribution (zip or tar.gz), so we use zip.)
+PyPI can only take one source distribution (zip or tar.gz), so we use zip.
 
 Test installing with:
 
@@ -212,7 +214,7 @@ See `PyPI upload directions
 
 .. code-block:: sh
 
-   twine upload dbprocessing-*.zip
+   twine upload dbprocessing-*.zip dbprocessing-*.whl
 
 Do not upload the .tar.gz since can only upload one source package per release.
 
@@ -235,7 +237,7 @@ notes on the website and also have a brief version of the release
 notes included.
 
 Click in the "upload binaries" area and upload all the files: source
-distributions (zip and tar), documentation PDF
+distributions (zip and tar), wheel, documentation PDF
 (``dbprocessing-x.y.z-doc.pdf``) and a zip
 (``dbprocessing-x.y.z-doc.zip``).
 
