@@ -10,16 +10,29 @@ This is a brief guide to setting up dbprocessing to support a new project.
 
 Dependencies
 ============
-Currently dbprocessing runs on Unix systems (Mac and Windows are in testing.)
+Currently dbprocessing runs on Linux systems (Mac and Windows are in testing.)
 
 Python is required, either 2.7 or 3.2+.
 
-If you wish to use a PostgreSQL database, PostgreSQL is required, with
-appropriate permissions set up (but you can use an sqlite database
-with no database manager setup.)
-
 Other dependencies are automatically installed if you install
 ``dbprocessing`` using ``pip``; these include SQLAlchemy and dateutil.
+
+If you wish to use a PostgreSQL database, PostgreSQL is required, with
+appropriate permissions set up (but you can use an sqlite database
+with no database manager setup.) ``psycopg2`` is also required for
+PostgreSQL and will not be installed automatically; *one* of the
+following lines will likely be appropriate, depending on your
+environment:
+
+.. code-block:: sh
+
+   sudo apt-get install python-psycopg2
+   sudo apt-get install python3-psycopg2
+   conda install psycopg2
+   pip install psycopg2
+
+It is recommended to use the same method (system package, conda, or
+pip) for psycopg2 as for SQLAlchemy.
 
 Manual dependency installation
 ------------------------------
