@@ -126,9 +126,9 @@ use that environment:
 
    bash ./Miniconda3-latest-Linux-x86_64.sh -b -p ~/miniconda
    ~/miniconda/bin/conda create -y -n dbp_build python=3
-   source ~/miniconda/bin/activate dbp_build
    export PYTHONNOUSERSITE=1
    export PYTHONPATH=
+   source ~/miniconda/bin/activate dbp_build
    conda install sqlalchemy python-dateutil sphinx numpydoc twine numpy wheel
 
 Note numpy is only required for the :mod:`.reports` module (and thus
