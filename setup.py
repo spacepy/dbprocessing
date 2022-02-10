@@ -61,7 +61,7 @@ setup_kwargs = {
     'requires': ['python (>=2.7, !=3.0)', 'python_dateutil', 'sqlalchemy'],
     'scripts': scripts,
     'url': 'https://spacepy.github.io/dbprocessing/',
-    'version': '0.1.0rc0',
+    'version': '0.1.0',
 }
 
 if use_setuptools:

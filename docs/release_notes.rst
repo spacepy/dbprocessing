@@ -9,7 +9,7 @@ Release Notes
 0.1 Series
 ==========
 
-0.1.0 (xxxx-xx-xx)
+0.1.0 (2022-02-10)
 ------------------
 This is the first public packaged release of dbprocessing. For the convenience
 of those working directly from git checkouts, these release notes summarize
