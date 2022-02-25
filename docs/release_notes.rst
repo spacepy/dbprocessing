@@ -209,11 +209,11 @@ PR `122 <https://github.com/spacepy/dbprocessing/pull/122>`_: Provide support do
 
     `118 <https://github.com/spacepy/dbprocessing/issues/118>`_: Link github page in documentation
 
-PR `123 <https://github.com/spacepy/dbprocessing/pull/123>`_: Updates for release 0.1.0
+PR `123 <https://github.com/spacepy/dbprocessing/pull/123>`_: Updates for release 0.1.0 (`5acdfa8d <https://github.com/spacepy/dbprocessing/commit/5acdfa8d6d33d7001660120790b634f5079148d5>`_)
 
     `5 <https://github.com/spacepy/dbprocessing/issues/5>`_: Script installation into default location
 
-PR `124 <https://github.com/spacepy/dbprocessing/pull/124>`_: Updated docs for release 0.1.0
+PR `124 <https://github.com/spacepy/dbprocessing/pull/124>`_: Updated docs for release 0.1.0 (`a474d582 <https://github.com/spacepy/dbprocessing/commit/a474d582616c6f8d795f6cc165be67b2834ba904>`_)
 
 Other issues closed this release
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
