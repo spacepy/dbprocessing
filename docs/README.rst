@@ -6,6 +6,8 @@ input data. Although originally written for Heliophysics data, it is
 intended to be flexible enough to manage most forms of digital time-series
 data.
 
+Documentation is available at <https://spacepy.github.io/dbprocessing/>.
+
 What dbprocessing does
 ----------------------
 Given a description of relationship between data files, a set of codes
