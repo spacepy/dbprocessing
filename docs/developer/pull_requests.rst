@@ -16,11 +16,11 @@ Creating a PR
 =============
 
 It is strongly recommended to create a pull request from a *topic
-branch* (not ``master``) in a *fork* of `the spacepy/dbprocessing
+branch* (not ``main``) in a *fork* of `the spacepy/dbprocessing
 repository <https://github.com/spacepy/dbprocessing/>`_. This allows a
 clean separation of code that's in-progress vs. ready-to-go, and also
 a distinction between different pull requests. Submitting a pull
-request from master, even of your fork, makes it difficult to have two
+request from main, even of your fork, makes it difficult to have two
 open PRs, and make cleanup after a PR is merged very difficult.
 
 Before working on an issue, then, `fork <https://docs.github.com/en/
@@ -35,7 +35,7 @@ request <https://docs.github.com/en/pull-requests/
 collaborating-with-pull-requests/
 proposing-changes-to-your-work-with-pull-requests/
 creating-a-pull-request>`_
-against ``spacepy/dbprocessing master``.
+against ``spacepy/dbprocessing main``.
 
 If you use CircleCI, `unfollow your fork before submitting a PR
 <https://support.circleci.com/hc/en-us/articles/
@@ -46,12 +46,12 @@ The preferred flow of code is summarized:
     1. Code is created on a `branch <https://docs.github.com/en/pull-requests/
        collaborating-with-pull-requests/
        proposing-changes-to-your-work-with-pull-requests/about-branches>`__ of a
-       fork, not directly on `master`.
+       fork, not directly on `main`.
     2. Code enters the ``dbprocessing`` repository via pull requests.    
        This applies to contributors and developers alike; developers do
-       not push directly. (Usually PRs are relative to the ``master`` branch
+       not push directly. (Usually PRs are relative to the ``main`` branch
        but in some cases a topic branch may be created.)
-    3. Code enters the ``master`` branch of a fork by `syncing upstream
+    3. Code enters the ``main`` branch of a fork by `syncing upstream
        to the fork <https://docs.github.com/en/pull-requests/
        collaborating-with-pull-requests/working-with-forks/
        syncing-a-fork>`_ after the pull request has been merged.
@@ -112,12 +112,12 @@ If changes are requested, they can usually be addressed by making additional
 commits on your branch and pushing to your fork. The PR will be automatically
 updated.
 
-In some cases the master branch of the repository may have changed in a
+In some cases the main branch of the repository may have changed in a
 way that's incompatible with the changes in the pull request. The solution
 is to `rebase <https://docs.github.com/en/get-started/using-git/
 about-git-rebase>`_
-the topic branch against the new master. (The easiest way to do this is to
-update the fork master from the upstream master, then rebase the branch.)
+the topic branch against the new main. (The easiest way to do this is to
+update the fork main from the upstream main, then rebase the branch.)
 In the case of a conflict rebase, this can get messy...feel free to ask
 for help. A developer may be able to perform the rebase if `maintainer
 edits are enabled <https://docs.github.com/en/pull-requests/
@@ -154,7 +154,7 @@ In order to be merged, a pull request must:
        There are two exceptions, provided all other requirements are met:
 
        a. A PR may be merged by a developer whose only contribution is to
-	  rebase the code to account for changes in master.
+	  rebase the code to account for changes in main.
        b. A PR authored by a developer may be merged by a different
 	  developer who has authored commits that make relatively minor
 	  changes to the PR; again, at the discretion of the developers
@@ -179,8 +179,8 @@ Post-merge cleanup
 ==================
 After merge, the contents of the pull request are in two separate sets
 of commits: the original commits on the topic branch, and new commits on
-master. To finish cleanup, the `fork should be synchronized to the
-updated master <https://docs.github.com/en/pull-requests/
+main. To finish cleanup, the `fork should be synchronized to the
+updated main <https://docs.github.com/en/pull-requests/
 collaborating-with-pull-requests/working-with-forks/syncing-a-fork>`_ and the
 `topic branch deleted <https://docs.github.com/en/pull-requests/
 collaborating-with-pull-requests/
