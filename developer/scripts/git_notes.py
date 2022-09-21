@@ -71,7 +71,7 @@ class NoteCreator(object):
         # Split into PRs...
         prs = [self.github.get_pull(p.number) for p in issues
                if p.pull_request is not None]
-        prs = [p for p in prs if p.merged and p.base.ref == 'master']
+        prs = [p for p in prs if p.merged and p.base.ref in ('master', 'main')]
         prs.sort(key=operator.attrgetter('merged_at'))
         # ... and non-prs
         issues = [i for i in issues if i.pull_request is None]

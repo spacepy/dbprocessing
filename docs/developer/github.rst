@@ -48,7 +48,7 @@ this the preferred means of submitting a PR, "Build forked pull requests"
 is on. (The PR itself must actually be submitted to the dbprocessing
 repository).
 
-We require status checks to pass before merging to master; in the GitHub
+We require status checks to pass before merging to main; in the GitHub
 branch settings, this takes the form of a branch protection rule that requires
 the CircleCI ``main`` workflow to succeed on the PR. `This document
 <https://web.archive.org/web/20210304061613/
