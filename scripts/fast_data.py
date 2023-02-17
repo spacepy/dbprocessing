@@ -43,9 +43,9 @@ def build_graph(dbu):
         dbu.File.quality_version, dbu.File.revision_version).all()])
 
     for f in dbu.getFiles(newest_version=True):
-        G.node[f.file_id]['newest'] = True
+        G.nodes[f.file_id]['newest'] = True
     for f in dbu.session.query(dbu.Release.file_id):
-        G.node[f[0]]['in_release'] = True
+        G.nodes[f[0]]['in_release'] = True
 
     G.add_edges_from(
         dbu.session.query(dbu.Filefilelink.source_file,
@@ -77,10 +77,10 @@ def filter_graph(graph, cutoff):
     """
     removenodes = set()
     for i in graph:
-        if graph.node[i]['newest'] or graph.node[i]['in_release']:
+        if graph.nodes[i]['newest'] or graph.nodes[i]['in_release']:
             removenodes.add(i)
             removenodes.update(networkx.ancestors(graph, i))
-        if graph.in_degree(i) == 0 and graph.node[i]['utc_file_date'] <= cutoff:
+        if graph.in_degree(i) == 0 and graph.nodes[i]['utc_file_date'] <= cutoff:
             removenodes.add(i)
             removenodes.update(networkx.descendants(graph, i))
     graph.remove_nodes_from(removenodes)
@@ -111,7 +111,7 @@ def reap(dbu, graph, participants, dofiles=False, dorecords=False, verbose=False
     leading_idx = len(missiondir)
     if missiondir[-1] == '':
         leading_idx -= 1
-    nodes = [graph.node[x] for x in participants]
+    nodes = [graph.nodes[x] for x in participants]
     nodes.sort(key=lambda file: (
         file['product_id'], file['utc_file_date'], file['version']))
     for node in reversed(nodes[:-1]):
