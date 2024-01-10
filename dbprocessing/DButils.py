@@ -235,7 +235,7 @@ class DButils(object):
             (t, v, tb) = sys.exc_info()
             raise DBError('Error creating engine: ' + str(v))
         try:
-            metadata = sqlalchemy.MetaData(bind=engineIns)
+            metadata = sqlalchemy.MetaData()
             # a session is what you use to actually talk to the DB, set one up with the current engine
             Session = sessionmaker(bind=engineIns)
             session = Session()
@@ -281,7 +281,7 @@ class DButils(object):
             if verbose: print(val)
             if not hasattr(self, val):  # then make it
                 myclass = type(str(val), (object,), dict())
-                tableobj = Table(table_dict[val], self.metadata, autoload=True)
+                tableobj = Table(table_dict[val], self.metadata, autoload_with=self.engine)
                 mapper(myclass, tableobj)
                 setattr(self, str(val), myclass)
                 if verbose: print("Class %s created" % (val))
@@ -3862,7 +3862,7 @@ class DButils(object):
             raise RuntimeError('Unixtime table already seems to exist.')
         unixtime = sqlalchemy.Table(
             'unixtime', self.metadata, *tables.definition('unixtime'))
-        self.metadata.create_all(tables=[unixtime])
+        self.metadata.create_all(self.engine, tables=[unixtime])
         # Make object for the new table definition (skips existing tables)
         self._createTableObjects()
         unx0 = datetime.datetime(1970, 1, 1)
@@ -3895,6 +3895,5 @@ def create_tables(filename='dbprocessing_default.db', dialect='sqlite'):
         data_table = sqlalchemy.schema.Table(
             name, metadata, *tables.definition(name))
     engine = sqlalchemy.engine.create_engine(url, echo=False)
-    metadata.bind = engine
-    metadata.create_all(checkfirst=True)
+    metadata.create_all(checkfirst=True, bind=engine)
     engine.dispose()
