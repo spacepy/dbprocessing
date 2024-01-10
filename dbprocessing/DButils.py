@@ -39,7 +39,7 @@ import sqlalchemy.engine
 import sqlalchemy.schema
 import sqlalchemy.sql.expression
 from sqlalchemy import Table
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import registry
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy.orm.exc
 from sqlalchemy.exc import IntegrityError
@@ -277,12 +277,13 @@ class DButils(object):
         ##         pass
         ##     missions = Table('missions', metadata, autoload=True)
         ##     mapper(Missions, missions)
+        mapper_registry = registry()
         for val in table_dict:
             if verbose: print(val)
             if not hasattr(self, val):  # then make it
                 myclass = type(str(val), (object,), dict())
                 tableobj = Table(table_dict[val], self.metadata, autoload_with=self.engine)
-                mapper(myclass, tableobj)
+                mapper_registry.map_imperatively(myclass, tableobj)
                 setattr(self, str(val), myclass)
                 if verbose: print("Class %s created" % (val))
                 if verbose: DBlogging.dblogger.debug("Class %s created" % (val))
