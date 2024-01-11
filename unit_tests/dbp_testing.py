@@ -282,7 +282,7 @@ class AddtoDBMixin(object):
             # persist_selectable added 1.3 (mapped_table deprecated)
             tbl = insp.persist_selectable\
                   if hasattr(insp, 'persist_selectable') else insp.mapped_table
-            tbl.drop()
+            tbl.drop(bind=self.dbu.engine)
             self.dbu.metadata.remove(tbl)
             del self.dbu.Unixtime
         if data['productprocesslink']\
