@@ -1997,7 +1997,7 @@ class DButils(object):
         if isinstance(filename, str_classes):
             filename = self.getFileID(filename)
         sq = self.session.query(self.File.filename, self.Product.relative_path).filter(
-            self.File.file_id == filename).join((self.Product, self.File.product_id == self.Product.product_id)).one()
+            self.File.file_id == filename).join(self.Product, self.Product.product_id == self.File.product_id).one()
         path = os.path.join(self.MissionDirectory,
                             *(sq[1].split(posixpath.sep) + [sq[0]]))
         if '{' in path:
@@ -3279,7 +3279,7 @@ class DButils(object):
             vars = ['code', 'process']
             sq = (self.session.query(self.Code, self.Process)
                   .filter_by(code_id=in_id)
-                  .join((self.Process, self.Code.process_id == self.Process.process_id)).all())
+                  .join(self.Process, self.Process.process_id == self.Code.process_id).all())
 
             if not sq:  # did not find a match this is a dberror
                 raise DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id))
