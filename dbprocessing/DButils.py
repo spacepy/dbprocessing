@@ -2740,7 +2740,7 @@ class DButils(object):
             # no file_id found
             raise DBNoData("No product_name %s found in the DB" % (product_name))
         # Numerical product ID, make sure it exists
-        sq = self.session.query(self.Product).get(product_name)
+        sq = self.session.get(self.Product, product_name)
         if sq is not None:
             return sq.product_id
         else:
@@ -3560,7 +3560,7 @@ class DButils(object):
         retval = None
         if isinstance(args, (int, collections.abc.Iterable)) \
            and not isinstance(args, str_classes):  # PK: int, non-str sequence
-            retval = self.session.query(getattr(self, table)).get(args)
+            retval = self.session.get(getattr(self, table), args)
         if retval is None:  # Not valid PK type, or PK not found
             # see if it was a name
             if ('get' + table + 'ID') in dir(self):
