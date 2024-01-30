@@ -2083,7 +2083,7 @@ class DButils(object):
         """
         try:
             proc_id = int(proc_name)
-            proc_name = self.session.query(self.Process).get(proc_id)
+            proc_name = self.session.get(self.Process, proc_id)
             if proc_name is None:
                 raise NoResultFound('No row was found for id={0}'.format(proc_id))
         except ValueError:  # it is not a number
@@ -2128,7 +2128,7 @@ class DButils(object):
         """
         try:
             i_id = int(name)
-            sq = self.session.query(self.Instrument).get(i_id)
+            sq = self.session.get(self.Instrument, i_id)
             if sq is None:
                 raise DBNoData("No instrument_id {0} found in the DB".format(i_id))
             return sq.instrument_id
@@ -2203,7 +2203,7 @@ class DButils(object):
             return filename.file_id
         try:
             f_id = int(filename)
-            sq = self.session.query(self.File).get(f_id)
+            sq = self.session.get(self.File, f_id)
             if sq is None:
                 raise DBNoData("No file_id {0} found in the DB".format(filename))
             return sq.file_id
@@ -2233,7 +2233,7 @@ class DButils(object):
         """
         try:
             c_id = int(codename)
-            code = self.session.query(self.Code).get(c_id)
+            code = self.session.get(self.Code, c_id)
             if code is None:
                 raise DBNoData("No code id {0} found in the DB".format(c_id))
         except TypeError:  # came in as list or tuple
@@ -2766,7 +2766,7 @@ class DButils(object):
         """
         try:
             sat_id = int(sat_name)
-            sq = self.session.query(self.Satellite).get(sat_id)
+            sq = self.session.get(self.Satellite, sat_id)
             if sq is None:
                 raise NoResultFound("No satellite id={0} found".format(sat_id))
             return sq.satellite_id
@@ -3075,7 +3075,7 @@ class DButils(object):
         """
         try:
             m_id = int(mission_name)
-            ms = self.session.query(self.Mission).get(m_id)
+            ms = self.session.get(self.Mission, m_id)
             if ms is None:
                 raise DBNoData('Invalid mission id {0}'.format(m_id))
         except (ValueError, TypeError):
@@ -3566,7 +3566,7 @@ class DButils(object):
             if ('get' + table + 'ID') in dir(self):
                 cmd = 'get' + table + 'ID'
                 pk = getattr(self, cmd)(args)
-                retval = self.session.query(getattr(self, table)).get(pk)
+                retval = self.session.get((getattr(self, table)),pk)
 # This code will make it consistently raise DBNoData if nothing is found,
 # but codebase needs to be scrubbed for callers that expect None instead.
 #            else:
