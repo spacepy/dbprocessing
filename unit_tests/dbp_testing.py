@@ -229,7 +229,7 @@ class AddtoDBMixin(object):
         """
         if self.pg:
             self.dbu.session.close()
-            self.dbu.metadata.drop_all()
+            self.dbu.metadata.drop_all(bind=self.dbu.engine)
         self.dbu.closeDB() # Before the database is removed...
         del self.dbu
         shutil.rmtree(self.td)
