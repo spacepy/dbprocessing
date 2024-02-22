@@ -306,7 +306,7 @@ class AddtoDBMixin(object):
                 sel = "SELECT pg_catalog.setval(pg_get_serial_sequence("\
                       "'{table}', '{column}'), {maxid})".format(
                           table=t, column=idcolumn, maxid=maxid)
-                self.dbu.session.execute(sel)
+                self.dbu.session.execute(sqlalchemy.sql.text(sel))
         self.dbu.commitDB()
         # Re-reference directories since new data loaded
         self.dbu.MissionDirectory = self.dbu.getMissionDirectory()
