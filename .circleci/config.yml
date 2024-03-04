@@ -20,7 +20,7 @@ jobs:
              pip install --user python-dateutil
              sudo apt update
              sudo apt install python3-pip
-             pip3 install --user "sqlalchemy<2.0"
+             pip3 install --user sqlalchemy
              pip3 install --user python-dateutil
        - persist_to_workspace:
            root: ~/.local

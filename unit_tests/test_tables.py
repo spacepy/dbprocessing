@@ -30,7 +30,7 @@ class TableDefnTests(unittest.TestCase):
         self.engine = sqlalchemy.create_engine(
             'sqlite:///{}'.format(os.path.join(self.td, 'test.sqlite')),
             echo=False)
-        self.metadata = sqlalchemy.schema.MetaData(bind=self.engine)
+        self.metadata = sqlalchemy.schema.MetaData()
 
     def tearDown(self):
         """Delete test database"""
@@ -54,7 +54,7 @@ class TableDefnTests(unittest.TestCase):
             name: sqlalchemy.schema.Table(
                 name, self.metadata, *dbprocessing.tables.definition(name))
             for name in tables}
-        self.metadata.create_all()
+        self.metadata.create_all(bind=self.engine)
         actual = sqlalchemy.inspection.inspect(self.engine)\
                  .get_table_names()
         self.assertEqual(sorted(tables), sorted(actual))

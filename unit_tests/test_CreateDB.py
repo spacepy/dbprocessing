@@ -26,7 +26,7 @@ class CreateDBTests(unittest.TestCase):
             dbu = DButils.DButils(testdb)
             if pg:
                 dbu.session.close()
-                dbu.metadata.drop_all()
+                dbu.metadata.drop_all(bind=dbu.engine)
             del dbu
         finally:
             shutil.rmtree(td)
