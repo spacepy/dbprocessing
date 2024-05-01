@@ -87,7 +87,7 @@ responsibility of data processing codes.
 Codes
 =====
 A data processing code, or simply "code", produces an output data file
-from one ore more inputs. There are several requirements on a code:
+from one or more inputs. There are several requirements on a code:
 
    * It must be callable from the command line.
    * It must accept one or more input files and produce a single
