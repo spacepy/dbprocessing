@@ -922,7 +922,7 @@ in most cases, return a record from any table.
 
    Describes an satellite. A satellite is primarily a means of connecting
    related products for convenience (e.g. in queries and reprocessing);
-   generally speaking it corresponds to a physical instrument. The hierarchy
+   generally speaking it corresponds to a physical spacecraft. The hierarchy
    of association is :sql:table:`instrument`, :sql:table:`satellite`,
    :sql:table:`mission`, where each relation is many-to-one.
 
