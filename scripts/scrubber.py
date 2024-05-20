@@ -24,7 +24,7 @@ class scrubber(object):
             print(np.difference(n))
 
     def version_number_check(self):
-        x = self.dbu.session.execute("SELECT max(interface_version), max(quality_version), max(revision_version) FROM file").fetchone()
+        x = self.dbu.session.execute().fetchone()
         if x[0] >= 1000:
             print("A interface version is too large")
         if x[1] >= 1000:
