@@ -3566,7 +3566,7 @@ class DButils(object):
             if ('get' + table + 'ID') in dir(self):
                 cmd = 'get' + table + 'ID'
                 pk = getattr(self, cmd)(args)
-                retval = self.session.get((getattr(self, table)),pk)
+                retval = self.session.get(getattr(self, table),pk)
 # This code will make it consistently raise DBNoData if nothing is found,
 # but codebase needs to be scrubbed for callers that expect None instead.
 #            else:
