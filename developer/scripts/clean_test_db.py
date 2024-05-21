@@ -116,5 +116,5 @@ while to_process:
 for file_id in delme:
     dbu._purgeFileFromDB(file_id, trust_id=True, commit=False)
 dbu.commitDB()
-dbu.session.execute('VACUUM')
+dbu.session.execute(sqlalchemy.sql.text("VACUUM"))
 dbu.commitDB()

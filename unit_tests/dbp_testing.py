@@ -229,7 +229,7 @@ class AddtoDBMixin(object):
         """
         if self.pg:
             self.dbu.session.close()
-            self.dbu.metadata.drop_all()
+            self.dbu.metadata.drop_all(bind=self.dbu.engine)
         self.dbu.closeDB() # Before the database is removed...
         del self.dbu
         shutil.rmtree(self.td)
@@ -282,7 +282,7 @@ class AddtoDBMixin(object):
             # persist_selectable added 1.3 (mapped_table deprecated)
             tbl = insp.persist_selectable\
                   if hasattr(insp, 'persist_selectable') else insp.mapped_table
-            tbl.drop()
+            tbl.drop(bind=self.dbu.engine)
             self.dbu.metadata.remove(tbl)
             del self.dbu.Unixtime
         if data['productprocesslink']\
@@ -306,7 +306,7 @@ class AddtoDBMixin(object):
                 sel = "SELECT pg_catalog.setval(pg_get_serial_sequence("\
                       "'{table}', '{column}'), {maxid})".format(
                           table=t, column=idcolumn, maxid=maxid)
-                self.dbu.session.execute(sel)
+                self.dbu.session.execute(sqlalchemy.sql.text(sel))
         self.dbu.commitDB()
         # Re-reference directories since new data loaded
         self.dbu.MissionDirectory = self.dbu.getMissionDirectory()

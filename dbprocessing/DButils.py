@@ -39,7 +39,7 @@ import sqlalchemy.engine
 import sqlalchemy.schema
 import sqlalchemy.sql.expression
 from sqlalchemy import Table
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import registry
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy.orm.exc
 from sqlalchemy.exc import IntegrityError
@@ -235,7 +235,7 @@ class DButils(object):
             (t, v, tb) = sys.exc_info()
             raise DBError('Error creating engine: ' + str(v))
         try:
-            metadata = sqlalchemy.MetaData(bind=engineIns)
+            metadata = sqlalchemy.MetaData()
             # a session is what you use to actually talk to the DB, set one up with the current engine
             Session = sessionmaker(bind=engineIns)
             session = Session()
@@ -277,12 +277,13 @@ class DButils(object):
         ##         pass
         ##     missions = Table('missions', metadata, autoload=True)
         ##     mapper(Missions, missions)
+        mapper_registry = registry()
         for val in table_dict:
             if verbose: print(val)
             if not hasattr(self, val):  # then make it
                 myclass = type(str(val), (object,), dict())
-                tableobj = Table(table_dict[val], self.metadata, autoload=True)
-                mapper(myclass, tableobj)
+                tableobj = Table(table_dict[val], self.metadata, autoload_with=self.engine)
+                mapper_registry.map_imperatively(myclass, tableobj)
                 setattr(self, str(val), myclass)
                 if verbose: print("Class %s created" % (val))
                 if verbose: DBlogging.dblogger.debug("Class %s created" % (val))
@@ -1996,7 +1997,7 @@ class DButils(object):
         if isinstance(filename, str_classes):
             filename = self.getFileID(filename)
         sq = self.session.query(self.File.filename, self.Product.relative_path).filter(
-            self.File.file_id == filename).join((self.Product, self.File.product_id == self.Product.product_id)).one()
+            self.File.file_id == filename).join(self.Product, self.Product.product_id == self.File.product_id).one()
         path = os.path.join(self.MissionDirectory,
                             *(sq[1].split(posixpath.sep) + [sq[0]]))
         if '{' in path:
@@ -2082,7 +2083,7 @@ class DButils(object):
         """
         try:
             proc_id = int(proc_name)
-            proc_name = self.session.query(self.Process).get(proc_id)
+            proc_name = self.session.get(self.Process, proc_id)
             if proc_name is None:
                 raise NoResultFound('No row was found for id={0}'.format(proc_id))
         except ValueError:  # it is not a number
@@ -2127,7 +2128,7 @@ class DButils(object):
         """
         try:
             i_id = int(name)
-            sq = self.session.query(self.Instrument).get(i_id)
+            sq = self.session.get(self.Instrument, i_id)
             if sq is None:
                 raise DBNoData("No instrument_id {0} found in the DB".format(i_id))
             return sq.instrument_id
@@ -2202,7 +2203,7 @@ class DButils(object):
             return filename.file_id
         try:
             f_id = int(filename)
-            sq = self.session.query(self.File).get(f_id)
+            sq = self.session.get(self.File, f_id)
             if sq is None:
                 raise DBNoData("No file_id {0} found in the DB".format(filename))
             return sq.file_id
@@ -2232,7 +2233,7 @@ class DButils(object):
         """
         try:
             c_id = int(codename)
-            code = self.session.query(self.Code).get(c_id)
+            code = self.session.get(self.Code, c_id)
             if code is None:
                 raise DBNoData("No code id {0} found in the DB".format(c_id))
         except TypeError:  # came in as list or tuple
@@ -2739,7 +2740,7 @@ class DButils(object):
             # no file_id found
             raise DBNoData("No product_name %s found in the DB" % (product_name))
         # Numerical product ID, make sure it exists
-        sq = self.session.query(self.Product).get(product_name)
+        sq = self.session.get(self.Product, product_name)
         if sq is not None:
             return sq.product_id
         else:
@@ -2765,7 +2766,7 @@ class DButils(object):
         """
         try:
             sat_id = int(sat_name)
-            sq = self.session.query(self.Satellite).get(sat_id)
+            sq = self.session.get(self.Satellite, sat_id)
             if sq is None:
                 raise NoResultFound("No satellite id={0} found".format(sat_id))
             return sq.satellite_id
@@ -3074,7 +3075,7 @@ class DButils(object):
         """
         try:
             m_id = int(mission_name)
-            ms = self.session.query(self.Mission).get(m_id)
+            ms = self.session.get(self.Mission, m_id)
             if ms is None:
                 raise DBNoData('Invalid mission id {0}'.format(m_id))
         except (ValueError, TypeError):
@@ -3244,18 +3245,23 @@ class DButils(object):
                     'instrumentproductlink', 'satellite', 'mission']
 
             in_id = self.getFileID(in_id)
-
-            sq = (self.session.query(self.File, self.Product,
-                                     self.Inspector, self.Instrument,
-                                     self.Instrumentproductlink, self.Satellite,
-                                     self.Mission)
+            sq = (self.session.query(self.File,
+                                     self.Product,
+                                     self.Inspector,
+                                     self.Instrument,
+                                     self.Instrumentproductlink,
+                                     self.Satellite,
+                                     self.Mission,
+                                     )
                   .filter_by(file_id=in_id)
-                  .join((self.Product, self.File.product_id == self.Product.product_id))
-                  .join((self.Inspector, self.Product.product_id == self.Inspector.product))
-                  .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
-                  .join((self.Instrument, self.Instrumentproductlink.instrument_id == self.Instrument.instrument_id))
-                  .join((self.Satellite, self.Instrument.satellite_id == self.Satellite.satellite_id))
-                  .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+                  .join(self.Product, self.Product.product_id == self.File.product_id)
+                  .join(self.Inspector, self.Inspector.product == self.Product.product_id)
+                  .join(self.Instrumentproductlink, self.Instrumentproductlink.product_id == self.Product.product_id)
+                  .join(self.Instrument, self.Instrument.instrument_id == self.Instrumentproductlink.instrument_id)
+                  .join(self.Satellite, self.Satellite.satellite_id == self.Instrument.satellite_id)
+                  .join(self.Mission, self.Mission.mission_id == self.Satellite.mission_id)
+                  .all()
+                  )
 
             if not sq:  # did not find a matchm this is a dberror
                 raise DBError("file {0} did not have a traceback, this is a problem, fix it".format(in_id))
@@ -3273,7 +3279,7 @@ class DButils(object):
             vars = ['code', 'process']
             sq = (self.session.query(self.Code, self.Process)
                   .filter_by(code_id=in_id)
-                  .join((self.Process, self.Code.process_id == self.Process.process_id)).all())
+                  .join(self.Process, self.Process.process_id == self.Code.process_id).all())
 
             if not sq:  # did not find a match this is a dberror
                 raise DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id))
@@ -3281,18 +3287,23 @@ class DButils(object):
             if sq[0][1].output_timebase != 'RUN':
                 vars = ['code', 'process', 'product', 'instrument',
                         'instrumentproductlink', 'satellite', 'mission']
-                sq = (self.session.query(self.Code, self.Process,
-                                         self.Product, self.Instrument,
-                                         self.Instrumentproductlink, self.Satellite,
+                sq = (self.session.query(self.Code,
+                                         self.Process,
+                                         self.Product,
+                                         self.Instrument,
+                                         self.Instrumentproductlink,
+                                         self.Satellite,
                                          self.Mission)
                       .filter_by(code_id=in_id)
-                      .join((self.Process, self.Code.process_id == self.Process.process_id))
-                      .join((self.Product, self.Product.product_id == self.Process.output_product))
-                      .join((self.Inspector, self.Product.product_id == self.Inspector.product))
-                      .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
-                      .join((self.Instrument, self.Instrumentproductlink.instrument_id == self.Instrument.instrument_id))
-                      .join((self.Satellite, self.Instrument.satellite_id == self.Satellite.satellite_id))
-                      .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+                      .join(self.Process, self.Process.process_id == self.Code.process_id)
+                      .join(self.Product, self.Product.product_id == self.Process.output_product)
+                      .join(self.Inspector, self.Inspector.product == self.Product.product_id)
+                      .join(self.Instrumentproductlink, self.Instrumentproductlink.product_id == self.Product.product_id)
+                      .join(self.Instrument, self.Instrument.instrument_id == self.Instrumentproductlink.instrument_id)
+                      .join(self.Satellite, self.Satellite.satellite_id == self.Instrument.satellite_id)
+                      .join(self.Mission, self.Mission.mission_id == self.Satellite.mission_id)
+                      .all()
+                      )
 
             if not sq:  # did not find a match this is a dberror
                 raise DBError("code {0} did not have a traceback, this is a problem, fix it".format(in_id))
@@ -3312,17 +3323,21 @@ class DButils(object):
                     'instrumentproductlink', 'satellite', 'mission']
 
             in_id = self.getProductID(in_id)
-
             sq = (self.session.query(self.Product,
-                                     self.Inspector, self.Instrument,
-                                     self.Instrumentproductlink, self.Satellite,
-                                     self.Mission)
-                  .filter_by(product_id=in_id)
-                  .join((self.Inspector, self.Product.product_id == self.Inspector.product))
-                  .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
-                  .join((self.Instrument, self.Instrumentproductlink.instrument_id == self.Instrument.instrument_id))
-                  .join((self.Satellite, self.Instrument.satellite_id == self.Satellite.satellite_id))
-                  .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+                                     self.Inspector,
+                                     self.Instrument,
+                                     self.Instrumentproductlink,
+                                     self.Satellite,
+                                     self.Mission,
+                                     )
+                 .filter_by(product_id=in_id)
+                 .join(self.Inspector, self.Inspector.product == self.Product.product_id)
+                 .join(self.Instrumentproductlink, self.Instrumentproductlink.product_id == self.Product.product_id)
+                 .join(self.Instrument, self.Instrument.instrument_id == self.Instrumentproductlink.instrument_id)
+                 .join(self.Satellite, self.Satellite.satellite_id == self.Instrument.satellite_id )
+                 .join(self.Mission, self.Mission.mission_id == self.Satellite.mission_id )
+                 .all()
+                  )
 
             if not sq:  # did not find a match this is a dberror
                 raise DBError("product {0} did not have a traceback, this is a problem, fix it".format(in_id))
@@ -3338,18 +3353,22 @@ class DButils(object):
                     'instrumentproductlink', 'satellite', 'mission']
 
             in_id = self.getProcessID(in_id)
-
             sq = (self.session.query(self.Process,
-                                     self.Product, self.Instrument,
-                                     self.Instrumentproductlink, self.Satellite,
-                                     self.Mission)
+                                     self.Product,
+                                     self.Instrument,
+                                     self.Instrumentproductlink,
+                                     self.Satellite,
+                                     self.Mission,
+                                     )
                   .filter_by(process_id=in_id)
-                  .join((self.Product, self.Product.product_id == self.Process.output_product))
-                  .join((self.Inspector, self.Product.product_id == self.Inspector.product))
-                  .join((self.Instrumentproductlink, self.Product.product_id == self.Instrumentproductlink.product_id))
-                  .join((self.Instrument, self.Instrumentproductlink.instrument_id == self.Instrument.instrument_id))
-                  .join((self.Satellite, self.Instrument.satellite_id == self.Satellite.satellite_id))
-                  .join((self.Mission, self.Satellite.mission_id == self.Mission.mission_id)).all())
+                  .join(self.Product, self.Product.product_id == self.Process.output_product)
+                  .join(self.Inspector, self.Inspector.product == self.Product.product_id)
+                  .join(self.Instrumentproductlink, self.Instrumentproductlink.product_id == self.Product.product_id)
+                  .join(self.Instrument, self.Instrument.instrument_id == self.Instrumentproductlink.instrument_id)
+                  .join(self.Satellite, self.Satellite.satellite_id == self.Instrument.satellite_id)
+                  .join(self.Mission, self.Mission.mission_id == self.Satellite.mission_id)
+                  .all()
+                  )
 
             if not sq:  # did not find a match this is a dberror
                 raise DBError("process {0} did not have a traceback, this is a problem, fix it".format(in_id))
@@ -3541,13 +3560,13 @@ class DButils(object):
         retval = None
         if isinstance(args, (int, collections.abc.Iterable)) \
            and not isinstance(args, str_classes):  # PK: int, non-str sequence
-            retval = self.session.query(getattr(self, table)).get(args)
+            retval = self.session.get(getattr(self, table), args)
         if retval is None:  # Not valid PK type, or PK not found
             # see if it was a name
             if ('get' + table + 'ID') in dir(self):
                 cmd = 'get' + table + 'ID'
                 pk = getattr(self, cmd)(args)
-                retval = self.session.query(getattr(self, table)).get(pk)
+                retval = self.session.get(getattr(self, table),pk)
 # This code will make it consistently raise DBNoData if nothing is found,
 # but codebase needs to be scrubbed for callers that expect None instead.
 #            else:
@@ -3862,7 +3881,7 @@ class DButils(object):
             raise RuntimeError('Unixtime table already seems to exist.')
         unixtime = sqlalchemy.Table(
             'unixtime', self.metadata, *tables.definition('unixtime'))
-        self.metadata.create_all(tables=[unixtime])
+        self.metadata.create_all(self.engine, tables=[unixtime])
         # Make object for the new table definition (skips existing tables)
         self._createTableObjects()
         unx0 = datetime.datetime(1970, 1, 1)
@@ -3895,6 +3914,5 @@ def create_tables(filename='dbprocessing_default.db', dialect='sqlite'):
         data_table = sqlalchemy.schema.Table(
             name, metadata, *tables.definition(name))
     engine = sqlalchemy.engine.create_engine(url, echo=False)
-    metadata.bind = engine
-    metadata.create_all(checkfirst=True)
+    metadata.create_all(checkfirst=True, bind=engine)
     engine.dispose()
