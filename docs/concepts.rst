@@ -58,7 +58,7 @@ A file has certain properties:
       to process level 2 files with old level 1 files as inputs. The
       level may be fractional to extend this concept.
 
-Files that have the same structure and are considered part of the same
+Files that have the same structure are considered part of the same
 data set; they are described as having the same :ref:`product
 <concepts_products>`. Again this is frequently reflected in the filename.
 
