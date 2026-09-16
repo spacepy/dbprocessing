@@ -81,7 +81,7 @@ of where files are created, metadata are populated by a process called
 
 dbprocessing itself does not create data files; that is the
 responsibility of data processing codes.
-      
+
 .. _concepts_codes:
 
 Codes
@@ -156,7 +156,7 @@ There are two other major properties of a process:
       The product produced by this process (i.e., the type of file
       created by codes which implement this process.) This is optional
       for processes which produce no output.
-   
+
    output_timebase
       The amount of data included in each file produced by this process.
       Currently the implemented timebases are ``DAILY``, to produce files
