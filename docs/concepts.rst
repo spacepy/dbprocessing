@@ -141,7 +141,7 @@ Products are represented in the :sql:table:`product` table.
 
 Processes
 =========
-As :ref:`products <concepts_products>` generalize files, so a process is
+As :ref:`products <concepts_products>` generalize files, a process is
 *a generalization of a code*. Processes describe the relationship between
 any number (usually one or more) of input products, and usually one output
 product (but sometimes zero).
