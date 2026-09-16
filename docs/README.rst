@@ -38,7 +38,7 @@ of the developers.
 state. It is not currently suitable for use without developer support;
 however, if you are considering dbprocessing to support a mission or
 project, the developers would be happy to work with you.
-The developers are working daily to improve the maturity of the code,
+The developers are working to improve the maturity of the code,
 documentation, and the infrastructure supporting development.
 
 Relationship to SpacePy
