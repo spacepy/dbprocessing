@@ -182,7 +182,7 @@ different versions.
 The *interface* version indicates compatibility. Changes in a file's
 interface suggest a change to file structure; changes in a code's
 interface usually suggests a change in the input or output files. For this
-reason, it is recommnded that the interface version of a code be incremented
+reason, it is recommended that the interface version of a code be incremented
 whenever the interface version of its output or any inputs is incremented.
 
 A change to the *quality* version suggests a change where a user of the data
@@ -266,8 +266,8 @@ directory and adds their names to a queue of files to ingest, removing
 any duplicate files.
 
 :meth:`~.ProcessQueue.importFromIncoming` iterates over these filenames.
-For each, checks if it is already in the database (:meth:`.getFileID`).
-If not, calls :meth:`~.ProcessQueue.figureProduct`, which runs each
+For each filename, this method checks if it is already in the database (:meth:`.getFileID`).
+If not, it calls :meth:`~.ProcessQueue.figureProduct`, which runs each
 :ref:`inspector <concepts_inspectors>` to determine the product. If
 there is a match, :meth:`~.ProcessQueue.figureProduct`:
 
