@@ -332,7 +332,7 @@ given the error).
 
 Implementation
 --------------
-For each file on the :ref:`process queue <concepts_process_queue>`, calls
+For each file on the :ref:`process queue <concepts_process_queue>`, (what?) calls
 :meth:`~.ProcessQueue.buildChildren`, which calculates all possible output
 products and makes a :class:`~.runMe.runMe` object for every possible command
 to run.
