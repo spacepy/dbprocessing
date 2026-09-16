@@ -30,7 +30,7 @@ to ensure all outputs are up to date.
 
 Current Status
 --------------
-``dbprocessing`` has been used in production since about 2012 in several
+``dbprocessing`` has been used in production since 2012 in several
 different projects; however, this has always been with the direct support
 of the developers.
 
