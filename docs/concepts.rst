@@ -58,8 +58,8 @@ A file has certain properties:
       to process level 2 files with old level 1 files as inputs. The
       level may be fractional to extend this concept.
 
-Files that have the same structure are considered part of the same
-data set; they are described as having the same :ref:`product
+Files that have the same structure and are considered part of the same
+data set are described as having the same :ref:`product
 <concepts_products>`. Again this is frequently reflected in the filename.
 
 The combination of file date, product, and version is considered to be
@@ -332,7 +332,7 @@ given the error).
 
 Implementation
 --------------
-For each file on the :ref:`process queue <concepts_process_queue>`, (what?) calls
+For each file on the :ref:`process queue <concepts_process_queue>`, :option:`ProcessQueue.py -p` calls
 :meth:`~.ProcessQueue.buildChildren`, which calculates all possible output
 products and makes a :class:`~.runMe.runMe` object for every possible command
 to run.
