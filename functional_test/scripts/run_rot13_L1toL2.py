@@ -1,10 +1,13 @@
 #!/usr/bin/env python
+import codecs
 from optparse import OptionParser
+
 
 def doProcess(infile, outfile):
     with open(outfile, 'w') as output:
         with open(infile) as infile:
-            output.write(infile.read().encode('rot13'))
+            output.write(codecs.encode(infile.read(), 'rot_13'))
+
 
 if __name__ == '__main__':
     usage = "usage: %prog infile outfile"
@@ -18,6 +21,6 @@ if __name__ == '__main__':
     infile = args[0]
     outfile = args[-1]
 
-    print "infile", infile
-    print "outfile", outfile
+    print("infile ", infile)
+    print("outfile ", outfile)
     doProcess(infile, outfile)

@@ -26,6 +26,7 @@ Current developers (*italics denote project administrators*) are:
    | Andrew Walker
    | Meilin Yan
    | Xiaoguang Yang
+   | Elisabeth Drakatos   
 
 Acknowledgements
 ================

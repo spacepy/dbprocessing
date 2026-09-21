@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 import argparse
-import imp
 
 from dbprocessing import inspector, DButils
-from dbprocessing.Utils import strargs_to_args
+from dbprocessing.Utils import load_source, strargs_to_args
 
 if __name__ == '__main__':
     usage = "usage: %prog -m mission -i inspector -p product_id -f file [-a args]"
@@ -24,7 +23,8 @@ if __name__ == '__main__':
 
     dbu = DButils.DButils(options.mission)
 
-    inspect = imp.load_source('inspect', options.inspector)
+    inspect = load_source('inspect', options.inspector)
+import dbpr
 
     if options.args:
         kwargs = strargs_to_args(options.args)

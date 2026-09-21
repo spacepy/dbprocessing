@@ -4,6 +4,7 @@ from __future__ import print_function
 import datetime
 import os
 import os.path
+import shutil
 import sys
 import tempfile
 import unittest
@@ -304,6 +305,18 @@ class UtilsTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         self.assertEqual(
             datetime.datetime(2010, 1, 1, 23, 59, 59, 999999),
             Utils.toDatetime(datetime.date(2010, 1, 1), end=True))
+
+    def test_load_source(self):
+        """Testing load_source in Utils.py"""
+        td = tempfile.mkdtemp()
+        try:
+            filename = os.path.join(td, "temp_testfile.py")
+            with open(filename, "w") as f:
+                f.write("def hello():\n    return 'Hello, world!'\n")
+            module = Utils.load_source("temp_testfile", filename)
+            self.assertEqual(module.hello(), 'Hello, world!')
+        finally:
+            shutil.rmtree(td)
 
 
 if __name__ == "__main__":

@@ -19,6 +19,6 @@ if __name__ == '__main__':
     infiles = sorted(args[:-1])
     outfile = args[-1]
 
-    print "infiles", infiles
-    print "outfile", outfile
+    print("infiles ", infiles)
+    print("outfile ", outfile)
     doProcess(infiles, outfile)

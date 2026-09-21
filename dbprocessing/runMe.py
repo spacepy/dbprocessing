@@ -723,6 +723,7 @@ class runMe(object):
         DBlogging.dblogger.debug("Entered moveToError: {0}".format(fname))
 
         path = self.dbu.getErrorPath()
+        os.makedirs(path, exist_ok=True) # Creates error directory if doesn't exist 
         if os.path.isfile(os.path.join(path, os.path.basename(fname) ) ):
         #TODO do I really want to remove old version:?
             os.remove( os.path.join(path, os.path.basename(fname) ) )

@@ -15,7 +15,7 @@ database.
 
 import datetime
 import dbprocessing.DButils
-
+import sqlalchemy
 
 def find_related_products(dbu, prod_ids, outputs=False):
     """Find all input/output products for a list of products
@@ -67,7 +67,6 @@ keep_products = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 20, 21, 
 for prod_id in range(1, 190):
     if prod_id in keep_products:
         continue
-
     files = [rec.file_id for rec in dbu.getFiles(product=prod_id)]
     for file_id in files:
         dbu._purgeFileFromDB(file_id, trust_id=True, commit=False)
@@ -76,13 +75,11 @@ for prod_id in range(1, 190):
         .filter_by(product_id=prod_id)
     for ll in list(sq):
         dbu.session.delete(ll)
-
     sq = dbu.session.query(dbu.Productprocesslink)\
         .filter_by(input_product_id=prod_id)
     results = list(sq)
     for ll in results:
         dbu.session.delete(ll)
-
     sq = dbu.session.query(dbu.Process).filter_by(output_product=prod_id)
     results = list(sq)
     for ll in results:
@@ -99,7 +96,6 @@ for prod_id in range(1, 190):
     results = list(sq)
     for ll in results:
         dbu.session.delete(ll)
-
     dbu.delProduct(prod_id)  # performs commit
 
 # Only keep a few dates
@@ -116,5 +112,5 @@ while to_process:
 for file_id in delme:
     dbu._purgeFileFromDB(file_id, trust_id=True, commit=False)
 dbu.commitDB()
-dbu.session.execute('VACUUM')
+dbu.session.execute(sqlalchemy.sql.text("VACUUM"))
 dbu.commitDB()

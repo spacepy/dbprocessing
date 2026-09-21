@@ -60,7 +60,7 @@ class DBUtilsEmptyTests(unittest.TestCase, dbp_testing.AddtoDBMixin):
         super(DBUtilsEmptyTests, self).tearDown()
         if self.pg:
             self.dbu.session.close()
-            self.dbu.metadata.drop_all()
+            self.dbu.metadata.drop_all(bind=self.dbu.engine)
         self.dbu.closeDB()
         del self.dbu
         shutil.rmtree(self.td)

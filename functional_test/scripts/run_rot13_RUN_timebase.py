@@ -16,5 +16,5 @@ if __name__ == '__main__':
 
 	infile = args[0]
 
-	print "infile", infile
+	print("infile ", infile)
 	doProcess(infile)

@@ -5,7 +5,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import datetime
-import imp
 import os
 import shutil
 import sys
@@ -259,7 +258,7 @@ class ProcessQueue(object):
         claimed = []
         for code, desc, arg, product in act_insp:
             try:
-                inspect = imp.load_source('inspect', code)
+                inspect = Utils.load_source('inspect', code)
             except IOError as msg:
                 DBlogging.dblogger.error('Inspector: "{0}" not found: {1}'.format(code, msg))
                 if os.path.isfile(code + ' '):

@@ -44,20 +44,20 @@ class DBFormatterTests(unittest.TestCase):
 
     def testExpandFormatRE(self):
         """Add formatting codes to special fields, with regex"""
-        self.assertEqual('((19|2\d)\d\d)',
+        self.assertEqual(r'((19|2\d)\d\d)',
                          self.fmtr.expand_format('{Y}', {}))
         self.assertEqual(
-            'stuff{morestuff|r:55.4f}{Y:02d}((19|2\d)\d\d){m:02d}',
+            r'stuff{morestuff|r:55.4f}{Y:02d}((19|2\d)\d\d){m:02d}',
             self.fmtr.expand_format('stuff{morestuff|r:55.4f}{Y:02d}{Y}{m}',
                                     {'m': 20}))
         self.assertEqual(
-            'stuff(\d{{3}})([0-3]\d\d){d:2d}',
+            r'stuff(\d{{3}})([0-3]\d\d){d:2d}',
             self.fmtr.expand_format('stuff{MILLI}{j:03d}{d:2d}',
                                     {'d': 89}))
 
     def testRegex(self):
         """Replace special fields with regular expression"""
-        self.assertEqual('stuff(\d{3})([0-3]\d\d)89',
+        self.assertEqual(r'stuff(\d{3})([0-3]\d\d)89',
                          self.fmtr.re('stuff{MILLI}{j:03d}{d:2d}', d=89))
 
     def testExpandDatetime(self):
@@ -72,7 +72,7 @@ class DBFormatterTests(unittest.TestCase):
 
     def testDatetimeRe(self):
         """Expand a simple datetime reference to regex"""
-        self.assertEqual('stuff((19|2\d)\d\d(0\d|1[0-2])[0-3]\d)',
+        self.assertEqual(r'stuff((19|2\d)\d\d(0\d|1[0-2])[0-3]\d)',
                          self.fmtr.re('stuff{datetime}'))
 
     def testFormat(self):
@@ -154,7 +154,7 @@ class DBFormatterTests(unittest.TestCase):
     def testAPID(self):
         """Test regex and format expansion with an APID in the string"""
         fmt = 'ect_rbspa_{nnnn}_{APID}_{nn}.ptp.gz'
-        expected = 'ect_rbspa_(\d\d\d\d)_([\da-fA-F]+)_(\d\d).ptp.gz'
+        expected = r'ect_rbspa_(\d\d\d\d)_([\da-fA-F]+)_(\d\d).ptp.gz'
         self.assertEqual(expected, self.fmtr.re(fmt))
         # Does this regex actually match a filename?
         self.assertTrue(re.match(
@@ -166,7 +166,7 @@ class DBFormatterTests(unittest.TestCase):
     def testMissionDayRegex(self):
         """Test regex and format expansion  with mission day in the string"""
         fmt = 'rbspa_int_ect-mageisLOW-ns-L05_{mday}_v{VERSION}.cdf'
-        expected = 'rbspa_int_ect-mageisLOW-ns-L05_(-?\d+)_v(\d+\.\d+\.\d+).cdf'
+        expected = r'rbspa_int_ect-mageisLOW-ns-L05_(-?\d+)_v(\d+\.\d+\.\d+).cdf'
         self.assertEqual(expected, self.fmtr.re(fmt))
         self.assertTrue(re.match(
             '^' + expected + '$',

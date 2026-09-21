@@ -560,3 +560,35 @@ def readconfig(config_filepath):
                 else:
                     ans[section][item] = (ans[section][item], 0, 0)
     return ans
+
+
+def load_source(modname, filepath):
+    """
+    Load a module from a source file, in the style of the imp module from
+    Python before 3.4.
+
+    Parameters
+    ----------
+    modname : :class:`str`
+        name for the module to have after importing
+
+    filepath : :class:`str`
+        full path to source code for the module to be parsed
+
+    Returns
+    -------
+    :ref:`module <module-objects>`
+        The loaded module
+
+    """
+    try:
+        import importlib.util
+        import importlib.machinery
+        loader = importlib.machinery.SourceFileLoader(modname, filepath)
+        spec = importlib.util.spec_from_file_location(modname, filepath, loader=loader)
+        module = importlib.util.module_from_spec(spec)
+        loader.exec_module(module)
+    except ImportError:
+        import imp # Deprecated in Python 3.4
+        module = imp.load_source(modname, filepath)
+    return module

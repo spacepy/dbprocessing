@@ -294,10 +294,10 @@ def extract_YYYYMMDD(filename):
     :class:`~datetime.datetime`
         First date found in ``filename``, or :data:`None`.
     """
-    # cmp = re.compile("[12][90]\d2[01]\d[0-3]\d")
+    # cmp = re.compile(r"[12][90]\d2[01]\d[0-3]\d")
     # return a datetime if there is one from YYYYMMDD
     try:
-        dt = datetime.datetime.strptime(re.search("[12][90]\d\d[01]\d[0-3]\d", filename).group(), "%Y%m%d")
+        dt = datetime.datetime.strptime(re.search(r"[12][90]\d\d[01]\d[0-3]\d", filename).group(), "%Y%m%d")
     except (ValueError, AttributeError): # there is not one
         return None
     if dt < datetime.datetime(1957, 10, 4, 19, 28, 34): # Sputnik 1 launch datetime
@@ -321,10 +321,10 @@ def extract_YYYYMM(filename):
     :class:`~datetime.datetime`
         First day of first month found in ``filename``, or :data:`None`.
     """
-    # cmp = re.compile("[12][90]\d2[01]\d[0-3]\d")
+    # cmp = re.compile(r"[12][90]\d2[01]\d[0-3]\d")
     # return a datetime if there is one from YYYYMMDD
     try:
-        dt = datetime.datetime.strptime(re.search("[12][90]\d\d[01]\d", filename).group(), "%Y%m")
+        dt = datetime.datetime.strptime(re.search(r"[12][90]\d\d[01]\d", filename).group(), "%Y%m")
     except (ValueError, AttributeError): # there is not one
         return None
     if dt < datetime.datetime(1957, 10, 4, 19, 28, 34): # Sputnik 1 launch datetime
@@ -376,7 +376,7 @@ def extract_Version(filename, basename=False):
     basename : :class:`bool`, default False
         Include the basename after the version as well.
     """
-    res = re.search("[vV]\d+\.\d+\.\d+\.", filename)
+    res = re.search(r"[vV]\d+\.\d+\.\d+\.", filename)
     ver = None
     base = None
     if res:

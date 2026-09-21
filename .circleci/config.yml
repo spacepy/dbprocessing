@@ -4,11 +4,7 @@ version: 2.1
 jobs:
   deps:
     docker:
-      - image: circleci/python:2.7
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
-      - image: circleci/python:3.7
+      - image: cimg/python:2.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -18,17 +14,29 @@ jobs:
            command: |
              pip install --user sqlalchemy
              pip install --user python-dateutil
-             sudo apt update
-             sudo apt install python3-pip
-             pip3 install --user "sqlalchemy<2.0"
-             pip3 install --user python-dateutil
+       - persist_to_workspace:
+           root: ~/.local
+           paths:
+             - lib # Save installed Python libraries
+  deps3:
+    docker:
+      - image: cimg/python:3.7
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    steps:
+       - checkout
+       - run:
+           command: |
+             pip install --user sqlalchemy
+             pip install --user python-dateutil
        - persist_to_workspace:
            root: ~/.local
            paths:
              - lib # Save installed Python libraries
   unittest:
     docker:
-      - image: circleci/python:2.7
+      - image: cimg/python:2.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -42,7 +50,7 @@ jobs:
              python unit_tests/test_all.py -v
   unittest3:
     docker:
-      - image: circleci/python:3.7
+      - image: cimg/python:3.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -52,20 +60,16 @@ jobs:
            at: ~/.local
        - run:
            command: |
-             python3 setup.py build
-             python3 unit_tests/test_all.py -v
+             python3.7 setup.py build
+             python3.7 unit_tests/test_all.py -v
   testpostgres:
     docker:
-      - image: circleci/python:2.7
+      - image: cimg/python:2.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
           DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
-      - image: circleci/postgres:9.6.5-alpine-ram
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
     environment:
       PGPORT: 5432
       PGUSER: root
@@ -79,23 +83,20 @@ jobs:
        - run:
            command: |
              sudo apt update
-             sudo apt install -y postgresql-client
+             sudo apt install -y postgresql postgresql-client
+             sudo -u postgres /usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main -l logfile start
              createdb -h localhost dbp_unittest -O root
              pip install --user psycopg2
              python setup.py build
              python unit_tests/test_all.py -v
   testpostgres3:
     docker:
-      - image: circleci/python:3.7
+      - image: cimg/python:3.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
           DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
-      - image: circleci/postgres:9.6.5-alpine-ram
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
     environment:
       PGPORT: 5432
       PGUSER: root
@@ -109,14 +110,15 @@ jobs:
        - run:
            command: |
              sudo apt update
-             sudo apt install -y postgresql-client python3-pip
+             sudo apt install -y postgresql postgresql-client
+             sudo -u postgres /usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main -l logfile start
              createdb -h localhost dbp_unittest -O root
-             pip3 install --user psycopg2
-             python3 setup.py build
-             python3 unit_tests/test_all.py -v
+             pip install --user psycopg2
+             python setup.py build
+             python unit_tests/test_all.py -v
   docs:
     docker:
-      - image: circleci/python:2.7
+      - image: cimg/python:2.7
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -147,15 +149,18 @@ workflows:
      - testpostgres:
          requires:
            - deps
-     - unittest3:
-         requires:
-           - deps
-     - testpostgres3:
-         requires:
-           - deps
      - docs:
          requires:
            - deps
+  main3:
+    jobs:
+     - deps3
+     - unittest3:
+         requires:
+           - deps3
+     - testpostgres3:
+         requires:
+           - deps3
 
 # Schedule disables other triggers; nightly identical to main except
 # triggers and branch restriction
@@ -176,12 +181,13 @@ workflows:
      - testpostgres:
          requires:
            - deps
-     - unittest3:
-         requires:
-           - deps
-     - testpostgres3:
-         requires:
-           - deps
      - docs:
          requires:
            - deps
+     - deps3
+     - unittest3:
+         requires:
+           - deps3
+     - testpostgres3:
+         requires:
+           - deps3

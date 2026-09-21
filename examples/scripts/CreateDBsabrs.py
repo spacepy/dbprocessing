@@ -37,8 +37,8 @@ class dbprocessing_db(object):
         url = "postgresql://{0}:{1}@{2}:{3}/{4}"
         url = url.format(user, password, host, port, db)
         self.engine = create_engine(url, echo=False, encoding='utf-8')
-        self.metadata = sqlalchemy.MetaData(bind=self.engine)
-        self.metadata.reflect()
+        self.metadata = sqlalchemy.MetaData()
+        self.metadata.reflect(bind=self.engine)
 
     def createDB(self):
         """
@@ -318,10 +318,7 @@ class dbprocessing_db(object):
         # engine = create_engine('postgres:///' + self.filename, echo=False)
         # metadata.bind = engine
 
-        metadata.create_all(checkfirst=True)
-        # self.engine = engine
-        # self.metadata = metadata
-
+        metadata.create_all(checkfirst=True, bind=self.engine)
     def addMission(self, filename):
         """utility to add a mission"""
         self.dbu = DButils.DButils(filename)
