@@ -362,8 +362,8 @@ class runMe(object):
             Force processing regardless of version bumping or out-of-date.
         """
         DBlogging.dblogger.debug("Entered runMe {0}, {1}, {2}, {3}".format(dbu, utc_file_date, process_id, input_files))
-        if isinstance(utc_file_date, datetime.datetime):
-            utc_file_date = utc_file_date.date()
+        #if isinstance(utc_file_date, datetime.datetime):
+        #    utc_file_date = utc_file_date.date()
 
         self.filename = '' # initialize it empty
         self.ableToRun = False

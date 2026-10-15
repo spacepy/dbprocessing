@@ -328,10 +328,12 @@ class ProcessQueue(object):
                 dt = Utils.datetimeToDate(utc_file_date)
                 start = dt - datetime.timedelta(days=y)
                 end = dt + datetime.timedelta(days=t)
+                starttime = utc_file_date
+                endtime = utc_file_date
 
                 kwargs = {'startTime': start, 'endTime': end} \
                          if timebase in ('DAILY',) \
-                         else {'startDate': start, 'endDate': end}
+                         else {'startTime': starttime, 'endTime': endtime}
                 tmp_files = self.dbu.getFiles(
                     product=iprod_id, newest_version=True, exists=True,
                     **kwargs)

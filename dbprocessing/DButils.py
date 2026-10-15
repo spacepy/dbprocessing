@@ -783,11 +783,11 @@ class DButils(object):
         file = self.getEntry('File', filename)
         product_id = file.product_id
         if debug: print('product_id', product_id )
-        date = file.utc_file_date
+        dates = [file.utc_start_time, file.utc_stop_time]
         if debug: print('date', date)
         file_id = file.file_id
         if debug: print('file_id', file_id, file.filename)
-        latest = self.getFilesByProductDate(product_id, [date]*2, newest_version=True)
+        latest = self.getFilesByProductTime(product_id, dates, newest_version=True)
         if len(latest) > 1:
             raise DBError("More than one latest for a product date")
         latest_id = latest[0].file_id
@@ -2260,8 +2260,8 @@ class DButils(object):
             First and last UTC timestamp of file.
         """
         sq = self.getEntry('File', file_id)
-        start_time = sq.utc_start_time.date()
-        stop_time = sq.utc_stop_time.date()
+        start_time = sq.utc_start_time
+        stop_time = sq.utc_stop_time
         return [start_time, stop_time]
 
     def file_id_Clean(self, invals):
